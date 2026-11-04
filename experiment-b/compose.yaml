@@ -1,0 +1,22 @@
+# Isolated, local-only lab. Never route these services to production networks.
+services:
+  service-a:
+    build:
+      context: ./java-lab
+    environment:
+      SERVER_PORT: "8080"
+      LAB_INSTANCE: "service-a"
+      LAB_INITIAL_ALLOW: "false"
+      LAB_TOKEN: "${LAB_TOKEN:?Set a nonempty disposable lab token}"
+    ports:
+      - "127.0.0.1:18081:8080"
+  service-b:
+    build:
+      context: ./java-lab
+    environment:
+      SERVER_PORT: "8080"
+      LAB_INSTANCE: "service-b"
+      LAB_INITIAL_ALLOW: "true"
+      LAB_TOKEN: "${LAB_TOKEN:?Set a nonempty disposable lab token}"
+    ports:
+      - "127.0.0.1:18082:8080"
