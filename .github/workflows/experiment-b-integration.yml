@@ -1,0 +1,43 @@
+name: Experiment B Java 25 Docker integration
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'experiment-b/**'
+      - '.github/workflows/experiment-b-integration.yml'
+  pull_request:
+    paths:
+      - 'experiment-b/**'
+      - '.github/workflows/experiment-b-integration.yml'
+jobs:
+  isolated-lab:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Create disposable lab authorization token
+        run: |
+          echo "LAB_TOKEN=$(python -c 'import secrets;print(secrets.token_urlsafe(32))')" >> "$GITHUB_ENV"
+      - name: Build and run lab on loopback
+        working-directory: experiment-b
+        run: docker compose up --build -d
+      - name: Validate initial fault, opt-in correction and independent probe
+        working-directory: experiment-b
+        run: python integration_smoke.py
+      - name: Preserve experiment artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: experiment-b-smoke
+          path: experiment-b/reports/
+          if-no-files-found: ignore
+      - name: Stop lab and record diagnostics
+        if: always()
+        working-directory: experiment-b
+        run: |
+          docker compose ps
+          docker compose logs --tail=80
+          docker compose down --remove-orphans
