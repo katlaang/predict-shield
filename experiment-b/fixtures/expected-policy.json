@@ -1,0 +1,11 @@
+{
+  "schema_version": "0.1",
+  "case": "B-revoked-role-stale-policy",
+  "assertion": "Access to /api/protected must be denied at every in-scope instance",
+  "ground_truth": {
+    "service-a": {"http_status": 403, "expected_revoked": true},
+    "service-b": {"http_status": 403, "expected_revoked": true}
+  },
+  "injection": "service-b begins with stale allow state; service-a denies",
+  "notes": "Ground truth is defined before execution. Probe HTTP outcomes are separate from mutation acknowledgements."
+}
