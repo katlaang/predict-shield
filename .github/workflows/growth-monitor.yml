@@ -1,0 +1,28 @@
+name: PREDICT-SHIELD growth monitoring
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '17 13 * * *'
+permissions:
+  contents: read
+jobs:
+  snapshot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Collect read-only metrics and outreach drafts
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PREDICT_SHIELD_METRICS_TOKEN: ${{ secrets.PREDICT_SHIELD_METRICS_TOKEN }}
+        run: python scripts/growth_monitor.py --out growth-report
+      - name: Upload dated snapshot
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: growth-report-${{ github.run_id }}
+          path: growth-report/
+          retention-days: 90
+          if-no-files-found: warn
