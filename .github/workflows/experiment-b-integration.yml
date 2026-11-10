@@ -21,6 +21,7 @@ jobs:
       - name: Create disposable lab authorization token
         run: |
           echo "LAB_TOKEN=$(python -c 'import secrets;print(secrets.token_urlsafe(32))')" >> "$GITHUB_ENV"
+          echo "LAB_ORACLE_TOKEN=$(python -c 'import secrets;print(secrets.token_urlsafe(32))')" >> "$GITHUB_ENV"
       - name: Build and run lab on loopback
         working-directory: experiment-b
         run: docker compose up --build -d
