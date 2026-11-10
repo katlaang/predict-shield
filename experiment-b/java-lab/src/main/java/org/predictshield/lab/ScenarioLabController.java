@@ -55,6 +55,7 @@ public final class ScenarioLabController {
     private boolean gatewayRestricted;
     private boolean regressionArmed;
     private int successfulLegitimateRequests;
+    private int legitimateRequestAttempts;
 
     /**
      * Loads lab-only credentials from the container environment.
@@ -96,6 +97,7 @@ public final class ScenarioLabController {
         gatewayRestricted = false;
         regressionArmed = "silent_rebuild".equals(next.faultFamily());
         successfulLegitimateRequests = 0;
+        legitimateRequestAttempts = 0;
         return ResponseEntity.ok(Map.of("run_id", next.runId(),
                 "reset_acknowledged", true, "logical_enforcement_points", accessAllowed.size()));
     }
@@ -130,10 +132,12 @@ public final class ScenarioLabController {
     /**
      * Executes one of four deliberately limited simulation actions.
      *
-     * <p>resync_policy corrects all points except that lost_event leaves one
-     * stale; restart_enforcer corrects all but introduces a bounded number
-     * of legitimate-request failures; gateway_restrict closes revoked access
-     * but also blocks legitimate traffic; monitor_only makes no change.
+     * <p>resync_policy corrects all points unless a lost event or a simulated
+     * propagation delay exceeding cache TTL leaves one point stale;
+     * restart_enforcer corrects all but introduces legitimate-request failures
+     * varying with dependency depth, enforcement point count and redundancy;
+     * gateway_restrict closes revoked access but restricts legitimate traffic
+     * as a function of redundancy; monitor_only makes no change.
      * These are fixture mechanisms, not estimates of real deployment action
      * effectiveness. The runner must observe each effect independently.</p>
      *
@@ -158,14 +162,17 @@ public final class ScenarioLabController {
         switch (action) {
             case "resync_policy" -> {
                 accessAllowed.replaceAll(ignored -> false);
-                if ("lost_event".equals(configuration.faultFamily())) {
+                if ("lost_event".equals(configuration.faultFamily())
+                        || configuration.propagationDelayMs() > configuration.cacheTtlMs()) {
+                    // Deferred propagation or missed event leaves one stale point.
                     accessAllowed.set(0, true);
                 }
             }
             case "restart_enforcer" -> {
                 accessAllowed.replaceAll(ignored -> false);
                 disruptionRequestsRemaining = Math.min(25, Math.max(1,
-                        configuration.dependencyDepth() * configuration.enforcementPoints()));
+                        configuration.dependencyDepth() * configuration.enforcementPoints()
+                        / configuration.redundancy()));
             }
             case "gateway_restrict" -> {
                 accessAllowed.replaceAll(ignored -> false);
@@ -195,7 +202,9 @@ public final class ScenarioLabController {
             return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
                     .body(Map.of("error", "scenario not configured"));
         }
-        if (gatewayRestricted) {
+        legitimateRequestAttempts++;
+        if (gatewayRestricted
+                && legitimateRequestAttempts % Math.max(2, configuration.redundancy() * 2) != 0) {
             return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
                     .body(Map.of("result", "gateway restricted legitimate traffic"));
         }
