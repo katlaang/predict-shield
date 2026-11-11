@@ -52,12 +52,14 @@ def assess(
     ]
     conflicting = any(e.observed_pass is True for e in valid) and any(e.observed_pass is False for e in valid)
     sources = tuple(sorted({e.source for e in valid}))
-    if conflicting:
-        return Assessment(Outcome.INDETERMINATE, True, "Current evidence contradicts; independent resolution required.", sources)
     independent = {e.source for e in valid if e.independent}
     failed_independent = any(e.independent and e.observed_pass is False for e in valid)
+    # INV-02: a trusted independent failure defeats a supporting self-report.
+    # Record the disagreement instead of hiding it or returning INDETERMINATE.
     if failed_independent:
-        return Assessment(Outcome.NOT_VERIFIED, False, "Current independent check refutes the assertion.", sources)
+        return Assessment(Outcome.NOT_VERIFIED, conflicting, "Current independent check refutes the assertion.", sources)
+    if conflicting:
+        return Assessment(Outcome.INDETERMINATE, True, "Current evidence contradicts; independent resolution required.", sources)
     if len(independent) < required_independent_checks:
         return Assessment(Outcome.INDETERMINATE, False, "Insufficient current independent verification coverage.", sources)
     if not all(e.observed_pass is True for e in valid if e.independent):
