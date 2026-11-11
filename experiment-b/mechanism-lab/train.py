@@ -255,6 +255,12 @@ def train_evaluate(rows: list[dict], seed: int = 20261110,
             "training_fingerprint": fingerprint,
             "training_group_count": len(sets[0]),
             "calibration_group_count": len(sets[1]),
+            "numeric_feature_bounds": {
+                name: [float(matrices["train"][:, i].min()),
+                       float(matrices["train"][:, i].max())]
+                for i, name in enumerate(FEATURES)
+                if i < 4
+            },
             "radii": calibration_radii,
             "models": fitted_models,
             "trust_boundary": "trusted local training artifact; never load externally supplied pickle",
