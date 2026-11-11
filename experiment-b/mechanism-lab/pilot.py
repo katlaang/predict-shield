@@ -32,9 +32,10 @@ HOST = {
     "enforcer-a": "http://127.0.0.1:18282",
     "enforcer-b": "http://127.0.0.1:18283",
     "enforcer-c": "http://127.0.0.1:18284",
+    "enforcer-hidden": "http://127.0.0.1:18286",
     "oracle": "http://127.0.0.1:18285",
 }
-ENFORCERS = ("enforcer-a", "enforcer-b", "enforcer-c")
+ENFORCERS = ("enforcer-a", "enforcer-b", "enforcer-c", "enforcer-hidden")
 ACTIONS = ("resync_policy", "restart_enforcer", "gateway_restrict", "monitor_only")
 
 
@@ -79,7 +80,8 @@ def wait_ready(timeout: float = 150) -> None:
     raise RuntimeError("Mechanism lab failed readiness; inspect docker compose logs")
 
 
-def setup_fault(control_token: str, *, ttl_ms: int, delay_ms: int) -> None:
+def setup_fault(control_token: str, *, ttl_ms: int, delay_ms: int,
+                fault_target: str = "enforcer-b") -> None:
     """Start a clean trial and lose the revocation event only at enforcer-b."""
     status, _, _ = request("gateway", "/admin/restore", method="POST", token=control_token)
     if status != 200:
@@ -93,7 +95,9 @@ def setup_fault(control_token: str, *, ttl_ms: int, delay_ms: int) -> None:
         raise RuntimeError("Authority reset failed")
     # Wait for background Kafka listeners to process the initial revision.
     time.sleep(1.5)
-    status, _, _ = request("enforcer-b", f"/admin/fault/loss/{delay_ms}",
+    if fault_target not in ENFORCERS:
+        raise ValueError("Unexpected fault target")
+    status, _, _ = request(fault_target, f"/admin/fault/loss/{delay_ms}",
                            method="POST", token=control_token)
     if status != 200:
         raise RuntimeError("Consumer fault setup failed")
@@ -237,6 +241,28 @@ def run_regression(control_token: str, oracle_token: str) -> dict:
     }
 
 
+
+def run_hidden_target_case(control_token: str, oracle_token: str) -> dict:
+    """Show that gateway-only checks miss an enforcement point outside the route.
+
+    The shadow process is in the oracle's independently declared inventory but
+    deliberately not included in the gateway's upstream list. A lost policy
+    event in that process leaves revoked access permitted despite all three
+    normal gateway paths denying it. Proper assurance must abstain without
+    independent inventory reconciliation.
+    """
+    setup_fault(control_token, ttl_ms=30000, delay_ms=0,
+                fault_target="enforcer-hidden")
+    gateway = gateway_probes(count=6)
+    oracle = oracle_snapshot(oracle_token)
+    return {
+        "gateway_observations": gateway,
+        "oracle": oracle,
+        "gateway_only_looks_clean": all(o["http_status"] == 403 for o in gateway),
+        "full_scope_verification_status": "INDETERMINATE",
+        "reason": "Gateway route omits a known enforcement process",
+    }
+
 def main() -> None:
     """Run an explicitly opted-in disposable pilot and retain real observations."""
     parser = argparse.ArgumentParser(description=__doc__)
@@ -258,6 +284,7 @@ def main() -> None:
         "cases": [run_case(action, control, oracle, rps=args.rps)
                   for action in args.actions],
         "silent_regression": run_regression(control, oracle),
+        "omitted_enforcement_point": run_hidden_target_case(control, oracle),
         "not_a_trained_ai_experiment": True,
         "not_full_1200_trial_dataset": True,
     }
