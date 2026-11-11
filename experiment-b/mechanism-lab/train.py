@@ -72,6 +72,7 @@ def load_executed_dataset(path: Path) -> list[dict]:
     examples = []
     partition_by_config: dict[str, str] = {}
     action_groups: dict[tuple[str, int], set[str]] = {}
+    paired_static_features: dict[tuple[str, int], tuple] = {}
     for run_id in sorted(ids):
         a, v, o, oracle = (streams[key][run_id] for key in
                            ("pre_action", "verification", "operations", "oracle"))
@@ -89,8 +90,21 @@ def load_executed_dataset(path: Path) -> list[dict]:
         if conf in partition_by_config and partition_by_config[conf] != partition:
             raise ValueError("Train/calibration/test group leakage")
         partition_by_config[conf] = partition
-        action_groups.setdefault((conf, a["repeat"]), set()).add(a["action_id"])
+        group_key = (conf, a["repeat"])
+        action_groups.setdefault(group_key, set()).add(a["action_id"])
         features = a["features"]
+        static_key = (
+            a.get("initial_state_seed"),
+            features.get("fault_mode"),
+            features.get("fault_target"),
+            features.get("cache_ttl_ms"),
+            features.get("event_delay_ms"),
+            features.get("requested_rps"),
+            features.get("measurement_seconds"),
+        )
+        if group_key in paired_static_features and paired_static_features[group_key] != static_key:
+            raise ValueError("Matched actions do not share the registered starting conditions")
+        paired_static_features[group_key] = static_key
         if (features.get("fault_mode") not in FAULTS
                 or features.get("fault_target") not in TARGETS
                 or a["action_id"] not in ACTIONS):
@@ -243,10 +257,15 @@ def train_evaluate(rows: list[dict], seed: int = 20261110,
         export_path.parent.mkdir(parents=True, exist_ok=True)
         if export_path.exists():
             raise FileExistsError("Refusing to overwrite existing model artifact")
-        train_ids = sorted((r["group"], r["action"], r["fault"], r["target"])
-                           for r in groups["train"])
+        training_rows = sorted(
+            (r["group"], r["action"], r["fault"], r["target"],
+             r["pre_action"], r["label_security_exposure"],
+             r["label_service_failure_fraction"])
+            for r in groups["train"]
+        )
+        # Fingerprint the measured training values, not merely run IDs.
         fingerprint = hashlib.sha256(
-            json.dumps(train_ids, separators=(",", ":")).encode("utf-8")
+            json.dumps(training_rows, sort_keys=True, separators=(",", ":")).encode("utf-8")
         ).hexdigest()
         bundle = {
             "schema": "predict-shield/mechanism-model-bundle/1",
