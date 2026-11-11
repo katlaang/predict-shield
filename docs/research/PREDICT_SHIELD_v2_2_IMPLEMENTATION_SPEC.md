@@ -5,7 +5,7 @@
 **Design baseline:** v2.1 as identified by the project owner and external reviewer; the complete v2.1 text was not independently available in this review. The separately available v2.0 design was inspected.  
 **Inspected code baseline:** katlaang/predict-shield, master, commit a8d010760ae1135155aad2b96af569cbe6160ea9 (2026-11-05).  
 **Scope:** Laboratory-only interconnected IT and cloud-service controls. Not operational technology, unrestricted autonomy, production authorization, or demonstrated national-scale impact.  
-**Research plan:** v1.4.1 is a separate earlier planning document, not the authoritative architecture revision.
+**Source of truth:** the inspected repository and dated experimental records establish implementation status; earlier design notes are not execution evidence.
 
 ## 1. Decision and research objective
 
@@ -24,7 +24,7 @@ At the inspected commit:
 - engine/predict_shield/assessment.py implements a small Python scoped-evidence evaluator; engine/tests/test_assessment.py contains 10 unit tests.
 - experiment-b has two Java/Spring Boot laboratory instances, an explicit localhost-only correction endpoint, Python HTTP probes, 8 mock-transport unit tests, a Compose file, and integration smoke/CI definitions.
 - The Java lab uses static divergent authorization state. It does **not** yet include Kafka propagation, real identities, a learned estimator, measured action disruption, a two-source inventory oracle, or a demonstrated full v2.2 experiment.
-- docs/evidence/v0.3.0-review-2026-11-05.md reports 38 passed tests in a **separate supplied ZIP not merged** into this repository. These are not evidence of the current repository's integrated AI execution.
+- docs/research/v0.3.0-validation-note.md reports 38 passed tests in a **separate supplied ZIP not merged** into this repository. These are not evidence of the current repository's integrated AI execution.
 - **Blocking correctness finding:** assessment.py currently returns INDETERMINATE immediately on mixed valid positive and negative observations, *before* checking for an independent failed observation. Under v2.0 INV-02, an authoritative independent refutation must produce NOT VERIFIED even alongside a supporting self-report. Add a regression test before changing this precedence. Source and trust policy must be explicit.
 - Existing run.py assumes only two configured endpoint URLs and treats two HTTP 403 responses as VERIFIED. This is acceptable as a narrow lab fixture only, not as proof of independent target enumeration or authenticated provenance.
 
@@ -180,6 +180,6 @@ The CI workflow must separately report: static/unit tests, integration launch, f
 
 ## 11. Evidence and communications status
 
-This is a **design/specification artifact**, not execution evidence. Any published white paper or NIW exhibit must distinguish planned capabilities, inspected source behavior, independently executed tests, measured results, external validation and broader impact claims. Nothing here establishes superiority, scientific novelty, production operational safety, or national importance.
+This is a **design/specification artifact**, not execution evidence. Published research materials must distinguish planned capabilities, inspected source behavior, independently executed tests, measured results, external validation, and observed limitations. Nothing here establishes superiority, scientific novelty, or production operational safety.
 
 **Next concrete step:** implement the typed prediction and record contracts; repair the independent-refutation precedence bug with regression tests; then extend the existing Experiment B lab to produce matched action-outcome measurements.
