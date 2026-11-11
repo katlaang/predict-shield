@@ -44,6 +44,10 @@ jobs:
           assert r["pre_regression_oracle"]["all_revoked_access_denied"] is True
           assert r["post_regression_oracle"]["all_revoked_access_denied"] is False
           assert cases["gateway_restrict"]["operations"]["non_200_requests"] > 0
+          omitted=d["omitted_enforcement_point"]
+          assert omitted["gateway_only_looks_clean"] is True
+          assert omitted["oracle"]["all_revoked_access_denied"] is False
+          assert omitted["full_scope_verification_status"] == "INDETERMINATE"
           print("PASS: separate enforcers, Kafka fault, action effects and regression")
           PY
       - name: Retain measured laboratory observations
