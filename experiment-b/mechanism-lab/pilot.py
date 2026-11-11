@@ -80,6 +80,24 @@ def wait_ready(timeout: float = 150) -> None:
     raise RuntimeError("Mechanism lab failed readiness; inspect docker compose logs")
 
 
+def wait_for_target(name: str, timeout_seconds: float = 90) -> float:
+    """Wait for an actual restarted JVM to serve readiness after measured downtime.
+
+    Returns the time needed for the separately observed restart to recover.
+    This delay is retained as an operational outcome and never discarded or
+    silently represented as zero service disruption.
+    """
+    if name not in ENFORCERS:
+        raise ValueError("Readiness target outside the declared lab inventory")
+    started = time.perf_counter()
+    while time.perf_counter() - started < timeout_seconds:
+        status, _, _ = request(name, "/healthz")
+        if status == 200:
+            return time.perf_counter() - started
+        time.sleep(0.5)
+    raise RuntimeError("Enforcement process did not recover in declared window")
+
+
 def setup_fault(control_token: str, *, ttl_ms: int, delay_ms: int,
                 fault_target: str = "enforcer-b") -> None:
     """Start a clean trial and lose the revocation event only at enforcer-b."""
@@ -211,6 +229,9 @@ def run_case(action: str, control_token: str, oracle_token: str,
     operations = measure_under_load(action, control_token, requests_per_second=rps)
     time.sleep(0.7)
     after_probes = gateway_probes()
+    recovery_wait_seconds = (
+        wait_for_target("enforcer-b") if action == "restart_enforcer" else 0.0
+    )
     after_truth = oracle_snapshot(oracle_token)
     return {
         "case": "experiment-b-kafka-revocation",
@@ -219,7 +240,7 @@ def run_case(action: str, control_token: str, oracle_token: str,
                    "oracle": before_truth},
         "after": {"verifier_gateway_probes": after_probes,
                   "oracle": after_truth},
-        "operations": operations,
+        "operations": {**operations, "post_window_recovery_wait_seconds": recovery_wait_seconds},
         "evaluation_only": True,
         "no_ai_model_invoked": True,
         "verification_scope_complete": False,
