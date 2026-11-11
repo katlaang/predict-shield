@@ -119,7 +119,17 @@ def oracle_snapshot(oracle_token: str) -> dict:
     """Fetch restricted separately collected direct-cache and direct-probe truth."""
     status, payload, _ = request("oracle", "/oracle/observe", oracle=oracle_token, timeout=5)
     if status != 200 or not payload.get("inventory_complete"):
-        raise RuntimeError("No complete oracle snapshot; do not infer success")
+        safe_details = {
+            "oracle_http": status,
+            "authority_http": payload.get("authority_http"),
+            "targets": [
+                {"node": item.get("node"),
+                 "admin_http": item.get("admin_http"),
+                 "probe_http": item.get("direct_probe_http")}
+                for item in payload.get("targets", [])
+            ],
+        }
+        raise RuntimeError("No complete oracle snapshot: " + json.dumps(safe_details))
     return payload
 
 
