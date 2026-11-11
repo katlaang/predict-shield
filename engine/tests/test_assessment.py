@@ -30,6 +30,24 @@ class AssessmentTests(unittest.TestCase):
         self.assertEqual(result.outcome, Outcome.INDETERMINATE)
         self.assertTrue(result.conflicting_evidence)
 
+    def test_authoritative_failure_overrides_positive_self_report(self):
+        evidence = [
+            ev(True, source="executor", independent=False),
+            ev(False, source="external-deny-probe", independent=True),
+        ]
+        result = self.run_assessment(evidence)
+        self.assertEqual(result.outcome, Outcome.NOT_VERIFIED)
+        self.assertTrue(result.conflicting_evidence)
+
+    def test_authoritative_failure_overrides_other_independent_positive(self):
+        evidence = [
+            ev(True, source="external-probe-a", independent=True),
+            ev(False, source="external-probe-b", independent=True),
+        ]
+        result = self.run_assessment(evidence)
+        self.assertEqual(result.outcome, Outcome.NOT_VERIFIED)
+        self.assertTrue(result.conflicting_evidence)
+
     def test_wrong_scope_does_not_count(self):
         self.assertEqual(self.run_assessment([ev(True, asset="service-b")]).outcome, Outcome.INDETERMINATE)
 
