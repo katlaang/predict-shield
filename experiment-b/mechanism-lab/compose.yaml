@@ -45,6 +45,12 @@ services:
       <<: *shared
       LAB_INSTANCE: enforcer-c
     ports: ["127.0.0.1:18284:8080"]
+  enforcer-hidden:
+    <<: *enforcer
+    environment:
+      <<: *shared
+      LAB_INSTANCE: enforcer-hidden
+    ports: ["127.0.0.1:18286:8080"]
   gateway:
     build: ./python
     command: ["python", "/app/gateway.py"]
@@ -60,7 +66,7 @@ services:
     environment:
       LAB_ORACLE_TOKEN: ${LAB_ORACLE_TOKEN:?Provide oracle token}
       LAB_INTERNAL_TOKEN: ${LAB_INTERNAL_TOKEN:?Provide internal token}
-      ENFORCERS: http://enforcer-a:8080,http://enforcer-b:8080,http://enforcer-c:8080
+      ENFORCERS: http://enforcer-a:8080,http://enforcer-b:8080,http://enforcer-c:8080,http://enforcer-hidden:8080
       AUTHORITY_URL: http://authority:8080
     depends_on: [authority, enforcer-a, enforcer-b, enforcer-c]
     networks: [lab]
@@ -74,7 +80,7 @@ services:
       AUTHORITY_URL: http://authority:8080
       ORACLE_URL: http://oracle:8080
       GATEWAY_URL: http://gateway:8080
-      ENFORCERS: http://enforcer-a:8080,http://enforcer-b:8080,http://enforcer-c:8080
+      ENFORCERS: http://enforcer-a:8080,http://enforcer-b:8080,http://enforcer-c:8080,http://enforcer-hidden:8080
     depends_on: [gateway, oracle]
     networks: [lab]
 networks:
