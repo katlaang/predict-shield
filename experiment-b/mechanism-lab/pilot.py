@@ -73,7 +73,7 @@ def wait_ready(timeout: float = 150) -> None:
     """Wait for separate JVMs, gateway and oracle to become responsive."""
     deadline = time.monotonic() + timeout
     while time.monotonic() < deadline:
-        statuses = [request(name, "/healthz")[0] for name in (*ENFORCERS, "gateway")]
+        statuses = [request(name, "/healthz")[0] for name in (*ENFORCERS, "gateway", "oracle")]
         if all(value == 200 for value in statuses):
             return
         time.sleep(2)
