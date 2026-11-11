@@ -19,8 +19,10 @@ authorization and artifact-provenance milestone.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import math
+import os
 from collections import Counter
 from pathlib import Path
 
@@ -152,7 +154,8 @@ def conformal_radius(actual, predicted, alpha: float = 0.1) -> float:
                          math.ceil((len(residuals) + 1) * (1 - alpha)) - 1)]
 
 
-def train_evaluate(rows: list[dict], seed: int = 20261110) -> dict:
+def train_evaluate(rows: list[dict], seed: int = 20261110,
+                   *, export_path: Path | None = None) -> dict:
     """Fit models on training groups and compare once on held-out groups.
 
     Uses strong train-only hierarchical lookup baselines including the fault
@@ -172,6 +175,8 @@ def train_evaluate(rows: list[dict], seed: int = 20261110) -> dict:
     from sklearn.ensemble import RandomForestRegressor
     from sklearn.metrics import mean_absolute_error
 
+    fitted_models = {}
+    calibration_radii = {}
     report = {
         "schema": "predict-shield/mechanism-model-evaluation/1",
         "not_production_effectiveness": True,
@@ -193,9 +198,11 @@ def train_evaluate(rows: list[dict], seed: int = 20261110) -> dict:
         model = RandomForestRegressor(n_estimators=200, min_samples_leaf=3,
                                       random_state=seed, n_jobs=1)
         model.fit(matrices["train"], y["train"])
+        fitted_models[label] = model
         pred_cal = np.clip(model.predict(matrices["calibration"]), 0, 1)
         pred_test = np.clip(model.predict(matrices["test"]), 0, 1)
         radius = conformal_radius(y["calibration"], pred_cal)
+        calibration_radii[label] = radius
         low = np.clip(pred_test - radius, 0, 1)
         high = np.clip(pred_test + radius, 0, 1)
         lookup = {}
@@ -228,6 +235,36 @@ def train_evaluate(rows: list[dict], seed: int = 20261110) -> dict:
             "heldout_test_count": len(test),
             "caveat": "Only measured laboratory behavior; not conditional service safety",
         }
+    if export_path is not None:
+        # Only load model artifacts created in a trusted local environment.
+        # The scikit-learn serialization is pickle-based and unsafe to load
+        # from arbitrary external sources.
+        import joblib
+        export_path.parent.mkdir(parents=True, exist_ok=True)
+        if export_path.exists():
+            raise FileExistsError("Refusing to overwrite existing model artifact")
+        train_ids = sorted((r["group"], r["action"], r["fault"], r["target"])
+                           for r in groups["train"])
+        fingerprint = hashlib.sha256(
+            json.dumps(train_ids, separators=(",", ":")).encode("utf-8")
+        ).hexdigest()
+        bundle = {
+            "schema": "predict-shield/mechanism-model-bundle/1",
+            "model_type": "RandomForestRegressor",
+            "features": list(FEATURES),
+            "training_fingerprint": fingerprint,
+            "training_group_count": len(sets[0]),
+            "calibration_group_count": len(sets[1]),
+            "radii": calibration_radii,
+            "models": fitted_models,
+            "trust_boundary": "trusted local training artifact; never load externally supplied pickle",
+            "not_certified_for_automatic_execution": True,
+        }
+        fd = os.open(export_path, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
+        with os.fdopen(fd, "wb") as destination:
+            joblib.dump(bundle, destination)
+        report["exported_model_path"] = str(export_path)
+        report["training_fingerprint"] = fingerprint
     return report
 
 
@@ -236,9 +273,11 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--records", type=Path, required=True)
     parser.add_argument("--report", type=Path, required=True)
+    parser.add_argument("--export-model", type=Path,
+                        help="Optional local-only trusted pickle bundle for later inference")
     args = parser.parse_args()
     rows = load_executed_dataset(args.records)
-    result = train_evaluate(rows)
+    result = train_evaluate(rows, export_path=args.export_model)
     args.report.parent.mkdir(parents=True, exist_ok=True)
     with args.report.open("x", encoding="utf-8") as file:
         json.dump(result, file, indent=2, sort_keys=True)
