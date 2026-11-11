@@ -159,10 +159,6 @@ def train_evaluate(rows: list[dict], seed: int = 20261110) -> dict:
     and target identity. No test-set results are used to select features,
     hyperparameters, interval radii, or baselines.
     """
-    import numpy as np
-    from sklearn.ensemble import RandomForestRegressor
-    from sklearn.metrics import mean_absolute_error
-
     groups = {name: [r for r in rows if r["partition"] == name]
               for name in SPLITS}
     sets = [{r["group"] for r in group} for group in groups.values()]
@@ -170,6 +166,12 @@ def train_evaluate(rows: list[dict], seed: int = 20261110) -> dict:
         sets[i] & sets[j] for i in range(3) for j in range(i + 1, 3)
     ):
         raise ValueError("No valid disjoint train/calibration/test groups")
+
+    # Validate experiment group isolation before importing optional ML packages.
+    import numpy as np
+    from sklearn.ensemble import RandomForestRegressor
+    from sklearn.metrics import mean_absolute_error
+
     report = {
         "schema": "predict-shield/mechanism-model-evaluation/1",
         "not_production_effectiveness": True,
