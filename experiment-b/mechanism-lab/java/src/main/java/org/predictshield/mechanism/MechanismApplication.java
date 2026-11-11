@@ -2,6 +2,7 @@ package org.predictshield.mechanism;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.kafka.annotation.EnableKafka;
 
 /**
  * Launches the Experiment B mechanism laboratory.
@@ -17,6 +18,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * policy updates rather than dividing them among members of one group.</p>
  */
 @SpringBootApplication
+@EnableKafka
 public class MechanismApplication {
 
     /**
