@@ -73,7 +73,7 @@ def wait_ready(timeout: float = 150) -> None:
     """Wait for separate JVMs, gateway and oracle to become responsive."""
     deadline = time.monotonic() + timeout
     while time.monotonic() < deadline:
-        statuses = [request(name, "/healthz")[0] for name in (*ENFORCERS, "gateway", "oracle")]
+        statuses = [request(name, "/healthz")[0] for name in (*ENFORCERS, "gateway", "oracle", "authority")]
         if all(value == 200 for value in statuses):
             return
         time.sleep(2)
@@ -99,8 +99,16 @@ def wait_for_target(name: str, timeout_seconds: float = 90) -> float:
 
 
 def setup_fault(control_token: str, *, ttl_ms: int, delay_ms: int,
-                fault_target: str = "enforcer-b") -> None:
-    """Start a clean trial and lose the revocation event only at enforcer-b."""
+                fault_target: str = "enforcer-b",
+                fault_mode: str = "loss",
+                oracle_token: str | None = None) -> None:
+    """Reset all JVMs and inject a configured actual Kafka consumer fault.
+
+    Faults are set on a named process before the policy event is published.
+    Every execution must start from a clean state. Delayed callbacks from
+    older trials are a known contamination risk until isolated group restarts
+    and event quiescence are introduced; the collector flags affected runs.
+    """
     status, _, _ = request("gateway", "/admin/restore", method="POST", token=control_token)
     if status != 200:
         raise RuntimeError("Gateway restore failed")
@@ -108,18 +116,41 @@ def setup_fault(control_token: str, *, ttl_ms: int, delay_ms: int,
         status, _, _ = request(node, f"/admin/reset/{ttl_ms}", method="POST", token=control_token)
         if status != 200:
             raise RuntimeError("Enforcer reset failed: " + node)
-    status, _, _ = request("authority", "/control/reset", method="POST", token=control_token)
+    status, _, _ = request("authority", "/control/reset", method="POST", token=control_token, timeout=10)
     if status != 202:
-        raise RuntimeError("Authority reset failed")
-    # Wait for background Kafka listeners to process the initial revision.
-    time.sleep(1.5)
+        raise RuntimeError("Authority reset was not acknowledged (HTTP " + str(status) + ")")
+    # A paired trial must start only after *every* enforcement JVM has
+    # acknowledged the current authority reset revision. This prevents a
+    # delayed message from a prior trial from changing the new starting state:
+    # Kafka callbacks reject older revisions once the reset has converged.
+    if oracle_token is not None:
+        deadline = time.monotonic() + 18
+        while time.monotonic() < deadline:
+            try:
+                baseline = oracle_snapshot(oracle_token)
+                desired = baseline["authority"]
+                if (desired.get("revoked") is False
+                        and all(t["admin"]["revision"] == desired["revision"]
+                                and t["admin"]["revoked"] is False
+                                for t in baseline["targets"])):
+                    break
+            except (RuntimeError, KeyError, TypeError):
+                pass
+            time.sleep(0.3)
+        else:
+            raise RuntimeError("No converged clean reset; abort before injecting fault")
+    else:
+        # Retained only for manually controlled legacy pilot callers.
+        time.sleep(1.5)
     if fault_target not in ENFORCERS:
         raise ValueError("Unexpected fault target")
-    status, _, _ = request(fault_target, f"/admin/fault/loss/{delay_ms}",
+    if fault_mode not in {"loss", "delay", "duplicate", "reorder"}:
+        raise ValueError("Unsupported Kafka fault mode")
+    status, _, _ = request(fault_target, f"/admin/fault/{fault_mode}/{delay_ms}",
                            method="POST", token=control_token)
     if status != 200:
         raise RuntimeError("Consumer fault setup failed")
-    status, _, _ = request("authority", "/control/revoke", method="POST", token=control_token)
+    status, _, _ = request("authority", "/control/revoke", method="POST", token=control_token, timeout=10)
     if status != 202:
         raise RuntimeError("Policy revocation rejected")
     time.sleep(1.2)
@@ -151,16 +182,19 @@ def oracle_snapshot(oracle_token: str) -> dict:
     return payload
 
 
-def perform_action(action: str, control_token: str) -> None:
+def perform_action(action: str, control_token: str,
+                   fault_target: str = "enforcer-b") -> None:
     """Execute exactly one allowlisted action without consulting oracle outcomes."""
+    if fault_target not in ENFORCERS:
+        raise ValueError("Unrecognized laboratory fault target")
     if action == "resync_policy":
-        request("enforcer-b", "/admin/fault/none/0", method="POST", token=control_token)
-        status, _, _ = request("authority", "/control/resync", method="POST", token=control_token)
+        request(fault_target, "/admin/fault/none/0", method="POST", token=control_token)
+        status, _, _ = request("authority", "/control/resync", method="POST", token=control_token, timeout=10)
         if status != 202:
             raise RuntimeError("Resynchronization not published")
     elif action == "restart_enforcer":
         completed = subprocess.run(
-            ["docker", "compose", "restart", "enforcer-b"],
+            ["docker", "compose", "restart", fault_target],
             text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=120,
             check=False
         )
@@ -177,7 +211,8 @@ def perform_action(action: str, control_token: str) -> None:
 
 
 def measure_under_load(action: str, control_token: str, *,
-                       requests_per_second: int = 30, duration_seconds: float = 5) -> dict:
+                       requests_per_second: int = 30, duration_seconds: float = 5,
+                       fault_target: str = "enforcer-b") -> dict:
     """Apply the action during sustained, concurrent real HTTP request traffic.
 
     Uses a monotonic request schedule and a thread pool. The measured rate,
@@ -195,7 +230,7 @@ def measure_under_load(action: str, control_token: str, *,
         count = int(requests_per_second * duration_seconds)
         for i in range(count):
             if i == count // 4:
-                future_action = pool.submit(perform_action, action, control_token)
+                future_action = pool.submit(perform_action, action, control_token, fault_target)
             deadline = start + i / requests_per_second
             delay = deadline - time.perf_counter()
             if delay > 0:
@@ -221,20 +256,30 @@ def measure_under_load(action: str, control_token: str, *,
 
 
 def run_case(action: str, control_token: str, oracle_token: str,
-             *, ttl_ms: int = 30000, rps: int = 30) -> dict:
+             *, ttl_ms: int = 30000, rps: int = 30,
+             fault_mode: str = "loss", fault_target: str = "enforcer-b",
+             delay_ms: int = 200, duration_seconds: float = 5) -> dict:
     """Reset all processes, inject event loss and measure one candidate action."""
-    setup_fault(control_token, ttl_ms=ttl_ms, delay_ms=200)
+    setup_fault(control_token, ttl_ms=ttl_ms, delay_ms=delay_ms,
+                fault_target=fault_target, fault_mode=fault_mode,
+                oracle_token=oracle_token)
     before_probes = gateway_probes()
     before_truth = oracle_snapshot(oracle_token)
-    operations = measure_under_load(action, control_token, requests_per_second=rps)
+    operations = measure_under_load(action, control_token, requests_per_second=rps,
+                                    duration_seconds=duration_seconds,
+                                    fault_target=fault_target)
     time.sleep(0.7)
     after_probes = gateway_probes()
     recovery_wait_seconds = (
-        wait_for_target("enforcer-b") if action == "restart_enforcer" else 0.0
+        wait_for_target(fault_target) if action == "restart_enforcer" else 0.0
     )
     after_truth = oracle_snapshot(oracle_token)
     return {
         "case": "experiment-b-kafka-revocation",
+        "fault_mode": fault_mode,
+        "fault_target": fault_target,
+        "cache_ttl_ms": ttl_ms,
+        "event_delay_ms": delay_ms,
         "action": action,
         "before": {"verifier_gateway_probes": before_probes,
                    "oracle": before_truth},
@@ -254,9 +299,10 @@ def run_case(action: str, control_token: str, oracle_token: str,
 
 def run_regression(control_token: str, oracle_token: str) -> dict:
     """Inject a silent cache regression and compare observer paths after a clean fix."""
-    setup_fault(control_token, ttl_ms=30000, delay_ms=0)
+    setup_fault(control_token, ttl_ms=30000, delay_ms=0,
+                oracle_token=oracle_token)
     request("enforcer-b", "/admin/fault/none/0", method="POST", token=control_token)
-    request("authority", "/control/resync", method="POST", token=control_token)
+    request("authority", "/control/resync", method="POST", token=control_token, timeout=10)
     time.sleep(0.7)
     first = oracle_snapshot(oracle_token)
     status, _, _ = request("enforcer-b", "/admin/silent-regression",
@@ -283,7 +329,7 @@ def run_hidden_target_case(control_token: str, oracle_token: str) -> dict:
     independent inventory reconciliation.
     """
     setup_fault(control_token, ttl_ms=30000, delay_ms=0,
-                fault_target="enforcer-hidden")
+                fault_target="enforcer-hidden", oracle_token=oracle_token)
     gateway = gateway_probes(count=6)
     oracle = oracle_snapshot(oracle_token)
     return {

@@ -51,6 +51,21 @@ public final class AuthorityController {
     }
 
     /**
+     * Reports process-level readiness for isolated experiment setup.
+     *
+     * <p>This check says only that the authority's HTTP process is running.
+     * It does not imply Kafka delivery, cache convergence, or that the
+     * revocation is effective at any enforcement point. Those conditions
+     * require independent observations from the experimental oracle.</p>
+     *
+     * @return authority process readiness, never a security verdict
+     */
+    @GetMapping("/healthz")
+    public Map<String, Object> health() {
+        return Map.of("authority", "ready");
+    }
+
+    /**
      * Revokes the test identity and asynchronously emits a policy update.
      *
      * @param token authorized control credential
