@@ -53,7 +53,7 @@ public final class EnforcementController {
     private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
     private final Random jitter;
     private volatile PolicyRevision cached = new PolicyRevision(0, false);
-    private volatile long refreshedAtMs = System.currentTimeMillis();
+    private volatile long refreshedAtMs = 0;
     private volatile long cacheTtlMs = 3000;
     private volatile String fault = "none";
     private volatile String heldEvent;
@@ -263,6 +263,27 @@ public final class EnforcementController {
         droppedEvents = 0;
         lastRefreshFailed = false;
         return ResponseEntity.ok(Map.of("instance", identity, "reset", true));
+    }
+
+    /**
+     * Deliberately rebuilds one cache from a stale local snapshot.
+     *
+     * <p>This reproduces a silent regression after previously successful
+     * revocation. Unlike the normal Kafka processing path, no policy change
+     * event is published. An external verifier must detect the regression
+     * through time-based rechecking or independent active probes. The action
+     * is explicitly authorized and isolated to this disposable testbed.</p>
+     *
+     * @param token authorized fault-injection credential
+     * @return acknowledgment of the injected stale-cache state
+     */
+    @PostMapping("/admin/silent-regression")
+    public synchronized ResponseEntity<Map<String, Object>> injectRegression(
+            @RequestHeader(value = "X-Lab-Control", required = false) String token) {
+        if (!authorized(token, controlToken)) return forbidden();
+        cached = new PolicyRevision(cached.revision(), false);
+        refreshedAtMs = System.currentTimeMillis();
+        return ResponseEntity.ok(Map.of("injected", true, "instance", identity));
     }
 
     /**
