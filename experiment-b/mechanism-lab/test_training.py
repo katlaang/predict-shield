@@ -3,12 +3,14 @@
 Any in-memory synthetic examples here are unit-test fixtures, not collected
 Experiment B measurements or publishable machine-learning results.
 """
+import hashlib
 import tempfile
 import unittest
 from pathlib import Path
 
 from plan import ACTIONS, create_plan
 from train import load_executed_dataset, to_features, train_evaluate
+from model_adapter import load_local_bundle
 
 
 class MeasuredModelTrainingTests(unittest.TestCase):
@@ -35,6 +37,41 @@ class MeasuredModelTrainingTests(unittest.TestCase):
         row["label_security_exposure"] = 0.0
         row["label_service_failure_fraction"] = 0.0
         self.assertEqual(to_features(row), baseline)
+
+    def test_synthetic_training_calibration_export_and_checksum(self):
+        """Exercise model fitting on toy fixtures without implying research results."""
+        examples = []
+        for group in range(12):
+            partition = ("train" if group < 8 else
+                         "calibration" if group < 10 else "test")
+            for repeat in range(3):
+                for index, action in enumerate(ACTIONS):
+                    examples.append({
+                        "group": "unit-" + str(group),
+                        "partition": partition,
+                        "action": action,
+                        "fault": ("loss", "delay", "duplicate", "reorder")[group % 4],
+                        "target": ("enforcer-a", "enforcer-b", "enforcer-c")[group % 3],
+                        "pre_action": {
+                            "cache_ttl_ms": 3000 + group * 100,
+                            "event_delay_ms": group * 100,
+                            "requested_rps": 15 + group,
+                            "initial_gateway_allowed_fraction": (group % 3) / 3,
+                        },
+                        "label_security_exposure": float(index == 3),
+                        "label_service_failure_fraction": float(index == 2) * 0.4,
+                    })
+        with tempfile.TemporaryDirectory() as directory:
+            model_file = Path(directory) / "lab-model.joblib"
+            report = train_evaluate(examples, export_path=model_file)
+            self.assertTrue(model_file.is_file())
+            self.assertEqual(report["trial_counts"]["test"], 24)
+            self.assertIn("label_security_exposure", report["metrics"])
+            digest = hashlib.sha256(model_file.read_bytes()).hexdigest()
+            bundle = load_local_bundle(model_file, trusted_sha256=digest)
+            self.assertEqual(bundle["training_group_count"], 8)
+            with self.assertRaises(ValueError):
+                load_local_bundle(model_file, trusted_sha256="0" * 64)
 
     def test_training_rejects_group_overlap(self):
         """Identical configuration IDs cannot occur across evaluation partitions."""
