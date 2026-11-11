@@ -10,7 +10,7 @@ from __future__ import annotations
 
 from datetime import datetime, timezone
 
-from train import ACTIONS, to_features
+from train import ACTIONS, FAULTS, TARGETS, FEATURES, to_features
 
 from predict_shield.ai_contracts import (
     ActionPrediction, CandidateAction, EvidenceSnapshot, Interval,
@@ -36,7 +36,7 @@ def predictions_from_bundle(
     be established by other components; the adapter cannot create those.
     """
     if (bundle.get("schema") != "predict-shield/mechanism-model-bundle/1"
-            or list(bundle.get("features", [])) != list(__import__("train").FEATURES)):
+            or list(bundle.get("features", [])) != list(FEATURES)):
         raise ValueError("Wrong or untrusted model feature schema")
     if pre_action.get("oracle_features_excluded") is not True:
         raise ValueError("Prediction input must be explicit pre-action record")
@@ -52,8 +52,8 @@ def predictions_from_bundle(
     if now < snapshot.captured_at:
         raise ValueError("Evidence timestamp is in the future")
     features = pre_action["features"]
-    if (features["fault_mode"] not in __import__("train").FAULTS
-            or features["fault_target"] not in __import__("train").TARGETS):
+    if (features["fault_mode"] not in FAULTS
+            or features["fault_target"] not in TARGETS):
         raise ValueError("Unrecognized fault or target")
     probes = pre_action["external_deny_observations"]
     if not probes or any(p.get("http_status") not in (200, 403) for p in probes):
