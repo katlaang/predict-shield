@@ -21,12 +21,33 @@ jobs:
       - name: Create disposable lab authorization token
         run: |
           echo "LAB_TOKEN=$(python -c 'import secrets;print(secrets.token_urlsafe(32))')" >> "$GITHUB_ENV"
+          echo "LAB_ORACLE_TOKEN=$(python -c 'import secrets;print(secrets.token_urlsafe(32))')" >> "$GITHUB_ENV"
       - name: Build and run lab on loopback
         working-directory: experiment-b
         run: docker compose up --build -d
       - name: Validate initial fault, opt-in correction and independent probe
         working-directory: experiment-b
         run: python integration_smoke.py
+      - name: Exercise four paired actions and segregated laboratory records
+        working-directory: experiment-b
+        run: |
+          python generate_manifest.py --out generated
+          python collect_training_data.py --execute-lab --manifest generated --out private_results --limit 4
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          base = Path("private_results")
+          for folder in ("pre_action", "verification", "operations", "oracle"):
+              files = list((base / folder).glob("*.json"))
+              assert len(files) == 4, (folder, len(files))
+              for f in files:
+                  record = json.loads(f.read_text())
+                  assert record["run_id"]
+          outcomes = [json.loads(p.read_text()) for p in (base / "oracle").glob("*.json")]
+          assert len(outcomes) == 4
+          print("PASS: four matched lab actions and separate records collected")
+          PY
+          rm -rf private_results generated
       - name: Preserve experiment artifact
         if: always()
         uses: actions/upload-artifact@v4

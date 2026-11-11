@@ -8,6 +8,7 @@ services:
       LAB_INSTANCE: "service-a"
       LAB_INITIAL_ALLOW: "false"
       LAB_TOKEN: "${LAB_TOKEN:?Set a nonempty disposable lab token}"
+      LAB_ORACLE_TOKEN: "${LAB_ORACLE_TOKEN:?Set a distinct disposable oracle token}"
     ports:
       - "127.0.0.1:18081:8080"
   service-b:
@@ -18,5 +19,6 @@ services:
       LAB_INSTANCE: "service-b"
       LAB_INITIAL_ALLOW: "true"
       LAB_TOKEN: "${LAB_TOKEN:?Set a nonempty disposable lab token}"
+      LAB_ORACLE_TOKEN: "${LAB_ORACLE_TOKEN:?Set a distinct disposable oracle token}"
     ports:
       - "127.0.0.1:18082:8080"
