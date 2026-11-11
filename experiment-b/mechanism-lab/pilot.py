@@ -73,7 +73,7 @@ def wait_ready(timeout: float = 150) -> None:
     """Wait for separate JVMs, gateway and oracle to become responsive."""
     deadline = time.monotonic() + timeout
     while time.monotonic() < deadline:
-        statuses = [request(name, "/healthz")[0] for name in (*ENFORCERS, "gateway", "oracle")]
+        statuses = [request(name, "/healthz")[0] for name in (*ENFORCERS, "gateway", "oracle", "authority")]
         if all(value == 200 for value in statuses):
             return
         time.sleep(2)
@@ -116,9 +116,9 @@ def setup_fault(control_token: str, *, ttl_ms: int, delay_ms: int,
         status, _, _ = request(node, f"/admin/reset/{ttl_ms}", method="POST", token=control_token)
         if status != 200:
             raise RuntimeError("Enforcer reset failed: " + node)
-    status, _, _ = request("authority", "/control/reset", method="POST", token=control_token)
+    status, _, _ = request("authority", "/control/reset", method="POST", token=control_token, timeout=10)
     if status != 202:
-        raise RuntimeError("Authority reset failed")
+        raise RuntimeError("Authority reset was not acknowledged (HTTP " + str(status) + ")")
     # A paired trial must start only after *every* enforcement JVM has
     # acknowledged the current authority reset revision. This prevents a
     # delayed message from a prior trial from changing the new starting state:
@@ -150,7 +150,7 @@ def setup_fault(control_token: str, *, ttl_ms: int, delay_ms: int,
                            method="POST", token=control_token)
     if status != 200:
         raise RuntimeError("Consumer fault setup failed")
-    status, _, _ = request("authority", "/control/revoke", method="POST", token=control_token)
+    status, _, _ = request("authority", "/control/revoke", method="POST", token=control_token, timeout=10)
     if status != 202:
         raise RuntimeError("Policy revocation rejected")
     time.sleep(1.2)
@@ -189,7 +189,7 @@ def perform_action(action: str, control_token: str,
         raise ValueError("Unrecognized laboratory fault target")
     if action == "resync_policy":
         request(fault_target, "/admin/fault/none/0", method="POST", token=control_token)
-        status, _, _ = request("authority", "/control/resync", method="POST", token=control_token)
+        status, _, _ = request("authority", "/control/resync", method="POST", token=control_token, timeout=10)
         if status != 202:
             raise RuntimeError("Resynchronization not published")
     elif action == "restart_enforcer":
@@ -302,7 +302,7 @@ def run_regression(control_token: str, oracle_token: str) -> dict:
     setup_fault(control_token, ttl_ms=30000, delay_ms=0,
                 oracle_token=oracle_token)
     request("enforcer-b", "/admin/fault/none/0", method="POST", token=control_token)
-    request("authority", "/control/resync", method="POST", token=control_token)
+    request("authority", "/control/resync", method="POST", token=control_token, timeout=10)
     time.sleep(0.7)
     first = oracle_snapshot(oracle_token)
     status, _, _ = request("enforcer-b", "/admin/silent-regression",
