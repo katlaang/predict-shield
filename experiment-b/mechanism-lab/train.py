@@ -257,12 +257,17 @@ def train_evaluate(rows: list[dict], seed: int = 20261110,
         export_path.parent.mkdir(parents=True, exist_ok=True)
         if export_path.exists():
             raise FileExistsError("Refusing to overwrite existing model artifact")
-        training_rows = sorted(
-            (r["group"], r["action"], r["fault"], r["target"],
-             r["pre_action"], r["label_security_exposure"],
-             r["label_service_failure_fraction"])
+        training_rows = [
+            {
+                "group": r["group"], "action": r["action"],
+                "fault": r["fault"], "target": r["target"],
+                "pre_action": r["pre_action"],
+                "label_security_exposure": r["label_security_exposure"],
+                "label_service_failure_fraction": r["label_service_failure_fraction"],
+            }
             for r in groups["train"]
-        )
+        ]
+        training_rows.sort(key=lambda item: json.dumps(item, sort_keys=True))
         # Fingerprint the measured training values, not merely run IDs.
         fingerprint = hashlib.sha256(
             json.dumps(training_rows, sort_keys=True, separators=(",", ":")).encode("utf-8")
