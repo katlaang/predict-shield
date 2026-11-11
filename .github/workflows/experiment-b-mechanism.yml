@@ -50,6 +50,37 @@ jobs:
           assert omitted["full_scope_verification_status"] == "INDETERMINATE"
           print("PASS: separate enforcers, Kafka fault, action effects and regression")
           PY
+      - name: Generate grouped 100 by 4 by 3 mechanism experiment plan
+        working-directory: experiment-b/mechanism-lab
+        run: python plan.py --output plans/ci-mechanism
+      - name: Collect four actual mechanism action replays into separate evidence records
+        working-directory: experiment-b/mechanism-lab
+        run: python collect.py --execute-lab --manifest plans/ci-mechanism --output results/ci-mechanism --limit 4
+      - name: Validate separate collected records without exposing private oracle data
+        working-directory: experiment-b/mechanism-lab
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          folder=Path("results/ci-mechanism")
+          joined=[]
+          for stream in ("pre_action","verification","operations","oracle"):
+              files=list((folder/stream).glob("*.json"))
+              assert len(files)==4,(stream,len(files))
+              for file in files:
+                  record=json.loads(file.read_text())
+                  assert record["run_id"]
+                  assert record["partition"] in ("train","calibration","test")
+              joined.append({p.name for p in files})
+          assert all(s==joined[0] for s in joined)
+          pre=[json.loads(p.read_text()) for p in (folder/"pre_action").glob("*.json")]
+          assert all(p["oracle_features_excluded"] for p in pre)
+          print("PASS: four real action replays, matching isolated records and no oracle leakage")
+          PY
+      - name: Remove restricted research and oracle trial files before artifact upload
+        if: always()
+        working-directory: experiment-b/mechanism-lab
+        run: rm -rf plans/ci-mechanism results/ci-mechanism
       - name: Retain measured laboratory observations
         if: always()
         uses: actions/upload-artifact@v4
