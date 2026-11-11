@@ -1,0 +1,66 @@
+name: Experiment B real Kafka mechanism lab
+on:
+  workflow_dispatch:
+  push:
+    paths: ['experiment-b/mechanism-lab/**', '.github/workflows/experiment-b-mechanism.yml']
+  pull_request:
+    paths: ['experiment-b/mechanism-lab/**', '.github/workflows/experiment-b-mechanism.yml']
+jobs:
+  mechanism-integration:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Create disposable distinct credentials
+        run: |
+          echo "LAB_CONTROL_TOKEN=$(python -c 'import secrets;print(secrets.token_urlsafe(32))')" >> "$GITHUB_ENV"
+          echo "LAB_ORACLE_TOKEN=$(python -c 'import secrets;print(secrets.token_urlsafe(32))')" >> "$GITHUB_ENV"
+          echo "LAB_INTERNAL_TOKEN=$(python -c 'import secrets;print(secrets.token_urlsafe(32))')" >> "$GITHUB_ENV"
+      - name: Validate Python test suite
+        run: python -m unittest discover -s experiment-b/mechanism-lab -p 'test_*.py' -v
+      - name: Start Kafka and separate enforcement JVMs
+        working-directory: experiment-b/mechanism-lab
+        run: docker compose up --build -d
+      - name: Execute actual mechanism pilot
+        working-directory: experiment-b/mechanism-lab
+        run: python pilot.py --execute-lab --rps 25 --output reports/ci-mechanism-pilot.json
+      - name: Assert observable action differences and regression
+        working-directory: experiment-b/mechanism-lab
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path("reports/ci-mechanism-pilot.json").read_text())
+          cases={x["action"]:x for x in d["cases"]}
+          assert set(cases)=={"resync_policy","restart_enforcer","gateway_restrict","monitor_only"}
+          assert all(x["operations"]["attempts"] > 10 for x in cases.values())
+          assert cases["monitor_only"]["after"]["oracle"]["all_revoked_access_denied"] is False
+          assert cases["resync_policy"]["after"]["oracle"]["all_revoked_access_denied"] is True
+          assert cases["gateway_restrict"]["after"]["oracle"]["all_revoked_access_denied"] is False
+          r=d["silent_regression"]
+          assert r["pre_regression_oracle"]["all_revoked_access_denied"] is True
+          assert r["post_regression_oracle"]["all_revoked_access_denied"] is False
+          assert cases["gateway_restrict"]["operations"]["non_200_requests"] > 0
+          omitted=d["omitted_enforcement_point"]
+          assert omitted["gateway_only_looks_clean"] is True
+          assert omitted["oracle"]["all_revoked_access_denied"] is False
+          assert omitted["full_scope_verification_status"] == "INDETERMINATE"
+          print("PASS: separate enforcers, Kafka fault, action effects and regression")
+          PY
+      - name: Retain measured laboratory observations
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: experiment-b-mechanism-pilot
+          path: experiment-b/mechanism-lab/reports/
+          if-no-files-found: ignore
+      - name: Shutdown and diagnostics
+        if: always()
+        working-directory: experiment-b/mechanism-lab
+        run: |
+          docker compose ps
+          docker compose logs --tail=100
+          docker compose down --remove-orphans --volumes

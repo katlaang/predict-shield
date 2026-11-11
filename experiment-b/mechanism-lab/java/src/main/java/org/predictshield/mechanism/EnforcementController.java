@@ -1,0 +1,335 @@
+package org.predictshield.mechanism;
+
+import java.net.URI;
+import java.time.Duration;
+import java.util.Map;
+import java.util.Random;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestClient;
+
+/**
+ * An independently deployed and independently cached authorization enforcement point.
+ *
+ * <p>Each instance runs in its own Java process and Kafka consumer group.
+ * Spring Kafka delivers revision events from the authority. Fault injection
+ * occurs in the real consumer callback, rather than in a training-label
+ * formula: an event may be dropped, delayed on a scheduler, duplicated, or
+ * held until a later event arrives. Cache TTL expiration independently issues
+ * an HTTP read to the authority. This implementation therefore exposes
+ * observable races between event publication, cache refresh, and request
+ * processing instead of a precomputed outcome.</p>
+ *
+ * <p>The external protected endpoint knows only its cached policy and does
+ * not publish its status as a proof of remediation. An administrator endpoint
+ * exposes internal revision information only under the oracle credential.
+ * Verification clients must not read this endpoint, and model feature
+ * preparation must not use it.</p>
+ *
+ * <p>Failure injection is deliberately scoped to this isolated lab. Never
+ * expose the admin endpoints or test identities on a production network.
+ * Fault state is process-local and is cleared when a container restarts.</p>
+ */
+@RestController
+@ConditionalOnProperty(name = "lab.role", havingValue = "enforcer")
+public final class EnforcementController {
+    private final String identity;
+    private final String controlToken;
+    private final String oracleToken;
+    private final String authorityUrl;
+    private final String internalToken;
+    private final RestClient http = RestClient.create();
+    private final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+    private final Random jitter;
+    private volatile PolicyRevision cached = new PolicyRevision(0, false);
+    private volatile long refreshedAtMs = 0;
+    private volatile long cacheTtlMs = 3000;
+    private volatile String fault = "none";
+    private volatile String heldEvent;
+    private volatile long delayedMs = 0;
+    private volatile long handledEvents = 0;
+    private volatile long droppedEvents = 0;
+    private volatile boolean lastRefreshFailed = false;
+
+    /**
+     * Injects process identity and separate authority, control and oracle credentials.
+     *
+     * @param identity stable name for this independently deployed enforcement point
+     * @param controlToken secret authorizing fault setup and local experiment resets
+     * @param oracleToken secret held only by the separate oracle observer
+     * @param authorityUrl internal HTTP address of the policy authority
+     * @param internalToken secret used exclusively for cache TTL refresh
+     */
+    public EnforcementController(
+            @Value("${lab.instance:unknown}") String identity,
+            @Value("${lab.control-token:}") String controlToken,
+            @Value("${lab.oracle-token:}") String oracleToken,
+            @Value("${lab.authority-url:http://authority:8080}") String authorityUrl,
+            @Value("${lab.internal-token:}") String internalToken) {
+        this.identity = identity;
+        this.controlToken = controlToken;
+        this.oracleToken = oracleToken;
+        this.authorityUrl = authorityUrl;
+        this.internalToken = internalToken;
+        this.jitter = new Random(identity.hashCode() ^ System.nanoTime());
+    }
+
+    /**
+     * Handles a real Kafka policy event under the configured fault mechanism.
+     *
+     * <p>Loss intentionally acknowledges but ignores an event. Delay schedules
+     * a future cache update. Duplication applies the same revision twice.
+     * Reordering holds one event and applies a later event before releasing it.
+     * Monotonic revision checks prevent older events from reverting state.
+     * All resulting cache changes are observed through HTTP requests.</p>
+     *
+     * @param value serialized revision and Boolean revocation value
+     */
+    @KafkaListener(topics = "lab-policy", groupId = "${lab.instance:enforcer}")
+    public synchronized void onEvent(String value) {
+        handledEvents++;
+        String mode = fault;
+        switch (mode) {
+            case "loss" -> droppedEvents++;
+            case "delay" -> scheduler.schedule(
+                    () -> applyRevision(value), Math.max(1, delayedMs + jitter.nextInt(81)),
+                    TimeUnit.MILLISECONDS);
+            case "duplicate" -> {
+                applyRevision(value);
+                scheduler.schedule(() -> applyRevision(value), 10 + jitter.nextInt(30),
+                        TimeUnit.MILLISECONDS);
+            }
+            case "reorder" -> {
+                if (heldEvent == null) heldEvent = value;
+                else {
+                    applyRevision(value);
+                    String earlier = heldEvent;
+                    heldEvent = null;
+                    scheduler.schedule(() -> applyRevision(earlier), 25 + jitter.nextInt(80),
+                            TimeUnit.MILLISECONDS);
+                }
+            }
+            default -> applyRevision(value);
+        }
+    }
+
+    /**
+     * Applies a parsed Kafka revision only when it is not older than the cache.
+     *
+     * @param raw Kafka event containing a nonnegative revision and Boolean flag
+     */
+    private synchronized void applyRevision(String raw) {
+        try {
+            String[] tokens = raw.split(",", -1);
+            if (tokens.length != 2 || !(tokens[1].equals("true") || tokens[1].equals("false"))) {
+                throw new IllegalArgumentException("Invalid lab policy event");
+            }
+            PolicyRevision incoming = new PolicyRevision(Long.parseLong(tokens[0]),
+                    Boolean.parseBoolean(tokens[1]));
+            if (incoming.revision() >= cached.revision()) {
+                cached = incoming;
+                refreshedAtMs = System.currentTimeMillis();
+                lastRefreshFailed = false;
+            }
+        } catch (IllegalArgumentException ignored) {
+            // Malformed experimental event cannot mutate an enforcement cache.
+        }
+    }
+
+    /**
+     * Performs an actual HTTP refresh after TTL expiration, if enabled.
+     *
+     * <p>An unreachable authority leaves the last known revision cached and
+     * records the failure for privileged inspection. This models stale
+     * enforcement under connectivity faults but does not claim to implement
+     * a production fail-closed identity system.</p>
+     */
+    private synchronized void refreshIfExpired() {
+        if (System.currentTimeMillis() - refreshedAtMs < cacheTtlMs) return;
+        try {
+            PolicyRevision result = http.get()
+                    .uri(URI.create(authorityUrl + "/internal/policy"))
+                    .header("X-Lab-Internal", internalToken)
+                    .retrieve().body(PolicyRevision.class);
+            if (result != null && result.revision() >= cached.revision()) {
+                cached = result;
+            }
+            refreshedAtMs = System.currentTimeMillis();
+            lastRefreshFailed = false;
+        } catch (RuntimeException ex) {
+            lastRefreshFailed = true;
+            refreshedAtMs = System.currentTimeMillis();
+        }
+    }
+
+    /**
+     * Enforces authorization for the revoked synthetic principal over HTTP.
+     *
+     * @return 403 when the local policy denies access; 200 when it permits
+     */
+    @GetMapping("/protected")
+    public synchronized ResponseEntity<Map<String, Object>> protectedOperation() {
+        refreshIfExpired();
+        return cached.revoked()
+                ? ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("decision", "DENY", "instance", identity))
+                : ResponseEntity.ok(Map.of("decision", "ALLOW", "instance", identity));
+    }
+
+    /**
+     * Handles legitimate workload requests unaffected by authorization policy.
+     *
+     * <p>Real service restarts and network delays produce measurable failures
+     * or request latency at the external gateway during concurrent traffic.
+     * The endpoint does not fabricate request failures from formulas.</p>
+     *
+     * @return successful legitimate application response when process is ready
+     */
+    @GetMapping("/legitimate")
+    public ResponseEntity<Map<String, Object>> legitimate() {
+        return ResponseEntity.ok(Map.of("instance", identity, "ok", true));
+    }
+
+    /**
+     * Returns readiness without claiming control correctness.
+     *
+     * @return instance identifier and process health
+     */
+    @GetMapping("/healthz")
+    public Map<String, Object> health() {
+        return Map.of("instance", identity, "ready", true);
+    }
+
+    /**
+     * Sets the next consumer fault mode for a single controlled experiment.
+     *
+     * @param token disposable lab mutation credential
+     * @param mode one of none, loss, delay, duplicate or reorder
+     * @param delayMs optional fixed delay component, bounded in milliseconds
+     * @return accepted fault configuration without inventing outcome labels
+     */
+    @PostMapping("/admin/fault/{mode}/{delayMs}")
+    public synchronized ResponseEntity<Map<String, Object>> setFault(
+            @RequestHeader(value = "X-Lab-Control", required = false) String token,
+            @PathVariable String mode,
+            @PathVariable long delayMs) {
+        if (!authorized(token, controlToken)) return forbidden();
+        if (!java.util.Set.of("none", "loss", "delay", "duplicate", "reorder").contains(mode)
+                || delayMs < 0 || delayMs > 5000) {
+            return ResponseEntity.badRequest().body(Map.of("error", "invalid fault"));
+        }
+        fault = mode;
+        delayedMs = delayMs;
+        heldEvent = null;
+        return ResponseEntity.ok(Map.of("instance", identity, "fault", mode));
+    }
+
+    /**
+     * Resets the local cache for an independent and clean action replay.
+     *
+     * <p>The runner must reset the authority and all enforcement processes
+     * before configuring fault modes; this does not erase Kafka's committed
+     * event log or external oracle observations.</p>
+     *
+     * @param token laboratory mutation credential
+     * @param ttlMs real cache TTL in milliseconds, bounded for safety
+     * @return accepted local reset or validation error
+     */
+    @PostMapping("/admin/reset/{ttlMs}")
+    public synchronized ResponseEntity<Map<String, Object>> reset(
+            @RequestHeader(value = "X-Lab-Control", required = false) String token,
+            @PathVariable long ttlMs) {
+        if (!authorized(token, controlToken)) return forbidden();
+        if (ttlMs < 50 || ttlMs > 30000) {
+            return ResponseEntity.badRequest().body(Map.of("error", "TTL out of bounds"));
+        }
+        cached = new PolicyRevision(0, false);
+        refreshedAtMs = System.currentTimeMillis();
+        cacheTtlMs = ttlMs;
+        fault = "none";
+        heldEvent = null;
+        handledEvents = 0;
+        droppedEvents = 0;
+        lastRefreshFailed = false;
+        return ResponseEntity.ok(Map.of("instance", identity, "reset", true));
+    }
+
+    /**
+     * Deliberately rebuilds one cache from a stale local snapshot.
+     *
+     * <p>This reproduces a silent regression after previously successful
+     * revocation. Unlike the normal Kafka processing path, no policy change
+     * event is published. An external verifier must detect the regression
+     * through time-based rechecking or independent active probes. The action
+     * is explicitly authorized and isolated to this disposable testbed.</p>
+     *
+     * @param token authorized fault-injection credential
+     * @return acknowledgment of the injected stale-cache state
+     */
+    @PostMapping("/admin/silent-regression")
+    public synchronized ResponseEntity<Map<String, Object>> injectRegression(
+            @RequestHeader(value = "X-Lab-Control", required = false) String token) {
+        if (!authorized(token, controlToken)) return forbidden();
+        cached = new PolicyRevision(cached.revision(), false);
+        refreshedAtMs = System.currentTimeMillis();
+        return ResponseEntity.ok(Map.of("injected", true, "instance", identity));
+    }
+
+    /**
+     * Exposes local cached state through a separate privileged oracle path.
+     *
+     * <p>The oracle obtains each instance's state directly, bypassing the
+     * normal request router and its potentially incomplete observations.
+     * This still uses administrator-reported cache state, so independent
+     * active probes should also be considered in scientific validation.</p>
+     *
+     * @param token credential possessed only by the oracle process
+     * @return cached revision and observed consumer statistics
+     */
+    @GetMapping("/admin/state")
+    public ResponseEntity<?> adminState(
+            @RequestHeader(value = "X-Lab-Oracle", required = false) String token) {
+        if (!authorized(token, oracleToken)) return forbidden();
+        return ResponseEntity.ok(Map.of(
+                "instance", identity,
+                "revision", cached.revision(),
+                "revoked", cached.revoked(),
+                "fault", fault,
+                "handled_events", handledEvents,
+                "dropped_events", droppedEvents,
+                "refresh_failed", lastRefreshFailed));
+    }
+
+    /**
+     * Checks a disposable header against the expected laboratory secret.
+     *
+     * @param supplied caller-provided token
+     * @param expected configured secret
+     * @return true when nonblank values exactly match
+     */
+    private static boolean authorized(String supplied, String expected) {
+        return supplied != null && expected != null && !expected.isBlank()
+                && expected.equals(supplied);
+    }
+
+    /**
+     * Returns a generic rejection for unauthorized administrative requests.
+     *
+     * @return HTTP 403 response without token or infrastructure details
+     */
+    private static ResponseEntity<Map<String, Object>> forbidden() {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(Map.of("error", "laboratory credential rejected"));
+    }
+}
