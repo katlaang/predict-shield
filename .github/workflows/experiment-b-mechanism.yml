@@ -20,7 +20,7 @@ jobs:
           echo "LAB_ORACLE_TOKEN=$(python -c 'import secrets;print(secrets.token_urlsafe(32))')" >> "$GITHUB_ENV"
           echo "LAB_INTERNAL_TOKEN=$(python -c 'import secrets;print(secrets.token_urlsafe(32))')" >> "$GITHUB_ENV"
       - name: Validate Python test suite
-        run: python -m unittest discover -s experiment-b/mechanism-lab -p 'test_*.py' -v
+        run: PYTHONPATH=engine python -m unittest discover -s experiment-b/mechanism-lab -p 'test_*.py' -v
       - name: Start Kafka and separate enforcement JVMs
         working-directory: experiment-b/mechanism-lab
         run: docker compose up --build -d
