@@ -25,22 +25,26 @@ services:
       LAB_INTERNAL_TOKEN: ${LAB_INTERNAL_TOKEN:?Provide internal token}
       SPRING_KAFKA_BOOTSTRAP_SERVERS: broker:9092
     depends_on: [broker]
+    ports: ["127.0.0.1:18281:8080"]
     networks: [lab]
   enforcer-a:
     <<: *enforcer
     environment:
       <<: *shared
       LAB_INSTANCE: enforcer-a
+    ports: ["127.0.0.1:18282:8080"]
   enforcer-b:
     <<: *enforcer
     environment:
       <<: *shared
       LAB_INSTANCE: enforcer-b
+    ports: ["127.0.0.1:18283:8080"]
   enforcer-c:
     <<: *enforcer
     environment:
       <<: *shared
       LAB_INSTANCE: enforcer-c
+    ports: ["127.0.0.1:18284:8080"]
   gateway:
     build: ./python
     command: ["python", "/app/gateway.py"]
