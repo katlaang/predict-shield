@@ -41,3 +41,120 @@ GitHub Actions builds the Java code, launches broker and separate services, exer
 Existing manifest and training code should only be adapted after the mechanism and independent observer CI checks pass. Do not run the full collection against the previous formula-based fixture.
 
 The omitted-target scenario deliberately loses a policy event in the hidden JVM, checks that gateway requests still deny access, and confirms that the independent oracle detects an unremediated in-scope target. Gateway-only clean results are not sufficient to declare global VERIFIED.
+
+
+## Reproducible mechanism-lab data collection (new milestone)
+
+The earlier 100 x 4 x 3 manifest under `experiment-b/generated` is specific
+to the **deprecated formula fixture** and must not be used to train a model
+for this laboratory. A new mechanism-aware manifest accounts for the actual
+four-JVM topology and supports only the implemented fault modes.
+
+### Generate the preregistered plan
+
+~~~bash
+python plan.py --output plans/mechanism --seed 20261110
+~~~
+
+This produces **100 configuration groups** (60 train, 20 calibration,
+20 held-out test), four named actions and three repeats per action, for
+**1,200 planned trials**. The plan records no oracle labels, measurements
+or completed actions. The initial experiment varies actual cache TTL,
+Kafka consumer fault mode/target, event-delay setting and requested load.
+The physical node count stays four: three gateway-visible and one deliberately
+omitted from gateway routing. This is not a 2-8 node topology study.
+
+### Collect actual HTTP measurements, without synthetic output labels
+
+With Docker Compose already running, and the three distinct disposable
+credentials set as described above:
+
+~~~bash
+python collect.py --execute-lab \
+    --manifest plans/mechanism \
+    --output results/mechanism \
+    --limit 4
+~~~
+
+Four paired action trials will be executed against the real JVMs, with
+a fresh authority reset and consumer fault configuration for each one.
+Results are written separately as:
+
+- `results/mechanism/pre_action/`: model-eligible pre-action configuration
+  and gateway observations, **without** the oracle
+- `results/mechanism/verification/`: post-action gateway outcomes,
+  deliberately unable to claim full-scope VERIFIED without inventory proof
+- `results/mechanism/operations/`: counted actual external HTTP failures,
+  attempted requests, latency and observed request rate
+- `results/mechanism/oracle/`: independently observed full target inventory,
+  per-target direct probes and private cache/authority state, protected with
+  owner-only file permissions
+
+The collector is **not** allowed to fill missing measurements, infer the
+oracle truth from gateway results or overwrite any previously executed run ID.
+The full 1,200-trial campaign requires an explicit `--limit 1200` and
+supervised review of outcomes, resource use and contamination from delayed
+events. It has not been run merely because the manifest exists. To resume a
+valid stopped campaign, select a subsequent `--offset`, after inspecting
+partial records.
+
+### Train only on completed measured records
+
+Install the research ML dependencies declared at
+`../requirements-ml.txt`, then run:
+
+~~~bash
+python -m pip install -r ../requirements-ml.txt
+python train.py \
+    --records results/mechanism \
+    --report reports/mechanism-evaluation.json \
+    --export-model reports/mechanism-model.joblib
+~~~
+
+The trainer refuses incomplete or mismatched 1,200-record collections,
+cross-partition configuration groups, unknown oracle provenance and missing
+actual request counts. Model inputs exclude oracle state and post-action
+measurements. Results compare an initial random forest with a competitive
+train-only hierarchical lookup baseline keyed by action, fault mode and
+fault target. The 20 calibration groups estimate the exploratory
+split-conformal prediction radius; 20 held-out configuration groups
+evaluate prediction error and marginal coverage.
+
+A saved model is a **local, trusted, pickle-based artifact**. Never load a
+model bundle downloaded from an untrusted source. The trained bundle records
+the fit-group fingerprint, calibration radius, feature schema and observed
+training feature ranges.
+
+The inference adapter in `model_adapter.py` converts trained estimates into
+typed `ActionPrediction` records. The existing
+`engine/predict_shield/selector.py` applies the independent policy gate and
+ranks actions, but the lab still lacks verified two-source inventory closure
+and a trusted error-budget provider. It therefore must abstain rather than
+automatically executing a model-selected action. Connecting actual authorized
+execution is a later separately tested milestone.
+
+### Reproducibility and limitations
+
+- Seeded configurations do not make asynchronous Kafka jitter, operating
+  system scheduling or restart latency deterministic. Preserve measured
+  timestamps, observed load and repeated runs rather than claiming identical
+  execution.
+- A late scheduled consumer callback from an earlier trial may contaminate a
+  later replay. The current pilot uses reset/revision ordering; an explicit
+  epoch barrier and quiescence audit are still required for publishable
+  repeated-trial comparisons.
+- Strong performance on one mechanism-lab topology is not proof of usefulness
+  in a real operator network or a new fault family.
+- The output labels derive from real HTTP observations of a controlled
+  testbed. They do not imply real-world exploitation probability, autonomous
+  authorization or production-safe policy changes.
+
+From repository root, run all Python contract tests with:
+
+~~~bash
+PYTHONPATH=engine python -m unittest discover \
+  -s experiment-b/mechanism-lab -p "test_*.py" -v
+~~~
+
+**Do not publish model performance claims before the entire measured dataset,
+independent oracle reliability and fair competing baselines have been reviewed.**
