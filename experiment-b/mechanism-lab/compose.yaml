@@ -68,7 +68,9 @@ services:
       LAB_INTERNAL_TOKEN: ${LAB_INTERNAL_TOKEN:?Provide internal token}
       ENFORCERS: http://enforcer-a:8080,http://enforcer-b:8080,http://enforcer-c:8080,http://enforcer-hidden:8080
       AUTHORITY_URL: http://authority:8080
-    depends_on: [authority, enforcer-a, enforcer-b, enforcer-c]
+    depends_on: [authority, enforcer-a, enforcer-b, enforcer-c, enforcer-hidden]
+    # Oracle is a different process, reachable only through localhost and token.
+    ports: ["127.0.0.1:18285:8080"]
     networks: [lab]
   runner:
     build: ./python
