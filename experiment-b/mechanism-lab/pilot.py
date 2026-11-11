@@ -100,7 +100,8 @@ def wait_for_target(name: str, timeout_seconds: float = 90) -> float:
 
 def setup_fault(control_token: str, *, ttl_ms: int, delay_ms: int,
                 fault_target: str = "enforcer-b",
-                fault_mode: str = "loss") -> None:
+                fault_mode: str = "loss",
+                oracle_token: str | None = None) -> None:
     """Reset all JVMs and inject a configured actual Kafka consumer fault.
 
     Faults are set on a named process before the policy event is published.
@@ -118,8 +119,29 @@ def setup_fault(control_token: str, *, ttl_ms: int, delay_ms: int,
     status, _, _ = request("authority", "/control/reset", method="POST", token=control_token)
     if status != 202:
         raise RuntimeError("Authority reset failed")
-    # Wait for background Kafka listeners to process the initial revision.
-    time.sleep(1.5)
+    # A paired trial must start only after *every* enforcement JVM has
+    # acknowledged the current authority reset revision. This prevents a
+    # delayed message from a prior trial from changing the new starting state:
+    # Kafka callbacks reject older revisions once the reset has converged.
+    if oracle_token is not None:
+        deadline = time.monotonic() + 18
+        while time.monotonic() < deadline:
+            try:
+                baseline = oracle_snapshot(oracle_token)
+                desired = baseline["authority"]
+                if (desired.get("revoked") is False
+                        and all(t["admin"]["revision"] == desired["revision"]
+                                and t["admin"]["revoked"] is False
+                                for t in baseline["targets"])):
+                    break
+            except (RuntimeError, KeyError, TypeError):
+                pass
+            time.sleep(0.3)
+        else:
+            raise RuntimeError("No converged clean reset; abort before injecting fault")
+    else:
+        # Retained only for manually controlled legacy pilot callers.
+        time.sleep(1.5)
     if fault_target not in ENFORCERS:
         raise ValueError("Unexpected fault target")
     if fault_mode not in {"loss", "delay", "duplicate", "reorder"}:
@@ -239,7 +261,8 @@ def run_case(action: str, control_token: str, oracle_token: str,
              delay_ms: int = 200, duration_seconds: float = 5) -> dict:
     """Reset all processes, inject event loss and measure one candidate action."""
     setup_fault(control_token, ttl_ms=ttl_ms, delay_ms=delay_ms,
-                fault_target=fault_target, fault_mode=fault_mode)
+                fault_target=fault_target, fault_mode=fault_mode,
+                oracle_token=oracle_token)
     before_probes = gateway_probes()
     before_truth = oracle_snapshot(oracle_token)
     operations = measure_under_load(action, control_token, requests_per_second=rps,
@@ -276,7 +299,8 @@ def run_case(action: str, control_token: str, oracle_token: str,
 
 def run_regression(control_token: str, oracle_token: str) -> dict:
     """Inject a silent cache regression and compare observer paths after a clean fix."""
-    setup_fault(control_token, ttl_ms=30000, delay_ms=0)
+    setup_fault(control_token, ttl_ms=30000, delay_ms=0,
+                oracle_token=oracle_token)
     request("enforcer-b", "/admin/fault/none/0", method="POST", token=control_token)
     request("authority", "/control/resync", method="POST", token=control_token)
     time.sleep(0.7)
@@ -305,7 +329,7 @@ def run_hidden_target_case(control_token: str, oracle_token: str) -> dict:
     independent inventory reconciliation.
     """
     setup_fault(control_token, ttl_ms=30000, delay_ms=0,
-                fault_target="enforcer-hidden")
+                fault_target="enforcer-hidden", oracle_token=oracle_token)
     gateway = gateway_probes(count=6)
     oracle = oracle_snapshot(oracle_token)
     return {
