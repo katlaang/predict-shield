@@ -16,3 +16,9 @@ experiment-b/private_results/
 experiment-b/reports/training/
 experiment-b/reports/model-*.json
 experiment-b/**/oracle/*.json
+
+# Real mechanism-lab experiment outputs and confidential oracle observations
+experiment-b/mechanism-lab/plans/
+experiment-b/mechanism-lab/results/
+experiment-b/mechanism-lab/reports/*-evaluation.json
+experiment-b/mechanism-lab/**/*.joblib
