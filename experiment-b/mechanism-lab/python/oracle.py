@@ -98,6 +98,14 @@ class OracleHandler(BaseHTTPRequestHandler):
 
     def do_GET(self) -> None:
         """Return an oracle snapshot or refuse an invalid lab credential."""
+        if self.path == "/healthz":
+            payload = b'{"oracle":"ready"}'
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self.send_header("Content-Length", str(len(payload)))
+            self.end_headers()
+            self.wfile.write(payload)
+            return
         if self.path != "/oracle/observe":
             self.send_error(404)
             return
