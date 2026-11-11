@@ -8,3 +8,11 @@ __pycache__/
 target/
 build/
 node_modules/
+
+# Generated research manifests, raw action outcomes and restricted lab oracle labels
+experiment-b/generated/
+experiment-b/results/
+experiment-b/private_results/
+experiment-b/reports/training/
+experiment-b/reports/model-*.json
+experiment-b/**/oracle/*.json
