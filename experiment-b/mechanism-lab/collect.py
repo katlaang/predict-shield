@@ -19,6 +19,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import subprocess
 from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
@@ -51,6 +52,26 @@ def assess_gateway(probes: list[dict]) -> tuple[str, str]:
     return "INDETERMINATE", "Gateway coverage does not include the full inventory"
 
 
+def source_commit() -> str:
+    """Resolve the exact reviewed source revision; never invent provenance.
+
+    GitHub Actions supplies GITHUB_SHA. A local clone uses git rev-parse HEAD.
+    If neither is available, collection stops rather than claiming results
+    without a reproducible version identifier.
+    """
+    source = os.environ.get("GITHUB_SHA")
+    if source:
+        return source
+    repository = Path(__file__).resolve().parents[2]
+    result = subprocess.run(
+        ["git", "-C", str(repository), "rev-parse", "HEAD"],
+        capture_output=True, text=True, timeout=5, check=True,
+    ).stdout.strip()
+    if len(result) != 40 or any(char not in "0123456789abcdef" for char in result):
+        raise ValueError("Could not establish a valid source commit")
+    return result
+
+
 def separate_records(config: dict, trial: dict, observed: dict) -> dict[str, dict]:
     """Partition one executed trial into four independently meaningful records.
 
@@ -80,7 +101,7 @@ def separate_records(config: dict, trial: dict, observed: dict) -> dict[str, dic
         "initial_state_seed": trial["initial_state_seed"],
         "experiment_type": "real_kafka_multijvm_lab",
         "collected_at": datetime.now(timezone.utc).isoformat(),
-        "source_commit": os.environ.get("GITHUB_SHA", "LOCAL_UNRECORDED_SHA"),
+        "source_commit": source_commit(),
     }
     return {
         "pre_action": {
