@@ -32,11 +32,12 @@ ACTIONS = ("resync_policy", "restart_enforcer", "gateway_restrict", "monitor_onl
 SPLITS = {"train": 60, "calibration": 20, "test": 20}
 EXPECTED_TRIALS = 1200
 
+# The trained model must not see laboratory-injected fault labels or timing.
+# Those variables remain available only for post-hoc stratification and an
+# explicitly *privileged* diagnostic lookup baseline.
 FEATURES = (
-    "cache_ttl_ms", "event_delay_ms", "requested_rps",
+    "cache_ttl_ms", "requested_rps",
     "initial_gateway_allowed_fraction",
-) + tuple("fault=" + x for x in FAULTS) + tuple(
-    "target=" + x for x in TARGETS
 ) + tuple("action=" + x for x in ACTIONS)
 
 
@@ -93,20 +94,23 @@ def load_executed_dataset(path: Path) -> list[dict]:
         group_key = (conf, a["repeat"])
         action_groups.setdefault(group_key, set()).add(a["action_id"])
         features = a["features"]
+        conditions = a.get("experimental_conditions", {})
+        if any(key in features for key in ("fault_mode", "fault_target", "event_delay_ms")):
+            raise ValueError("Injected hidden fault metadata leaked into model features")
         static_key = (
             a.get("initial_state_seed"),
-            features.get("fault_mode"),
-            features.get("fault_target"),
+            conditions.get("fault_mode"),
+            conditions.get("fault_target"),
             features.get("cache_ttl_ms"),
-            features.get("event_delay_ms"),
+            conditions.get("event_delay_ms"),
             features.get("requested_rps"),
             features.get("measurement_seconds"),
         )
         if group_key in paired_static_features and paired_static_features[group_key] != static_key:
             raise ValueError("Matched actions do not share the registered starting conditions")
         paired_static_features[group_key] = static_key
-        if (features.get("fault_mode") not in FAULTS
-                or features.get("fault_target") not in TARGETS
+        if (conditions.get("fault_mode") not in FAULTS
+                or conditions.get("fault_target") not in TARGETS
                 or a["action_id"] not in ACTIONS):
             raise ValueError("Unregistered fault, target or action")
         observations = a["external_deny_observations"]
@@ -127,11 +131,10 @@ def load_executed_dataset(path: Path) -> list[dict]:
         # Target labels are isolated until this post-hoc training/evaluation phase.
         examples.append({
             "group": conf, "partition": partition,
-            "action": a["action_id"], "fault": features["fault_mode"],
-            "target": features["fault_target"],
+            "action": a["action_id"], "fault": conditions["fault_mode"],
+            "target": conditions["fault_target"],
             "pre_action": {
                 "cache_ttl_ms": features["cache_ttl_ms"],
-                "event_delay_ms": features["event_delay_ms"],
                 "requested_rps": features["requested_rps"],
                 "initial_gateway_allowed_fraction": sum(
                     x["http_status"] == 200 for x in observations) / len(observations),
@@ -149,14 +152,15 @@ def load_executed_dataset(path: Path) -> list[dict]:
 
 
 def to_features(row: dict) -> list[float]:
-    """One-hot encode only registered action, fault, target and pre-action values."""
+    """Encode only operator-observable pre-action inputs and action identity.
+
+    Injected fault labels and timing remain deliberately excluded to avoid
+    turning a hidden experimental intervention into a model shortcut.
+    """
     p = row["pre_action"]
     return [float(p[k]) for k in (
-        "cache_ttl_ms", "event_delay_ms", "requested_rps",
-        "initial_gateway_allowed_fraction",
-    )] + [float(row["fault"] == x) for x in FAULTS] + [
-        float(row["target"] == x) for x in TARGETS
-    ] + [float(row["action"] == x) for x in ACTIONS]
+        "cache_ttl_ms", "requested_rps", "initial_gateway_allowed_fraction",
+    )] + [float(row["action"] == x) for x in ACTIONS]
 
 
 def conformal_radius(actual, predicted, alpha: float = 0.1) -> float:
@@ -172,8 +176,8 @@ def train_evaluate(rows: list[dict], seed: int = 20261110,
                    *, export_path: Path | None = None) -> dict:
     """Fit models on training groups and compare once on held-out groups.
 
-    Uses strong train-only hierarchical lookup baselines including the fault
-    and target identity. No test-set results are used to select features,
+    Uses an operational action-only lookup baseline and an explicitly privileged
+    diagnostic fault/target lookup that is not considered a fair operational competitor. No test-set results are used to select features,
     hyperparameters, interval radii, or baselines.
     """
     groups = {name: [r for r in rows if r["partition"] == name]
@@ -201,6 +205,7 @@ def train_evaluate(rows: list[dict], seed: int = 20261110,
         "trial_counts": {k: len(v) for k, v in groups.items()},
         "metrics": {},
         "model_automatically_dispatched": False,
+        "fault_injection_metadata_used_as_model_features": False,
         "test_used_for_training_or_calibration": False,
     }
     matrices = {k: np.asarray([to_features(r) for r in v], dtype=float)
@@ -238,9 +243,18 @@ def train_evaluate(rows: list[dict], seed: int = 20261110,
                     return averages[key]
             raise ValueError("Action not seen in training")
         baseline_test = np.asarray([baseline(r) for r in test])
+        # Comparable deployment baseline: action averages only, without the
+        # laboratory's hidden fault label or injected target identity.
+        action_means = {action: float(np.mean([
+            item[label] for item in train if item["action"] == action]))
+            for action in ACTIONS}
+        action_baseline = np.asarray([action_means[item["action"]] for item in test])
         report["metrics"][label] = {
+            "action_only_lookup_heldout_mae": float(mean_absolute_error(
+                y["test"], action_baseline)),
+            "privileged_fault_lookup_is_not_operational_baseline": True,
             "model_heldout_mae": float(mean_absolute_error(y["test"], pred_test)),
-            "hierarchical_lookup_heldout_mae": float(mean_absolute_error(
+            "privileged_fault_lookup_heldout_mae": float(mean_absolute_error(
                 y["test"], baseline_test)),
             "marginal_interval_coverage": float(np.mean(
                 (y["test"] >= low) & (y["test"] <= high))),
