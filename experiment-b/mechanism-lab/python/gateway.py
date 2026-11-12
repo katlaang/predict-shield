@@ -77,8 +77,17 @@ class Gateway(BaseHTTPRequestHandler):
             self._send(403, {"source": "gateway", "decision": "DENY"})
             return
         node = routes[next(counter) % len(routes)]
+        # Forward only the disposable *lab* authorized-user marker. No
+        # identity from this header is trusted outside this synthetic lab.
+        # All other client headers are deliberately excluded.
+        forwarded_headers = {}
+        if self.path == "/protected" and self.headers.get("X-Lab-Principal") == "authorized":
+            forwarded_headers["X-Lab-Principal"] = "authorized"
         try:
-            with urllib.request.urlopen(node + self.path, timeout=1.0) as resp:
+            upstream_request = urllib.request.Request(
+                node + self.path, headers=forwarded_headers
+            )
+            with urllib.request.urlopen(upstream_request, timeout=1.0) as resp:
                 status = resp.status
                 body = resp.read(4096)
         except urllib.error.HTTPError as err:
