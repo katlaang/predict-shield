@@ -63,6 +63,11 @@ jobs:
       - name: Collect four real actions through the audited bounded campaign runner
         working-directory: experiment-b/mechanism-lab
         run: python campaign.py --execute-lab --plan plans/ci-mechanism --records results/ci-mechanism --max-trials 4
+      - name: Expand bounded pilot to three distinct fault configurations
+        working-directory: experiment-b/mechanism-lab
+        run: |
+          python campaign.py --execute-lab --plan plans/ci-mechanism --records results/ci-mechanism --start 12 --max-trials 4
+          python campaign.py --execute-lab --plan plans/ci-mechanism --records results/ci-mechanism --start 24 --max-trials 4
       - name: Audit registered campaign completion and reject fabricated outcomes
         working-directory: experiment-b/mechanism-lab
         run: |
@@ -71,10 +76,10 @@ jobs:
           import json
           from pathlib import Path
           d = json.loads(Path("reports/ci-campaign-audit.json").read_text())
-          assert d["complete"] == 4 and d["missing"] == 1196
+          assert d["complete"] == 12 and d["missing"] == 1188
           assert d["partial"] == d["invalid"] == d["unexpected_files"] == 0
           assert not d["ready_for_training"]
-          print("PASS: four measured trials, no fabricated 1200-run completion")
+          print("PASS: 12 measured trials across three configurations, not 1200")
           PY
       - name: Validate separate collected records without exposing private oracle data
         working-directory: experiment-b/mechanism-lab
@@ -86,7 +91,7 @@ jobs:
           joined=[]
           for stream in ("pre_action","verification","operations","oracle"):
               files=list((folder/stream).glob("*.json"))
-              assert len(files)==4,(stream,len(files))
+              assert len(files)==12,(stream,len(files))
               for file in files:
                   record=json.loads(file.read_text())
                   assert record["run_id"]
@@ -95,7 +100,33 @@ jobs:
           assert all(s==joined[0] for s in joined)
           pre=[json.loads(p.read_text()) for p in (folder/"pre_action").glob("*.json")]
           assert all(p["oracle_features_excluded"] for p in pre)
-          print("PASS: four real action replays, matching isolated records and no oracle leakage")
+          assert len({p["configuration_id"] for p in pre}) == 3
+          report=[]
+          for p in sorted(pre,key=lambda x:(x["configuration_id"], x["action_id"])):
+              name=p["run_id"]+".json"
+              verification=json.loads((folder/"verification"/name).read_text())
+              operations=json.loads((folder/"operations"/name).read_text())
+              oracle=json.loads((folder/"oracle"/name).read_text())
+              report.append({
+                  "configuration":p["configuration_id"],
+                  "fault_family":p["experimental_conditions"]["fault_mode"],
+                  "action":p["action_id"],
+                  "control_remediated":oracle["actual_revoked_access_denied"],
+                  "gateway_path_exposed":verification["path_exposure_observed"],
+                  "legitimate_failed_requests":operations["failed_requests"],
+                  "legitimate_attempts":operations["observed_requests"],
+                  "verifier":verification["outcome"]
+              })
+          assert len(report)==12
+          Path("reports/ci-12-trial-summary.json").write_text(json.dumps({
+              "status":"observed_laboratory_pilot_only",
+              "executed_trials":12,
+              "configurations":3,
+              "outcomes":report,
+              "not_a_model_effectiveness_result":True
+          },indent=2)+"\\n")
+          print(json.dumps(report,indent=2))
+          print("PASS: twelve real action replays, matching private oracle records and no feature leakage")
           PY
       - name: Remove restricted research and oracle trial files before artifact upload
         if: always()
