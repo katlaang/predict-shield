@@ -42,7 +42,8 @@ ACTIONS = ("resync_policy", "restart_enforcer", "gateway_restrict", "monitor_onl
 
 def request(name: str, path: str, *, method: str = "GET",
             token: str | None = None, oracle: str | None = None,
-            timeout: float = 1.5) -> tuple[int | None, dict, float]:
+            timeout: float = 1.5,
+            authorized_lab_user: bool = False) -> tuple[int | None, dict, float]:
     """Issue an actual HTTP request and preserve failures and measured latency."""
     if name not in HOST or not path.startswith("/") or "://" in path:
         raise ValueError("Unexpected fixture destination")
@@ -51,6 +52,10 @@ def request(name: str, path: str, *, method: str = "GET",
         headers["X-Lab-Control"] = token
     if oracle:
         headers["X-Lab-Oracle"] = oracle
+    if authorized_lab_user:
+        if path != "/protected" or method != "GET":
+            raise ValueError("Authorized test marker only valid for protected GET")
+        headers["X-Lab-Principal"] = "authorized"
     begin = time.perf_counter()
     try:
         with urllib.request.urlopen(
@@ -450,7 +455,15 @@ def measure_under_load(action: str, control_token: str, *,
             delay = deadline - time.perf_counter()
             if delay > 0:
                 time.sleep(delay)
-            scheduled.append(pool.submit(request, "gateway", "/legitimate"))
+            # One quarter of legitimate load is an authorized user of
+            # the SAME protected route. A coarse emergency gateway block
+            # will therefore deny real authorized requests, not become free.
+            if i % 4 == 0:
+                scheduled.append(pool.submit(
+                    request, "gateway", "/protected", authorized_lab_user=True
+                ))
+            else:
+                scheduled.append(pool.submit(request, "gateway", "/legitimate"))
             # Roughly four protected probes per second. Both probe and workload
             # requests use the live gateway; the collector does not ask the
             # private oracle or infer timing from policy configuration.
