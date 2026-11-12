@@ -1,7 +1,10 @@
 """Tests for hindsight regret accounting without empirical effectiveness claims."""
 import unittest
 
-from decision_eval import ACTIONS, engineering_rule, evaluate_regret, observed_utility, evaluate_sensitivity
+from decision_eval import (
+    ACTIONS, engineering_rule, evaluate_regret, observed_utility,
+    evaluate_sensitivity, tune_rule_on_training_groups, tuned_rule_action,
+)
 
 
 class DecisionRegretTests(unittest.TestCase):
@@ -86,6 +89,38 @@ class DecisionRegretTests(unittest.TestCase):
         """Use all three fixed research weights, not a test-selected optimum."""
         rows, predictions = self.cases()
         self.assertEqual(len(evaluate_sensitivity(rows, predictions)), 3)
+
+    def test_thresholds_are_fitted_only_on_training_groups(self):
+        """A deterministic threshold grid must never inspect held-out outcomes."""
+        rows, predictions = self.cases()
+        for row in rows:
+            row["partition"] = "train"
+            row["pre_action"]["operator_revision_spread"] = 1
+            row["pre_action"]["requested_rps"] = 20
+        result = tune_rule_on_training_groups(rows)
+        self.assertEqual(result["fitted_partition"], "train")
+        self.assertEqual(result["grid_size"], 216)
+        self.assertFalse(result["test_labels_used_for_fitting"])
+        evaluation = evaluate_regret(
+            rows, predictions, tuned_parameters=result["parameters"]
+        )
+        self.assertIn("train_tuned_rule", evaluation["policies"])
+        rows[0]["partition"] = "test"
+        with self.assertRaises(ValueError):
+            tune_rule_on_training_groups(rows)
+
+    def test_tuned_rule_never_bypasses_change_freeze(self):
+        """Even an aggressive fitted threshold cannot authorize restart."""
+        rows, _ = self.cases()
+        choice = rows[0]
+        choice["restart_permitted"] = False
+        params = {
+            "ttl_threshold_ms": 3500,
+            "load_threshold_rps": 65,
+            "revision_spread_threshold": 0,
+            "gateway_threshold_rps": 55,
+        }
+        self.assertEqual(tuned_rule_action(choice, params), "gateway_restrict")
 
     def test_outcome_normalization_is_mandatory(self):
         """Out-of-range risk or service failure measurements invalidate regret."""
