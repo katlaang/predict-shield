@@ -46,3 +46,9 @@ The KEV date-added field is a catalog inclusion timestamp, not the date of first
 ## Safety
 
 This module is offline and has no credentials, network calls, asset discovery, scanners or execution hooks. Never claim critical-infrastructure field validation on the basis of synthetic asset fixtures.
+
+## Official historical EPSS archive integrity
+
+The parser accepts the official `.csv.gz` format, records a checksum of the *original compressed bytes*, and compares a modern file's embedded `score_date` with the declared `snapshot_date`. A mismatch fails closed. Older EPSS CSVs without an embedded date are accepted with `embedded_score_date: null` and must have independently preserved historical provenance. Metadata validation alone cannot prove a file existed before the prediction cutoff.
+
+The official historical EPSS archive is `https://github.com/empiricalsec/epss_scores`, not a current-date CSV renamed to an older date. Historical KEV snapshots must also come from dated repository history and preserve the source commit SHA. EPSS model versions change over time; chronological evaluations crossing a version boundary must report the boundary explicitly.
