@@ -407,3 +407,29 @@ requirement; this lab endpoint is not suitable for production exposure.
 
 Automatic defensive execution is still **disabled**. A research lab's fixed
 error allowance is not an independently measured remaining service budget.
+
+
+## Pre-campaign protocol and engineering review
+
+The reviewer-identified reorder audit bug is corrected by comparing the
+hostname parsed from the oracle's URL with the registered short target
+name. A genuine increment of the reordered-event counter is still mandatory.
+
+The measured pilot plan covers loss, delay, duplicate and reorder across
+five configurations, two repetitions and four actions: 40 actual replays.
+The trained study's 216-point deterministic threshold grid fits only the
+60 training configurations, never the calibration/test labels. A separate,
+explicitly exploratory leave-one-configuration-out fit is available for the
+five-configuration pilot, not as proof of comparative AI effectiveness.
+
+The Java workload now includes authorized users of the same protected
+operation, so a gateway-wide operation block can cause measurable legitimate
+failures. Per-node request latency is a real JVM handler setting and is
+measured as a secondary outcome. Distinct cold-start-time distributions
+are not implemented and are not claimed.
+
+The prospective research protocol is pinned to a Git commit and blob SHA
+in [PROTOCOL_V3_FREEZE.md](PROTOCOL_V3_FREEZE.md). GitHub Actions checks its
+content checksum before pilot collection. This is an immutable commit-based
+freeze, not an actual annotated Git tag; the repository maintainer's tag
+command is documented in the freeze file.
