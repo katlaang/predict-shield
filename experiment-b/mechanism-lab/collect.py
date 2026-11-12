@@ -141,6 +141,7 @@ def separate_records(config: dict, trial: dict, observed: dict) -> dict[str, dic
                 "counterfactual_actions_may_be_tested_offline": True,
             },
             "external_deny_observations": before["verifier_gateway_probes"],
+            "operator_observations": before.get("operator_telemetry", []),
             "model_prediction_recorded": False,
             "oracle_features_excluded": True,
         },
