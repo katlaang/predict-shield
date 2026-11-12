@@ -297,7 +297,7 @@ def train_evaluate(rows: list[dict], seed: int = 20261110,
                 name: [float(matrices["train"][:, i].min()),
                        float(matrices["train"][:, i].max())]
                 for i, name in enumerate(FEATURES)
-                if i < 4
+                if i < 3
             },
             "radii": calibration_radii,
             "models": fitted_models,
