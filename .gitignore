@@ -22,3 +22,6 @@ experiment-b/mechanism-lab/plans/
 experiment-b/mechanism-lab/results/
 experiment-b/mechanism-lab/reports/*-evaluation.json
 experiment-b/mechanism-lab/**/*.joblib
+
+# Keep raw laboratory oracle and experiment reports out of source control
+experiment-b/mechanism-lab/reports/*.json
