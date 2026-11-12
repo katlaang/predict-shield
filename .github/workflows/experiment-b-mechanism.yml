@@ -132,12 +132,14 @@ jobs:
         if: always()
         working-directory: experiment-b/mechanism-lab
         run: rm -rf plans/ci-mechanism results/ci-mechanism
-      - name: Retain measured laboratory observations
+      - name: Retain sanitized campaign summary without raw oracle or control secrets
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: experiment-b-mechanism-pilot
-          path: experiment-b/mechanism-lab/reports/
+          path: |
+            experiment-b/mechanism-lab/reports/ci-campaign-audit.json
+            experiment-b/mechanism-lab/reports/ci-12-trial-summary.json
           if-no-files-found: ignore
       - name: Shutdown and diagnostics
         if: always()
