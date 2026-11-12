@@ -278,6 +278,82 @@ def perform_action(action: str, control_token: str,
         raise ValueError("Unrecognized corrective action")
 
 
+def integrate_gateway_exposure(
+    samples: list[dict], *, window_seconds: float,
+) -> dict:
+    """Integrate observed gateway authorization over the action window.
+
+    Each scheduled external gateway probe carries a monotonic completion
+    timestamp relative to the window start. A response of HTTP 200 counts as
+    exposed; HTTP 403 is an observed denial; all other codes and missing
+    probe periods are unknown. Piecewise constant samples contribute
+    exposure-seconds, and unknown time contributes a separate uncertainty
+    bound, never an invented denial. This is sampled observable path
+    exposure, not continuous network-wide exposure or cache oracle truth.
+
+    The first observation must be within the window. The interval from
+    window start to first completed response is unknown, and every observed
+    response applies until the next completed sample. The final observation
+    carries forward only until the registered end of the window. No labels
+    are inferred from the final oracle snapshot.
+    """
+    if not 0 < window_seconds <= 30 or not samples:
+        raise ValueError("Missing bounded observed gateway timeline")
+    ordered = sorted(samples, key=lambda item: item["seconds_after_start"])
+    last_time = 0.0
+    state = None
+    exposed = 0.0
+    unknown = 0.0
+    valid = 0
+    for record in ordered:
+        timestamp = float(record["seconds_after_start"])
+        if timestamp < last_time or timestamp > window_seconds:
+            raise ValueError("Invalid or late authorization sample timestamp")
+        elapsed = timestamp - last_time
+        if state == 200:
+            exposed += elapsed
+        elif state != 403:
+            unknown += elapsed
+        state = record["http_status"]
+        if state in (200, 403):
+            valid += 1
+        last_time = timestamp
+    tail = window_seconds - last_time
+    if state == 200:
+        exposed += tail
+    elif state != 403:
+        unknown += tail
+    if valid < 2:
+        raise ValueError("Insufficient valid timed gateway denial observations")
+    return {
+        "method": "monotonic_http_step_integral",
+        "window_seconds": window_seconds,
+        "probe_count": len(samples),
+        "valid_probe_count": valid,
+        "exposure_seconds_lower_bound": exposed,
+        "exposure_seconds_upper_bound": exposed + unknown,
+        "unknown_seconds": unknown,
+        "exposure_fraction_lower_bound": exposed / window_seconds,
+        "exposure_fraction_upper_bound": (exposed + unknown) / window_seconds,
+        "samples": ordered,
+    }
+
+
+def timed_gateway_probe(start: float) -> dict:
+    """Record a real protected gateway response with its completion timestamp.
+
+    Only externally returned HTTP status and gateway origin are retained.
+    Calling this function does not require control or private oracle tokens.
+    A transport failure is explicitly unknown rather than an assumed denial.
+    """
+    status, response, _ = request("gateway", "/protected")
+    return {
+        "seconds_after_start": time.perf_counter() - start,
+        "http_status": status,
+        "upstream": response.get("gateway_upstream"),
+    }
+
+
 def measure_under_load(action: str, control_token: str, *,
                        requests_per_second: int = 30, duration_seconds: float = 5,
                        fault_target: str = "enforcer-b") -> dict:
@@ -292,6 +368,7 @@ def measure_under_load(action: str, control_token: str, *,
         raise ValueError("Pilot workload outside declared safe limits")
     start = time.perf_counter()
     outcomes = []
+    timed_probes = []
     future_action = None
     with concurrent.futures.ThreadPoolExecutor(max_workers=16) as pool:
         scheduled = []
@@ -304,15 +381,31 @@ def measure_under_load(action: str, control_token: str, *,
             if delay > 0:
                 time.sleep(delay)
             scheduled.append(pool.submit(request, "gateway", "/legitimate"))
+            # Roughly four protected probes per second. Both probe and workload
+            # requests use the live gateway; the collector does not ask the
+            # private oracle or infer timing from policy configuration.
+            if i % max(1, requests_per_second // 4) == 0:
+                timed_probes.append(pool.submit(
+                    timed_gateway_probe, start
+                ))
         for result in scheduled:
             status, _, latency = result.result(timeout=20)
             outcomes.append({"http_status": status, "latency_ms": latency})
+        samples = [future.result(timeout=20) for future in timed_probes]
         if future_action is not None:
             future_action.result(timeout=125)
     elapsed = time.perf_counter() - start
     failures = sum(item["http_status"] != 200 for item in outcomes)
     latencies = sorted(item["latency_ms"] for item in outcomes)
+    valid_samples = [
+        sample for sample in samples
+        if sample["seconds_after_start"] <= duration_seconds
+    ]
+    exposure = integrate_gateway_exposure(
+        valid_samples, window_seconds=duration_seconds
+    )
     return {
+        "gateway_exposure_timeline": exposure,
         "requested_rps": requests_per_second,
         "measured_rps": len(outcomes) / elapsed,
         "duration_seconds": elapsed,
