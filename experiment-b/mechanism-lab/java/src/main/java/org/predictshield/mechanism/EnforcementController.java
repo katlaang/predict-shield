@@ -381,6 +381,7 @@ public final class EnforcementController {
             @RequestHeader(value = "X-Lab-Oracle", required = false) String token) {
         if (!authorized(token, oracleToken)) return forbidden();
         return ResponseEntity.ok(Map.ofEntries(
+                Map.entry("instance", identity),
                 Map.entry("revision", cached.revision()),
                 Map.entry("revoked", cached.revoked()),
                 Map.entry("fault", fault),
