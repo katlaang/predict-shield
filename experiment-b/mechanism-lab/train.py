@@ -37,7 +37,7 @@ EXPECTED_TRIALS = 1200
 # Those variables remain available only for post-hoc stratification and an
 # explicitly *privileged* diagnostic lookup baseline.
 FEATURES = (
-    "cache_ttl_ms", "requested_rps",
+    "cache_ttl_ms", "requested_rps", "gateway_visible_enforcer_count",
     "initial_gateway_allowed_fraction",
 ) + tuple("action=" + x for x in ACTIONS)
 
@@ -145,6 +145,7 @@ def load_executed_dataset(path: Path) -> list[dict]:
             "pre_action": {
                 "cache_ttl_ms": features["cache_ttl_ms"],
                 "requested_rps": features["requested_rps"],
+                "gateway_visible_enforcer_count": features["visible_enforcement_processes"],
                 "initial_gateway_allowed_fraction": sum(
                     x["http_status"] == 200 for x in observations) / len(observations),
             },
@@ -173,7 +174,8 @@ def to_features(row: dict) -> list[float]:
     """
     p = row["pre_action"]
     return [float(p[k]) for k in (
-        "cache_ttl_ms", "requested_rps", "initial_gateway_allowed_fraction",
+        "cache_ttl_ms", "requested_rps",
+        "gateway_visible_enforcer_count", "initial_gateway_allowed_fraction",
     )] + [float(row["action"] == x) for x in ACTIONS]
 
 
@@ -364,7 +366,7 @@ def train_evaluate(rows: list[dict], seed: int = 20261110,
                 name: [float(matrices["train"][:, i].min()),
                        float(matrices["train"][:, i].max())]
                 for i, name in enumerate(FEATURES)
-                if i < 3
+                if i < 4
             },
             "radii": calibration_radii,
             "models": fitted_models,
