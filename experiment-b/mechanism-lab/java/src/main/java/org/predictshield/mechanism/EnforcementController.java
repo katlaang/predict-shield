@@ -380,21 +380,21 @@ public final class EnforcementController {
     public ResponseEntity<?> adminState(
             @RequestHeader(value = "X-Lab-Oracle", required = false) String token) {
         if (!authorized(token, oracleToken)) return forbidden();
-        return ResponseEntity.ok(Map.of(
-                "instance", identity,
-                "revision", cached.revision(),
-                "revoked", cached.revoked(),
-                "fault", fault,
-                "handled_events", handledEvents,
-                "dropped_events", droppedEvents,
-                "pending_scheduled_callbacks", scheduledCallbacks.get(),
-                "old_epoch_callbacks_discarded", discardedOldEpochCallbacks.get(),
-                "experiment_epoch", experimentEpoch.get(),
-                "trial_id", cached.trialId(),
-                "rejected_trial_events", rejectedTrialEvents.get(),
-                "reordered_event_pairs", reorderedEventPairs.get(),
-                "duplicated_events", duplicatedEvents.get(),
-                "refresh_failed", lastRefreshFailed));
+        return ResponseEntity.ok(Map.ofEntries(
+                Map.entry("revision", cached.revision()),
+                Map.entry("revoked", cached.revoked()),
+                Map.entry("fault", fault),
+                Map.entry("handled_events", handledEvents),
+                Map.entry("dropped_events", droppedEvents),
+                Map.entry("pending_scheduled_callbacks", scheduledCallbacks.get()),
+                Map.entry("old_epoch_callbacks_discarded", discardedOldEpochCallbacks.get()),
+                Map.entry("experiment_epoch", experimentEpoch.get()),
+                Map.entry("trial_id", cached.trialId()),
+                Map.entry("rejected_trial_events", rejectedTrialEvents.get()),
+                Map.entry("reordered_event_pairs", reorderedEventPairs.get()),
+                Map.entry("duplicated_events", duplicatedEvents.get()),
+                Map.entry("refresh_failed", lastRefreshFailed));)
+        ));
     }
 
     /**
