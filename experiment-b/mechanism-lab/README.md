@@ -289,8 +289,7 @@ broker after reset. A reorder trial emits two distinct revisions.
 Resync republishes current policy without disabling the injected consumer
 fault. A permanent lost-event consumer is not secretly fixed by resync.
 Restart exercises actual service downtime and a separate authority HTTP
-refresh. Gateway restriction can block reachable paths while the enforcement
-control remains stale. The outcomes distinguish: (1) complete direct
+refresh. Gateway restriction can block reachable protected paths without intentionally denying unrelated legitimate work, while the enforcement control remains stale. The outcomes distinguish: (1) complete direct
 enforcement-control remediation; (2) observed gateway-path exposure;
 and (3) legitimate service HTTP failure/latency.
 
@@ -317,3 +316,43 @@ The GitHub integration workflow performs a bounded 12-trial pilot across
 three fault configurations and retains a sanitized per-action outcome table.
 Private oracle raw records are deleted before uploading CI artifacts.
 The full 1,200-run campaign is still unexecuted.
+
+## Temporal exposure, absolute disruption, and repeated baseline pilot
+
+The experimental action window now samples actual protected gateway HTTP
+responses over time. It integrates allowed access into exposure-seconds,
+preserves the observed window, and records unknown seconds separately.
+Network errors and unobserved initial intervals contribute to an upper
+exposure bound; no missing interval is assumed to be safely denied.
+
+Action evaluation uses exposure fraction derived from these time-integrated
+upper bounds, independent control remediation, and absolute measured
+failed legitimate requests divided by a declared experimental count budget.
+The absolute allowance of 25 requests is a research comparator, NOT a
+verified remaining operational error budget and cannot authorize execution.
+
+Configurations also vary whether a restart is permitted by a declared
+research change policy. All four actions are replayed in the disposable
+experiment to measure counterfactual outcomes, but offline decision policies
+must exclude restart whenever the simulated change freeze applies. The
+gateway mitigation intentionally targets only the compromised protected
+route and allows legitimate requests to continue, making it a plausible
+fallback where restart is prohibited or excessively disruptive.
+
+The offline regret comparator reports fixed resync, fixed restart with
+gateway fallback, fixed gateway, fixed monitor and a preregistered
+engineering rule under three independent weightings:
+(path, control, disruption) = (0.50, 0.25, 0.25), (0.70, 0.20, 0.10)
+and (0.30, 0.20, 0.50). Absolute failure cost is not capped at one.
+
+The revised CI pilot targets four configurations: loss, delay, reorder
+and restart-prohibited loss, with two repeats of each of four actions.
+It therefore plans 32 ACTUAL experimental replays (four configurations
+times two repeats times four actions), plus the existing mechanism smoke
+tests. CI will preserve only a sanitized regret report, not raw oracle
+or sensitive data. The full 1,200-trial campaign remains unexecuted.
+
+This pilot has only four independently configured environments, so
+regret values remain preliminary descriptive statistics. Reordered messages
+may be safely ignored under monotonic revision checks; the goal is to
+measure the behavior, not force a security failure or invent a model win.
