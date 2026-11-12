@@ -24,7 +24,7 @@ import json
 import math
 import os
 from collections import Counter
-from decision_eval import evaluate_sensitivity
+from decision_eval import evaluate_sensitivity, tune_rule_on_training_groups
 from pathlib import Path
 
 FAULTS = ("loss", "delay", "duplicate", "reorder")
@@ -396,8 +396,13 @@ def train_evaluate(rows: list[dict], seed: int = 20261110,
             )[0]))
             for label, model in fitted_models.items()
         }
+    # Fit the strongest declared deterministic comparator exclusively on
+    # 60 training configurations; apply it unchanged to all test strata and
+    # all three objective sensitivity weights.
+    tuned_rule = tune_rule_on_training_groups(groups["train"])
+    report["train_only_tuned_rule"] = tuned_rule
     report["offline_decision_sensitivity"] = evaluate_sensitivity(
-        test_rows, offline_predictions
+        test_rows, offline_predictions, tuned_rule["parameters"]
     )
     # Prospective crossover: describe results at every declared difficulty
     # level without filtering for strata where AI happens to outperform a rule.
@@ -407,7 +412,8 @@ def train_evaluate(rows: list[dict], seed: int = 20261110,
         if selected:
             keys = {(r["group"], r["repeat"], r["action"]) for r in selected}
             report["complexity_crossover"][level] = evaluate_sensitivity(
-                selected, {k: p for k, p in offline_predictions.items() if k in keys}
+                selected, {k: p for k, p in offline_predictions.items() if k in keys},
+                tuned_rule["parameters"]
             )
         else:
             report["complexity_crossover"][level] = {
