@@ -231,6 +231,38 @@ def gateway_scope_evidence(control_token: str, probes: list[dict]) -> dict:
         }
 
 
+def operator_telemetry(control_token: str) -> list[dict]:
+    """Observe actual cached revisions and refresh indicators before action.
+
+    This uses only the separately authenticated operator endpoint, never
+    the oracle admin state or injected fault configuration. Each process
+    contributes an explicit present/missing marker. A revision difference
+    across processes is a cache divergence indicator, NOT a direct Kafka
+    consumer lag or evidence of a specific injected fault type.
+    """
+    samples = []
+    for node in ENFORCERS:
+        status, payload, latency = request(
+            node, "/operator/telemetry", token=control_token, timeout=1.5
+        )
+        if status != 200 or payload.get("observation_type") != "operator_pre_action":
+            samples.append({"node": node, "observed": False,
+                            "latency_ms": latency})
+        else:
+            samples.append({
+                "node": node, "observed": True,
+                "observed_at_monotonic": time.monotonic(),
+                "applied_revision": payload["applied_revision"],
+                "cache_age_ms": payload["cache_age_ms"],
+                "cache_ttl_ms": payload["cache_ttl_ms"],
+                "handled_events": payload["handled_events"],
+                "refresh_failed": payload["refresh_failed"],
+                "scheduled_callbacks_pending": payload["scheduled_callbacks_pending"],
+                "latency_ms": latency,
+            })
+    return samples
+
+
 def oracle_snapshot(oracle_token: str) -> dict:
     """Fetch restricted separately collected direct-cache and direct-probe truth."""
     status, payload, _ = request("oracle", "/oracle/observe", oracle=oracle_token, timeout=5)
@@ -426,6 +458,7 @@ def run_case(action: str, control_token: str, oracle_token: str,
                 fault_target=fault_target, fault_mode=fault_mode,
                 oracle_token=oracle_token, gateway_includes_hidden=gateway_includes_hidden)
     before_probes = gateway_probes(count=8)
+    before_operator_telemetry = operator_telemetry(control_token)
     before_scope = gateway_scope_evidence(control_token, before_probes)
     before_truth = oracle_snapshot(oracle_token)
     operations = measure_under_load(action, control_token, requests_per_second=rps,
@@ -451,6 +484,7 @@ def run_case(action: str, control_token: str, oracle_token: str,
         "path_access_exposed": any(p["http_status"] == 200 for p in after_probes),
         "action": action,
         "before": {"verifier_gateway_probes": before_probes,
+                   "operator_telemetry": before_operator_telemetry,
                    "verifier_scope": before_scope,
                    "oracle": before_truth},
         "after": {"verifier_gateway_probes": after_probes,
