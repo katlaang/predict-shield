@@ -130,6 +130,19 @@ def setup_fault(control_token: str, *, ttl_ms: int, delay_ms: int,
     )
     if route_status != 200:
         raise RuntimeError("Could not configure registered gateway profile")
+    # Distinct experimental complexity levels must produce genuinely
+    # different Java service timings, not just labels in the JSON manifest.
+    # SIMPLE uses equal handler latency; the two harder levels use
+    # heterogeneous real per-request execution times.
+    delays = ((15, 15, 15, 15) if complexity_stratum == "SIMPLE"
+              else (0, 15, 50, 100))
+    for node, latency_ms in zip(ENFORCERS, delays):
+        set_status, payload, _ = request(
+            node, f"/admin/service-latency/{latency_ms}",
+            method="POST", token=control_token
+        )
+        if set_status != 200 or payload.get("latency_ms") != latency_ms:
+            raise RuntimeError("Could not establish actual per-node service latency")
     for node in ENFORCERS:
         status, _, _ = request(node, f"/admin/reset/{ttl_ms}", method="POST", token=control_token)
         if status != 200:
