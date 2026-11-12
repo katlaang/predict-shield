@@ -9,7 +9,7 @@ as model features. Configurations, not individual repeated trials, are split
 
 A fitted random forest is compared to train-only action means and train-only
 action-by-fault and action-by-fault-by-target lookup baselines. The 90% nominal
-split-conformal radius is evaluated on the held-out test partition, and does
+grouped split-conformal radius is evaluated on held-out configuration groups, and does
 not justify safety-critical automatic execution under distribution shift.
 
 This experiment intentionally produces an evaluation report only, not an
@@ -172,6 +172,30 @@ def conformal_radius(actual, predicted, alpha: float = 0.1) -> float:
                          math.ceil((len(residuals) + 1) * (1 - alpha)) - 1)]
 
 
+def grouped_conformal_radius(
+    actual, predicted, group_ids: list[str], alpha: float = 0.1
+) -> float:
+    """Calibrate on whole independent operating configuration groups.
+
+    Trials within one group share environment and event conditions, so their
+    residuals are dependent. Taking each group's maximum absolute residual
+    then applying the finite-sample conformal quantile prevents treating
+    three repeats and four actions as 12 independent deployments. The
+    resulting coverage target is marginal across exchangeable configuration
+    groups, not conditional for a specific fault or safe for production.
+    """
+    if len(actual) != len(predicted) or len(actual) != len(group_ids):
+        raise ValueError("Grouped calibration arrays do not align")
+    worst_by_group: dict[str, float] = {}
+    for true, estimate, group in zip(actual, predicted, group_ids):
+        if not group:
+            raise ValueError("Configuration group identifier missing")
+        error = abs(float(true) - float(estimate))
+        worst_by_group[group] = max(worst_by_group.get(group, 0.0), error)
+    return conformal_radius([0.0] * len(worst_by_group),
+                            list(worst_by_group.values()), alpha)
+
+
 def train_evaluate(rows: list[dict], seed: int = 20261110,
                    *, export_path: Path | None = None) -> dict:
     """Fit models on training groups and compare once on held-out groups.
@@ -220,7 +244,10 @@ def train_evaluate(rows: list[dict], seed: int = 20261110,
         fitted_models[label] = model
         pred_cal = np.clip(model.predict(matrices["calibration"]), 0, 1)
         pred_test = np.clip(model.predict(matrices["test"]), 0, 1)
-        radius = conformal_radius(y["calibration"], pred_cal)
+        radius = grouped_conformal_radius(
+            y["calibration"], pred_cal,
+            [row["group"] for row in groups["calibration"]]
+        )
         calibration_radii[label] = radius
         low = np.clip(pred_test - radius, 0, 1)
         high = np.clip(pred_test + radius, 0, 1)
@@ -258,6 +285,12 @@ def train_evaluate(rows: list[dict], seed: int = 20261110,
                 y["test"], baseline_test)),
             "marginal_interval_coverage": float(np.mean(
                 (y["test"] >= low) & (y["test"] <= high))),
+            "heldout_configuration_group_coverage": float(np.mean([
+                all(bool(y["test"][i] >= low[i] and y["test"][i] <= high[i])
+                    for i, row in enumerate(test) if row["group"] == group)
+                for group in sorted({row["group"] for row in test})
+            ])),
+            "calibration_unit": "configuration_group_max_absolute_residual",
             "conformal_absolute_error_radius": radius,
             "nominal_coverage": 0.90,
             "heldout_test_count": len(test),
