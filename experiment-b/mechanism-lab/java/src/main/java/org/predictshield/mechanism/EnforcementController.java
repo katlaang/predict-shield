@@ -372,6 +372,39 @@ public final class EnforcementController {
     }
 
     /**
+     * Exposes bounded operational indicators to the experimental decision
+     * engine without disclosing fault injection, oracle truth or private
+     * verification outcome.
+     *
+     * <p>The separately scoped laboratory operator credential grants access
+     * to this pre-action snapshot. The telemetry contains observed cache age,
+     * applied revision, processed-event count, failed TTL refresh and pending
+     * scheduled operations. It deliberately omits the injected fault mode,
+     * target identity as a fault label, desired authoritative access verdict,
+     * oracle direct probes and post-action results. A local revision is not a
+     * verified Kafka consumer offset. These indicators must be timestamped
+     * before an action to be used as model inputs.</p>
+     *
+     * @param token disposable laboratory control credential
+     * @return only operator-observable monitoring fields, not oracle truth
+     */
+    @GetMapping("/operator/telemetry")
+    public synchronized ResponseEntity<Map<String, Object>> operatorTelemetry(
+            @RequestHeader(value = "X-Lab-Control", required = false) String token) {
+        if (!authorized(token, controlToken)) return forbidden();
+        long cacheAge = Math.max(0L, System.currentTimeMillis() - refreshedAtMs);
+        return ResponseEntity.ok(Map.of(
+                "instance", identity,
+                "applied_revision", cached.revision(),
+                "cache_age_ms", cacheAge,
+                "cache_ttl_ms", cacheTtlMs,
+                "handled_events", handledEvents,
+                "refresh_failed", lastRefreshFailed,
+                "scheduled_callbacks_pending", scheduledCallbacks.get(),
+                "observation_type", "operator_pre_action"));
+    }
+
+    /**
      * Exposes local cached state through a separate privileged oracle path.
      *
      * <p>The oracle obtains each instance's state directly, bypassing the
