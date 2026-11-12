@@ -135,6 +135,24 @@ final class EnforcementControllerEpochTest {
     }
 
     /**
+     * Verifies the same protected operation treats the two disposable
+     * principal types differently before a coarse gateway action.
+     *
+     * <p>Both requests are genuinely served by the independent Java JVM.
+     * Gateway restriction blocks the protected route for both principals,
+     * allowing external load measurement to count the legitimate collateral
+     * failures. The test principal header is synthetic and untrusted.</p>
+     */
+    @Test
+    void authorizedProtectedWorkloadIsNotEquivalentToRevokedUser() {
+        controller.reset("test-control", 30000);
+        controller.bindTrial("test-control", TRIAL);
+        controller.onEvent(TRIAL + ",7,true");
+        assertEquals(403, controller.protectedOperation(null).getStatusCode().value());
+        assertEquals(200, controller.protectedOperation("authorized").getStatusCode().value());
+    }
+
+    /**
      * Confirms an absent operator feed never disables the separate oracle.
      *
      * <p>The operator request has no access to injected fault identity or
