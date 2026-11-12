@@ -50,6 +50,8 @@ class MeasuredModelTrainingTests(unittest.TestCase):
                     examples.append({
                         "group": "unit-" + str(group),
                         "repeat": repeat,
+                        "restart_permitted": (group % 2 == 0),
+                        "absolute_error_budget_requests": 25,
                         "partition": partition,
                         "action": action,
                         "fault": ("loss", "delay", "duplicate", "reorder")[group % 4],
@@ -63,6 +65,8 @@ class MeasuredModelTrainingTests(unittest.TestCase):
                         },
                         "label_security_exposure": float(index == 3),
                         "label_path_exposure": float(index in (0, 3)),
+                        "label_exposure_seconds": float(index in (0, 3)) * 4,
+                        "label_absolute_failed_requests": float(index == 2) * 15,
                         "label_service_failure_fraction": float(index == 2) * 0.4,
                     })
         with tempfile.TemporaryDirectory() as directory:
