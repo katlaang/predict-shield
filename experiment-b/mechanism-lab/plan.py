@@ -52,12 +52,13 @@ def create_plan(seed: int = SEED) -> tuple[list[dict], list[dict]]:
             "configuration_id": f"mechanism-{i:03d}",
             "partition": splits[i],
             "fault_mode": fault,
-            "fault_target": rng.choice(("enforcer-a", "enforcer-b", "enforcer-c")),
+            "fault_target": rng.choice(("enforcer-a", "enforcer-b", "enforcer-c", "enforcer-hidden")),
             "cache_ttl_ms": rng.randint(2500, 15000),
             "event_delay_ms": rng.randint(0, 2500),
             "requested_rps": rng.randint(10, 65),
             "measurement_seconds": 4,
-            "visible_enforcement_processes": 3,
+            "gateway_includes_hidden": i % 2 == 0,
+            "visible_enforcement_processes": (4 if i % 2 == 0 else 3),
             "oracle_inventory_processes": 4,
             "scenario_seed": rng.getrandbits(63),
         }
@@ -123,7 +124,7 @@ def save_plan(folder: Path, seed: int = SEED) -> None:
     (folder / "protocol.json").write_text(json.dumps({
         "schema": SCHEMA, "configurations": 100, "planned_trials": 1200,
         "splits": PARTITIONS, "seed": seed, "repeats": REPEATS,
-        "physical_enforcers": 4, "gateway_visible_enforcers": 3,
+        "physical_enforcers": 4, "gateway_visible_enforcers": "3_or_4_by_scenario",
         "outcomes_collected": False, "model_trained": False,
         "limitations": [
             "The physical topology has four JVMs and cannot realize the earlier 2-8 node claim",
