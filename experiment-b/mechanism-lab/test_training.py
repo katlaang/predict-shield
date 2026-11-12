@@ -9,7 +9,7 @@ import unittest
 from pathlib import Path
 
 from plan import ACTIONS, create_plan
-from train import load_executed_dataset, to_features, train_evaluate
+from train import load_executed_dataset, to_features, train_evaluate, grouped_conformal_radius
 from model_adapter import load_local_bundle
 
 
@@ -85,6 +85,17 @@ class MeasuredModelTrainingTests(unittest.TestCase):
         before = to_features(row)
         row.update(fault="reorder", target="enforcer-c")
         self.assertEqual(before, to_features(row))
+
+    def test_conformal_calibration_uses_configuration_max_residual(self):
+        """Correlated repeats must not inflate the independent sample count."""
+        truth = [0, 0, 0, 0, 0, 0]
+        predicted = [0, .1, .2, .1, .4, .7]
+        groups = ["cfg-a"] * 3 + ["cfg-b"] * 3
+        self.assertAlmostEqual(
+            grouped_conformal_radius(truth, predicted, groups), .7
+        )
+        with self.assertRaises(ValueError):
+            grouped_conformal_radius(truth, predicted, ["cfg-a"])
 
     def test_training_rejects_group_overlap(self):
         """Identical configuration IDs cannot occur across evaluation partitions."""
