@@ -5,6 +5,9 @@ on:
     paths: ['experiment-b/mechanism-lab/**', '.github/workflows/experiment-b-mechanism.yml']
   pull_request:
     paths: ['experiment-b/mechanism-lab/**', '.github/workflows/experiment-b-mechanism.yml']
+concurrency:
+  group: experiment-b-mechanism-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
 jobs:
   mechanism-integration:
     runs-on: ubuntu-latest
