@@ -4,11 +4,11 @@ This roadmap tracks software deliverables only. Entries marked “implemented”
 
 | Workstream | Status | Next acceptance gate |
 | --- | --- | --- |
-| Evidence-assessment engine | Implemented, pre-alpha | Reconcile independent target inventory and verify authoritative observation provenance |
-| Policy-constrained action screening | Implemented, pre-alpha | Connect predictor output to policy gate with end-to-end tests |
-| Experiment B authorization-drift lab | Implemented, limited fixture | Verify behavior under independent processes, delayed/missing propagation and silence-driven regressions |
+| Evidence-assessment engine | Implemented, pre-alpha | Exercise independent Compose/runtime-gateway inventory reconciliation under complete and omitted targets |
+| Policy-constrained action screening | Implemented, pre-alpha | Establish verified remaining error budgets and approved execution permissions |
+| Experiment B authorization-drift lab | Implemented and Kafka/Docker tested | Validate trial-scoped broker events, non-dominated candidate actions and multi-revision reordering |
 | Seeded 100 × 4 × 3 plan | Implemented | Execute all permitted lab trials and retain valid, separated measurement records |
-| Experiment B data collection | Implemented, limited | Measure sustained workload, service impacts, and independently checked outcomes |
+| Experiment B data collection | Implemented, limited | Audit diverse 12-trial pilot before expanding to the full registered campaign |
 | Supervised action-outcome training | Code implemented; trained evaluation not verified | Fit and compare models on actual full-scope run data, use disjoint configuration splits |
 | Regression detection model | Planned | Collect time-to-regression labels, define censoring, compare under measured probe budgets |
 | Contextual threat intelligence | Planned | Integrate dated source data with defensible temporally valid labels |

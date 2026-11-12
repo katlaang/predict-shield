@@ -1,26 +1,42 @@
 package org.predictshield.mechanism;
 
 /**
- * Immutable authoritative or cached authorization policy revision.
+ * Immutable authorization revision scoped to exactly one experimental trial.
  *
- * <p>Revisions are monotonically increasing. Enforcement points must ignore
- * events older than their current revision to prevent delayed or reordered
- * policy updates from silently restoring a revoked permission. The policy
- * describes one disposable test identity, never a real user's credentials.</p>
+ * <p>Each reset allocates a new opaque, non-secret trial identifier. Kafka
+ * events and policy-cache refreshes carry that identifier. Enforcement
+ * points reject policy events for any other trial, even when the late event
+ * has a higher revision. Revision ordering applies only within one trial.
+ * This is a research isolation mechanism, not a production authorization
+ * protocol or a substitute for broker transactional guarantees.</p>
  *
- * @param revision monotonic revision number assigned by the authority
- * @param revoked true when the test identity must be denied
+ * @param revision monotonic authority revision within the current trial
+ * @param revoked true when the disposable test identity must be denied
+ * @param trialId nonblank opaque trial identity shared by event and policy
  */
-public record PolicyRevision(long revision, boolean revoked) {
+public record PolicyRevision(long revision, boolean revoked, String trialId) {
 
     /**
-     * Validates that the policy revision can be ordered against earlier events.
+     * Rejects corrupt or incomplete policy revisions before they become state.
      *
-     * @throws IllegalArgumentException when revision is negative
+     * @throws IllegalArgumentException if revision is negative or trialId blank
      */
     public PolicyRevision {
-        if (revision < 0) {
-            throw new IllegalArgumentException("revision must be nonnegative");
+        if (revision < 0 || trialId == null || trialId.isBlank()
+                || trialId.length() > 128 || trialId.contains(",")) {
+            throw new IllegalArgumentException("Invalid trial-scoped policy revision");
         }
+    }
+
+    /**
+     * Constructs a pre-trial bootstrap marker that must never authorize
+     * enforcement of an old Kafka event. Existing fixture construction
+     * can use this before the authority establishes a trial identifier.
+     *
+     * @param revision initial nonnegative version
+     * @param revoked initial synthetic authorization state
+     */
+    public PolicyRevision(long revision, boolean revoked) {
+        this(revision, revoked, "unassigned");
     }
 }

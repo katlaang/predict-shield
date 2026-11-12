@@ -28,7 +28,8 @@ class MeasuredModelTrainingTests(unittest.TestCase):
             "action": ACTIONS[0], "fault": "loss", "target": "enforcer-b",
             "pre_action": {
                 "cache_ttl_ms": 5000, "event_delay_ms": 200,
-                "requested_rps": 20, "initial_gateway_allowed_fraction": 1/3,
+                "requested_rps": 20, "gateway_visible_enforcer_count": 3,
+                "initial_gateway_allowed_fraction": 1/3,
             },
             "label_security_exposure": 1.0,
             "label_service_failure_fraction": 0.5,
@@ -48,6 +49,7 @@ class MeasuredModelTrainingTests(unittest.TestCase):
                 for index, action in enumerate(ACTIONS):
                     examples.append({
                         "group": "unit-" + str(group),
+                        "repeat": repeat,
                         "partition": partition,
                         "action": action,
                         "fault": ("loss", "delay", "duplicate", "reorder")[group % 4],
@@ -56,9 +58,11 @@ class MeasuredModelTrainingTests(unittest.TestCase):
                             "cache_ttl_ms": 3000 + group * 100,
                             "event_delay_ms": group * 100,
                             "requested_rps": 15 + group,
+                            "gateway_visible_enforcer_count": 3,
                             "initial_gateway_allowed_fraction": (group % 3) / 3,
                         },
                         "label_security_exposure": float(index == 3),
+                        "label_path_exposure": float(index in (0, 3)),
                         "label_service_failure_fraction": float(index == 2) * 0.4,
                     })
         with tempfile.TemporaryDirectory() as directory:
@@ -78,7 +82,7 @@ class MeasuredModelTrainingTests(unittest.TestCase):
         row = {
             "action": ACTIONS[0], "fault": "loss", "target": "enforcer-a",
             "pre_action": {
-                "cache_ttl_ms": 6000, "requested_rps": 30,
+                "cache_ttl_ms": 6000, "requested_rps": 30, "gateway_visible_enforcer_count": 3,
                 "initial_gateway_allowed_fraction": .3,
             },
         }
@@ -104,7 +108,8 @@ class MeasuredModelTrainingTests(unittest.TestCase):
             "fault": "loss", "target": "enforcer-b",
             "pre_action": {
                 "cache_ttl_ms": 5000, "event_delay_ms": 200,
-                "requested_rps": 20, "initial_gateway_allowed_fraction": 0.5,
+                "requested_rps": 20, "gateway_visible_enforcer_count": 3,
+                "initial_gateway_allowed_fraction": 0.5,
             },
             "label_security_exposure": 1.0,
             "label_service_failure_fraction": 0.5,

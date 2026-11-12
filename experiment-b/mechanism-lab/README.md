@@ -1,13 +1,13 @@
 # Experiment B: mechanism-based authorization propagation laboratory
 
-This experimental replacement uses separate Java 25 / Spring Boot enforcement processes, an authoritative revision publisher, a real Kafka-compatible Redpanda broker, a gateway, and a distinct oracle observer. A fourth enforcement process is omitted from the normal gateway but included in the oracle inventory, exposing false assurance from gateway-only probing. The older single-JVM fixture remains intact for compatibility, but its predetermined outcome formulas must not be used to claim AI effectiveness.
+This experimental replacement uses separate Java 25 / Spring Boot enforcement processes, an authoritative revision publisher, a real Kafka-compatible Redpanda broker, a gateway, and a distinct oracle observer. A fourth enforcement process can be omitted from gateway routing while remaining in the separate oracle inventory, exposing false assurance from gateway-only probing. The older single-JVM fixture remains intact for compatibility, but its predetermined outcome formulas must not be used to claim AI effectiveness.
 
 ## Technical architecture
 
 - Authority: publishes revisioned authorization decisions over the Kafka topic lab-policy.
 - Enforcer A, B, C and hidden enforcer: independent JVMs, each with a local policy cache, actual TTL refresh over HTTP, and a separate Kafka consumer group.
 - Consumer faults: loss, delayed delivery with jitter, duplicated delivery, and reordering with monotonic revision protection.
-- Gateway: real round-robin forwarding among A/B/C; the hidden enforcer is deliberately omitted to test scope completeness. A restriction changes actual request handling, including legitimate traffic.
+- Gateway: real round-robin forwarding among A/B/C, with an explicit hidden-target routing switch to test complete and incomplete scope. A restriction changes actual request handling, including legitimate traffic.
 - Oracle: independently deployed process querying authoritative state, each enforcer's private administrative state and a separate active HTTP probe path.
 - Pilot: produces measured HTTP status/latency during concurrent traffic, exercises four candidate actions, and triggers silent cache regression.
 
@@ -30,7 +30,7 @@ The pilot is explicitly opt-in. The only host-exposed ports bind to 127.0.0.1.
 
 ## What must not be claimed
 
-This is a first mechanism-based pilot, not a trained AI system, not a 1,200-trial comparative study, and not a validated production security solution. The model is not yet wired into the decision gate or selector. The oracle uses a known inventory and administrative cache reports corroborated by active probes; it does not cryptographically attest an honest enforcement point. Fault injection is in Kafka consumers rather than in a network-layer Toxiproxy. The current physical topology is four enforcement JVMs, three gateway-visible and one intentionally omitted; a 2-8 variable topology requires a dynamic Compose launcher.
+This is a first mechanism-based pilot, not a trained AI system, not a 1,200-trial comparative study, and not a validated production security solution. The model is not yet wired into the decision gate or selector. The oracle uses a known inventory and administrative cache reports corroborated by active probes; it does not cryptographically attest an honest enforcement point. Fault injection is in Kafka consumers rather than in a network-layer Toxiproxy. The current physical topology is four enforcement JVMs, three or four gateway-visible depending on the registered experimental scenario; a 2-8 variable topology requires a dynamic Compose launcher.
 
 An observed zero request failure count does not establish zero impact, because a load test may miss a transient restart. Every metric must preserve denominators, observation windows and actual request rates.
 
@@ -61,8 +61,7 @@ This produces **100 configuration groups** (60 train, 20 calibration,
 **1,200 planned trials**. The plan records no oracle labels, measurements
 or completed actions. The initial experiment varies actual cache TTL,
 Kafka consumer fault mode/target, event-delay setting and requested load.
-The physical node count stays four: three gateway-visible and one deliberately
-omitted from gateway routing. This is not a 2-8 node topology study.
+The physical node count stays four; full-routing and omitted-target conditions are independently assigned across fault families. This is not a 2-8 node topology study.
 
 ### Collect actual HTTP measurements, without synthetic output labels
 
@@ -83,7 +82,7 @@ Results are written separately as:
 - `results/mechanism/pre_action/`: model-eligible pre-action configuration
   and gateway observations, **without** the oracle
 - `results/mechanism/verification/`: post-action gateway outcomes,
-  deliberately unable to claim full-scope VERIFIED without inventory proof
+  able to return VERIFIED only when independent Compose-vs-gateway inventory reconciliation and all observed forwarded deny probes support it
 - `results/mechanism/operations/`: counted actual external HTTP failures,
   attempted requests, latency and observed request rate
 - `results/mechanism/oracle/`: independently observed full target inventory,
@@ -92,9 +91,7 @@ Results are written separately as:
 
 The collector is **not** allowed to fill missing measurements, infer the
 oracle truth from gateway results or overwrite any previously executed run ID.
-The full 1,200-trial campaign requires an explicit `--limit 1200` and
-supervised review of outcomes, resource use and contamination from delayed
-events. It has not been run merely because the manifest exists. To resume a
+The full 1,200-trial campaign requires supervised batches of at most 12 actual trials through the locked, resumable campaign runner. The plan alone does not count as collected outcomes. It has not been run merely because the manifest exists. To resume a
 valid stopped campaign, select a subsequent `--offset`, after inspecting
 partial records.
 
@@ -281,3 +278,42 @@ duplicates of a monotonic revision may be correctly ignored by an
 idempotent consumer, and one held event does not constitute a meaningful
 multi-revision reordering trial. Both situations require explicit analysis
 before claiming that the corresponding fault family has been evaluated.
+
+## Persistent faults, broker-scoped trials and scientific comparison
+
+Policy events now carry an authority-assigned trial ID, policy revision and
+revocation state. Each process must bind to the current trial. A delayed
+message from an older trial cannot be accepted even if it arrives from the
+broker after reset. A reorder trial emits two distinct revisions.
+
+Resync republishes current policy without disabling the injected consumer
+fault. A permanent lost-event consumer is not secretly fixed by resync.
+Restart exercises actual service downtime and a separate authority HTTP
+refresh. Gateway restriction can block reachable paths while the enforcement
+control remains stale. The outcomes distinguish: (1) complete direct
+enforcement-control remediation; (2) observed gateway-path exposure;
+and (3) legitimate service HTTP failure/latency.
+
+The normal verifier separately reads deployment inventory from Docker Compose
+and current gateway routing state. VERIFIED requires exact inventory
+reconciliation and a forwarded denial observed from every registered process.
+A missing route or a gateway-generated denial alone is INDETERMINATE.
+These rules are scoped to the experimental Compose deployment and do not
+establish production inventory completeness.
+
+The laboratory-only 99 percent request-success objective is a declared SLO,
+not a known remaining service error budget. It cannot by itself authorize
+automatic defensive execution. Model-to-gate integration continues to
+abstain without trusted evidence and measured remaining budgets.
+
+Offline decision_eval reports hindsight regret on held-out paired replays
+against predeclared fixed playbooks and an engineering rule. Research utility
+weights are path exposure 0.50, control exposure 0.25 and service failure
+0.25. Oracle outcomes score the hindsight cost, but never enter action
+selection inputs. All regret results are descriptive for the laboratory,
+not causal or production effectiveness findings.
+
+The GitHub integration workflow performs a bounded 12-trial pilot across
+three fault configurations and retains a sanitized per-action outcome table.
+Private oracle raw records are deleted before uploading CI artifacts.
+The full 1,200-run campaign is still unexecuted.

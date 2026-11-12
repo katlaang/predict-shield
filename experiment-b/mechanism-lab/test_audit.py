@@ -84,6 +84,26 @@ class CampaignAuditTests(unittest.TestCase):
         self.record("verification", {"outcome": "VERIFIED"})
         self.assertEqual(inspect_trial(self.trial, self.output)[0], "invalid")
 
+    def test_reconciled_verified_lab_probes_are_permitted(self):
+        """A complete two-source routed-denial record may declare lab VERIFIED."""
+        for kind in ("pre_action", "verification", "operations", "oracle"):
+            self.record(kind)
+        self.record("verification", {
+            "outcome": "VERIFIED",
+            "independent_inventory_reconciled": True,
+            "scope_evidence": {
+                "status": "VERIFIED",
+                "inventory_reconciled": True,
+                "independent_compose_inventory": ["enforcer-a"],
+                "observed_forwarded_targets": ["enforcer-a"],
+            },
+            "observations": [
+                {"http_status": 403,
+                 "result": {"gateway_upstream": "http://enforcer-a:8080"}}
+            ],
+        })
+        self.assertEqual(inspect_trial(self.trial, self.output)[0], "complete")
+
     def test_extra_unknown_record_fails_readiness(self):
         """The plan must account for every stored research run ID."""
         (self.output / "oracle").mkdir()

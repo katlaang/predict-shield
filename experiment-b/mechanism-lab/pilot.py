@@ -19,6 +19,7 @@ import concurrent.futures
 import json
 import os
 from pathlib import Path
+from scope import compose_expected_enforcers, verify_reconciled_scope
 import statistics
 import subprocess
 import threading
@@ -101,7 +102,8 @@ def wait_for_target(name: str, timeout_seconds: float = 90) -> float:
 def setup_fault(control_token: str, *, ttl_ms: int, delay_ms: int,
                 fault_target: str = "enforcer-b",
                 fault_mode: str = "loss",
-                oracle_token: str | None = None) -> None:
+                oracle_token: str | None = None,
+                gateway_includes_hidden: bool = True) -> None:
     """Reset all JVMs and inject a configured actual Kafka consumer fault.
 
     Faults are set on a named process before the policy event is published.
@@ -112,13 +114,36 @@ def setup_fault(control_token: str, *, ttl_ms: int, delay_ms: int,
     status, _, _ = request("gateway", "/admin/restore", method="POST", token=control_token)
     if status != 200:
         raise RuntimeError("Gateway restore failed")
+    routing = "/admin/include-hidden" if gateway_includes_hidden else "/admin/omit-hidden"
+    route_status, _, _ = request("gateway", routing, method="POST", token=control_token)
+    if route_status != 200:
+        raise RuntimeError("Could not establish experimental gateway inventory")
     for node in ENFORCERS:
         status, _, _ = request(node, f"/admin/reset/{ttl_ms}", method="POST", token=control_token)
         if status != 200:
             raise RuntimeError("Enforcer reset failed: " + node)
-    status, _, _ = request("authority", "/control/reset", method="POST", token=control_token, timeout=10)
+    status, reset_response, _ = request(
+        "authority", "/control/reset", method="POST", token=control_token, timeout=10
+    )
+    if status != 202 or not reset_response.get("trial_id"):
+        raise RuntimeError("Authority reset missing acknowledged trial ID")
+    trial_id = reset_response["trial_id"]
+    # Bind all four caches to the *broker-carried* trial identifier. Events
+    # arriving from prior experiments cannot pass the consumer trial check.
+    for node in ENFORCERS:
+        bind_status, _, _ = request(
+            node, "/admin/bind/" + trial_id,
+            method="POST", token=control_token
+        )
+        if bind_status != 200:
+            raise RuntimeError("Could not bind " + node + " to current trial")
+    # Guarantee that every JVM receives the new authority revision, even
+    # when the reset publication preceded a particular binding request.
+    status, _, _ = request(
+        "authority", "/control/resync", method="POST", token=control_token, timeout=10
+    )
     if status != 202:
-        raise RuntimeError("Authority reset was not acknowledged (HTTP " + str(status) + ")")
+        raise RuntimeError("Failed to announce newly bound trial")
     # Each JVM reset advances its local epoch. Delayed callbacks from prior
     # trials are rejected under the same synchronized monitor. The oracle
     # then verifies that all four JVMs reached the same authority revision
@@ -131,7 +156,9 @@ def setup_fault(control_token: str, *, ttl_ms: int, delay_ms: int,
                 baseline = oracle_snapshot(oracle_token)
                 desired = baseline["authority"]
                 if (desired.get("revoked") is False
-                        and all(t["admin"]["revision"] == desired["revision"]
+                        and desired.get("trialId") == trial_id
+                        and all(t["admin"].get("trial_id") == trial_id
+                                and t["admin"]["revision"] == desired["revision"]
                                 and t["admin"]["revoked"] is False
                                 and t["admin"].get("pending_scheduled_callbacks") == 0
                                 and isinstance(t["admin"].get("experiment_epoch"), int)
@@ -156,6 +183,13 @@ def setup_fault(control_token: str, *, ttl_ms: int, delay_ms: int,
     status, _, _ = request("authority", "/control/revoke", method="POST", token=control_token, timeout=10)
     if status != 202:
         raise RuntimeError("Policy revocation rejected")
+    if fault_mode == "reorder":
+        # Two distinct broker revisions are necessary to exercise true
+        # out-of-order consumer delivery; a single held message is not enough.
+        status, _, _ = request("authority", "/control/reaffirm",
+                               method="POST", token=control_token, timeout=10)
+        if status != 202:
+            raise RuntimeError("Second reorder revision was not published")
     time.sleep(1.2)
 
 
@@ -165,6 +199,36 @@ def gateway_probes(count: int = 3) -> list[dict]:
         {"http_status": status, "result": response}
         for status, response, _ in (request("gateway", "/protected") for _ in range(count))
     ]
+
+
+def gateway_scope_evidence(control_token: str, probes: list[dict]) -> dict:
+    """Reconcile gateway routing with Docker Compose independently of the oracle.
+
+    The normal verifier sees the gateway's *live routing configuration* and
+    the separately enumerated Compose services. Neither input comes from
+    the private oracle or from post-action internal cache reports. Complete
+    VERIFIED remains possible only with coverage of every declared route.
+    """
+    status, response, _ = request(
+        "gateway", "/admin/inventory", token=control_token, timeout=3
+    )
+    if status != 200 or not isinstance(response.get("upstreams"), list):
+        return {
+            "status": "INDETERMINATE",
+            "reason": "Gateway runtime inventory unavailable",
+            "inventory_reconciled": False,
+            "testbed_only": True,
+        }
+    try:
+        expected = compose_expected_enforcers()
+        return verify_reconciled_scope(expected, response["upstreams"], probes)
+    except (OSError, ValueError, KeyError, subprocess.CalledProcessError):
+        return {
+            "status": "INDETERMINATE",
+            "reason": "Independent Compose inventory unavailable",
+            "inventory_reconciled": False,
+            "testbed_only": True,
+        }
 
 
 def oracle_snapshot(oracle_token: str) -> dict:
@@ -191,7 +255,8 @@ def perform_action(action: str, control_token: str,
     if fault_target not in ENFORCERS:
         raise ValueError("Unrecognized laboratory fault target")
     if action == "resync_policy":
-        request(fault_target, "/admin/fault/none/0", method="POST", token=control_token)
+        # A resync cannot magically repair a broken Kafka consumer. Keep the
+        # injected event-loss/latency fault active throughout the action.
         status, _, _ = request("authority", "/control/resync", method="POST", token=control_token, timeout=10)
         if status != 202:
             raise RuntimeError("Resynchronization not published")
@@ -261,21 +326,27 @@ def measure_under_load(action: str, control_token: str, *,
 def run_case(action: str, control_token: str, oracle_token: str,
              *, ttl_ms: int = 30000, rps: int = 30,
              fault_mode: str = "loss", fault_target: str = "enforcer-b",
-             delay_ms: int = 200, duration_seconds: float = 5) -> dict:
+             delay_ms: int = 200, duration_seconds: float = 5,
+             gateway_includes_hidden: bool = True) -> dict:
     """Reset all processes, inject event loss and measure one candidate action."""
     setup_fault(control_token, ttl_ms=ttl_ms, delay_ms=delay_ms,
                 fault_target=fault_target, fault_mode=fault_mode,
-                oracle_token=oracle_token)
-    before_probes = gateway_probes()
+                oracle_token=oracle_token, gateway_includes_hidden=gateway_includes_hidden)
+    before_probes = gateway_probes(count=8)
+    before_scope = gateway_scope_evidence(control_token, before_probes)
     before_truth = oracle_snapshot(oracle_token)
     operations = measure_under_load(action, control_token, requests_per_second=rps,
                                     duration_seconds=duration_seconds,
                                     fault_target=fault_target)
     time.sleep(0.7)
-    after_probes = gateway_probes()
     recovery_wait_seconds = (
         wait_for_target(fault_target) if action == "restart_enforcer" else 0.0
     )
+    # Post-action verification occurs after the restarted process is ready.
+    # Request errors during its actual downtime are already retained in
+    # measured concurrent service-health outcomes.
+    after_probes = gateway_probes(count=8)
+    after_scope = gateway_scope_evidence(control_token, after_probes)
     after_truth = oracle_snapshot(oracle_token)
     return {
         "case": "experiment-b-kafka-revocation",
@@ -283,15 +354,19 @@ def run_case(action: str, control_token: str, oracle_token: str,
         "fault_target": fault_target,
         "cache_ttl_ms": ttl_ms,
         "event_delay_ms": delay_ms,
+        "gateway_includes_hidden": gateway_includes_hidden,
+        "path_access_exposed": any(p["http_status"] == 200 for p in after_probes),
         "action": action,
         "before": {"verifier_gateway_probes": before_probes,
+                   "verifier_scope": before_scope,
                    "oracle": before_truth},
         "after": {"verifier_gateway_probes": after_probes,
+                  "verifier_scope": after_scope,
                   "oracle": after_truth},
         "operations": {**operations, "post_window_recovery_wait_seconds": recovery_wait_seconds},
         "evaluation_only": True,
         "no_ai_model_invoked": True,
-        "verification_scope_complete": False,
+        "verification_scope_complete": after_scope.get("status") == "VERIFIED",
         "limitations": [
             "Three actual enforcement processes; no independent production inventory",
             "Gateway probes are intentionally partial and cannot certify global VERIFIED",
@@ -332,7 +407,8 @@ def run_hidden_target_case(control_token: str, oracle_token: str) -> dict:
     independent inventory reconciliation.
     """
     setup_fault(control_token, ttl_ms=30000, delay_ms=0,
-                fault_target="enforcer-hidden", oracle_token=oracle_token)
+                fault_target="enforcer-hidden", oracle_token=oracle_token,
+                gateway_includes_hidden=False)
     gateway = gateway_probes(count=6)
     oracle = oracle_snapshot(oracle_token)
     return {

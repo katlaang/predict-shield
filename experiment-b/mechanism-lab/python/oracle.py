@@ -55,10 +55,13 @@ def observe() -> dict:
     )
     target_records = []
     for node in NODES:
+        # Probe first: a newly restarted enforcer may recover its current
+        # authority trial over real HTTP TTL refresh on this request.
+        # Privileged cache observation then describes the enforced decision.
+        probe_status, probe = request_json(node + "/protected")
         admin_status, admin = request_json(
             node + "/admin/state", "X-Lab-Oracle", ORACLE_TOKEN
         )
-        probe_status, probe = request_json(node + "/protected")
         target_records.append({
             "node": node,
             "admin_http": admin_status,
@@ -66,10 +69,17 @@ def observe() -> dict:
             "direct_probe_http": probe_status,
             "direct_probe": probe,
         })
-    valid_authority = policy_status == 200 and type(policy.get("revoked")) is bool
+    valid_authority = (
+        policy_status == 200
+        and type(policy.get("revoked")) is bool
+        and isinstance(policy.get("trialId"), str)
+        and bool(policy["trialId"])
+    )
     complete = valid_authority and all(
         t["admin_http"] == 200 and t["direct_probe_http"] in (200, 403)
-        and type(t["admin"].get("revoked")) is bool for t in target_records
+        and type(t["admin"].get("revoked")) is bool
+        and t["admin"].get("trial_id") == policy.get("trialId")
+        for t in target_records
     )
     if not complete:
         truth = None

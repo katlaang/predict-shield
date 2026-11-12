@@ -24,10 +24,11 @@ import json
 import math
 import os
 from collections import Counter
+from decision_eval import evaluate_regret
 from pathlib import Path
 
 FAULTS = ("loss", "delay", "duplicate", "reorder")
-TARGETS = ("enforcer-a", "enforcer-b", "enforcer-c")
+TARGETS = ("enforcer-a", "enforcer-b", "enforcer-c", "enforcer-hidden")
 ACTIONS = ("resync_policy", "restart_enforcer", "gateway_restrict", "monitor_only")
 SPLITS = {"train": 60, "calibration": 20, "test": 20}
 EXPECTED_TRIALS = 1200
@@ -36,7 +37,7 @@ EXPECTED_TRIALS = 1200
 # Those variables remain available only for post-hoc stratification and an
 # explicitly *privileged* diagnostic lookup baseline.
 FEATURES = (
-    "cache_ttl_ms", "requested_rps",
+    "cache_ttl_ms", "requested_rps", "gateway_visible_enforcer_count",
     "initial_gateway_allowed_fraction",
 ) + tuple("action=" + x for x in ACTIONS)
 
@@ -138,16 +139,21 @@ def load_executed_dataset(path: Path) -> list[dict]:
         # Target labels are isolated until this post-hoc training/evaluation phase.
         examples.append({
             "group": conf, "partition": partition,
+            "repeat": a["repeat"],
             "action": a["action_id"], "fault": conditions["fault_mode"],
             "target": conditions["fault_target"],
             "pre_action": {
                 "cache_ttl_ms": features["cache_ttl_ms"],
                 "requested_rps": features["requested_rps"],
+                "gateway_visible_enforcer_count": features["visible_enforcement_processes"],
                 "initial_gateway_allowed_fraction": sum(
                     x["http_status"] == 200 for x in observations) / len(observations),
             },
             "label_security_exposure": float(
                 not oracle["after"]["all_revoked_access_denied"]),
+            "label_path_exposure": float(
+                bool(oracle.get("gateway_path_exposure_observed",
+                     v.get("path_exposure_observed", False)))),
             "label_service_failure_fraction": failures / attempted,
         })
     if len(source_revisions) != 1:
@@ -168,7 +174,8 @@ def to_features(row: dict) -> list[float]:
     """
     p = row["pre_action"]
     return [float(p[k]) for k in (
-        "cache_ttl_ms", "requested_rps", "initial_gateway_allowed_fraction",
+        "cache_ttl_ms", "requested_rps",
+        "gateway_visible_enforcer_count", "initial_gateway_allowed_fraction",
     )] + [float(row["action"] == x) for x in ACTIONS]
 
 
@@ -243,7 +250,8 @@ def train_evaluate(rows: list[dict], seed: int = 20261110,
     }
     matrices = {k: np.asarray([to_features(r) for r in v], dtype=float)
                 for k, v in groups.items()}
-    for label in ("label_security_exposure", "label_service_failure_fraction"):
+    for label in ("label_security_exposure", "label_path_exposure",
+                  "label_service_failure_fraction"):
         train, cal, test = (groups[k] for k in SPLITS)
         y = {k: np.asarray([r[label] for r in v], dtype=float)
              for k, v in groups.items()}
@@ -305,6 +313,24 @@ def train_evaluate(rows: list[dict], seed: int = 20261110,
             "heldout_test_count": len(test),
             "caveat": "Only measured laboratory behavior; not conditional service safety",
         }
+    # Evaluate the complete *decision*, not only per-target regression MAE.
+    # The hidden test outcomes are read exclusively by evaluate_regret as a
+    # hindsight scoring oracle, never as model features or action preferences.
+    test_rows = groups["test"]
+    offline_predictions = {}
+    for i, row in enumerate(test_rows):
+        key = (row["group"], row["repeat"], row["action"])
+        if key in offline_predictions:
+            raise ValueError("Duplicate held-out decision candidate")
+        offline_predictions[key] = {
+            label: max(0.0, min(1.0, float(model.predict(
+                matrices["test"][i:i+1]
+            )[0])))
+            for label, model in fitted_models.items()
+        }
+    report["offline_decision_evaluation"] = evaluate_regret(
+        test_rows, offline_predictions
+    )
     if export_path is not None:
         # Only load model artifacts created in a trusted local environment.
         # The scikit-learn serialization is pickle-based and unsafe to load
@@ -319,6 +345,7 @@ def train_evaluate(rows: list[dict], seed: int = 20261110,
                 "fault": r["fault"], "target": r["target"],
                 "pre_action": r["pre_action"],
                 "label_security_exposure": r["label_security_exposure"],
+                "label_path_exposure": r["label_path_exposure"],
                 "label_service_failure_fraction": r["label_service_failure_fraction"],
             }
             for r in groups["train"]
@@ -339,7 +366,7 @@ def train_evaluate(rows: list[dict], seed: int = 20261110,
                 name: [float(matrices["train"][:, i].min()),
                        float(matrices["train"][:, i].max())]
                 for i, name in enumerate(FEATURES)
-                if i < 3
+                if i < 4
             },
             "radii": calibration_radii,
             "models": fitted_models,
