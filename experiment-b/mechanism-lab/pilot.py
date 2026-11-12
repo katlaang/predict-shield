@@ -110,7 +110,8 @@ def setup_fault(control_token: str, *, ttl_ms: int, delay_ms: int,
                 oracle_token: str | None = None,
                 gateway_includes_hidden: bool = True,
                 routing_profile: str = "balanced",
-                complexity_stratum: str = "SIMPLE") -> None:
+                complexity_stratum: str = "SIMPLE",
+                node_service_latency_ms: tuple[int, ...] | None = None) -> None:
     """Reset all JVMs and inject a configured actual Kafka consumer fault.
 
     Faults are set on a named process before the policy event is published.
@@ -139,8 +140,13 @@ def setup_fault(control_token: str, *, ttl_ms: int, delay_ms: int,
     # different Java service timings, not just labels in the JSON manifest.
     # SIMPLE uses equal handler latency; the two harder levels use
     # heterogeneous real per-request execution times.
-    delays = ((15, 15, 15, 15) if complexity_stratum == "SIMPLE"
-              else (0, 15, 50, 100))
+    delays = (tuple(node_service_latency_ms)
+              if node_service_latency_ms is not None
+              else ((15, 15, 15, 15) if complexity_stratum == "SIMPLE"
+                    else (0, 15, 50, 100)))
+    if len(delays) != len(ENFORCERS) or any(
+            type(value) is not int or not 0 <= value <= 150 for value in delays):
+        raise ValueError("Invalid registered per-node service latency vector")
     for node, latency_ms in zip(ENFORCERS, delays):
         set_status, payload, _ = request(
             node, f"/admin/service-latency/{latency_ms}",
@@ -505,13 +511,15 @@ def run_case(action: str, control_token: str, oracle_token: str,
              delay_ms: int = 200, duration_seconds: float = 5,
              gateway_includes_hidden: bool = True,
              routing_profile: str = "balanced",
-             complexity_stratum: str = "SIMPLE") -> dict:
+             complexity_stratum: str = "SIMPLE",
+             node_service_latency_ms: tuple[int, ...] | None = None) -> dict:
     """Reset all processes, inject event loss and measure one candidate action."""
     setup_fault(control_token, ttl_ms=ttl_ms, delay_ms=delay_ms,
                 fault_target=fault_target, fault_mode=fault_mode,
                 oracle_token=oracle_token, gateway_includes_hidden=gateway_includes_hidden,
                 routing_profile=routing_profile,
-                complexity_stratum=complexity_stratum)
+                complexity_stratum=complexity_stratum,
+                node_service_latency_ms=node_service_latency_ms)
     before_probes = gateway_probes(count=8)
     before_operator_telemetry = operator_telemetry(control_token)
     before_scope = gateway_scope_evidence(control_token, before_probes)
@@ -538,6 +546,8 @@ def run_case(action: str, control_token: str, oracle_token: str,
         "gateway_includes_hidden": gateway_includes_hidden,
         "routing_profile": routing_profile,
         "complexity_stratum": complexity_stratum,
+        "node_service_latency_ms": list(node_service_latency_ms)
+        if node_service_latency_ms is not None else None,
         "path_access_exposed": any(p["http_status"] == 200 for p in after_probes),
         "action": action,
         "before": {"verifier_gateway_probes": before_probes,
