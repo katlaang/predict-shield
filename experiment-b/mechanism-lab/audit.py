@@ -76,8 +76,20 @@ def inspect_trial(trial: dict, record_root: Path) -> tuple[str, str]:
     if pre.get("oracle_features_excluded") is not True or pre.get(
             "model_prediction_recorded") is not False:
         return "invalid", "pre-action feature boundary was violated"
-    if verification.get("outcome") not in ("INDETERMINATE", "NOT VERIFIED"):
-        return "invalid", "unjustified gateway assurance verdict"
+    decision = verification.get("outcome")
+    if decision not in ("VERIFIED", "INDETERMINATE", "NOT VERIFIED"):
+        return "invalid", "unsupported verification verdict"
+    if decision == "VERIFIED":
+        scope = verification.get("scope_evidence") or {}
+        if (not verification.get("independent_inventory_reconciled")
+                or scope.get("status") != "VERIFIED"
+                or not scope.get("inventory_reconciled")
+                or len(scope.get("observed_forwarded_targets", [])) !=
+                   len(scope.get("independent_compose_inventory", []))
+                or any(p.get("http_status") != 403 or
+                       not p.get("result", {}).get("gateway_upstream")
+                       for p in verification.get("observations", []))):
+            return "invalid", "full-scope VERIFIED lacks independent routing evidence"
     after = oracle.get("after")
     if (oracle.get("oracle_role") != "separate_process_admin_plus_direct_probe"
             or not isinstance(after, dict) or not after.get("inventory_complete")
