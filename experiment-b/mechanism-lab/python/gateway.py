@@ -22,6 +22,13 @@ counter = itertools.count()
 state_lock = threading.Lock()
 restricted = False
 include_hidden = False
+traffic_profile = "balanced"
+# Weighted slots affect actual request routing, not generated outcome labels.
+PROFILE_WEIGHTS = {
+    "balanced": (1, 1, 1, 1),
+    "skewed_a": (6, 2, 1, 1),
+    "skewed_hidden": (1, 1, 1, 7),
+}
 
 
 class Gateway(BaseHTTPRequestHandler):
@@ -47,14 +54,21 @@ class Gateway(BaseHTTPRequestHandler):
                 return
             with state_lock:
                 visible = list(UPSTREAMS) + ([SHADOW] if include_hidden else [])
-            self._send(200, {"upstreams": visible, "scope": "gateway-config-only"})
+                weights = PROFILE_WEIGHTS[traffic_profile][:len(visible)]
+                profile = traffic_profile
+            self._send(200, {"upstreams": visible, "traffic_profile": profile,
+                             "routing_weights": list(weights),
+                             "scope": "gateway-config-only"})
             return
         if self.path not in ("/protected", "/legitimate"):
             self._send(404, {"error": "unsupported route"})
             return
         with state_lock:
             is_restricted = restricted
-            routes = UPSTREAMS + ((SHADOW,) if include_hidden else ())
+            visible = UPSTREAMS + ((SHADOW,) if include_hidden else ())
+            weights = PROFILE_WEIGHTS[traffic_profile][:len(visible)]
+            routes = tuple(node for node, weight in zip(visible, weights)
+                           for _ in range(weight))
         if is_restricted and self.path == "/protected":
             # This laboratory rule targets the compromised protected route,
             # not unrelated legitimate service traffic. It reduces *path*
@@ -82,25 +96,31 @@ class Gateway(BaseHTTPRequestHandler):
 
     def do_POST(self) -> None:
         """Change only the disposable gateway restriction with an authorized token."""
-        global restricted, include_hidden
+        global restricted, include_hidden, traffic_profile
         if self.headers.get("X-Lab-Control", "") != CONTROL or not CONTROL:
             self._send(403, {"error": "gateway token rejected"})
             return
         if self.path not in (
             "/admin/restrict", "/admin/restore",
             "/admin/include-hidden", "/admin/omit-hidden",
+            "/admin/traffic/balanced", "/admin/traffic/skewed_a",
+            "/admin/traffic/skewed_hidden",
         ):
             self._send(404, {"error": "unknown gateway control"})
             return
         with state_lock:
             if self.path in ("/admin/restrict", "/admin/restore"):
                 restricted = self.path == "/admin/restrict"
-            else:
+            elif self.path in ("/admin/include-hidden", "/admin/omit-hidden"):
                 include_hidden = self.path == "/admin/include-hidden"
+            else:
+                traffic_profile = self.path.rsplit("/", 1)[-1]
             new_state = restricted
             visible = include_hidden
+            profile = traffic_profile
         self._send(200, {"restricted": new_state,
-                         "include_hidden": visible, "acknowledged": True})
+                         "include_hidden": visible, "traffic_profile": profile,
+                         "acknowledged": True})
 
     def log_message(self, format: str, *args: object) -> None:
         """Suppress request-body logging and avoid leaking synthetic credentials."""
