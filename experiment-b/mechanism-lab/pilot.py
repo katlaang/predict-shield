@@ -119,10 +119,11 @@ def setup_fault(control_token: str, *, ttl_ms: int, delay_ms: int,
     status, _, _ = request("authority", "/control/reset", method="POST", token=control_token, timeout=10)
     if status != 202:
         raise RuntimeError("Authority reset was not acknowledged (HTTP " + str(status) + ")")
-    # A paired trial must start only after *every* enforcement JVM has
-    # acknowledged the current authority reset revision. This prevents a
-    # delayed message from a prior trial from changing the new starting state:
-    # Kafka callbacks reject older revisions once the reset has converged.
+    # Each JVM reset advances its local epoch. Delayed callbacks from prior
+    # trials are rejected under the same synchronized monitor. The oracle
+    # then verifies that all four JVMs reached the same authority revision
+    # before a new fault is injected. Quiescence checks below ensure that no
+    # current-epoch callback is still scheduled at the start of measurement.
     if oracle_token is not None:
         deadline = time.monotonic() + 18
         while time.monotonic() < deadline:
@@ -132,6 +133,8 @@ def setup_fault(control_token: str, *, ttl_ms: int, delay_ms: int,
                 if (desired.get("revoked") is False
                         and all(t["admin"]["revision"] == desired["revision"]
                                 and t["admin"]["revoked"] is False
+                                and t["admin"].get("pending_scheduled_callbacks") == 0
+                                and isinstance(t["admin"].get("experiment_epoch"), int)
                                 for t in baseline["targets"])):
                     break
             except (RuntimeError, KeyError, TypeError):
