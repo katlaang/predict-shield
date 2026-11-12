@@ -66,6 +66,13 @@ class ModelDecisionIntegrationTests(unittest.TestCase):
                 "requested_rps": [10, 65],
                 "gateway_visible_enforcer_count": [3, 4],
                 "initial_gateway_allowed_fraction": [0, 1],
+                "operator_observed_count": [0, 4],
+                "operator_missing_count": [0, 4],
+                "operator_revision_spread": [0, 100],
+                "operator_max_cache_age_ms": [0, 100000],
+                "operator_refresh_failure_count": [0, 4],
+                "operator_pending_callback_count": [0, 100],
+                "operator_handled_event_spread": [0, 100],
             },
             "models": {
                 "label_security_exposure": FakeActionModel([.20, .10, .02, .90]),
