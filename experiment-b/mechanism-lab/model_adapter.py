@@ -74,6 +74,7 @@ def predictions_from_bundle(
     numeric = {
         "cache_ttl_ms": features["cache_ttl_ms"],
         "requested_rps": features["requested_rps"],
+        "gateway_visible_enforcer_count": features["visible_enforcement_processes"],
         "initial_gateway_allowed_fraction": allowed,
     }
     out_of_distribution = any(
