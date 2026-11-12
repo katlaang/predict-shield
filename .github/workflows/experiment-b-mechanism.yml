@@ -46,6 +46,9 @@ jobs:
           # broken channel must NOT repair the stale enforcement cache.
           assert cases["resync_policy"]["after"]["oracle"]["all_revoked_access_denied"] is False
           assert cases["restart_enforcer"]["after"]["oracle"]["all_revoked_access_denied"] is True
+          assert cases["restart_enforcer"]["after"]["verifier_scope"]["status"] == "VERIFIED"
+          assert cases["resync_policy"]["after"]["verifier_scope"]["status"] == "NOT VERIFIED"
+          assert cases["gateway_restrict"]["after"]["verifier_scope"]["status"] == "INDETERMINATE"
           assert cases["gateway_restrict"]["after"]["oracle"]["all_revoked_access_denied"] is False
           r=d["silent_regression"]
           assert r["pre_regression_oracle"]["all_revoked_access_denied"] is True
