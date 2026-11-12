@@ -1,7 +1,8 @@
 package org.predictshield.mechanism;
 
 import java.net.URI;
-import java.time.Duration;
+import java.util.concurrent.atomic.AtomicLong;
+import jakarta.annotation.PreDestroy;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.Executors;
@@ -61,6 +62,9 @@ public final class EnforcementController {
     private volatile long handledEvents = 0;
     private volatile long droppedEvents = 0;
     private volatile boolean lastRefreshFailed = false;
+    private final AtomicLong experimentEpoch = new AtomicLong(0);
+    private final AtomicLong scheduledCallbacks = new AtomicLong(0);
+    private final AtomicLong discardedOldEpochCallbacks = new AtomicLong(0);
 
     /**
      * Injects process identity and separate authority, control and oracle credentials.
@@ -100,15 +104,14 @@ public final class EnforcementController {
     public synchronized void onEvent(String value) {
         handledEvents++;
         String mode = fault;
+        long epoch = experimentEpoch.get();
         switch (mode) {
             case "loss" -> droppedEvents++;
-            case "delay" -> scheduler.schedule(
-                    () -> applyRevision(value), Math.max(1, delayedMs + jitter.nextInt(81)),
-                    TimeUnit.MILLISECONDS);
+            case "delay" -> scheduleForEpoch(
+                    value, epoch, Math.max(1, delayedMs + jitter.nextInt(81)));
             case "duplicate" -> {
                 applyRevision(value);
-                scheduler.schedule(() -> applyRevision(value), 10 + jitter.nextInt(30),
-                        TimeUnit.MILLISECONDS);
+                scheduleForEpoch(value, epoch, 10 + jitter.nextInt(30));
             }
             case "reorder" -> {
                 if (heldEvent == null) heldEvent = value;
@@ -116,12 +119,43 @@ public final class EnforcementController {
                     applyRevision(value);
                     String earlier = heldEvent;
                     heldEvent = null;
-                    scheduler.schedule(() -> applyRevision(earlier), 25 + jitter.nextInt(80),
-                            TimeUnit.MILLISECONDS);
+                    scheduleForEpoch(earlier, epoch, 25 + jitter.nextInt(80));
                 }
             }
             default -> applyRevision(value);
         }
+    }
+
+    /**
+     * Schedules an actual Kafka-consumer fault callback bound to the active trial epoch.
+     *
+     * <p>Replaying a message after a fresh trial reset would contaminate the
+     * successor's starting conditions. The scheduled callback therefore checks
+     * its captured epoch while holding the same monitor used by reset(). A
+     * callback from an earlier experiment can never change the new cached
+     * policy even if it carries a greater revision. A pending callback is
+     * tracked so readiness can distinguish real quiescence from apparent
+     * policy convergence. This does not make Kafka itself transactional.</p>
+     *
+     * @param raw the genuine broker-delivered revision payload
+     * @param epoch active experiment generation captured during consumer handling
+     * @param delayMs injected nonnegative callback delay in milliseconds
+     */
+    private synchronized void scheduleForEpoch(String raw, long epoch, long delayMs) {
+        scheduledCallbacks.incrementAndGet();
+        scheduler.schedule(() -> {
+            try {
+                synchronized (EnforcementController.this) {
+                    if (experimentEpoch.get() == epoch) {
+                        applyRevision(raw);
+                    } else {
+                        discardedOldEpochCallbacks.incrementAndGet();
+                    }
+                }
+            } finally {
+                scheduledCallbacks.decrementAndGet();
+            }
+        }, delayMs, TimeUnit.MILLISECONDS);
     }
 
     /**
@@ -254,6 +288,10 @@ public final class EnforcementController {
         if (ttlMs < 50 || ttlMs > 30000) {
             return ResponseEntity.badRequest().body(Map.of("error", "TTL out of bounds"));
         }
+        // The epoch is incremented before mutating cache state under the
+        // same monitor as Kafka callbacks and delayed scheduled work.
+        // This explicitly invalidates callbacks from previous trials.
+        experimentEpoch.incrementAndGet();
         cached = new PolicyRevision(0, false);
         refreshedAtMs = System.currentTimeMillis();
         cacheTtlMs = ttlMs;
@@ -308,7 +346,22 @@ public final class EnforcementController {
                 "fault", fault,
                 "handled_events", handledEvents,
                 "dropped_events", droppedEvents,
+                "pending_scheduled_callbacks", scheduledCallbacks.get(),
+                "old_epoch_callbacks_discarded", discardedOldEpochCallbacks.get(),
+                "experiment_epoch", experimentEpoch.get(),
                 "refresh_failed", lastRefreshFailed));
+    }
+
+    /**
+     * Stops the laboratory scheduler when the Spring service is destroyed.
+     *
+     * <p>Delayed callbacks are discarded when the process terminates. The
+     * research lab does not persist a callback queue, so experimental
+     * collectors must not treat container shutdown as delivery confirmation.</p>
+     */
+    @PreDestroy
+    public void shutdownScheduler() {
+        scheduler.shutdownNow();
     }
 
     /**
