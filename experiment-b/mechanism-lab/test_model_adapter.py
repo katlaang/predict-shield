@@ -73,6 +73,8 @@ class ModelDecisionIntegrationTests(unittest.TestCase):
                 "operator_refresh_failure_count": [0, 4],
                 "operator_pending_callback_count": [0, 100],
                 "operator_handled_event_spread": [0, 100],
+                "operator_max_service_latency_ms": [0, 150],
+                "operator_service_latency_spread_ms": [0, 150],
             },
             "models": {
                 "label_security_exposure": FakeActionModel([.20, .10, .02, .90]),
