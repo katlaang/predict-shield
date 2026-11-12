@@ -158,3 +158,81 @@ PYTHONPATH=engine python -m unittest discover \
 
 **Do not publish model performance claims before the entire measured dataset,
 independent oracle reliability and fair competing baselines have been reviewed.**
+
+
+## Campaign integrity, comparison, and leakage controls
+
+The campaign is not considered complete merely because the planner created
+1,200 run IDs. Only independently measured Kafka/JVM runs with four matching
+record streams count as complete. A read-only audit now validates record
+provenance, complete oracle state, observed HTTP request denominators,
+registered run IDs, and the exact pre-registered configuration splits.
+
+~~~bash
+python plan.py --output plans/mechanism
+python campaign.py --audit \
+  --plan plans/mechanism --records results/mechanism
+~~~
+
+To execute at most four additional real trials in an isolated Docker lab,
+with the three distinct disposable credentials configured:
+
+~~~bash
+python campaign.py --execute-lab \
+  --plan plans/mechanism --records results/mechanism \
+  --max-trials 4 --resume
+~~~
+
+The batch command holds an exclusive local lock and pins a SHA-256 digest of
+the registered plan. It refuses partial, invalid, mismatched or unexpected
+records, and cannot execute more than 12 trials in one invocation. A failed
+trial must be investigated; a resumed run never silently overwrites
+incomplete evidence. This does not implement automatic cloud scheduling
+or certify that a full campaign has taken place.
+
+### Experimental leakage correction
+
+Fault mode, fault target and deliberately injected event delay are now stored
+as **experimental metadata**, not deployable model features. The learned
+action-effectiveness model uses only registered, operationally observable
+inputs: cache TTL, intended load, pre-action gateway allow fraction, and
+candidate action. Deliberately hidden experimental conditions remain
+available for post-hoc stratification and for a clearly labeled *privileged*
+diagnostic lookup, not for an operational model comparison.
+
+The training report distinguishes the comparable action-only lookup
+baseline from the privileged fault/target lookup. A model that outperforms
+only the action-only baseline has not established superiority over a
+stronger operationally informed risk heuristic or fixed playbook.
+
+### Paired outcome comparison
+
+After a **fully measured and reviewed** collection:
+
+~~~bash
+python train.py --records results/mechanism \
+  --report reports/mechanism-evaluation.json \
+  --export-model reports/mechanism-model.joblib
+
+python compare.py --records results/mechanism \
+  --partition test --report reports/paired-test-comparison.json
+~~~
+
+The comparison reports measured exposure and failed-request differences
+for each action relative to monitor-only. It resamples operating
+configurations, not individual repeat runs, when constructing exploratory
+confidence intervals. Action order is deterministically randomized within
+each configuration/repeat to reduce fixed-order bias.
+
+Important remaining threats to experimental validity: delayed Kafka
+callbacks may contaminate adjacent runs; request timing and TTL refresh
+may change the actual fault before action selection; the operator-only
+feature set is limited; randomization does not eliminate all confounding;
+the independent oracle still depends partly on admin self-reports and
+a fixed inventory; and the system does not yet possess independently
+established service error budgets.
+
+**There is no evidence yet that the trained model outperforms deterministic
+defensive selection, or that it can be deployed safely.** The existing
+model-to-gate-to-selector code can abstain, but automatic action dispatch
+remains intentionally disabled.
