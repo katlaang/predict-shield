@@ -72,6 +72,7 @@ def predictions_from_bundle(
         raise ValueError("Unbounded action-specific scheduled request count")
     bounds = bundle.get("numeric_feature_bounds", {})
     numeric = {
+        "routing_profile": pre_action.get("routing_profile", "balanced"),
         "cache_ttl_ms": features["cache_ttl_ms"],
         "requested_rps": features["requested_rps"],
         "gateway_visible_enforcer_count": features["visible_enforcement_processes"],
@@ -81,7 +82,7 @@ def predictions_from_bundle(
     out_of_distribution = any(
         name not in bounds or float(value) < bounds[name][0]
         or float(value) > bounds[name][1]
-        for name, value in numeric.items()
+        for name, value in numeric.items() if name != "routing_profile"
     )
     if len({c.action_id for c in candidates}) != len(candidates):
         raise ValueError("Candidate IDs must be unique")
