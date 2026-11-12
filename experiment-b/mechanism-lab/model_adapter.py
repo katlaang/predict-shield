@@ -27,10 +27,12 @@ def predictions_from_bundle(
     Expects a bundle trained exclusively on the 60 registered training groups
     and calibrated on 20 disjoint groups. Residual risk is the predicted
     probability-like fraction of post-action oracle-exposed cases. The impact
-    quantity uses the predicted *total* failed HTTP request fraction times
-    scheduled request attempts. As no background subtraction is implemented,
-    the total is conservatively treated as a bound on additional disruption.
-    This is not a calibrated real-service error-budget predictor.
+    quantity uses the separately trained *absolute number* of failed
+    legitimate HTTP requests during the action window, with a grouped
+    calibration interval in the same count units. As no background
+    subtraction is implemented, total observed failures conservatively
+    stand in for additional disruption. The expected count is not an
+    independently verified remaining error budget.
 
     A nonempty verified inventory snapshot and explicit service budgets must
     be established by other components; the adapter cannot create those.
@@ -64,9 +66,9 @@ def predictions_from_bundle(
         raise ValueError("Missing pre-action gateway observations")
     allowed = sum(p["http_status"] == 200 for p in probes) / len(probes)
     risk_model = bundle["models"]["label_security_exposure"]
-    impact_model = bundle["models"]["label_service_failure_fraction"]
+    impact_model = bundle["models"]["label_absolute_failed_requests"]
     risk_radius = bundle["radii"]["label_security_exposure"]
-    impact_radius = bundle["radii"]["label_service_failure_fraction"]
+    impact_radius = bundle["radii"]["label_absolute_failed_requests"]
     count = float(features["requested_rps"]) * float(features["measurement_seconds"])
     if count <= 0 or count > 3000:
         raise ValueError("Unbounded action-specific scheduled request count")
@@ -96,11 +98,13 @@ def predictions_from_bundle(
         }
         vector = [to_features(example)]
         r = max(0.0, min(1.0, float(risk_model.predict(vector)[0])))
-        d = max(0.0, min(1.0, float(impact_model.predict(vector)[0])))
+        # The absolute-count regressor and its calibration radius share
+        # failed-request units. Multiplying a fraction by requested traffic
+        # here would reintroduce the old mismatched research objective.
+        d = max(0.0, float(impact_model.predict(vector)[0]))
         r_interval = Interval(max(0, r-risk_radius), r, min(1, r+risk_radius))
-        d_interval = Interval(max(0, d-impact_radius) * count,
-                              d * count,
-                              min(1, d+impact_radius) * count)
+        d_interval = Interval(max(0, d-impact_radius),
+                              d, d+impact_radius)
         result.append(ActionPrediction(
             action_id=candidate.action_id,
             snapshot_id=snapshot.snapshot_id,
