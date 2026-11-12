@@ -53,7 +53,9 @@ jobs:
           r=d["silent_regression"]
           assert r["pre_regression_oracle"]["all_revoked_access_denied"] is True
           assert r["post_regression_oracle"]["all_revoked_access_denied"] is False
-          assert cases["gateway_restrict"]["operations"]["non_200_requests"] > 0
+          # Gateway restriction now denies only the protected revoked route;
+          # legitimate service traffic must continue without deliberate 503s.
+          assert cases["gateway_restrict"]["operations"]["non_200_requests"] == 0
           omitted=d["omitted_enforcement_point"]
           assert omitted["gateway_only_looks_clean"] is True
           assert omitted["oracle"]["all_revoked_access_denied"] is False
@@ -63,74 +65,54 @@ jobs:
       - name: Generate grouped 100 by 4 by 3 mechanism experiment plan
         working-directory: experiment-b/mechanism-lab
         run: python plan.py --output plans/ci-mechanism
-      - name: Collect four real actions through the audited bounded campaign runner
-        working-directory: experiment-b/mechanism-lab
-        run: python campaign.py --execute-lab --plan plans/ci-mechanism --records results/ci-mechanism --max-trials 4
-      - name: Expand bounded pilot to three distinct fault configurations
+      - name: Execute repeated pilot: loss, delay and genuine two-revision reorder
         working-directory: experiment-b/mechanism-lab
         run: |
-          python campaign.py --execute-lab --plan plans/ci-mechanism --records results/ci-mechanism --start 12 --max-trials 4
-          python campaign.py --execute-lab --plan plans/ci-mechanism --records results/ci-mechanism --start 24 --max-trials 4
-      - name: Audit registered campaign completion and reject fabricated outcomes
+          for start in 0 4 12 16 36 40; do
+            python campaign.py --execute-lab --plan plans/ci-mechanism --records results/ci-mechanism --start "$start" --max-trials 4
+          done
+      - name: Audit 24 executed records, preserving four separate streams
         working-directory: experiment-b/mechanism-lab
         run: |
           python campaign.py --audit --plan plans/ci-mechanism --records results/ci-mechanism > reports/ci-campaign-audit.json
           python - <<'PY'
           import json
           from pathlib import Path
-          d = json.loads(Path("reports/ci-campaign-audit.json").read_text())
-          assert d["complete"] == 12 and d["missing"] == 1188
+          d=json.loads(Path("reports/ci-campaign-audit.json").read_text())
+          assert d["complete"] == 24 and d["missing"] == 1176
           assert d["partial"] == d["invalid"] == d["unexpected_files"] == 0
           assert not d["ready_for_training"]
-          print("PASS: 12 measured trials across three configurations, not 1200")
+          root=Path("results/ci-mechanism")
+          id_sets=[]
+          for stream in ("pre_action","verification","operations","oracle"):
+              paths=list((root/stream).glob("*.json"))
+              assert len(paths)==24, (stream, len(paths))
+              id_sets.append({p.name for p in paths})
+          assert all(items == id_sets[0] for items in id_sets)
+          records=[json.loads(p.read_text()) for p in (root/"pre_action").glob("*.json")]
+          assert len({r["configuration_id"] for r in records}) == 3
+          assert {r["repeat"] for r in records} == {0,1}
+          assert {r["experimental_conditions"]["fault_mode"] for r in records} == {
+              "loss","delay","reorder"
+          }
+          assert all(r["oracle_features_excluded"] for r in records)
+          reorder=[r for r in records
+                   if r["experimental_conditions"]["fault_mode"] == "reorder"]
+          observed_pairs=[]
+          for r in reorder:
+              oracle=json.loads((root/"oracle"/(r["run_id"]+".json")).read_text())
+              target=r["experimental_conditions"]["fault_target"]
+              selected=[x["admin"].get("reordered_event_pairs",0)
+                        for x in oracle["after"]["targets"] if x["node"]==target]
+              assert len(selected)==1
+              observed_pairs.extend(selected)
+          assert any(n > 0 for n in observed_pairs), "Real reordered Kafka events were not observed"
+          print("PASS: 24 genuine paired replays; two repetitions per configuration; broker reordering observed")
           PY
-      - name: Validate separate collected records without exposing private oracle data
+      - name: Score observed engineering rule and fixed playbooks across sensitivity weights
         working-directory: experiment-b/mechanism-lab
         run: |
-          python - <<'PY'
-          import json
-          from pathlib import Path
-          folder=Path("results/ci-mechanism")
-          joined=[]
-          for stream in ("pre_action","verification","operations","oracle"):
-              files=list((folder/stream).glob("*.json"))
-              assert len(files)==12,(stream,len(files))
-              for file in files:
-                  record=json.loads(file.read_text())
-                  assert record["run_id"]
-                  assert record["partition"] in ("train","calibration","test")
-              joined.append({p.name for p in files})
-          assert all(s==joined[0] for s in joined)
-          pre=[json.loads(p.read_text()) for p in (folder/"pre_action").glob("*.json")]
-          assert all(p["oracle_features_excluded"] for p in pre)
-          assert len({p["configuration_id"] for p in pre}) == 3
-          report=[]
-          for p in sorted(pre,key=lambda x:(x["configuration_id"], x["action_id"])):
-              name=p["run_id"]+".json"
-              verification=json.loads((folder/"verification"/name).read_text())
-              operations=json.loads((folder/"operations"/name).read_text())
-              oracle=json.loads((folder/"oracle"/name).read_text())
-              report.append({
-                  "configuration":p["configuration_id"],
-                  "fault_family":p["experimental_conditions"]["fault_mode"],
-                  "action":p["action_id"],
-                  "control_remediated":oracle["actual_revoked_access_denied"],
-                  "gateway_path_exposed":verification["path_exposure_observed"],
-                  "legitimate_failed_requests":operations["failed_requests"],
-                  "legitimate_attempts":operations["observed_requests"],
-                  "verifier":verification["outcome"]
-              })
-          assert len(report)==12
-          Path("reports/ci-12-trial-summary.json").write_text(json.dumps({
-              "status":"observed_laboratory_pilot_only",
-              "executed_trials":12,
-              "configurations":3,
-              "outcomes":report,
-              "not_a_model_effectiveness_result":True
-          },indent=2)+"\\n")
-          print(json.dumps(report,indent=2))
-          print("PASS: twelve real action replays, matching private oracle records and no feature leakage")
-          PY
+          python pilot_regret.py --plan plans/ci-mechanism --records results/ci-mechanism --configurations mechanism-000 mechanism-001 mechanism-003 --report reports/ci-repeated-pilot-regret.json
       - name: Remove restricted research and oracle trial files before artifact upload
         if: always()
         working-directory: experiment-b/mechanism-lab
@@ -142,7 +124,7 @@ jobs:
           name: experiment-b-mechanism-pilot
           path: |
             experiment-b/mechanism-lab/reports/ci-campaign-audit.json
-            experiment-b/mechanism-lab/reports/ci-12-trial-summary.json
+            experiment-b/mechanism-lab/reports/ci-repeated-pilot-regret.json
           if-no-files-found: ignore
       - name: Shutdown and diagnostics
         if: always()
