@@ -397,8 +397,9 @@ public final class EnforcementController {
      * engine without disclosing fault injection, oracle truth or private
      * verification outcome.
      *
-     * <p>The separately scoped laboratory operator credential grants access
-     * to this pre-action snapshot. The telemetry contains observed cache age,
+     * <p>The existing laboratory control credential grants read-only access
+     * to this pre-action snapshot. It is NOT yet a distinct least-privilege
+     * operator credential. The telemetry contains observed cache age,
      * applied revision, processed-event count, failed TTL refresh and pending
      * scheduled operations. It deliberately omits the injected fault mode,
      * target identity as a fault label, desired authoritative access verdict,
@@ -406,7 +407,7 @@ public final class EnforcementController {
      * verified Kafka consumer offset. These indicators must be timestamped
      * before an action to be used as model inputs.</p>
      *
-     * @param token disposable laboratory control credential
+     * @param token disposable laboratory control credential, shared with lab mutations
      * @return only operator-observable monitoring fields, not oracle truth
      */
     @GetMapping("/operator/telemetry")
