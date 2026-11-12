@@ -9,6 +9,9 @@ on:
     paths:
       - 'experiment-b/**'
       - '.github/workflows/experiment-b-integration.yml'
+concurrency:
+  group: experiment-b-java-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
 jobs:
   isolated-lab:
     runs-on: ubuntu-latest
