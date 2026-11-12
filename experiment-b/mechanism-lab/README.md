@@ -356,3 +356,54 @@ This pilot has only four independently configured environments, so
 regret values remain preliminary descriptive statistics. Reordered messages
 may be safely ignored under monotonic revision checks; the goal is to
 measure the behavior, not force a security failure or invent a model win.
+
+
+## AI-centered v3 study (preregistered before model results)
+
+Read [PROTOCOL_V3_AI_EVALUATION.md](PROTOCOL_V3_AI_EVALUATION.md)
+for the immutable prospective research questions and success/failure criteria.
+The proposition is **falsifiable**: a learned selector must be compared to
+strong non-AI rules using only signals available before an action, and it
+may tie or lose.
+
+The prototype now produces:
+
+- Real time-stamped gateway authorization probes, sampled exposure-seconds,
+  and unknown-time upper bounds
+- Absolute legitimate HTTP failures against a fixed experimental cost
+  allowance, not just a failure fraction
+- Pre-action operator telemetry from each Java process: cache revision,
+  cache age, processed event count, refresh failures and pending callbacks.
+  These are operational indicators, **not known fault labels or direct Kafka
+  consumer lag**. A missing feed remains explicitly missing
+- Real, heterogeneous JVM service time: node A 0 ms, B 15 ms, C 50 ms,
+  hidden node 100 ms, with actual request execution and measured latency
+- Balanced and skewed gateway routing profiles, independently registered
+  from fault family, and a suppressed operator feed in the partial-visibility
+  condition
+- Offline AI-versus-rule regret under three declared utility weightings,
+  including a stronger telemetry-based deterministic heuristic
+- A complexity-crossover report with SIMPLE, INTERACTION and
+  PARTIAL_VISIBILITY strata, retaining all outcomes, including negative
+  results, unchanged
+
+The heterogeneity is deliberately configured for this **synthetic
+laboratory**. The current four-node deployment does not yet implement real
+hardware-capacity differences or controlled per-node JVM cold-start time
+distributions. A node with slower legitimate request handling is not
+necessarily slower to restart. Those must not be conflated.
+
+The revised CI integration attempts 40 **actual action replays**:
+five configurations × two repeats × four actions. These cover all four
+fault families, both simple and skewed gateway routing and an explicit
+change freeze. The outcome report is not a trained AI performance result.
+Do not begin the full 1,200-trial study without complete CI, physical
+measurement review, sufficient operator signals and evaluation protocol
+approval. CI success on older commits does not validate changes at HEAD.
+
+The operator telemetry uses the existing disposable control credential.
+Dedicated least-privilege operator credentials remain a future security
+requirement; this lab endpoint is not suitable for production exposure.
+
+Automatic defensive execution is still **disabled**. A research lab's fixed
+error allowance is not an independently measured remaining service budget.
