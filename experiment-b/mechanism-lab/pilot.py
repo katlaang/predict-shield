@@ -339,11 +339,14 @@ def run_case(action: str, control_token: str, oracle_token: str,
                                     duration_seconds=duration_seconds,
                                     fault_target=fault_target)
     time.sleep(0.7)
-    after_probes = gateway_probes(count=8)
-    after_scope = gateway_scope_evidence(control_token, after_probes)
     recovery_wait_seconds = (
         wait_for_target(fault_target) if action == "restart_enforcer" else 0.0
     )
+    # Post-action verification occurs after the restarted process is ready.
+    # Request errors during its actual downtime are already retained in
+    # measured concurrent service-health outcomes.
+    after_probes = gateway_probes(count=8)
+    after_scope = gateway_scope_evidence(control_token, after_probes)
     after_truth = oracle_snapshot(oracle_token)
     return {
         "case": "experiment-b-kafka-revocation",
