@@ -24,7 +24,7 @@ import json
 import math
 import os
 from collections import Counter
-from decision_eval import evaluate_regret
+from decision_eval import evaluate_sensitivity
 from pathlib import Path
 
 FAULTS = ("loss", "delay", "duplicate", "reorder")
@@ -349,7 +349,7 @@ def train_evaluate(rows: list[dict], seed: int = 20261110,
             )[0]))
             for label, model in fitted_models.items()
         }
-    report["offline_decision_evaluation"] = evaluate_regret(
+    report["offline_decision_sensitivity"] = evaluate_sensitivity(
         test_rows, offline_predictions
     )
     if export_path is not None:
