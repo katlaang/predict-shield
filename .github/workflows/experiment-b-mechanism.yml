@@ -68,7 +68,7 @@ jobs:
       - name: 'Execute repeated pilot: all three complexity strata and four fault families'
         working-directory: experiment-b/mechanism-lab
         run: |
-          for start in 0 4 12 16 36 40 48 52 96 100; do
+          for start in 0 4 12 16 24 28 228 232 336 340; do
             python campaign.py --execute-lab --plan plans/ci-mechanism --records results/ci-mechanism --start "$start" --max-trials 4
           done
       - name: Audit 24 executed records, preserving four separate streams
@@ -96,8 +96,12 @@ jobs:
               "loss","delay","reorder"
           }
           assert all(r["oracle_features_excluded"] for r in records)
+          assert {r["complexity_stratum"] for r in records} == {
+              "SIMPLE", "INTERACTION", "PARTIAL_VISIBILITY"
+          }
+          assert {r["routing_profile"] for r in records} >= {"balanced", "skewed_a"}
           frozen=[r for r in records if not r["decision_policy_metadata"]["restart_permitted"]]
-          assert len(frozen)==8 and {r["configuration_id"] for r in frozen}=={"mechanism-008"}
+          assert len(frozen)==8 and {r["configuration_id"] for r in frozen}=={"mechanism-028"}
           reorder=[r for r in records
                    if r["experimental_conditions"]["fault_mode"] == "reorder"]
           observed_pairs=[]
@@ -114,7 +118,7 @@ jobs:
       - name: Score observed engineering rule and fixed playbooks across sensitivity weights
         working-directory: experiment-b/mechanism-lab
         run: |
-          python pilot_regret.py --plan plans/ci-mechanism --records results/ci-mechanism --configurations mechanism-000 mechanism-001 mechanism-003 mechanism-004 mechanism-008 --report reports/ci-repeated-pilot-regret.json
+          python pilot_regret.py --plan plans/ci-mechanism --records results/ci-mechanism --configurations mechanism-000 mechanism-001 mechanism-002 mechanism-019 mechanism-028 --report reports/ci-repeated-pilot-regret.json
       - name: Remove restricted research and oracle trial files before artifact upload
         if: always()
         working-directory: experiment-b/mechanism-lab
