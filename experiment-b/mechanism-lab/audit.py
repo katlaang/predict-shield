@@ -108,10 +108,15 @@ def audit_campaign(configurations: list[dict], trials: list[dict],
     by_split: dict[str, Counter] = {split: Counter()
                                     for split in ("train", "calibration", "test")}
     problems: list[dict] = []
+    observed_source_revisions: set[str] = set()
     for trial in trials:
         status, why = inspect_trial(trial, record_root)
         summaries[status] += 1
         by_split[trial["partition"]][status] += 1
+        if status == "complete":
+            metadata = json.loads((record_root / "pre_action" /
+                                   (trial["run_id"] + ".json")).read_text(encoding="utf-8"))
+            observed_source_revisions.add(metadata["source_commit"])
         if status in ("partial", "invalid") and len(problems) < 25:
             problems.append({"run_id": trial["run_id"], "status": status, "reason": why})
     unknown = []
@@ -128,6 +133,8 @@ def audit_campaign(configurations: list[dict], trials: list[dict],
         "partial": summaries["partial"],
         "invalid": summaries["invalid"],
         "unexpected_files": len(unknown),
+        "distinct_source_revisions": len(observed_source_revisions),
+        "single_source_revision": len(observed_source_revisions) <= 1,
         "by_split": {
             split: {k: count[k] for k in
                     ("complete", "missing", "partial", "invalid")}
@@ -139,6 +146,7 @@ def audit_campaign(configurations: list[dict], trials: list[dict],
             summaries["complete"] == len(trials)
             and not any(summaries[status] for status in ("missing", "partial", "invalid"))
             and not unknown
+            and len(observed_source_revisions) == 1
         ),
         "caution": "Completed laboratory records do not establish real-world model efficacy",
     }
@@ -159,7 +167,8 @@ def main() -> None:
             json.dump(report, output, indent=2, sort_keys=True)
             output.write("\n")
     print(json.dumps(report, indent=2, sort_keys=True))
-    if report["partial"] or report["invalid"] or report["unexpected_files"]:
+    if (report["partial"] or report["invalid"] or report["unexpected_files"]
+            or not report["single_source_revision"]):
         raise SystemExit(2)
 
 
