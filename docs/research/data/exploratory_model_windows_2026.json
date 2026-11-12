@@ -1,0 +1,108 @@
+{
+  "schema": "predict-shield/exploratory-chronological-model/1",
+  "source_outcome": {
+    "repository": "cisagov/kev-data",
+    "commit": "6b8d7ba579672e4f84e2b1f255724aa97c8455b4",
+    "path": "known_exploited_vulnerabilities.json",
+    "snapshot_date": "2026-11-10"
+  },
+  "windows": [
+    {
+      "partition": "train",
+      "as_of": "2026-06-02",
+      "horizon_days": 30,
+      "epss": {
+        "repository": "empiricalsec/epss_scores",
+        "commit": "f1694817a93b3f4d266aa8683eee4bfbe6e85f91",
+        "path": "2026/epss_scores-2026-06-01.csv.gz",
+        "snapshot_date": "2026-06-01",
+        "commit_observed_date": "2026-06-01"
+      },
+      "kev_before": {
+        "repository": "cisagov/kev-data",
+        "commit": "733c1246953ad5f5a5a07ec0df34f65e8e710fcd",
+        "path": "known_exploited_vulnerabilities.json",
+        "snapshot_date": "2026-06-01",
+        "commit_observed_date": "2026-06-01"
+      }
+    },
+    {
+      "partition": "train",
+      "as_of": "2026-07-02",
+      "horizon_days": 30,
+      "epss": {
+        "repository": "empiricalsec/epss_scores",
+        "commit": "86c0b7f92b140fff8f02348e1ad8352f36488b28",
+        "path": "2026/epss_scores-2026-07-01.csv.gz",
+        "snapshot_date": "2026-07-01",
+        "commit_observed_date": "2026-07-01"
+      },
+      "kev_before": {
+        "repository": "cisagov/kev-data",
+        "commit": "d506da19ebb1f0282d803c4f218aa551ac758365",
+        "path": "known_exploited_vulnerabilities.json",
+        "snapshot_date": "2026-07-01",
+        "commit_observed_date": "2026-07-01"
+      }
+    },
+    {
+      "partition": "train",
+      "as_of": "2026-08-04",
+      "horizon_days": 30,
+      "epss": {
+        "repository": "empiricalsec/epss_scores",
+        "commit": "15cf7b7ee80a1e7ec29c31746a9a3017455cf6ec",
+        "path": "2026/epss_scores-2026-08-03.csv.gz",
+        "snapshot_date": "2026-08-03",
+        "commit_observed_date": "2026-08-03"
+      },
+      "kev_before": {
+        "repository": "cisagov/kev-data",
+        "commit": "57b172b5df6dce56d1cb04df0c977fd050ace6b3",
+        "path": "known_exploited_vulnerabilities.json",
+        "snapshot_date": "2026-08-03",
+        "commit_observed_date": "2026-08-03"
+      }
+    },
+    {
+      "partition": "diagnostic",
+      "as_of": "2026-09-02",
+      "horizon_days": 30,
+      "epss": {
+        "repository": "empiricalsec/epss_scores",
+        "commit": "371e370498a78b8e13e76b0766e7d731e26c9eb3",
+        "path": "2026/epss_scores-2026-09-01.csv.gz",
+        "snapshot_date": "2026-09-01",
+        "commit_observed_date": "2026-09-01"
+      },
+      "kev_before": {
+        "repository": "cisagov/kev-data",
+        "commit": "2d5aab3aef546281b9a7a82310c5c3dce31ce507",
+        "path": "known_exploited_vulnerabilities.json",
+        "snapshot_date": "2026-09-01",
+        "commit_observed_date": "2026-09-01"
+      }
+    },
+    {
+      "partition": "previously_inspected_exploratory",
+      "as_of": "2026-10-02",
+      "horizon_days": 30,
+      "epss": {
+        "repository": "empiricalsec/epss_scores",
+        "commit": "ed574837a582b41b77ae96ed04e027b668b27cb4",
+        "path": "2026/epss_scores-2026-10-01.csv.gz",
+        "snapshot_date": "2026-10-01",
+        "commit_observed_date": "2026-10-01"
+      },
+      "kev_before": {
+        "repository": "cisagov/kev-data",
+        "commit": "a25b61fbc5e3125030a15e09adba33f427cc0e25",
+        "path": "known_exploited_vulnerabilities.json",
+        "snapshot_date": "2026-10-01",
+        "commit_observed_date": "2026-10-01"
+      }
+    }
+  ],
+  "labels": "future KEV catalog addition, not first exploitation",
+  "assumption": "October baseline outcomes inspected before this exploratory model protocol was written; not confirmatory"
+}
