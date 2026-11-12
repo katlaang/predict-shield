@@ -200,6 +200,13 @@ candidate action. Deliberately hidden experimental conditions remain
 available for post-hoc stratification and for a clearly labeled *privileged*
 diagnostic lookup, not for an operational model comparison.
 
+Calibration now uses the *maximum observed residual per operating
+configuration* before constructing nominal 90% split-conformal intervals.
+The 20 calibration configurations, rather than the 240 correlated action
+replays, form the independent calibration units. The held-out report also
+records the fraction of entire test configurations covered by the intervals.
+This does not guarantee conditional safety under a distribution shift.
+
 The training report distinguishes the comparable action-only lookup
 baseline from the privileged fault/target lookup. A model that outperforms
 only the action-only baseline has not established superiority over a
