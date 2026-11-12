@@ -73,6 +73,19 @@ class MeasuredModelTrainingTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 load_local_bundle(model_file, trusted_sha256="0" * 64)
 
+    def test_injected_fault_information_cannot_change_training_features(self):
+        """Changing hidden fault labels cannot change operational model input."""
+        row = {
+            "action": ACTIONS[0], "fault": "loss", "target": "enforcer-a",
+            "pre_action": {
+                "cache_ttl_ms": 6000, "requested_rps": 30,
+                "initial_gateway_allowed_fraction": .3,
+            },
+        }
+        before = to_features(row)
+        row.update(fault="reorder", target="enforcer-c")
+        self.assertEqual(before, to_features(row))
+
     def test_training_rejects_group_overlap(self):
         """Identical configuration IDs cannot occur across evaluation partitions."""
         row = {
