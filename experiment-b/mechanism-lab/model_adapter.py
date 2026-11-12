@@ -10,7 +10,7 @@ from __future__ import annotations
 
 from datetime import datetime, timezone
 
-from train import ACTIONS, FAULTS, TARGETS, FEATURES, to_features
+from train import ACTIONS, FEATURES, to_features
 
 from predict_shield.ai_contracts import (
     ActionPrediction, CandidateAction, EvidenceSnapshot, Interval,
@@ -52,9 +52,13 @@ def predictions_from_bundle(
     if now < snapshot.captured_at:
         raise ValueError("Evidence timestamp is in the future")
     features = pre_action["features"]
-    if (features["fault_mode"] not in FAULTS
-            or features["fault_target"] not in TARGETS):
-        raise ValueError("Unrecognized fault or target")
+    if set(features) & {"fault_mode", "fault_target", "event_delay_ms"}:
+        raise ValueError("Injected laboratory metadata cannot be used for prediction")
+    if "experimental_conditions" in pre_action and set(pre_action["experimental_conditions"]) & {
+            "fault_mode", "fault_target", "event_delay_ms"}:
+        # The collector retains these details only for offline analysis; a
+        # model request must be explicitly stripped of experimental metadata.
+        raise ValueError("Strip privileged injection metadata from inference request")
     probes = pre_action["external_deny_observations"]
     if not probes or any(p.get("http_status") not in (200, 403) for p in probes):
         raise ValueError("Missing pre-action gateway observations")
@@ -69,7 +73,6 @@ def predictions_from_bundle(
     bounds = bundle.get("numeric_feature_bounds", {})
     numeric = {
         "cache_ttl_ms": features["cache_ttl_ms"],
-        "event_delay_ms": features["event_delay_ms"],
         "requested_rps": features["requested_rps"],
         "initial_gateway_allowed_fraction": allowed,
     }
@@ -86,8 +89,6 @@ def predictions_from_bundle(
             raise ValueError("Unknown action or missing affected service closure")
         example = {
             "action": candidate.action_id,
-            "fault": features["fault_mode"],
-            "target": features["fault_target"],
             "pre_action": numeric,
         }
         vector = [to_features(example)]

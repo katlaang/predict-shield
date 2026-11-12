@@ -9,7 +9,7 @@ as model features. Configurations, not individual repeated trials, are split
 
 A fitted random forest is compared to train-only action means and train-only
 action-by-fault and action-by-fault-by-target lookup baselines. The 90% nominal
-split-conformal radius is evaluated on the held-out test partition, and does
+grouped split-conformal radius is evaluated on held-out configuration groups, and does
 not justify safety-critical automatic execution under distribution shift.
 
 This experiment intentionally produces an evaluation report only, not an
@@ -32,11 +32,12 @@ ACTIONS = ("resync_policy", "restart_enforcer", "gateway_restrict", "monitor_onl
 SPLITS = {"train": 60, "calibration": 20, "test": 20}
 EXPECTED_TRIALS = 1200
 
+# The trained model must not see laboratory-injected fault labels or timing.
+# Those variables remain available only for post-hoc stratification and an
+# explicitly *privileged* diagnostic lookup baseline.
 FEATURES = (
-    "cache_ttl_ms", "event_delay_ms", "requested_rps",
+    "cache_ttl_ms", "requested_rps",
     "initial_gateway_allowed_fraction",
-) + tuple("fault=" + x for x in FAULTS) + tuple(
-    "target=" + x for x in TARGETS
 ) + tuple("action=" + x for x in ACTIONS)
 
 
@@ -73,6 +74,7 @@ def load_executed_dataset(path: Path) -> list[dict]:
     partition_by_config: dict[str, str] = {}
     action_groups: dict[tuple[str, int], set[str]] = {}
     paired_static_features: dict[tuple[str, int], tuple] = {}
+    source_revisions: set[str] = set()
     for run_id in sorted(ids):
         a, v, o, oracle = (streams[key][run_id] for key in
                            ("pre_action", "verification", "operations", "oracle"))
@@ -80,8 +82,14 @@ def load_executed_dataset(path: Path) -> list[dict]:
             if (other["run_id"] != run_id or
                     other["configuration_id"] != a["configuration_id"] or
                     other["partition"] != a["partition"] or
-                    other["action_id"] != a["action_id"]):
-                raise ValueError("Cross-stream record identity mismatch")
+                    other["action_id"] != a["action_id"] or
+                    other.get("source_commit") != a.get("source_commit")):
+                raise ValueError("Cross-stream record identity or revision mismatch")
+        revision = a.get("source_commit")
+        if (not isinstance(revision, str) or len(revision) != 40
+                or any(c not in "0123456789abcdef" for c in revision)):
+            raise ValueError("Measured run has no valid source revision")
+        source_revisions.add(revision)
         if (a["experiment_type"] != "real_kafka_multijvm_lab"
                 or a.get("model_prediction_recorded") is not False
                 or a.get("oracle_features_excluded") is not True):
@@ -93,20 +101,23 @@ def load_executed_dataset(path: Path) -> list[dict]:
         group_key = (conf, a["repeat"])
         action_groups.setdefault(group_key, set()).add(a["action_id"])
         features = a["features"]
+        conditions = a.get("experimental_conditions", {})
+        if any(key in features for key in ("fault_mode", "fault_target", "event_delay_ms")):
+            raise ValueError("Injected hidden fault metadata leaked into model features")
         static_key = (
             a.get("initial_state_seed"),
-            features.get("fault_mode"),
-            features.get("fault_target"),
+            conditions.get("fault_mode"),
+            conditions.get("fault_target"),
             features.get("cache_ttl_ms"),
-            features.get("event_delay_ms"),
+            conditions.get("event_delay_ms"),
             features.get("requested_rps"),
             features.get("measurement_seconds"),
         )
         if group_key in paired_static_features and paired_static_features[group_key] != static_key:
             raise ValueError("Matched actions do not share the registered starting conditions")
         paired_static_features[group_key] = static_key
-        if (features.get("fault_mode") not in FAULTS
-                or features.get("fault_target") not in TARGETS
+        if (conditions.get("fault_mode") not in FAULTS
+                or conditions.get("fault_target") not in TARGETS
                 or a["action_id"] not in ACTIONS):
             raise ValueError("Unregistered fault, target or action")
         observations = a["external_deny_observations"]
@@ -127,11 +138,10 @@ def load_executed_dataset(path: Path) -> list[dict]:
         # Target labels are isolated until this post-hoc training/evaluation phase.
         examples.append({
             "group": conf, "partition": partition,
-            "action": a["action_id"], "fault": features["fault_mode"],
-            "target": features["fault_target"],
+            "action": a["action_id"], "fault": conditions["fault_mode"],
+            "target": conditions["fault_target"],
             "pre_action": {
                 "cache_ttl_ms": features["cache_ttl_ms"],
-                "event_delay_ms": features["event_delay_ms"],
                 "requested_rps": features["requested_rps"],
                 "initial_gateway_allowed_fraction": sum(
                     x["http_status"] == 200 for x in observations) / len(observations),
@@ -140,6 +150,8 @@ def load_executed_dataset(path: Path) -> list[dict]:
                 not oracle["after"]["all_revoked_access_denied"]),
             "label_service_failure_fraction": failures / attempted,
         })
+    if len(source_revisions) != 1:
+        raise ValueError("Refusing to fit a model on results from mixed source revisions")
     if Counter(partition_by_config.values()) != SPLITS:
         raise ValueError("Expected exactly 60/20/20 distinct configuration groups")
     if len(action_groups) != 300 or any(actions != set(ACTIONS)
@@ -149,14 +161,15 @@ def load_executed_dataset(path: Path) -> list[dict]:
 
 
 def to_features(row: dict) -> list[float]:
-    """One-hot encode only registered action, fault, target and pre-action values."""
+    """Encode only operator-observable pre-action inputs and action identity.
+
+    Injected fault labels and timing remain deliberately excluded to avoid
+    turning a hidden experimental intervention into a model shortcut.
+    """
     p = row["pre_action"]
     return [float(p[k]) for k in (
-        "cache_ttl_ms", "event_delay_ms", "requested_rps",
-        "initial_gateway_allowed_fraction",
-    )] + [float(row["fault"] == x) for x in FAULTS] + [
-        float(row["target"] == x) for x in TARGETS
-    ] + [float(row["action"] == x) for x in ACTIONS]
+        "cache_ttl_ms", "requested_rps", "initial_gateway_allowed_fraction",
+    )] + [float(row["action"] == x) for x in ACTIONS]
 
 
 def conformal_radius(actual, predicted, alpha: float = 0.1) -> float:
@@ -168,12 +181,36 @@ def conformal_radius(actual, predicted, alpha: float = 0.1) -> float:
                          math.ceil((len(residuals) + 1) * (1 - alpha)) - 1)]
 
 
+def grouped_conformal_radius(
+    actual, predicted, group_ids: list[str], alpha: float = 0.1
+) -> float:
+    """Calibrate on whole independent operating configuration groups.
+
+    Trials within one group share environment and event conditions, so their
+    residuals are dependent. Taking each group's maximum absolute residual
+    then applying the finite-sample conformal quantile prevents treating
+    three repeats and four actions as 12 independent deployments. The
+    resulting coverage target is marginal across exchangeable configuration
+    groups, not conditional for a specific fault or safe for production.
+    """
+    if len(actual) != len(predicted) or len(actual) != len(group_ids):
+        raise ValueError("Grouped calibration arrays do not align")
+    worst_by_group: dict[str, float] = {}
+    for true, estimate, group in zip(actual, predicted, group_ids):
+        if not group:
+            raise ValueError("Configuration group identifier missing")
+        error = abs(float(true) - float(estimate))
+        worst_by_group[group] = max(worst_by_group.get(group, 0.0), error)
+    return conformal_radius([0.0] * len(worst_by_group),
+                            list(worst_by_group.values()), alpha)
+
+
 def train_evaluate(rows: list[dict], seed: int = 20261110,
                    *, export_path: Path | None = None) -> dict:
     """Fit models on training groups and compare once on held-out groups.
 
-    Uses strong train-only hierarchical lookup baselines including the fault
-    and target identity. No test-set results are used to select features,
+    Uses an operational action-only lookup baseline and an explicitly privileged
+    diagnostic fault/target lookup that is not considered a fair operational competitor. No test-set results are used to select features,
     hyperparameters, interval radii, or baselines.
     """
     groups = {name: [r for r in rows if r["partition"] == name]
@@ -201,6 +238,7 @@ def train_evaluate(rows: list[dict], seed: int = 20261110,
         "trial_counts": {k: len(v) for k, v in groups.items()},
         "metrics": {},
         "model_automatically_dispatched": False,
+        "fault_injection_metadata_used_as_model_features": False,
         "test_used_for_training_or_calibration": False,
     }
     matrices = {k: np.asarray([to_features(r) for r in v], dtype=float)
@@ -215,7 +253,10 @@ def train_evaluate(rows: list[dict], seed: int = 20261110,
         fitted_models[label] = model
         pred_cal = np.clip(model.predict(matrices["calibration"]), 0, 1)
         pred_test = np.clip(model.predict(matrices["test"]), 0, 1)
-        radius = conformal_radius(y["calibration"], pred_cal)
+        radius = grouped_conformal_radius(
+            y["calibration"], pred_cal,
+            [row["group"] for row in groups["calibration"]]
+        )
         calibration_radii[label] = radius
         low = np.clip(pred_test - radius, 0, 1)
         high = np.clip(pred_test + radius, 0, 1)
@@ -238,12 +279,27 @@ def train_evaluate(rows: list[dict], seed: int = 20261110,
                     return averages[key]
             raise ValueError("Action not seen in training")
         baseline_test = np.asarray([baseline(r) for r in test])
+        # Comparable deployment baseline: action averages only, without the
+        # laboratory's hidden fault label or injected target identity.
+        action_means = {action: float(np.mean([
+            item[label] for item in train if item["action"] == action]))
+            for action in ACTIONS}
+        action_baseline = np.asarray([action_means[item["action"]] for item in test])
         report["metrics"][label] = {
+            "action_only_lookup_heldout_mae": float(mean_absolute_error(
+                y["test"], action_baseline)),
+            "privileged_fault_lookup_is_not_operational_baseline": True,
             "model_heldout_mae": float(mean_absolute_error(y["test"], pred_test)),
-            "hierarchical_lookup_heldout_mae": float(mean_absolute_error(
+            "privileged_fault_lookup_heldout_mae": float(mean_absolute_error(
                 y["test"], baseline_test)),
             "marginal_interval_coverage": float(np.mean(
                 (y["test"] >= low) & (y["test"] <= high))),
+            "heldout_configuration_group_coverage": float(np.mean([
+                all(bool(y["test"][i] >= low[i] and y["test"][i] <= high[i])
+                    for i, row in enumerate(test) if row["group"] == group)
+                for group in sorted({row["group"] for row in test})
+            ])),
+            "calibration_unit": "configuration_group_max_absolute_residual",
             "conformal_absolute_error_radius": radius,
             "nominal_coverage": 0.90,
             "heldout_test_count": len(test),
@@ -283,7 +339,7 @@ def train_evaluate(rows: list[dict], seed: int = 20261110,
                 name: [float(matrices["train"][:, i].min()),
                        float(matrices["train"][:, i].max())]
                 for i, name in enumerate(FEATURES)
-                if i < 4
+                if i < 3
             },
             "radii": calibration_radii,
             "models": fitted_models,

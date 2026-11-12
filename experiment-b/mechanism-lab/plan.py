@@ -4,8 +4,9 @@ The plan is strictly a manifest, not measured data. It is intentionally
 compatible with the *four physical JVM* topology currently present, and does
 not pretend to instantiate the old generator's 2-8 enforcement processes.
 The current mechanism test supports four distinct policy-event mechanisms:
-loss, delay, duplicate and reorder. No particular result is forced by the
-planner. Train, calibration and test configuration groups never overlap.
+loss, delay, duplicate and reorder. Action replay order is randomized within
+each configuration/repeat to reduce fixed-order confounding. No result is
+forced by the planner. Train, calibration and test configuration groups never overlap.
 """
 from __future__ import annotations
 
@@ -63,7 +64,12 @@ def create_plan(seed: int = SEED) -> tuple[list[dict], list[dict]]:
         configs.append(conf)
         for repeat in range(REPEATS):
             seed_for_repeat = int(digest(seed, i, repeat), 16)
-            for action in ACTIONS:
+            # Randomize replay order within each matched group to avoid
+            # systematically favoring the first action after a clean setup.
+            # The action IDs and shared starting-condition seed stay fixed.
+            order = list(ACTIONS)
+            random.Random(seed_for_repeat).shuffle(order)
+            for action in order:
                 trials.append({
                     "schema": SCHEMA,
                     "run_id": "mechanism-run-" + digest(seed, i, repeat, action),

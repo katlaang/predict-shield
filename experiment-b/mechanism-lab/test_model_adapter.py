@@ -45,10 +45,7 @@ class ModelDecisionIntegrationTests(unittest.TestCase):
             "experiment_type": "real_kafka_multijvm_lab",
             "oracle_features_excluded": True,
             "features": {
-                "fault_mode": "loss",
-                "fault_target": "enforcer-b",
                 "cache_ttl_ms": 6000,
-                "event_delay_ms": 200,
                 "requested_rps": 20,
                 "measurement_seconds": 4,
             },
@@ -65,7 +62,6 @@ class ModelDecisionIntegrationTests(unittest.TestCase):
                       "label_service_failure_fraction": .01},
             "numeric_feature_bounds": {
                 "cache_ttl_ms": [2500, 15000],
-                "event_delay_ms": [0, 2500],
                 "requested_rps": [10, 65],
                 "initial_gateway_allowed_fraction": [0, 1],
             },
@@ -113,6 +109,14 @@ class ModelDecisionIntegrationTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             predictions_from_bundle(self.bundle, tampered, self.snapshot,
                                     self.actions)
+
+    def test_hidden_fault_metadata_is_rejected(self):
+        """The actual injected fault type and target must not enter a model call."""
+        tampered = {**self.pre, "features": {
+            **self.pre["features"], "fault_mode": "loss"
+        }}
+        with self.assertRaises(ValueError):
+            predictions_from_bundle(self.bundle, tampered, self.snapshot, self.actions)
 
     def test_ood_model_abstains(self):
         """A condition outside registered training support blocks automatic action."""
