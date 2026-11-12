@@ -50,6 +50,7 @@ class MeasuredModelTrainingTests(unittest.TestCase):
                     examples.append({
                         "group": "unit-" + str(group),
                         "repeat": repeat,
+                        "complexity_stratum": ("SIMPLE", "INTERACTION", "PARTIAL_VISIBILITY")[group % 3],
                         "restart_permitted": (group % 2 == 0),
                         "absolute_error_budget_requests": 25,
                         "partition": partition,
