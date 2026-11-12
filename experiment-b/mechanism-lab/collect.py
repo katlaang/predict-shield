@@ -106,10 +106,15 @@ def separate_records(config: dict, trial: dict, observed: dict) -> dict[str, dic
     return {
         "pre_action": {
             **base,
+            # Only values available to an operator before an action may be
+            # supplied to the deployed predictor. Injection parameters and
+            # true fault location are retained as evaluation metadata below.
             "features": {k: config[k] for k in (
-                "fault_mode", "fault_target", "cache_ttl_ms", "event_delay_ms",
-                "requested_rps", "measurement_seconds", "visible_enforcement_processes",
-                "oracle_inventory_processes",
+                "cache_ttl_ms", "requested_rps", "measurement_seconds",
+                "visible_enforcement_processes", "oracle_inventory_processes",
+            )},
+            "experimental_conditions": {k: config[k] for k in (
+                "fault_mode", "fault_target", "event_delay_ms",
             )},
             "external_deny_observations": before["verifier_gateway_probes"],
             "model_prediction_recorded": False,
