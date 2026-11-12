@@ -131,6 +131,19 @@ def load_executed_dataset(path: Path) -> list[dict]:
             raise ValueError("Missing independent oracle truth")
         if oracle["oracle_role"] != "separate_process_admin_plus_direct_probe":
             raise ValueError("Oracle provenance unrecognized")
+        timeline = v.get("timed_gateway_exposure")
+        if (not isinstance(timeline, dict)
+                or timeline.get("method") != "monotonic_http_step_integral"
+                or timeline.get("valid_probe_count", 0) < 2
+                or not 0 <= timeline.get("exposure_fraction_lower_bound", -1)
+                <= timeline.get("exposure_fraction_upper_bound", -1) <= 1):
+            raise ValueError("Missing measured timed gateway exposure")
+        policy = a.get("decision_policy_metadata")
+        if (not isinstance(policy, dict)
+                or type(policy.get("restart_permitted")) is not bool
+                or type(policy.get("absolute_error_budget_requests")) is not int
+                or policy["absolute_error_budget_requests"] < 1):
+            raise ValueError("Missing explicitly declared decision constraints")
         attempted = o.get("observed_requests")
         failures = o.get("failed_requests")
         if (not isinstance(attempted, int) or attempted < 1 or
@@ -140,6 +153,8 @@ def load_executed_dataset(path: Path) -> list[dict]:
         examples.append({
             "group": conf, "partition": partition,
             "repeat": a["repeat"],
+            "restart_permitted": policy["restart_permitted"],
+            "absolute_error_budget_requests": policy["absolute_error_budget_requests"],
             "action": a["action_id"], "fault": conditions["fault_mode"],
             "target": conditions["fault_target"],
             "pre_action": {
@@ -152,8 +167,10 @@ def load_executed_dataset(path: Path) -> list[dict]:
             "label_security_exposure": float(
                 not oracle["after"]["all_revoked_access_denied"]),
             "label_path_exposure": float(
-                bool(oracle.get("gateway_path_exposure_observed",
-                     v.get("path_exposure_observed", False)))),
+                timeline["exposure_fraction_upper_bound"]),
+            "label_exposure_seconds": float(
+                timeline["exposure_seconds_upper_bound"]),
+            "label_absolute_failed_requests": float(failures),
             "label_service_failure_fraction": failures / attempted,
         })
     if len(source_revisions) != 1:
@@ -251,6 +268,7 @@ def train_evaluate(rows: list[dict], seed: int = 20261110,
     matrices = {k: np.asarray([to_features(r) for r in v], dtype=float)
                 for k, v in groups.items()}
     for label in ("label_security_exposure", "label_path_exposure",
+                  "label_absolute_failed_requests",
                   "label_service_failure_fraction"):
         train, cal, test = (groups[k] for k in SPLITS)
         y = {k: np.asarray([r[label] for r in v], dtype=float)
@@ -259,15 +277,18 @@ def train_evaluate(rows: list[dict], seed: int = 20261110,
                                       random_state=seed, n_jobs=1)
         model.fit(matrices["train"], y["train"])
         fitted_models[label] = model
-        pred_cal = np.clip(model.predict(matrices["calibration"]), 0, 1)
-        pred_test = np.clip(model.predict(matrices["test"]), 0, 1)
+        upper = (max(1.0, max(float(v["label_absolute_failed_requests"])
+                              for v in groups["train"]))
+                 if label == "label_absolute_failed_requests" else 1.0)
+        pred_cal = np.clip(model.predict(matrices["calibration"]), 0, upper)
+        pred_test = np.clip(model.predict(matrices["test"]), 0, upper)
         radius = grouped_conformal_radius(
             y["calibration"], pred_cal,
             [row["group"] for row in groups["calibration"]]
         )
         calibration_radii[label] = radius
-        low = np.clip(pred_test - radius, 0, 1)
-        high = np.clip(pred_test + radius, 0, 1)
+        low = np.clip(pred_test - radius, 0, upper)
+        high = np.clip(pred_test + radius, 0, upper)
         lookup = {}
         for r in train:
             for key in (
@@ -323,9 +344,9 @@ def train_evaluate(rows: list[dict], seed: int = 20261110,
         if key in offline_predictions:
             raise ValueError("Duplicate held-out decision candidate")
         offline_predictions[key] = {
-            label: max(0.0, min(1.0, float(model.predict(
+            label: max(0.0, float(model.predict(
                 matrices["test"][i:i+1]
-            )[0])))
+            )[0]))
             for label, model in fitted_models.items()
         }
     report["offline_decision_evaluation"] = evaluate_regret(
@@ -346,6 +367,7 @@ def train_evaluate(rows: list[dict], seed: int = 20261110,
                 "pre_action": r["pre_action"],
                 "label_security_exposure": r["label_security_exposure"],
                 "label_path_exposure": r["label_path_exposure"],
+                "label_absolute_failed_requests": r["label_absolute_failed_requests"],
                 "label_service_failure_fraction": r["label_service_failure_fraction"],
             }
             for r in groups["train"]
