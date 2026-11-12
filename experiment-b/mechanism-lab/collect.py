@@ -232,6 +232,7 @@ def collect_batch(configs: list[dict], trials: list[dict], output: Path,
             delay_ms=conf["event_delay_ms"],
             duration_seconds=conf["measurement_seconds"],
             gateway_includes_hidden=conf.get("gateway_includes_hidden", True),
+            routing_profile=conf.get("routing_profile", "balanced"),
         )
         records = separate_records(conf, trial, measured)
         write_trial_records(output, records)
