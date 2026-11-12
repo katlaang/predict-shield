@@ -400,7 +400,7 @@ public final class EnforcementController {
                 Map.entry("rejected_trial_events", rejectedTrialEvents.get()),
                 Map.entry("reordered_event_pairs", reorderedEventPairs.get()),
                 Map.entry("duplicated_events", duplicatedEvents.get()),
-                Map.entry("refresh_failed", lastRefreshFailed));)
+                Map.entry("refresh_failed", lastRefreshFailed)
         ));
     }
 
