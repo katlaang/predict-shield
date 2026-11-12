@@ -30,6 +30,7 @@ from pathlib import Path
 FAULTS = ("loss", "delay", "duplicate", "reorder")
 TARGETS = ("enforcer-a", "enforcer-b", "enforcer-c", "enforcer-hidden")
 ACTIONS = ("resync_policy", "restart_enforcer", "gateway_restrict", "monitor_only")
+ROUTING_PROFILES = ("balanced", "skewed_a", "skewed_hidden")
 SPLITS = {"train": 60, "calibration": 20, "test": 20}
 EXPECTED_TRIALS = 1200
 
@@ -45,7 +46,8 @@ OPERATOR_FEATURES = (
 FEATURES = (
     "cache_ttl_ms", "requested_rps", "gateway_visible_enforcer_count",
     "initial_gateway_allowed_fraction",
-) + OPERATOR_FEATURES + tuple("action=" + x for x in ACTIONS)
+) + OPERATOR_FEATURES + tuple("route=" + x for x in ROUTING_PROFILES) + tuple(
+    "action=" + x for x in ACTIONS)
 
 
 def summarize_operator_telemetry(observations: list[dict]) -> dict[str, float]:
@@ -174,6 +176,9 @@ def load_executed_dataset(path: Path) -> list[dict]:
                 or not 0 <= timeline.get("exposure_fraction_lower_bound", -1)
                 <= timeline.get("exposure_fraction_upper_bound", -1) <= 1):
             raise ValueError("Missing measured timed gateway exposure")
+        routing_profile = a.get("routing_profile", "balanced")
+        if routing_profile not in ROUTING_PROFILES:
+            raise ValueError("Unregistered operational routing profile")
         policy = a.get("decision_policy_metadata")
         if (not isinstance(policy, dict)
                 or type(policy.get("restart_permitted")) is not bool
@@ -195,6 +200,7 @@ def load_executed_dataset(path: Path) -> list[dict]:
             "target": conditions["fault_target"],
             "pre_action": {
                 **summarize_operator_telemetry(a.get("operator_observations", [])),
+                "routing_profile": routing_profile,
                 "cache_ttl_ms": features["cache_ttl_ms"],
                 "requested_rps": features["requested_rps"],
                 "gateway_visible_enforcer_count": features["visible_enforcement_processes"],
@@ -231,7 +237,8 @@ def to_features(row: dict) -> list[float]:
         "cache_ttl_ms", "requested_rps",
         "gateway_visible_enforcer_count", "initial_gateway_allowed_fraction",
         *OPERATOR_FEATURES,
-    )] + [float(row["action"] == x) for x in ACTIONS]
+    )] + [float(p.get("routing_profile", "balanced") == x)
+          for x in ROUTING_PROFILES] + [float(row["action"] == x) for x in ACTIONS]
 
 
 def conformal_radius(actual, predicted, alpha: float = 0.1) -> float:
