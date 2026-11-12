@@ -55,6 +55,17 @@ public final class EnforcementController {
     private final Random jitter;
     private volatile PolicyRevision cached = new PolicyRevision(0, false);
     private volatile long refreshedAtMs = 0;
+    /**
+     * Configured per-node synthetic service time in the real HTTP handler.
+     *
+     * <p>Unlike a generated disruption label, the configured delay occurs
+     * during actual JVM request execution and is observed by the gateway.
+     * This models heterogeneous service times, not authentic production
+     * hardware capacity or JVM cold-start duration.</p>
+     */
+    @Value("${lab.legitimate-latency-ms:0}")
+    private long legitimateLatencyMs;
+
     private volatile long cacheTtlMs = 3000;
     private volatile String fault = "none";
     private volatile String heldEvent;
@@ -252,6 +263,16 @@ public final class EnforcementController {
      */
     @GetMapping("/legitimate")
     public ResponseEntity<Map<String, Object>> legitimate() {
+        long boundedMs = Math.max(0L, Math.min(150L, legitimateLatencyMs));
+        if (boundedMs > 0) {
+            try {
+                Thread.sleep(boundedMs);
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
+                return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
+                        .body(Map.of("instance", identity, "ok", false));
+            }
+        }
         return ResponseEntity.ok(Map.of("instance", identity, "ok", true));
     }
 
