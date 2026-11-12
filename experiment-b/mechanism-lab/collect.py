@@ -10,9 +10,10 @@ Example, from the mechanism-lab directory, with Compose already running:
   python collect.py --execute-lab --manifest plans/mechanism \
       --output results/mechanism --limit 4
 
-A full 1,200-run campaign is expensive, requires manual experiment supervision,
-and must not be represented as performed until all records have been collected
-and reviewed for delayed-event carryover and scope completeness.
+CLI execution now delegates to the locked, audited campaign runner. Each
+explicit invocation can execute at most 12 trials. A full 1,200-run campaign
+requires repeated supervised batches and has not occurred by generating a plan.
+Review delayed-event carryover and oracle completeness before any conclusions.
 """
 from __future__ import annotations
 
@@ -218,9 +219,14 @@ def main() -> None:
         "LAB_CONTROL_TOKEN", "LAB_ORACLE_TOKEN", "LAB_INTERNAL_TOKEN")]
     if not all(tokens) or len(set(tokens)) != 3:
         parser.error("Require three distinct nonempty disposable laboratory tokens")
+    # All direct CLI invocations must use the same locked, audited and
+    # registered-plan path as campaign.py. The unguarded collect_batch helper
+    # is retained for compatibility with existing callers but is not exposed
+    # through this CLI; do not bypass campaign controls in experiments.
+    from campaign import run_batch
     configs, trials = load_plan(args.manifest)
-    result = collect_batch(configs, trials, args.output, tokens[0], tokens[1],
-                           offset=args.offset, limit=args.limit)
+    result = run_batch(configs, trials, args.output, tokens[0], tokens[1],
+                       start=args.offset, max_trials=args.limit, resume=False)
     print(json.dumps(result, indent=2))
 
 
