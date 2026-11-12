@@ -54,6 +54,7 @@ def select_probes(controls: Iterable[TrackedControl], *, now: int,
 
 def record_probe(control: TrackedControl, request: ProbeRequest,
                  evidence: list[Evidence], *, observed_at: int,
+                 requested_at: int,
                  max_age_seconds: int = 3600,
                  required_independent_checks: int = 1
                  ) -> tuple[TrackedControl, VerificationRecord]:
@@ -64,13 +65,21 @@ def record_probe(control: TrackedControl, request: ProbeRequest,
     """
     if request.subject_id != control.subject_id:
         raise ValueError("probe request does not match tracked subject")
-    if observed_at < 0 or observed_at < control.last_verified_at:
-        raise ValueError("observation cannot precede existing verification")
+    if (requested_at < control.last_verified_at or requested_at > observed_at
+            or observed_at < 0):
+        raise ValueError("invalid probe request or observation order")
     observed_dt = datetime.fromtimestamp(observed_at, tz=timezone.utc)
     result: Assessment = assess(
         control.asset, control.assertion, evidence,
         required_independent_checks=required_independent_checks,
         max_age_seconds=max_age_seconds, now=observed_dt)
+    # A control changed after this request began. Even a successful old-scope
+    # probe cannot clear or supersede the newer change.
+    if (control.changed_at is not None and
+            requested_at < control.changed_at <= observed_at):
+        result = Assessment(Outcome.INDETERMINATE, result.conflicting_evidence,
+                            "Control changed after probe request; fresh check required.",
+                            result.evidence_sources)
     # Important: NOT VERIFIED/INDETERMINATE/NOT APPLICABLE are not positive
     # evidence and must never advance the last known successful verification.
     updated = replace(control, last_verified_at=observed_at,
