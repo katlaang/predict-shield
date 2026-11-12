@@ -491,6 +491,7 @@ public final class EnforcementController {
                 "applied_revision", cached.revision(),
                 "cache_age_ms", cacheAge,
                 "cache_ttl_ms", cacheTtlMs,
+                "legitimate_service_latency_ms", legitimateLatencyMs,
                 "handled_events", handledEvents,
                 "refresh_failed", lastRefreshFailed,
                 "scheduled_callbacks_pending", scheduledCallbacks.get(),
