@@ -19,6 +19,7 @@ import concurrent.futures
 import json
 import os
 from pathlib import Path
+from scope import compose_expected_enforcers, verify_reconciled_scope
 import statistics
 import subprocess
 import threading
@@ -200,6 +201,36 @@ def gateway_probes(count: int = 3) -> list[dict]:
     ]
 
 
+def gateway_scope_evidence(control_token: str, probes: list[dict]) -> dict:
+    """Reconcile gateway routing with Docker Compose independently of the oracle.
+
+    The normal verifier sees the gateway's *live routing configuration* and
+    the separately enumerated Compose services. Neither input comes from
+    the private oracle or from post-action internal cache reports. Complete
+    VERIFIED remains possible only with coverage of every declared route.
+    """
+    status, response, _ = request(
+        "gateway", "/admin/inventory", token=control_token, timeout=3
+    )
+    if status != 200 or not isinstance(response.get("upstreams"), list):
+        return {
+            "status": "INDETERMINATE",
+            "reason": "Gateway runtime inventory unavailable",
+            "inventory_reconciled": False,
+            "testbed_only": True,
+        }
+    try:
+        expected = compose_expected_enforcers()
+        return verify_reconciled_scope(expected, response["upstreams"], probes)
+    except (OSError, ValueError, KeyError, subprocess.CalledProcessError):
+        return {
+            "status": "INDETERMINATE",
+            "reason": "Independent Compose inventory unavailable",
+            "inventory_reconciled": False,
+            "testbed_only": True,
+        }
+
+
 def oracle_snapshot(oracle_token: str) -> dict:
     """Fetch restricted separately collected direct-cache and direct-probe truth."""
     status, payload, _ = request("oracle", "/oracle/observe", oracle=oracle_token, timeout=5)
@@ -302,12 +333,14 @@ def run_case(action: str, control_token: str, oracle_token: str,
                 fault_target=fault_target, fault_mode=fault_mode,
                 oracle_token=oracle_token, gateway_includes_hidden=gateway_includes_hidden)
     before_probes = gateway_probes(count=8)
+    before_scope = gateway_scope_evidence(control_token, before_probes)
     before_truth = oracle_snapshot(oracle_token)
     operations = measure_under_load(action, control_token, requests_per_second=rps,
                                     duration_seconds=duration_seconds,
                                     fault_target=fault_target)
     time.sleep(0.7)
     after_probes = gateway_probes(count=8)
+    after_scope = gateway_scope_evidence(control_token, after_probes)
     recovery_wait_seconds = (
         wait_for_target(fault_target) if action == "restart_enforcer" else 0.0
     )
@@ -322,13 +355,15 @@ def run_case(action: str, control_token: str, oracle_token: str,
         "path_access_exposed": any(p["http_status"] == 200 for p in after_probes),
         "action": action,
         "before": {"verifier_gateway_probes": before_probes,
+                   "verifier_scope": before_scope,
                    "oracle": before_truth},
         "after": {"verifier_gateway_probes": after_probes,
+                  "verifier_scope": after_scope,
                   "oracle": after_truth},
         "operations": {**operations, "post_window_recovery_wait_seconds": recovery_wait_seconds},
         "evaluation_only": True,
         "no_ai_model_invoked": True,
-        "verification_scope_complete": False,
+        "verification_scope_complete": after_scope.get("status") == "VERIFIED",
         "limitations": [
             "Three actual enforcement processes; no independent production inventory",
             "Gateway probes are intentionally partial and cannot certify global VERIFIED",
