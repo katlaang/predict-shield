@@ -100,7 +100,7 @@ class ModelDecisionIntegrationTests(unittest.TestCase):
         # neither the interval nor its radius is scaled by scheduled RPS.
         predicted = predictions[0].additional_errors["authorization"]
         self.assertEqual(predicted.lower, 6.0)
-        self.assertEqual(predicted.point, 8.0)
+        self.assertEqual(predicted.estimate, 8.0)
         self.assertEqual(predicted.upper, 10.0)
 
     def test_incomplete_scope_must_abstain_even_if_model_confident(self):
