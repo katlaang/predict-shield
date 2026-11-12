@@ -64,7 +64,8 @@ public final class EnforcementController {
      * hardware capacity or JVM cold-start duration.</p>
      */
     @Value("${lab.legitimate-latency-ms:0}")
-    private long legitimateLatencyMs;
+    private volatile long legitimateLatencyMs;
+    private volatile boolean operatorTelemetryVisible = true;
 
     private volatile long cacheTtlMs = 3000;
     private volatile String fault = "none";
@@ -393,6 +394,51 @@ public final class EnforcementController {
     }
 
     /**
+     * Sets real HTTP handler service latency for a preregistered lab scenario.
+     *
+     * <p>The setting changes actual JVM service time, and therefore gateway
+     * concurrency and measured latency under load. It never supplies a
+     * generated action-outcome label or overwrites an oracle measurement.
+     * Values are intentionally bounded to prevent runaway experiment load.</p>
+     *
+     * @param token disposable lab mutation credential
+     * @param milliseconds requested per-request service delay, in [0, 150]
+     * @return acknowledged actual handler configuration
+     */
+    @PostMapping("/admin/service-latency/{milliseconds}")
+    public synchronized ResponseEntity<Map<String, Object>> setServiceLatency(
+            @RequestHeader(value = "X-Lab-Control", required = false) String token,
+            @PathVariable long milliseconds) {
+        if (!authorized(token, controlToken)) return forbidden();
+        if (milliseconds < 0 || milliseconds > 150) {
+            return ResponseEntity.badRequest().body(Map.of("error", "delay out of bounds"));
+        }
+        legitimateLatencyMs = milliseconds;
+        return ResponseEntity.ok(Map.of("instance", identity, "latency_ms", milliseconds));
+    }
+
+    /**
+     * Enables or suppresses this process's pre-action operator telemetry.
+     *
+     * <p>The oracle's separate privileged admin endpoint remains available
+     * even when the operator feed is missing. This models an observable
+     * telemetry outage without pretending that injected faults are known to
+     * the predictor. It does not affect Kafka delivery or authorization.</p>
+     *
+     * @param token disposable laboratory mutation credential
+     * @param enabled whether this node's operator feed is available
+     * @return acknowledged feed visibility state
+     */
+    @PostMapping("/admin/operator-visible/{enabled}")
+    public synchronized ResponseEntity<Map<String, Object>> setOperatorVisibility(
+            @RequestHeader(value = "X-Lab-Control", required = false) String token,
+            @PathVariable boolean enabled) {
+        if (!authorized(token, controlToken)) return forbidden();
+        operatorTelemetryVisible = enabled;
+        return ResponseEntity.ok(Map.of("instance", identity, "visible", enabled));
+    }
+
+    /**
      * Exposes bounded operational indicators to the experimental decision
      * engine without disclosing fault injection, oracle truth or private
      * verification outcome.
@@ -414,6 +460,10 @@ public final class EnforcementController {
     public synchronized ResponseEntity<Map<String, Object>> operatorTelemetry(
             @RequestHeader(value = "X-Lab-Control", required = false) String token) {
         if (!authorized(token, controlToken)) return forbidden();
+        if (!operatorTelemetryVisible) {
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
+                    .body(Map.of("instance", identity, "error", "operator feed unavailable"));
+        }
         long cacheAge = Math.max(0L, System.currentTimeMillis() - refreshedAtMs);
         return ResponseEntity.ok(Map.of(
                 "instance", identity,
