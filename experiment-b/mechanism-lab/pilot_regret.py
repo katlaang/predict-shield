@@ -21,8 +21,9 @@ from audit import inspect_trial
 from collect import load_plan
 from decision_eval import (
     ACTIONS, SENSITIVITY_WEIGHTS, eligible_actions, engineering_rule,
-    observed_utility,
+    observable_telemetry_rule, observed_utility,
 )
+from train import summarize_operator_telemetry
 
 
 def assess_pilot(plan_dir: Path, record_dir: Path, *,
@@ -65,6 +66,8 @@ def assess_pilot(plan_dir: Path, record_dir: Path, *,
         row = {
             "action": trial["action_id"],
             "pre_action": {
+                **summarize_operator_telemetry(pre.get("operator_observations", [])),
+                "requested_rps": pre["features"]["requested_rps"],
                 "cache_ttl_ms": pre["features"]["cache_ttl_ms"],
                 "initial_gateway_allowed_fraction": sum(
                     p.get("http_status") == 200 for p in observations
@@ -100,6 +103,7 @@ def assess_pilot(plan_dir: Path, record_dir: Path, *,
             optimal = min(cost.values())
             selections = {
                 "engineering_rule": engineering_rule(sample),
+                "observable_telemetry_rule": observable_telemetry_rule(sample),
                 "fixed_resync": "resync_policy",
                 "fixed_restart_or_gateway": (
                     "restart_enforcer" if sample["restart_permitted"]
