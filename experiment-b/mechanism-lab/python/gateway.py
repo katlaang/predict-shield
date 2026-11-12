@@ -1,7 +1,7 @@
 """Actual HTTP gateway routing to independently running Java enforcement processes.
 
-The process is intentionally small and disposable. Routing rotates through
-three upstream services and preserves actual HTTP response codes. An explicit,
+The process is intentionally small and disposable. Routing rotates through configured
+upstream services and preserves actual HTTP response codes. An explicit,
 credential-protected restriction changes the gateway's real forwarding rule.
 An unavailable upstream produces HTTP 502, which the external load generator
 records as disruption. This is not a hardened reverse proxy.
@@ -16,10 +16,12 @@ import urllib.request
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 UPSTREAMS = tuple(os.environ.get("ENFORCERS", "").split(","))
+SHADOW = os.environ.get("HIDDEN_ENFORCER", "")
 CONTROL = os.environ.get("LAB_CONTROL_TOKEN", "")
 counter = itertools.count()
 state_lock = threading.Lock()
 restricted = False
+include_hidden = False
 
 
 class Gateway(BaseHTTPRequestHandler):
@@ -39,18 +41,27 @@ class Gateway(BaseHTTPRequestHandler):
         if self.path == "/healthz":
             self._send(200, {"gateway": "ready"})
             return
+        if self.path == "/admin/inventory":
+            if not CONTROL or self.headers.get("X-Lab-Control") != CONTROL:
+                self._send(403, {"error": "gateway inventory credential rejected"})
+                return
+            with state_lock:
+                visible = list(UPSTREAMS) + ([SHADOW] if include_hidden else [])
+            self._send(200, {"upstreams": visible, "scope": "gateway-config-only"})
+            return
         if self.path not in ("/protected", "/legitimate"):
             self._send(404, {"error": "unsupported route"})
             return
         with state_lock:
             is_restricted = restricted
+            routes = UPSTREAMS + ((SHADOW,) if include_hidden else ())
         if is_restricted:
             if self.path == "/protected":
                 self._send(403, {"source": "gateway", "decision": "DENY"})
             else:
                 self._send(503, {"source": "gateway", "error": "gateway restriction"})
             return
-        node = UPSTREAMS[next(counter) % len(UPSTREAMS)]
+        node = routes[next(counter) % len(routes)]
         try:
             with urllib.request.urlopen(node + self.path, timeout=1.0) as resp:
                 status = resp.status
@@ -70,17 +81,25 @@ class Gateway(BaseHTTPRequestHandler):
 
     def do_POST(self) -> None:
         """Change only the disposable gateway restriction with an authorized token."""
-        global restricted
+        global restricted, include_hidden
         if self.headers.get("X-Lab-Control", "") != CONTROL or not CONTROL:
             self._send(403, {"error": "gateway token rejected"})
             return
-        if self.path not in ("/admin/restrict", "/admin/restore"):
+        if self.path not in (
+            "/admin/restrict", "/admin/restore",
+            "/admin/include-hidden", "/admin/omit-hidden",
+        ):
             self._send(404, {"error": "unknown gateway control"})
             return
         with state_lock:
-            restricted = self.path == "/admin/restrict"
+            if self.path in ("/admin/restrict", "/admin/restore"):
+                restricted = self.path == "/admin/restrict"
+            else:
+                include_hidden = self.path == "/admin/include-hidden"
             new_state = restricted
-        self._send(200, {"restricted": new_state, "acknowledged": True})
+            visible = include_hidden
+        self._send(200, {"restricted": new_state,
+                         "include_hidden": visible, "acknowledged": True})
 
     def log_message(self, format: str, *args: object) -> None:
         """Suppress request-body logging and avoid leaking synthetic credentials."""
@@ -89,7 +108,8 @@ class Gateway(BaseHTTPRequestHandler):
 
 def main() -> None:
     """Serve the isolated gateway exclusively within its Docker network."""
-    if not UPSTREAMS or any(not node.startswith("http://enforcer-") for node in UPSTREAMS):
+    if (not UPSTREAMS or not SHADOW.startswith("http://enforcer-")
+            or any(not node.startswith("http://enforcer-") for node in UPSTREAMS)):
         raise RuntimeError("Expected explicit laboratory enforcement upstreams")
     ThreadingHTTPServer(("0.0.0.0", 8080), Gateway).serve_forever()
 
