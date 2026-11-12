@@ -14,6 +14,7 @@ from __future__ import annotations
 import json
 import math
 import subprocess
+from urllib.parse import urlsplit
 
 ENFORCER_PREFIX = "enforcer-"
 
@@ -53,7 +54,7 @@ def verify_reconciled_scope(
     if any(not isinstance(x, str) or not x.startswith("http://enforcer-")
            for x in gateway_upstreams):
         raise ValueError("Unexpected gateway routing entry")
-    routed = [item.rsplit("/", 1)[-1] for item in gateway_upstreams]
+    routed = [urlsplit(item).hostname for item in gateway_upstreams]
     routed_set = set(routed)
     valid_route = len(routed) == len(routed_set) and routed_set == expected
     responses = [p.get("http_status") for p in probes]
@@ -63,7 +64,7 @@ def verify_reconciled_scope(
         status, reason = "INDETERMINATE", "Compose and gateway inventory disagree"
     else:
         forwarded = {
-            p.get("result", {}).get("gateway_upstream", "").rsplit("/", 1)[-1]
+            urlsplit(p.get("result", {}).get("gateway_upstream", "")).hostname
             for p in probes if p.get("http_status") == 403
         }
         if (len(probes) >= len(expected) and forwarded == expected
