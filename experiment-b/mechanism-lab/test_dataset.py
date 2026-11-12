@@ -83,7 +83,17 @@ class MechanismDatasetTests(unittest.TestCase):
             "after": {"verifier_gateway_probes": probes, "oracle": oracle},
             "operations": {"attempts": 40, "non_200_requests": 7,
                            "measured_rps": 25.0, "latency_p95_ms": 12.0,
-                           "post_window_recovery_wait_seconds": 0.0}
+                           "post_window_recovery_wait_seconds": 0.0,
+                           "gateway_exposure_timeline": {
+                               "method": "monotonic_http_step_integral",
+                               "window_seconds": 4.0,
+                               "valid_probe_count": 4,
+                               "exposure_seconds_lower_bound": 1.0,
+                               "exposure_seconds_upper_bound": 1.5,
+                               "exposure_fraction_lower_bound": 0.25,
+                               "exposure_fraction_upper_bound": 0.375,
+                               "unknown_seconds": 0.5,
+                           }}
         }
         records = separate_records(c, trial, observed)
         self.assertEqual(records["verification"]["outcome"], "INDETERMINATE")
