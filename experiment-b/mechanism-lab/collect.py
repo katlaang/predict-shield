@@ -92,6 +92,14 @@ def separate_records(config: dict, trial: dict, observed: dict) -> dict[str, dic
         raise ValueError("Oracle cannot establish complete applicable scope")
     if health.get("attempts", 0) <= 0 or not (0 <= health.get("non_200_requests", -1) <= health["attempts"]):
         raise ValueError("Actual measured service-health denominator is missing")
+    timeline = health.get("gateway_exposure_timeline")
+    if (not isinstance(timeline, dict)
+            or timeline.get("method") != "monotonic_http_step_integral"
+            or timeline.get("valid_probe_count", 0) < 2
+            or not 0 <= timeline.get("exposure_seconds_lower_bound", -1)
+            <= timeline.get("exposure_seconds_upper_bound", -1)
+            <= timeline.get("window_seconds", -1)):
+        raise ValueError("No time-integrated actual gateway exposure record")
     scope_assessment = after.get("verifier_scope")
     if scope_assessment is None:
         verification, reason = assess_gateway(after["verifier_gateway_probes"])
@@ -125,6 +133,13 @@ def separate_records(config: dict, trial: dict, observed: dict) -> dict[str, dic
                 "fault_mode", "fault_target", "event_delay_ms",
             )},
             "gateway_includes_hidden": config.get("gateway_includes_hidden", True),
+            "decision_policy_metadata": {
+                "restart_permitted": config.get("restart_permitted", True),
+                "absolute_error_budget_requests": config.get(
+                    "absolute_error_budget_requests", 25
+                ),
+                "counterfactual_actions_may_be_tested_offline": True,
+            },
             "external_deny_observations": before["verifier_gateway_probes"],
             "model_prediction_recorded": False,
             "oracle_features_excluded": True,
@@ -139,6 +154,7 @@ def separate_records(config: dict, trial: dict, observed: dict) -> dict[str, dic
                 x.get("http_status") == 200
                 for x in after["verifier_gateway_probes"]
             ),
+            "timed_gateway_exposure": timeline,
             "independent_inventory_reconciled": reconciled,
             "verification_did_not_read_oracle": True,
         },
