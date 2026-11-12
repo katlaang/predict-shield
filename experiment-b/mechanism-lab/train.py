@@ -27,7 +27,7 @@ from collections import Counter
 from pathlib import Path
 
 FAULTS = ("loss", "delay", "duplicate", "reorder")
-TARGETS = ("enforcer-a", "enforcer-b", "enforcer-c")
+TARGETS = ("enforcer-a", "enforcer-b", "enforcer-c", "enforcer-hidden")
 ACTIONS = ("resync_policy", "restart_enforcer", "gateway_restrict", "monitor_only")
 SPLITS = {"train": 60, "calibration": 20, "test": 20}
 EXPECTED_TRIALS = 1200
@@ -138,6 +138,7 @@ def load_executed_dataset(path: Path) -> list[dict]:
         # Target labels are isolated until this post-hoc training/evaluation phase.
         examples.append({
             "group": conf, "partition": partition,
+            "repeat": a["repeat"],
             "action": a["action_id"], "fault": conditions["fault_mode"],
             "target": conditions["fault_target"],
             "pre_action": {
@@ -148,6 +149,9 @@ def load_executed_dataset(path: Path) -> list[dict]:
             },
             "label_security_exposure": float(
                 not oracle["after"]["all_revoked_access_denied"]),
+            "label_path_exposure": float(
+                bool(oracle.get("gateway_path_exposure_observed",
+                     v.get("path_exposure_observed", False)))),
             "label_service_failure_fraction": failures / attempted,
         })
     if len(source_revisions) != 1:
@@ -243,7 +247,8 @@ def train_evaluate(rows: list[dict], seed: int = 20261110,
     }
     matrices = {k: np.asarray([to_features(r) for r in v], dtype=float)
                 for k, v in groups.items()}
-    for label in ("label_security_exposure", "label_service_failure_fraction"):
+    for label in ("label_security_exposure", "label_path_exposure",
+                  "label_service_failure_fraction"):
         train, cal, test = (groups[k] for k in SPLITS)
         y = {k: np.asarray([r[label] for r in v], dtype=float)
              for k, v in groups.items()}
@@ -319,6 +324,7 @@ def train_evaluate(rows: list[dict], seed: int = 20261110,
                 "fault": r["fault"], "target": r["target"],
                 "pre_action": r["pre_action"],
                 "label_security_exposure": r["label_security_exposure"],
+                "label_path_exposure": r["label_path_exposure"],
                 "label_service_failure_fraction": r["label_service_failure_fraction"],
             }
             for r in groups["train"]
