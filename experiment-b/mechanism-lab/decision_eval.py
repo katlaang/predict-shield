@@ -74,6 +74,35 @@ def engineering_rule(row: dict) -> str:
     return "gateway_restrict"
 
 
+def observable_telemetry_rule(row: dict) -> str:
+    """Use a stronger prespecified *non-AI* rule with operational telemetry.
+
+    Decisions depend on the gateway's observed allow fraction, real cache
+    revision divergence, refresh-failure reports, measured cache age,
+    requested load and explicit restart eligibility. They never use the
+    fault-injection type, private oracle, future outcome or test labels.
+    This comparator is deliberately stronger than a one-threshold rule;
+    it is expected to tie or beat AI in some simple configurations.
+    """
+    pre = row["pre_action"]
+    if pre["initial_gateway_allowed_fraction"] <= 0:
+        return "monitor_only"
+    divergence = pre.get("operator_revision_spread", 0)
+    failures = pre.get("operator_refresh_failure_count", 0)
+    age = pre.get("operator_max_cache_age_ms", 0)
+    missing = pre.get("operator_missing_count", 0)
+    if missing > 1:
+        return "gateway_restrict"
+    if not row["restart_permitted"]:
+        return "gateway_restrict"
+    if (divergence >= 1 or failures >= 1) and (
+            pre["requested_rps"] <= 45 or age > pre["cache_ttl_ms"]):
+        return "restart_enforcer"
+    if pre["requested_rps"] > 45:
+        return "gateway_restrict"
+    return "resync_policy"
+
+
 def eligible_actions(row: dict) -> tuple[str, ...]:
     """Screen candidates using declared change-freeze constraints only.
 
@@ -108,7 +137,7 @@ def evaluate_regret(
         grouped[key][row["action"]] = row
     if not grouped:
         raise ValueError("No measured matched action groups")
-    names = ("model", "engineer_rule", "fixed_resync",
+    names = ("model", "engineer_rule", "observable_telemetry_rule", "fixed_resync",
              "fixed_restart_or_gateway", "fixed_gateway", "fixed_monitor")
     totals = {name: {"regret": [], "utility": [], "optimal_matches": 0,
                      "choices": Counter()} for name in names}
@@ -140,6 +169,7 @@ def evaluate_regret(
         selected = {
             "model": min(allowed, key=lambda action: (predicted_cost[action], action)),
             "engineer_rule": engineering_rule(reference),
+            "observable_telemetry_rule": observable_telemetry_rule(reference),
             "fixed_resync": "resync_policy",
             "fixed_restart_or_gateway": ("restart_enforcer"
                                          if reference["restart_permitted"]
