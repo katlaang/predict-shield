@@ -55,11 +55,12 @@ class Gateway(BaseHTTPRequestHandler):
         with state_lock:
             is_restricted = restricted
             routes = UPSTREAMS + ((SHADOW,) if include_hidden else ())
-        if is_restricted:
-            if self.path == "/protected":
-                self._send(403, {"source": "gateway", "decision": "DENY"})
-            else:
-                self._send(503, {"source": "gateway", "error": "gateway restriction"})
+        if is_restricted and self.path == "/protected":
+            # This laboratory rule targets the compromised protected route,
+            # not unrelated legitimate service traffic. It reduces *path*
+            # exposure without repairing the underlying stale enforcer.
+            # The independent verifier therefore cannot call this VERIFIED.
+            self._send(403, {"source": "gateway", "decision": "DENY"})
             return
         node = routes[next(counter) % len(routes)]
         try:
