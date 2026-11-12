@@ -65,6 +65,9 @@ public final class EnforcementController {
     private final AtomicLong experimentEpoch = new AtomicLong(0);
     private final AtomicLong scheduledCallbacks = new AtomicLong(0);
     private final AtomicLong discardedOldEpochCallbacks = new AtomicLong(0);
+    private final AtomicLong rejectedTrialEvents = new AtomicLong(0);
+    private final AtomicLong reorderedEventPairs = new AtomicLong(0);
+    private final AtomicLong duplicatedEvents = new AtomicLong(0);
 
     /**
      * Injects process identity and separate authority, control and oracle credentials.
@@ -102,6 +105,13 @@ public final class EnforcementController {
      */
     @KafkaListener(topics = "lab-policy", groupId = "${lab.instance:enforcer}")
     public synchronized void onEvent(String value) {
+        // Malformed and old-trial broker messages must never enter this
+        // trial's fault handler or consume a matched action's fault budget.
+        String[] envelope = value.split(",", -1);
+        if (envelope.length != 3 || !envelope[0].equals(cached.trialId())) {
+            rejectedTrialEvents.incrementAndGet();
+            return;
+        }
         handledEvents++;
         String mode = fault;
         long epoch = experimentEpoch.get();
@@ -110,12 +120,14 @@ public final class EnforcementController {
             case "delay" -> scheduleForEpoch(
                     value, epoch, Math.max(1, delayedMs + jitter.nextInt(81)));
             case "duplicate" -> {
+                duplicatedEvents.incrementAndGet();
                 applyRevision(value);
                 scheduleForEpoch(value, epoch, 10 + jitter.nextInt(30));
             }
             case "reorder" -> {
                 if (heldEvent == null) heldEvent = value;
                 else {
+                    reorderedEventPairs.incrementAndGet();
                     applyRevision(value);
                     String earlier = heldEvent;
                     heldEvent = null;
@@ -166,11 +178,12 @@ public final class EnforcementController {
     private synchronized void applyRevision(String raw) {
         try {
             String[] tokens = raw.split(",", -1);
-            if (tokens.length != 2 || !(tokens[1].equals("true") || tokens[1].equals("false"))) {
+            if (tokens.length != 3 || !tokens[0].equals(cached.trialId())
+                    || !(tokens[2].equals("true") || tokens[2].equals("false"))) {
                 throw new IllegalArgumentException("Invalid lab policy event");
             }
-            PolicyRevision incoming = new PolicyRevision(Long.parseLong(tokens[0]),
-                    Boolean.parseBoolean(tokens[1]));
+            PolicyRevision incoming = new PolicyRevision(Long.parseLong(tokens[1]),
+                    Boolean.parseBoolean(tokens[2]), tokens[0]);
             if (incoming.revision() >= cached.revision()) {
                 cached = incoming;
                 refreshedAtMs = System.currentTimeMillis();
@@ -196,7 +209,8 @@ public final class EnforcementController {
                     .uri(URI.create(authorityUrl + "/internal/policy"))
                     .header("X-Lab-Internal", internalToken)
                     .retrieve().body(PolicyRevision.class);
-            if (result != null && result.revision() >= cached.revision()) {
+            if (result != null && result.trialId().equals(cached.trialId())
+                    && result.revision() >= cached.revision()) {
                 cached = result;
             }
             refreshedAtMs = System.currentTimeMillis();
@@ -304,6 +318,33 @@ public final class EnforcementController {
     }
 
     /**
+     * Binds a freshly reset local cache to the authority's current trial.
+     *
+     * <p>Only events bearing this identifier can be consumed in this trial.
+     * Unlike a local callback epoch, this identifier travels over Kafka and
+     * prevents broker-delayed messages from prior trials from being applied.
+     * The runner must obtain the ID from the authenticated authority reset
+     * response and bind every enforcement process before proceeding.</p>
+     *
+     * @param token disposable experiment control credential
+     * @param trialId nonblank URL-safe authority-assigned trial identity
+     * @return acknowledged trial identifier or a controlled error
+     */
+    @PostMapping("/admin/bind/{trialId}")
+    public synchronized ResponseEntity<Map<String, Object>> bindTrial(
+            @RequestHeader(value = "X-Lab-Control", required = false) String token,
+            @PathVariable String trialId) {
+        if (!authorized(token, controlToken)) return forbidden();
+        if (!trialId.matches("[a-fA-F0-9-]{36}")) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Invalid trial ID"));
+        }
+        experimentEpoch.incrementAndGet();
+        cached = new PolicyRevision(0, false, trialId);
+        refreshedAtMs = System.currentTimeMillis();
+        return ResponseEntity.ok(Map.of("instance", identity, "trial_id", trialId));
+    }
+
+    /**
      * Deliberately rebuilds one cache from a stale local snapshot.
      *
      * <p>This reproduces a silent regression after previously successful
@@ -319,7 +360,7 @@ public final class EnforcementController {
     public synchronized ResponseEntity<Map<String, Object>> injectRegression(
             @RequestHeader(value = "X-Lab-Control", required = false) String token) {
         if (!authorized(token, controlToken)) return forbidden();
-        cached = new PolicyRevision(cached.revision(), false);
+        cached = new PolicyRevision(cached.revision(), false, cached.trialId());
         refreshedAtMs = System.currentTimeMillis();
         return ResponseEntity.ok(Map.of("injected", true, "instance", identity));
     }
@@ -349,6 +390,10 @@ public final class EnforcementController {
                 "pending_scheduled_callbacks", scheduledCallbacks.get(),
                 "old_epoch_callbacks_discarded", discardedOldEpochCallbacks.get(),
                 "experiment_epoch", experimentEpoch.get(),
+                "trial_id", cached.trialId(),
+                "rejected_trial_events", rejectedTrialEvents.get(),
+                "reordered_event_pairs", reorderedEventPairs.get(),
+                "duplicated_events", duplicatedEvents.get(),
                 "refresh_failed", lastRefreshFailed));
     }
 
