@@ -159,6 +159,7 @@ def run_batch(configs: list[dict], trials: list[dict], records: Path,
                 gateway_includes_hidden=cfg.get("gateway_includes_hidden", True),
                 routing_profile=cfg.get("routing_profile", "balanced"),
                 complexity_stratum=cfg.get("complexity_stratum", "SIMPLE"),
+                node_service_latency_ms=tuple(cfg["node_service_latency_ms"]),
             )
             records_by_stream = separate_records(cfg, trial, observation)
             write_trial_records(records, records_by_stream)
