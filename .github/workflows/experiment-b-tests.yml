@@ -8,6 +8,9 @@ on:
     paths:
       - 'experiment-b/**'
       - '.github/workflows/experiment-b-tests.yml'
+concurrency:
+  group: experiment-b-python-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
 jobs:
   python-unit:
     runs-on: ubuntu-latest
