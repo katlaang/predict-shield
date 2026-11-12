@@ -42,7 +42,8 @@ ACTIONS = ("resync_policy", "restart_enforcer", "gateway_restrict", "monitor_onl
 
 def request(name: str, path: str, *, method: str = "GET",
             token: str | None = None, oracle: str | None = None,
-            timeout: float = 1.5) -> tuple[int | None, dict, float]:
+            timeout: float = 1.5,
+            authorized_lab_user: bool = False) -> tuple[int | None, dict, float]:
     """Issue an actual HTTP request and preserve failures and measured latency."""
     if name not in HOST or not path.startswith("/") or "://" in path:
         raise ValueError("Unexpected fixture destination")
@@ -51,6 +52,10 @@ def request(name: str, path: str, *, method: str = "GET",
         headers["X-Lab-Control"] = token
     if oracle:
         headers["X-Lab-Oracle"] = oracle
+    if authorized_lab_user:
+        if path != "/protected" or method != "GET":
+            raise ValueError("Authorized test marker only valid for protected GET")
+        headers["X-Lab-Principal"] = "authorized"
     begin = time.perf_counter()
     try:
         with urllib.request.urlopen(
@@ -103,7 +108,10 @@ def setup_fault(control_token: str, *, ttl_ms: int, delay_ms: int,
                 fault_target: str = "enforcer-b",
                 fault_mode: str = "loss",
                 oracle_token: str | None = None,
-                gateway_includes_hidden: bool = True) -> None:
+                gateway_includes_hidden: bool = True,
+                routing_profile: str = "balanced",
+                complexity_stratum: str = "SIMPLE",
+                node_service_latency_ms: tuple[int, ...] | None = None) -> None:
     """Reset all JVMs and inject a configured actual Kafka consumer fault.
 
     Faults are set on a named process before the policy event is published.
@@ -118,10 +126,51 @@ def setup_fault(control_token: str, *, ttl_ms: int, delay_ms: int,
     route_status, _, _ = request("gateway", routing, method="POST", token=control_token)
     if route_status != 200:
         raise RuntimeError("Could not establish experimental gateway inventory")
+    if complexity_stratum not in {"SIMPLE", "INTERACTION", "PARTIAL_VISIBILITY"}:
+        raise ValueError("Unregistered complexity stratum")
+    if routing_profile not in {"balanced", "skewed_a", "skewed_hidden"}:
+        raise ValueError("Unregistered gateway profile")
+    route_status, _, _ = request(
+        "gateway", "/admin/traffic/" + routing_profile,
+        method="POST", token=control_token
+    )
+    if route_status != 200:
+        raise RuntimeError("Could not configure registered gateway profile")
+    # Distinct experimental complexity levels must produce genuinely
+    # different Java service timings, not just labels in the JSON manifest.
+    # SIMPLE uses equal handler latency; the two harder levels use
+    # heterogeneous real per-request execution times.
+    delays = (tuple(node_service_latency_ms)
+              if node_service_latency_ms is not None
+              else ((15, 15, 15, 15) if complexity_stratum == "SIMPLE"
+                    else (0, 15, 50, 100)))
+    if len(delays) != len(ENFORCERS) or any(
+            type(value) is not int or not 0 <= value <= 150 for value in delays):
+        raise ValueError("Invalid registered per-node service latency vector")
+    for node, latency_ms in zip(ENFORCERS, delays):
+        set_status, payload, _ = request(
+            node, f"/admin/service-latency/{latency_ms}",
+            method="POST", token=control_token
+        )
+        if set_status != 200 or payload.get("latency_ms") != latency_ms:
+            raise RuntimeError("Could not establish actual per-node service latency")
     for node in ENFORCERS:
         status, _, _ = request(node, f"/admin/reset/{ttl_ms}", method="POST", token=control_token)
         if status != 200:
             raise RuntimeError("Enforcer reset failed: " + node)
+    # The independent operator feed is deliberately unavailable on exactly
+    # one process only in the preregistered partial-visibility stratum.
+    # Oracle observation remains separately available and unchanged.
+    for node in ENFORCERS:
+        visible = not (
+            complexity_stratum == "PARTIAL_VISIBILITY" and node == "enforcer-hidden"
+        )
+        status, _, _ = request(
+            node, "/admin/operator-visible/" + str(visible).lower(),
+            method="POST", token=control_token
+        )
+        if status != 200:
+            raise RuntimeError("Failed to establish operator telemetry visibility")
     status, reset_response, _ = request(
         "authority", "/control/reset", method="POST", token=control_token, timeout=10
     )
@@ -231,6 +280,39 @@ def gateway_scope_evidence(control_token: str, probes: list[dict]) -> dict:
         }
 
 
+def operator_telemetry(control_token: str) -> list[dict]:
+    """Observe actual cached revisions and refresh indicators before action.
+
+    This uses only the separately authenticated operator endpoint, never
+    the oracle admin state or injected fault configuration. Each process
+    contributes an explicit present/missing marker. A revision difference
+    across processes is a cache divergence indicator, NOT a direct Kafka
+    consumer lag or evidence of a specific injected fault type.
+    """
+    samples = []
+    for node in ENFORCERS:
+        status, payload, latency = request(
+            node, "/operator/telemetry", token=control_token, timeout=1.5
+        )
+        if status != 200 or payload.get("observation_type") != "operator_pre_action":
+            samples.append({"node": node, "observed": False,
+                            "latency_ms": latency})
+        else:
+            samples.append({
+                "node": node, "observed": True,
+                "observed_at_monotonic": time.monotonic(),
+                "applied_revision": payload["applied_revision"],
+                "cache_age_ms": payload["cache_age_ms"],
+                "cache_ttl_ms": payload["cache_ttl_ms"],
+                "legitimate_service_latency_ms": payload["legitimate_service_latency_ms"],
+                "handled_events": payload["handled_events"],
+                "refresh_failed": payload["refresh_failed"],
+                "scheduled_callbacks_pending": payload["scheduled_callbacks_pending"],
+                "latency_ms": latency,
+            })
+    return samples
+
+
 def oracle_snapshot(oracle_token: str) -> dict:
     """Fetch restricted separately collected direct-cache and direct-probe truth."""
     status, payload, _ = request("oracle", "/oracle/observe", oracle=oracle_token, timeout=5)
@@ -278,6 +360,82 @@ def perform_action(action: str, control_token: str,
         raise ValueError("Unrecognized corrective action")
 
 
+def integrate_gateway_exposure(
+    samples: list[dict], *, window_seconds: float,
+) -> dict:
+    """Integrate observed gateway authorization over the action window.
+
+    Each scheduled external gateway probe carries a monotonic completion
+    timestamp relative to the window start. A response of HTTP 200 counts as
+    exposed; HTTP 403 is an observed denial; all other codes and missing
+    probe periods are unknown. Piecewise constant samples contribute
+    exposure-seconds, and unknown time contributes a separate uncertainty
+    bound, never an invented denial. This is sampled observable path
+    exposure, not continuous network-wide exposure or cache oracle truth.
+
+    The first observation must be within the window. The interval from
+    window start to first completed response is unknown, and every observed
+    response applies until the next completed sample. The final observation
+    carries forward only until the registered end of the window. No labels
+    are inferred from the final oracle snapshot.
+    """
+    if not 0 < window_seconds <= 30 or not samples:
+        raise ValueError("Missing bounded observed gateway timeline")
+    ordered = sorted(samples, key=lambda item: item["seconds_after_start"])
+    last_time = 0.0
+    state = None
+    exposed = 0.0
+    unknown = 0.0
+    valid = 0
+    for record in ordered:
+        timestamp = float(record["seconds_after_start"])
+        if timestamp < last_time or timestamp > window_seconds:
+            raise ValueError("Invalid or late authorization sample timestamp")
+        elapsed = timestamp - last_time
+        if state == 200:
+            exposed += elapsed
+        elif state != 403:
+            unknown += elapsed
+        state = record["http_status"]
+        if state in (200, 403):
+            valid += 1
+        last_time = timestamp
+    tail = window_seconds - last_time
+    if state == 200:
+        exposed += tail
+    elif state != 403:
+        unknown += tail
+    if valid < 2:
+        raise ValueError("Insufficient valid timed gateway denial observations")
+    return {
+        "method": "monotonic_http_step_integral",
+        "window_seconds": window_seconds,
+        "probe_count": len(samples),
+        "valid_probe_count": valid,
+        "exposure_seconds_lower_bound": exposed,
+        "exposure_seconds_upper_bound": exposed + unknown,
+        "unknown_seconds": unknown,
+        "exposure_fraction_lower_bound": exposed / window_seconds,
+        "exposure_fraction_upper_bound": (exposed + unknown) / window_seconds,
+        "samples": ordered,
+    }
+
+
+def timed_gateway_probe(start: float) -> dict:
+    """Record a real protected gateway response with its completion timestamp.
+
+    Only externally returned HTTP status and gateway origin are retained.
+    Calling this function does not require control or private oracle tokens.
+    A transport failure is explicitly unknown rather than an assumed denial.
+    """
+    status, response, _ = request("gateway", "/protected")
+    return {
+        "seconds_after_start": time.perf_counter() - start,
+        "http_status": status,
+        "upstream": response.get("gateway_upstream"),
+    }
+
+
 def measure_under_load(action: str, control_token: str, *,
                        requests_per_second: int = 30, duration_seconds: float = 5,
                        fault_target: str = "enforcer-b") -> dict:
@@ -292,6 +450,7 @@ def measure_under_load(action: str, control_token: str, *,
         raise ValueError("Pilot workload outside declared safe limits")
     start = time.perf_counter()
     outcomes = []
+    timed_probes = []
     future_action = None
     with concurrent.futures.ThreadPoolExecutor(max_workers=16) as pool:
         scheduled = []
@@ -303,16 +462,40 @@ def measure_under_load(action: str, control_token: str, *,
             delay = deadline - time.perf_counter()
             if delay > 0:
                 time.sleep(delay)
-            scheduled.append(pool.submit(request, "gateway", "/legitimate"))
+            # One quarter of legitimate load is an authorized user of
+            # the SAME protected route. A coarse emergency gateway block
+            # will therefore deny real authorized requests, not become free.
+            if i % 4 == 0:
+                scheduled.append(pool.submit(
+                    request, "gateway", "/protected", authorized_lab_user=True
+                ))
+            else:
+                scheduled.append(pool.submit(request, "gateway", "/legitimate"))
+            # Roughly four protected probes per second. Both probe and workload
+            # requests use the live gateway; the collector does not ask the
+            # private oracle or infer timing from policy configuration.
+            if i % max(1, requests_per_second // 4) == 0:
+                timed_probes.append(pool.submit(
+                    timed_gateway_probe, start
+                ))
         for result in scheduled:
             status, _, latency = result.result(timeout=20)
             outcomes.append({"http_status": status, "latency_ms": latency})
+        samples = [future.result(timeout=20) for future in timed_probes]
         if future_action is not None:
             future_action.result(timeout=125)
     elapsed = time.perf_counter() - start
     failures = sum(item["http_status"] != 200 for item in outcomes)
     latencies = sorted(item["latency_ms"] for item in outcomes)
+    valid_samples = [
+        sample for sample in samples
+        if sample["seconds_after_start"] <= duration_seconds
+    ]
+    exposure = integrate_gateway_exposure(
+        valid_samples, window_seconds=duration_seconds
+    )
     return {
+        "gateway_exposure_timeline": exposure,
         "requested_rps": requests_per_second,
         "measured_rps": len(outcomes) / elapsed,
         "duration_seconds": elapsed,
@@ -327,12 +510,19 @@ def run_case(action: str, control_token: str, oracle_token: str,
              *, ttl_ms: int = 30000, rps: int = 30,
              fault_mode: str = "loss", fault_target: str = "enforcer-b",
              delay_ms: int = 200, duration_seconds: float = 5,
-             gateway_includes_hidden: bool = True) -> dict:
+             gateway_includes_hidden: bool = True,
+             routing_profile: str = "balanced",
+             complexity_stratum: str = "SIMPLE",
+             node_service_latency_ms: tuple[int, ...] | None = None) -> dict:
     """Reset all processes, inject event loss and measure one candidate action."""
     setup_fault(control_token, ttl_ms=ttl_ms, delay_ms=delay_ms,
                 fault_target=fault_target, fault_mode=fault_mode,
-                oracle_token=oracle_token, gateway_includes_hidden=gateway_includes_hidden)
+                oracle_token=oracle_token, gateway_includes_hidden=gateway_includes_hidden,
+                routing_profile=routing_profile,
+                complexity_stratum=complexity_stratum,
+                node_service_latency_ms=node_service_latency_ms)
     before_probes = gateway_probes(count=8)
+    before_operator_telemetry = operator_telemetry(control_token)
     before_scope = gateway_scope_evidence(control_token, before_probes)
     before_truth = oracle_snapshot(oracle_token)
     operations = measure_under_load(action, control_token, requests_per_second=rps,
@@ -355,9 +545,14 @@ def run_case(action: str, control_token: str, oracle_token: str,
         "cache_ttl_ms": ttl_ms,
         "event_delay_ms": delay_ms,
         "gateway_includes_hidden": gateway_includes_hidden,
+        "routing_profile": routing_profile,
+        "complexity_stratum": complexity_stratum,
+        "node_service_latency_ms": list(node_service_latency_ms)
+        if node_service_latency_ms is not None else None,
         "path_access_exposed": any(p["http_status"] == 200 for p in after_probes),
         "action": action,
         "before": {"verifier_gateway_probes": before_probes,
+                   "operator_telemetry": before_operator_telemetry,
                    "verifier_scope": before_scope,
                    "oracle": before_truth},
         "after": {"verifier_gateway_probes": after_probes,

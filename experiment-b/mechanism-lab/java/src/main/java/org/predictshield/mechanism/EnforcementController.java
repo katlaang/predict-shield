@@ -55,6 +55,18 @@ public final class EnforcementController {
     private final Random jitter;
     private volatile PolicyRevision cached = new PolicyRevision(0, false);
     private volatile long refreshedAtMs = 0;
+    /**
+     * Configured per-node synthetic service time in the real HTTP handler.
+     *
+     * <p>Unlike a generated disruption label, the configured delay occurs
+     * during actual JVM request execution and is observed by the gateway.
+     * This models heterogeneous service times, not authentic production
+     * hardware capacity or JVM cold-start duration.</p>
+     */
+    @Value("${lab.legitimate-latency-ms:0}")
+    private volatile long legitimateLatencyMs;
+    private volatile boolean operatorTelemetryVisible = true;
+
     private volatile long cacheTtlMs = 3000;
     private volatile String fault = "none";
     private volatile String heldEvent;
@@ -228,12 +240,33 @@ public final class EnforcementController {
     }
 
     /**
-     * Enforces authorization for the revoked synthetic principal over HTTP.
+     * Enforces a disposable revoked principal and a separate authorized
+     * laboratory principal on the same protected resource.
      *
-     * @return 403 when the local policy denies access; 200 when it permits
+     * <p>Authorized-protected traffic incurs a real denial when a gateway
+     * restriction blocks the protected route wholesale. This is essential
+     * for measuring intervention cost instead of giving gateway restriction
+     * a zero-disruption advantage. The X-Lab-Principal header is a synthetic
+     * test marker, NOT authenticated identity or a production security
+     * boundary. It is accepted only inside the isolated testbed.</p>
+     *
+     * @param principal synthetic test-only principal type; "authorized" is
+     *                  permitted, missing values represent the revoked test user
+     * @return 403 for denied revoked access; 200 for genuinely permitted
+     *         laboratory operations
      */
     @GetMapping("/protected")
-    public synchronized ResponseEntity<Map<String, Object>> protectedOperation() {
+    public synchronized ResponseEntity<Map<String, Object>> protectedOperation(
+            @RequestHeader(value = "X-Lab-Principal", required = false) String principal) {
+        // Test-only identity: the header is NOT authenticated and must not
+        // be used as an authorization mechanism outside this isolated lab.
+        // Its purpose is to observe how coarse gateway restriction affects
+        // authorized users of the SAME protected operation.
+        if ("authorized".equals(principal)) {
+            return ResponseEntity.ok(Map.of(
+                    "decision", "ALLOW", "instance", identity,
+                    "principal_type", "authorized_test_identity"));
+        }
         refreshIfExpired();
         return cached.revoked()
                 ? ResponseEntity.status(HttpStatus.FORBIDDEN)
@@ -252,6 +285,16 @@ public final class EnforcementController {
      */
     @GetMapping("/legitimate")
     public ResponseEntity<Map<String, Object>> legitimate() {
+        long boundedMs = Math.max(0L, Math.min(150L, legitimateLatencyMs));
+        if (boundedMs > 0) {
+            try {
+                Thread.sleep(boundedMs);
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
+                return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
+                        .body(Map.of("instance", identity, "ok", false));
+            }
+        }
         return ResponseEntity.ok(Map.of("instance", identity, "ok", true));
     }
 
@@ -369,6 +412,90 @@ public final class EnforcementController {
         cached = new PolicyRevision(cached.revision(), false, cached.trialId());
         refreshedAtMs = System.currentTimeMillis();
         return ResponseEntity.ok(Map.of("injected", true, "instance", identity));
+    }
+
+    /**
+     * Sets real HTTP handler service latency for a preregistered lab scenario.
+     *
+     * <p>The setting changes actual JVM service time, and therefore gateway
+     * concurrency and measured latency under load. It never supplies a
+     * generated action-outcome label or overwrites an oracle measurement.
+     * Values are intentionally bounded to prevent runaway experiment load.</p>
+     *
+     * @param token disposable lab mutation credential
+     * @param milliseconds requested per-request service delay, in [0, 150]
+     * @return acknowledged actual handler configuration
+     */
+    @PostMapping("/admin/service-latency/{milliseconds}")
+    public synchronized ResponseEntity<Map<String, Object>> setServiceLatency(
+            @RequestHeader(value = "X-Lab-Control", required = false) String token,
+            @PathVariable long milliseconds) {
+        if (!authorized(token, controlToken)) return forbidden();
+        if (milliseconds < 0 || milliseconds > 150) {
+            return ResponseEntity.badRequest().body(Map.of("error", "delay out of bounds"));
+        }
+        legitimateLatencyMs = milliseconds;
+        return ResponseEntity.ok(Map.of("instance", identity, "latency_ms", milliseconds));
+    }
+
+    /**
+     * Enables or suppresses this process's pre-action operator telemetry.
+     *
+     * <p>The oracle's separate privileged admin endpoint remains available
+     * even when the operator feed is missing. This models an observable
+     * telemetry outage without pretending that injected faults are known to
+     * the predictor. It does not affect Kafka delivery or authorization.</p>
+     *
+     * @param token disposable laboratory mutation credential
+     * @param enabled whether this node's operator feed is available
+     * @return acknowledged feed visibility state
+     */
+    @PostMapping("/admin/operator-visible/{enabled}")
+    public synchronized ResponseEntity<Map<String, Object>> setOperatorVisibility(
+            @RequestHeader(value = "X-Lab-Control", required = false) String token,
+            @PathVariable boolean enabled) {
+        if (!authorized(token, controlToken)) return forbidden();
+        operatorTelemetryVisible = enabled;
+        return ResponseEntity.ok(Map.of("instance", identity, "visible", enabled));
+    }
+
+    /**
+     * Exposes bounded operational indicators to the experimental decision
+     * engine without disclosing fault injection, oracle truth or private
+     * verification outcome.
+     *
+     * <p>The existing laboratory control credential grants read-only access
+     * to this pre-action snapshot. It is NOT yet a distinct least-privilege
+     * operator credential. The telemetry contains observed cache age,
+     * applied revision, processed-event count, failed TTL refresh and pending
+     * scheduled operations. It deliberately omits the injected fault mode,
+     * target identity as a fault label, desired authoritative access verdict,
+     * oracle direct probes and post-action results. A local revision is not a
+     * verified Kafka consumer offset. These indicators must be timestamped
+     * before an action to be used as model inputs.</p>
+     *
+     * @param token disposable laboratory control credential, shared with lab mutations
+     * @return only operator-observable monitoring fields, not oracle truth
+     */
+    @GetMapping("/operator/telemetry")
+    public synchronized ResponseEntity<Map<String, Object>> operatorTelemetry(
+            @RequestHeader(value = "X-Lab-Control", required = false) String token) {
+        if (!authorized(token, controlToken)) return forbidden();
+        if (!operatorTelemetryVisible) {
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
+                    .body(Map.of("instance", identity, "error", "operator feed unavailable"));
+        }
+        long cacheAge = Math.max(0L, System.currentTimeMillis() - refreshedAtMs);
+        return ResponseEntity.ok(Map.of(
+                "instance", identity,
+                "applied_revision", cached.revision(),
+                "cache_age_ms", cacheAge,
+                "cache_ttl_ms", cacheTtlMs,
+                "legitimate_service_latency_ms", legitimateLatencyMs,
+                "handled_events", handledEvents,
+                "refresh_failed", lastRefreshFailed,
+                "scheduled_callbacks_pending", scheduledCallbacks.get(),
+                "observation_type", "operator_pre_action"));
     }
 
     /**

@@ -24,22 +24,70 @@ import json
 import math
 import os
 from collections import Counter
-from decision_eval import evaluate_regret
+from decision_eval import evaluate_sensitivity, tune_rule_on_training_groups
 from pathlib import Path
 
 FAULTS = ("loss", "delay", "duplicate", "reorder")
 TARGETS = ("enforcer-a", "enforcer-b", "enforcer-c", "enforcer-hidden")
 ACTIONS = ("resync_policy", "restart_enforcer", "gateway_restrict", "monitor_only")
+ROUTING_PROFILES = ("balanced", "skewed_a", "skewed_hidden")
 SPLITS = {"train": 60, "calibration": 20, "test": 20}
 EXPECTED_TRIALS = 1200
 
 # The trained model must not see laboratory-injected fault labels or timing.
 # Those variables remain available only for post-hoc stratification and an
 # explicitly *privileged* diagnostic lookup baseline.
+OPERATOR_FEATURES = (
+    "operator_observed_count", "operator_missing_count",
+    "operator_revision_spread", "operator_max_cache_age_ms",
+    "operator_refresh_failure_count", "operator_pending_callback_count",
+    "operator_handled_event_spread",
+    "operator_max_service_latency_ms",
+    "operator_service_latency_spread_ms",
+)
 FEATURES = (
     "cache_ttl_ms", "requested_rps", "gateway_visible_enforcer_count",
     "initial_gateway_allowed_fraction",
-) + tuple("action=" + x for x in ACTIONS)
+) + OPERATOR_FEATURES + tuple("route=" + x for x in ROUTING_PROFILES) + tuple(
+    "action=" + x for x in ACTIONS)
+
+
+def summarize_operator_telemetry(observations: list[dict]) -> dict[str, float]:
+    """Derive only real pre-action operational signals and missingness.
+
+    Read-only operator telemetry is NOT the private oracle and does not
+    disclose injected fault identity, injection delay or a future outcome.
+    Differences in cached revisions are a proxy for synchronization state,
+    not a direct measurement of Kafka broker consumer lag. Missing endpoint
+    responses are counted explicitly rather than filled with success.
+    """
+    if not isinstance(observations, list):
+        raise ValueError("Operator observations must be an ordered list")
+    observed = [x for x in observations if x.get("observed") is True]
+    missing = (len(observations) - len(observed)) if observations else 4
+    revisions = [int(x["applied_revision"]) for x in observed]
+    handled = [int(x["handled_events"]) for x in observed]
+    configured_latency = [
+        int(x.get("legitimate_service_latency_ms", 0)) for x in observed
+    ]
+    return {
+        "operator_observed_count": float(len(observed)),
+        "operator_missing_count": float(missing),
+        "operator_revision_spread": float(max(revisions) - min(revisions)) if revisions else 0.,
+        "operator_max_cache_age_ms": float(max(
+            (x["cache_age_ms"] for x in observed), default=0)),
+        "operator_refresh_failure_count": float(sum(
+            x["refresh_failed"] is True for x in observed)),
+        "operator_pending_callback_count": float(sum(
+            x["scheduled_callbacks_pending"] for x in observed)),
+        "operator_handled_event_spread": float(
+            max(handled) - min(handled)) if handled else 0.,
+        "operator_max_service_latency_ms": float(
+            max(configured_latency) if configured_latency else 0),
+        "operator_service_latency_spread_ms": float(
+            max(configured_latency) - min(configured_latency)
+        ) if configured_latency else 0.,
+    }
 
 
 def _read_stream(path: Path) -> dict[str, dict]:
@@ -131,6 +179,22 @@ def load_executed_dataset(path: Path) -> list[dict]:
             raise ValueError("Missing independent oracle truth")
         if oracle["oracle_role"] != "separate_process_admin_plus_direct_probe":
             raise ValueError("Oracle provenance unrecognized")
+        timeline = v.get("timed_gateway_exposure")
+        if (not isinstance(timeline, dict)
+                or timeline.get("method") != "monotonic_http_step_integral"
+                or timeline.get("valid_probe_count", 0) < 2
+                or not 0 <= timeline.get("exposure_fraction_lower_bound", -1)
+                <= timeline.get("exposure_fraction_upper_bound", -1) <= 1):
+            raise ValueError("Missing measured timed gateway exposure")
+        routing_profile = a.get("routing_profile", "balanced")
+        if routing_profile not in ROUTING_PROFILES:
+            raise ValueError("Unregistered operational routing profile")
+        policy = a.get("decision_policy_metadata")
+        if (not isinstance(policy, dict)
+                or type(policy.get("restart_permitted")) is not bool
+                or type(policy.get("absolute_error_budget_requests")) is not int
+                or policy["absolute_error_budget_requests"] < 1):
+            raise ValueError("Missing explicitly declared decision constraints")
         attempted = o.get("observed_requests")
         failures = o.get("failed_requests")
         if (not isinstance(attempted, int) or attempted < 1 or
@@ -139,10 +203,15 @@ def load_executed_dataset(path: Path) -> list[dict]:
         # Target labels are isolated until this post-hoc training/evaluation phase.
         examples.append({
             "group": conf, "partition": partition,
+            "complexity_stratum": a.get("complexity_stratum", "SIMPLE"),
             "repeat": a["repeat"],
+            "restart_permitted": policy["restart_permitted"],
+            "absolute_error_budget_requests": policy["absolute_error_budget_requests"],
             "action": a["action_id"], "fault": conditions["fault_mode"],
             "target": conditions["fault_target"],
             "pre_action": {
+                **summarize_operator_telemetry(a.get("operator_observations", [])),
+                "routing_profile": routing_profile,
                 "cache_ttl_ms": features["cache_ttl_ms"],
                 "requested_rps": features["requested_rps"],
                 "gateway_visible_enforcer_count": features["visible_enforcement_processes"],
@@ -152,8 +221,10 @@ def load_executed_dataset(path: Path) -> list[dict]:
             "label_security_exposure": float(
                 not oracle["after"]["all_revoked_access_denied"]),
             "label_path_exposure": float(
-                bool(oracle.get("gateway_path_exposure_observed",
-                     v.get("path_exposure_observed", False)))),
+                timeline["exposure_fraction_upper_bound"]),
+            "label_exposure_seconds": float(
+                timeline["exposure_seconds_upper_bound"]),
+            "label_absolute_failed_requests": float(failures),
             "label_service_failure_fraction": failures / attempted,
         })
     if len(source_revisions) != 1:
@@ -173,10 +244,13 @@ def to_features(row: dict) -> list[float]:
     turning a hidden experimental intervention into a model shortcut.
     """
     p = row["pre_action"]
-    return [float(p[k]) for k in (
+    return [float(p.get(k, 4.0 if k == "operator_missing_count" else 0.0))
+            for k in (
         "cache_ttl_ms", "requested_rps",
         "gateway_visible_enforcer_count", "initial_gateway_allowed_fraction",
-    )] + [float(row["action"] == x) for x in ACTIONS]
+        *OPERATOR_FEATURES,
+    )] + [float(p.get("routing_profile", "balanced") == x)
+          for x in ROUTING_PROFILES] + [float(row["action"] == x) for x in ACTIONS]
 
 
 def conformal_radius(actual, predicted, alpha: float = 0.1) -> float:
@@ -251,6 +325,7 @@ def train_evaluate(rows: list[dict], seed: int = 20261110,
     matrices = {k: np.asarray([to_features(r) for r in v], dtype=float)
                 for k, v in groups.items()}
     for label in ("label_security_exposure", "label_path_exposure",
+                  "label_absolute_failed_requests",
                   "label_service_failure_fraction"):
         train, cal, test = (groups[k] for k in SPLITS)
         y = {k: np.asarray([r[label] for r in v], dtype=float)
@@ -259,15 +334,18 @@ def train_evaluate(rows: list[dict], seed: int = 20261110,
                                       random_state=seed, n_jobs=1)
         model.fit(matrices["train"], y["train"])
         fitted_models[label] = model
-        pred_cal = np.clip(model.predict(matrices["calibration"]), 0, 1)
-        pred_test = np.clip(model.predict(matrices["test"]), 0, 1)
+        upper = (max(1.0, max(float(v["label_absolute_failed_requests"])
+                              for v in groups["train"]))
+                 if label == "label_absolute_failed_requests" else 1.0)
+        pred_cal = np.clip(model.predict(matrices["calibration"]), 0, upper)
+        pred_test = np.clip(model.predict(matrices["test"]), 0, upper)
         radius = grouped_conformal_radius(
             y["calibration"], pred_cal,
             [row["group"] for row in groups["calibration"]]
         )
         calibration_radii[label] = radius
-        low = np.clip(pred_test - radius, 0, 1)
-        high = np.clip(pred_test + radius, 0, 1)
+        low = np.clip(pred_test - radius, 0, upper)
+        high = np.clip(pred_test + radius, 0, upper)
         lookup = {}
         for r in train:
             for key in (
@@ -323,14 +401,34 @@ def train_evaluate(rows: list[dict], seed: int = 20261110,
         if key in offline_predictions:
             raise ValueError("Duplicate held-out decision candidate")
         offline_predictions[key] = {
-            label: max(0.0, min(1.0, float(model.predict(
+            label: max(0.0, float(model.predict(
                 matrices["test"][i:i+1]
-            )[0])))
+            )[0]))
             for label, model in fitted_models.items()
         }
-    report["offline_decision_evaluation"] = evaluate_regret(
-        test_rows, offline_predictions
+    # Fit the strongest declared deterministic comparator exclusively on
+    # 60 training configurations; apply it unchanged to all test strata and
+    # all three objective sensitivity weights.
+    tuned_rule = tune_rule_on_training_groups(groups["train"])
+    report["train_only_tuned_rule"] = tuned_rule
+    report["offline_decision_sensitivity"] = evaluate_sensitivity(
+        test_rows, offline_predictions, tuned_rule["parameters"]
     )
+    # Prospective crossover: describe results at every declared difficulty
+    # level without filtering for strata where AI happens to outperform a rule.
+    report["complexity_crossover"] = {}
+    for level in ("SIMPLE", "INTERACTION", "PARTIAL_VISIBILITY"):
+        selected = [r for r in test_rows if r["complexity_stratum"] == level]
+        if selected:
+            keys = {(r["group"], r["repeat"], r["action"]) for r in selected}
+            report["complexity_crossover"][level] = evaluate_sensitivity(
+                selected, {k: p for k, p in offline_predictions.items() if k in keys},
+                tuned_rule["parameters"]
+            )
+        else:
+            report["complexity_crossover"][level] = {
+                "not_evaluable": "No registered held-out groups in this stratum"
+            }
     if export_path is not None:
         # Only load model artifacts created in a trusted local environment.
         # The scikit-learn serialization is pickle-based and unsafe to load
@@ -346,6 +444,7 @@ def train_evaluate(rows: list[dict], seed: int = 20261110,
                 "pre_action": r["pre_action"],
                 "label_security_exposure": r["label_security_exposure"],
                 "label_path_exposure": r["label_path_exposure"],
+                "label_absolute_failed_requests": r["label_absolute_failed_requests"],
                 "label_service_failure_fraction": r["label_service_failure_fraction"],
             }
             for r in groups["train"]
@@ -366,7 +465,7 @@ def train_evaluate(rows: list[dict], seed: int = 20261110,
                 name: [float(matrices["train"][:, i].min()),
                        float(matrices["train"][:, i].max())]
                 for i, name in enumerate(FEATURES)
-                if i < 4
+                if i < 4 + len(OPERATOR_FEATURES)
             },
             "radii": calibration_radii,
             "models": fitted_models,

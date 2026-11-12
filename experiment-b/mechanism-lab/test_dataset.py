@@ -35,6 +35,21 @@ class MechanismDatasetTests(unittest.TestCase):
         self.assertTrue(any(x["fault_target"] == "enforcer-hidden"
                             for x in configs))
 
+    def test_strata_have_multiple_routing_profiles(self):
+        """Difficulty cannot merely re-label balanced versus skewed traffic."""
+        configs, _ = create_plan()
+        for level in ("SIMPLE", "INTERACTION", "PARTIAL_VISIBILITY"):
+            group = [c for c in configs if c["complexity_stratum"] == level]
+            self.assertGreaterEqual(len(group), 12)
+            self.assertEqual(
+                {c["routing_profile"] for c in group},
+                {"balanced", "skewed_a", "skewed_hidden"}
+            )
+            self.assertEqual(
+                {c["fault_mode"] for c in group},
+                {"loss", "delay", "duplicate", "reorder"}
+            )
+
     def test_no_manifest_oracle_labels(self):
         """Manifest never substitutes for an executed measurement."""
         _, trials = create_plan()
@@ -83,7 +98,17 @@ class MechanismDatasetTests(unittest.TestCase):
             "after": {"verifier_gateway_probes": probes, "oracle": oracle},
             "operations": {"attempts": 40, "non_200_requests": 7,
                            "measured_rps": 25.0, "latency_p95_ms": 12.0,
-                           "post_window_recovery_wait_seconds": 0.0}
+                           "post_window_recovery_wait_seconds": 0.0,
+                           "gateway_exposure_timeline": {
+                               "method": "monotonic_http_step_integral",
+                               "window_seconds": 4.0,
+                               "valid_probe_count": 4,
+                               "exposure_seconds_lower_bound": 1.0,
+                               "exposure_seconds_upper_bound": 1.5,
+                               "exposure_fraction_lower_bound": 0.25,
+                               "exposure_fraction_upper_bound": 0.375,
+                               "unknown_seconds": 0.5,
+                           }}
         }
         records = separate_records(c, trial, observed)
         self.assertEqual(records["verification"]["outcome"], "INDETERMINATE")

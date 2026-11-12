@@ -5,6 +5,9 @@ on:
     paths: ['experiment-b/mechanism-lab/**', '.github/workflows/experiment-b-mechanism.yml']
   pull_request:
     paths: ['experiment-b/mechanism-lab/**', '.github/workflows/experiment-b-mechanism.yml']
+concurrency:
+  group: experiment-b-mechanism-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
 jobs:
   mechanism-integration:
     runs-on: ubuntu-latest
@@ -14,6 +17,11 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Verify frozen Experiment B v3 protocol before collecting any evidence
+        run: |
+          actual="$(git hash-object experiment-b/mechanism-lab/PROTOCOL_V3_AI_EVALUATION.md)"
+          test "$actual" = "3ac868036435720d6a809c3de3b3e265ea766fcf"
+          echo "Research protocol blob matches immutable pre-score freeze"
       - name: Create disposable distinct credentials
         run: |
           for name in LAB_CONTROL_TOKEN LAB_ORACLE_TOKEN LAB_INTERNAL_TOKEN; do
@@ -53,6 +61,8 @@ jobs:
           r=d["silent_regression"]
           assert r["pre_regression_oracle"]["all_revoked_access_denied"] is True
           assert r["post_regression_oracle"]["all_revoked_access_denied"] is False
+          # Gateway restriction denies the protected operation for both
+          # revoked and authorized test identities, producing real collateral cost.
           assert cases["gateway_restrict"]["operations"]["non_200_requests"] > 0
           omitted=d["omitted_enforcement_point"]
           assert omitted["gateway_only_looks_clean"] is True
@@ -63,74 +73,65 @@ jobs:
       - name: Generate grouped 100 by 4 by 3 mechanism experiment plan
         working-directory: experiment-b/mechanism-lab
         run: python plan.py --output plans/ci-mechanism
-      - name: Collect four real actions through the audited bounded campaign runner
-        working-directory: experiment-b/mechanism-lab
-        run: python campaign.py --execute-lab --plan plans/ci-mechanism --records results/ci-mechanism --max-trials 4
-      - name: Expand bounded pilot to three distinct fault configurations
+      - name: 'Execute repeated pilot: all three complexity strata and four fault families'
         working-directory: experiment-b/mechanism-lab
         run: |
-          python campaign.py --execute-lab --plan plans/ci-mechanism --records results/ci-mechanism --start 12 --max-trials 4
-          python campaign.py --execute-lab --plan plans/ci-mechanism --records results/ci-mechanism --start 24 --max-trials 4
-      - name: Audit registered campaign completion and reject fabricated outcomes
+          for start in 0 4 12 16 24 28 228 232 336 340; do
+            python campaign.py --execute-lab --plan plans/ci-mechanism --records results/ci-mechanism --start "$start" --max-trials 4
+          done
+      - name: Audit 40 executed records across five configurations and four streams
         working-directory: experiment-b/mechanism-lab
         run: |
           python campaign.py --audit --plan plans/ci-mechanism --records results/ci-mechanism > reports/ci-campaign-audit.json
           python - <<'PY'
           import json
           from pathlib import Path
-          d = json.loads(Path("reports/ci-campaign-audit.json").read_text())
-          assert d["complete"] == 12 and d["missing"] == 1188
+          d=json.loads(Path("reports/ci-campaign-audit.json").read_text())
+          assert d["complete"] == 40 and d["missing"] == 1160
           assert d["partial"] == d["invalid"] == d["unexpected_files"] == 0
           assert not d["ready_for_training"]
-          print("PASS: 12 measured trials across three configurations, not 1200")
+          root=Path("results/ci-mechanism")
+          id_sets=[]
+          for stream in ("pre_action","verification","operations","oracle"):
+              paths=list((root/stream).glob("*.json"))
+              assert len(paths)==40, (stream, len(paths))
+              id_sets.append({p.name for p in paths})
+          assert all(items == id_sets[0] for items in id_sets)
+          records=[json.loads(p.read_text()) for p in (root/"pre_action").glob("*.json")]
+          assert len({r["configuration_id"] for r in records}) == 5
+          assert {r["repeat"] for r in records} == {0,1}
+          assert {r["experimental_conditions"]["fault_mode"] for r in records} == {
+              "loss","delay","duplicate","reorder"
+          }
+          assert all(r["oracle_features_excluded"] for r in records)
+          assert {r["complexity_stratum"] for r in records} == {
+              "SIMPLE", "INTERACTION", "PARTIAL_VISIBILITY"
+          }
+          assert {r["routing_profile"] for r in records} >= {"balanced", "skewed_a"}
+          frozen=[r for r in records if not r["decision_policy_metadata"]["restart_permitted"]]
+          assert len(frozen)==8 and {r["configuration_id"] for r in frozen}=={"mechanism-028"}
+          reorder=[r for r in records
+                   if r["experimental_conditions"]["fault_mode"] == "reorder"]
+          observed_pairs=[]
+          for r in reorder:
+              oracle=json.loads((root/"oracle"/(r["run_id"]+".json")).read_text())
+              target=r["experimental_conditions"]["fault_target"]
+              # Oracle entries use upstream URLs, not short service names.
+              # Normalize the real URL host instead of claiming the fault was
+              # exercised based on a mismatched node identifier.
+              from urllib.parse import urlsplit
+              selected=[x["admin"].get("reordered_event_pairs",0)
+                        for x in oracle["after"]["targets"]
+                        if urlsplit(x["node"]).hostname==target]
+              assert len(selected)==1
+              observed_pairs.extend(selected)
+          assert any(n > 0 for n in observed_pairs), "Real reordered Kafka events were not observed"
+          print("PASS: 40 genuine paired replays, repeated fault/freeze conditions, broker reordering observed")
           PY
-      - name: Validate separate collected records without exposing private oracle data
+      - name: Score observed engineering rule and fixed playbooks across sensitivity weights
         working-directory: experiment-b/mechanism-lab
         run: |
-          python - <<'PY'
-          import json
-          from pathlib import Path
-          folder=Path("results/ci-mechanism")
-          joined=[]
-          for stream in ("pre_action","verification","operations","oracle"):
-              files=list((folder/stream).glob("*.json"))
-              assert len(files)==12,(stream,len(files))
-              for file in files:
-                  record=json.loads(file.read_text())
-                  assert record["run_id"]
-                  assert record["partition"] in ("train","calibration","test")
-              joined.append({p.name for p in files})
-          assert all(s==joined[0] for s in joined)
-          pre=[json.loads(p.read_text()) for p in (folder/"pre_action").glob("*.json")]
-          assert all(p["oracle_features_excluded"] for p in pre)
-          assert len({p["configuration_id"] for p in pre}) == 3
-          report=[]
-          for p in sorted(pre,key=lambda x:(x["configuration_id"], x["action_id"])):
-              name=p["run_id"]+".json"
-              verification=json.loads((folder/"verification"/name).read_text())
-              operations=json.loads((folder/"operations"/name).read_text())
-              oracle=json.loads((folder/"oracle"/name).read_text())
-              report.append({
-                  "configuration":p["configuration_id"],
-                  "fault_family":p["experimental_conditions"]["fault_mode"],
-                  "action":p["action_id"],
-                  "control_remediated":oracle["actual_revoked_access_denied"],
-                  "gateway_path_exposed":verification["path_exposure_observed"],
-                  "legitimate_failed_requests":operations["failed_requests"],
-                  "legitimate_attempts":operations["observed_requests"],
-                  "verifier":verification["outcome"]
-              })
-          assert len(report)==12
-          Path("reports/ci-12-trial-summary.json").write_text(json.dumps({
-              "status":"observed_laboratory_pilot_only",
-              "executed_trials":12,
-              "configurations":3,
-              "outcomes":report,
-              "not_a_model_effectiveness_result":True
-          },indent=2)+"\\n")
-          print(json.dumps(report,indent=2))
-          print("PASS: twelve real action replays, matching private oracle records and no feature leakage")
-          PY
+          python pilot_regret.py --plan plans/ci-mechanism --records results/ci-mechanism --configurations mechanism-000 mechanism-001 mechanism-002 mechanism-019 mechanism-028 --report reports/ci-repeated-pilot-regret.json
       - name: Remove restricted research and oracle trial files before artifact upload
         if: always()
         working-directory: experiment-b/mechanism-lab
@@ -142,7 +143,7 @@ jobs:
           name: experiment-b-mechanism-pilot
           path: |
             experiment-b/mechanism-lab/reports/ci-campaign-audit.json
-            experiment-b/mechanism-lab/reports/ci-12-trial-summary.json
+            experiment-b/mechanism-lab/reports/ci-repeated-pilot-regret.json
           if-no-files-found: ignore
       - name: Shutdown and diagnostics
         if: always()

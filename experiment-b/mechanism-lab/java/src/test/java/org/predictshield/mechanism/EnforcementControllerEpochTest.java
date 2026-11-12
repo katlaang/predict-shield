@@ -117,6 +117,70 @@ final class EnforcementControllerEpochTest {
     }
 
     /**
+     * Confirms that a configured Java service delay is experienced by actual
+     * HTTP handler execution rather than substituted as a result formula.
+     *
+     * <p>Timing is bounded and deliberately conservative so the test tolerates
+     * normal CI scheduling overhead while still detecting a missing delay.</p>
+     */
+    @Test
+    void configuredNodeServiceDelayAffectsRealHandlerTime() {
+        assertEquals(200, controller.setServiceLatency("test-control", 80)
+                .getStatusCode().value());
+        long start = System.nanoTime();
+        controller.legitimate();
+        long elapsedMs = java.util.concurrent.TimeUnit.NANOSECONDS.toMillis(
+                System.nanoTime() - start);
+        assertTrue(elapsedMs >= 65);
+    }
+
+    /**
+     * Verifies the same protected operation treats the two disposable
+     * principal types differently before a coarse gateway action.
+     *
+     * <p>Both requests are genuinely served by the independent Java JVM.
+     * Gateway restriction blocks the protected route for both principals,
+     * allowing external load measurement to count the legitimate collateral
+     * failures. The test principal header is synthetic and untrusted.</p>
+     */
+    @Test
+    void authorizedProtectedWorkloadIsNotEquivalentToRevokedUser() {
+        controller.reset("test-control", 30000);
+        controller.bindTrial("test-control", TRIAL);
+        controller.onEvent(TRIAL + ",7,true");
+        assertEquals(403, controller.protectedOperation(null).getStatusCode().value());
+        assertEquals(200, controller.protectedOperation("authorized").getStatusCode().value());
+    }
+
+    /**
+     * Confirms an absent operator feed never disables the separate oracle.
+     *
+     * <p>The operator request has no access to injected fault identity or
+     * oracle control truth, and the privileged oracle path remains available
+     * when the pre-action monitoring endpoint is deliberately unavailable.</p>
+     */
+    @Test
+    void operatorFeedCanBeMissingWithoutHidingPrivateOracleState() {
+        controller.reset("test-control", 30000);
+        controller.bindTrial("test-control", TRIAL);
+        assertEquals(200, controller.operatorTelemetry("test-control")
+                .getStatusCode().value());
+        assertEquals(200, controller.setOperatorVisibility("test-control", false)
+                .getStatusCode().value());
+        assertEquals(503, controller.operatorTelemetry("test-control")
+                .getStatusCode().value());
+        assertEquals(200, controller.adminState("test-oracle")
+                .getStatusCode().value());
+        assertEquals(200, controller.setOperatorVisibility("test-control", true)
+                .getStatusCode().value());
+        Map<?, ?> visible = (Map<?, ?>) controller.operatorTelemetry("test-control")
+                .getBody();
+        assertEquals("operator_pre_action", visible.get("observation_type"));
+        assertTrue(!visible.containsKey("fault"));
+        assertTrue(!visible.containsKey("revoked"));
+    }
+
+    /**
      * Verifies obsolete callbacks cannot restore a state in the next trial.
      *
      * @throws InterruptedException when test execution is interrupted

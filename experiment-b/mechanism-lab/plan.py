@@ -57,6 +57,33 @@ def create_plan(seed: int = SEED) -> tuple[list[dict], list[dict]]:
             "event_delay_ms": rng.randint(0, 2500),
             "requested_rps": rng.randint(10, 65),
             "measurement_seconds": 4,
+            # Fault and routing profile are assigned on different cycles;
+            # each fault family occurs under balanced and skewed traffic.
+            "routing_profile": ("balanced", "skewed_a", "skewed_hidden")[
+                (i // 4) % 3
+            ],
+            # Values affect actual JVM handler execution, not generated
+            # result labels. SIMPLE has uniform service time; harder strata
+            # vary independent per-node latency for each configuration.
+            "node_service_latency_ms": (
+                [15, 15, 15, 15] if (i // 12) % 3 == 0
+                else [rng.choice((0, 10, 25, 55, 100, 140)) for _ in range(4)]
+            ),
+            # Complexity uses a 12-case block, independent of the
+            # 4-case routing-profile cycle. Every 12-case block contains
+            # all three routing profiles and every fault family, so
+            # stratum is not merely another name for traffic weighting.
+            "complexity_stratum": ("SIMPLE", "INTERACTION",
+                                   "PARTIAL_VISIBILITY")[(i // 12) % 3],
+            # Decision-policy eligibility is not a fault-injection feature.
+            # Replays still execute every candidate in a disposable lab to
+            # estimate counterfactual outcomes; an offline policy must never
+            # select a prohibited restart.
+            "restart_permitted": (i // 8) % 2 == 0,
+            # Absolute failure allowance is held fixed as requested RPS
+            # varies. This is a research decision threshold, not a measured
+            # remaining SLO budget or a production safety guarantee.
+            "absolute_error_budget_requests": 25,
             # Each four-scenario block includes every fault family. Alternate
             # topology only between blocks, avoiding deterministic confounding
             # between fault type and whether the hidden target is routable.
