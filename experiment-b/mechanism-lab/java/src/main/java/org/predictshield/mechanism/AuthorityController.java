@@ -1,6 +1,7 @@
 package org.predictshield.mechanism;
 
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -75,7 +76,7 @@ public final class AuthorityController {
     public synchronized ResponseEntity<Map<String, Object>> revoke(
             @RequestHeader(value = "X-Lab-Control", required = false) String token) {
         if (!authorized(token, controlToken)) return denied();
-        current = new PolicyRevision(sequence.incrementAndGet(), true);
+        current = new PolicyRevision(sequence.incrementAndGet(), true, current.trialId());
         return publish(current);
     }
 
@@ -106,7 +107,27 @@ public final class AuthorityController {
     public synchronized ResponseEntity<Map<String, Object>> reset(
             @RequestHeader(value = "X-Lab-Control", required = false) String token) {
         if (!authorized(token, controlToken)) return denied();
-        current = new PolicyRevision(sequence.incrementAndGet(), false);
+        current = new PolicyRevision(sequence.incrementAndGet(), false, UUID.randomUUID().toString());
+        return publish(current);
+    }
+
+    /**
+     * Issues a second revision within the current trial for genuine reordering tests.
+     *
+     * <p>After a revocation, a second consecutive revision is published while
+     * the principal remains revoked. A consumer in reorder mode must observe
+     * distinct revisions and may apply the later event first. This control
+     * endpoint is only for the isolated experiment, not production policy use.</p>
+     *
+     * @param token scoped operator token for test-only mutations
+     * @return queued publication acknowledgment, never proof of enforcement
+     */
+    @PostMapping("/control/reaffirm")
+    public synchronized ResponseEntity<Map<String, Object>> reaffirm(
+            @RequestHeader(value = "X-Lab-Control", required = false) String token) {
+        if (!authorized(token, controlToken)) return denied();
+        current = new PolicyRevision(sequence.incrementAndGet(),
+                current.revoked(), current.trialId());
         return publish(current);
     }
 
@@ -147,9 +168,10 @@ public final class AuthorityController {
      */
     private ResponseEntity<Map<String, Object>> publish(PolicyRevision revision) {
         publisher.send("lab-policy", "revoked-test-principal",
-                revision.revision() + "," + revision.revoked());
+                revision.trialId() + "," + revision.revision() + "," + revision.revoked());
         return ResponseEntity.accepted().body(Map.of(
                 "revision", revision.revision(),
+                "trial_id", revision.trialId(),
                 "desired_revoked", revision.revoked(),
                 "publication_queued", true));
     }
