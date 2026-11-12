@@ -289,8 +289,7 @@ broker after reset. A reorder trial emits two distinct revisions.
 Resync republishes current policy without disabling the injected consumer
 fault. A permanent lost-event consumer is not secretly fixed by resync.
 Restart exercises actual service downtime and a separate authority HTTP
-refresh. Gateway restriction can block reachable paths while the enforcement
-control remains stale. The outcomes distinguish: (1) complete direct
+refresh. Gateway restriction can block reachable protected paths without intentionally denying unrelated legitimate work, while the enforcement control remains stale. The outcomes distinguish: (1) complete direct
 enforcement-control remediation; (2) observed gateway-path exposure;
 and (3) legitimate service HTTP failure/latency.
 
@@ -317,3 +316,120 @@ The GitHub integration workflow performs a bounded 12-trial pilot across
 three fault configurations and retains a sanitized per-action outcome table.
 Private oracle raw records are deleted before uploading CI artifacts.
 The full 1,200-run campaign is still unexecuted.
+
+## Temporal exposure, absolute disruption, and repeated baseline pilot
+
+The experimental action window now samples actual protected gateway HTTP
+responses over time. It integrates allowed access into exposure-seconds,
+preserves the observed window, and records unknown seconds separately.
+Network errors and unobserved initial intervals contribute to an upper
+exposure bound; no missing interval is assumed to be safely denied.
+
+Action evaluation uses exposure fraction derived from these time-integrated
+upper bounds, independent control remediation, and absolute measured
+failed legitimate requests divided by a declared experimental count budget.
+The absolute allowance of 25 requests is a research comparator, NOT a
+verified remaining operational error budget and cannot authorize execution.
+
+Configurations also vary whether a restart is permitted by a declared
+research change policy. All four actions are replayed in the disposable
+experiment to measure counterfactual outcomes, but offline decision policies
+must exclude restart whenever the simulated change freeze applies. The
+gateway mitigation intentionally targets only the compromised protected
+route and allows legitimate requests to continue, making it a plausible
+fallback where restart is prohibited or excessively disruptive.
+
+The offline regret comparator reports fixed resync, fixed restart with
+gateway fallback, fixed gateway, fixed monitor and a preregistered
+engineering rule under three independent weightings:
+(path, control, disruption) = (0.50, 0.25, 0.25), (0.70, 0.20, 0.10)
+and (0.30, 0.20, 0.50). Absolute failure cost is not capped at one.
+
+The revised CI pilot targets four configurations: loss, delay, reorder
+and restart-prohibited loss, with two repeats of each of four actions.
+It therefore plans 32 ACTUAL experimental replays (four configurations
+times two repeats times four actions), plus the existing mechanism smoke
+tests. CI will preserve only a sanitized regret report, not raw oracle
+or sensitive data. The full 1,200-trial campaign remains unexecuted.
+
+This pilot has only four independently configured environments, so
+regret values remain preliminary descriptive statistics. Reordered messages
+may be safely ignored under monotonic revision checks; the goal is to
+measure the behavior, not force a security failure or invent a model win.
+
+
+## AI-centered v3 study (preregistered before model results)
+
+Read [PROTOCOL_V3_AI_EVALUATION.md](PROTOCOL_V3_AI_EVALUATION.md)
+for the immutable prospective research questions and success/failure criteria.
+The proposition is **falsifiable**: a learned selector must be compared to
+strong non-AI rules using only signals available before an action, and it
+may tie or lose.
+
+The prototype now produces:
+
+- Real time-stamped gateway authorization probes, sampled exposure-seconds,
+  and unknown-time upper bounds
+- Absolute legitimate HTTP failures against a fixed experimental cost
+  allowance, not just a failure fraction
+- Pre-action operator telemetry from each Java process: cache revision,
+  cache age, processed event count, refresh failures and pending callbacks.
+  These are operational indicators, **not known fault labels or direct Kafka
+  consumer lag**. A missing feed remains explicitly missing
+- Real, heterogeneous JVM service time: node A 0 ms, B 15 ms, C 50 ms,
+  hidden node 100 ms, with actual request execution and measured latency
+- Balanced and skewed gateway routing profiles, independently registered
+  from fault family, and a suppressed operator feed in the partial-visibility
+  condition
+- Offline AI-versus-rule regret under three declared utility weightings,
+  including a stronger telemetry-based deterministic heuristic
+- A complexity-crossover report with SIMPLE, INTERACTION and
+  PARTIAL_VISIBILITY strata, retaining all outcomes, including negative
+  results, unchanged
+
+The heterogeneity is deliberately configured for this **synthetic
+laboratory**. The current four-node deployment does not yet implement real
+hardware-capacity differences or controlled per-node JVM cold-start time
+distributions. A node with slower legitimate request handling is not
+necessarily slower to restart. Those must not be conflated.
+
+The revised CI integration attempts 40 **actual action replays**:
+five configurations × two repeats × four actions. These cover all four
+fault families, both simple and skewed gateway routing and an explicit
+change freeze. The outcome report is not a trained AI performance result.
+Do not begin the full 1,200-trial study without complete CI, physical
+measurement review, sufficient operator signals and evaluation protocol
+approval. CI success on older commits does not validate changes at HEAD.
+
+The operator telemetry uses the existing disposable control credential.
+Dedicated least-privilege operator credentials remain a future security
+requirement; this lab endpoint is not suitable for production exposure.
+
+Automatic defensive execution is still **disabled**. A research lab's fixed
+error allowance is not an independently measured remaining service budget.
+
+
+## Pre-campaign protocol and engineering review
+
+The reviewer-identified reorder audit bug is corrected by comparing the
+hostname parsed from the oracle's URL with the registered short target
+name. A genuine increment of the reordered-event counter is still mandatory.
+
+The measured pilot plan covers loss, delay, duplicate and reorder across
+five configurations, two repetitions and four actions: 40 actual replays.
+The trained study's 216-point deterministic threshold grid fits only the
+60 training configurations, never the calibration/test labels. A separate,
+explicitly exploratory leave-one-configuration-out fit is available for the
+five-configuration pilot, not as proof of comparative AI effectiveness.
+
+The Java workload now includes authorized users of the same protected
+operation, so a gateway-wide operation block can cause measurable legitimate
+failures. Per-node request latency is a real JVM handler setting and is
+measured as a secondary outcome. Distinct cold-start-time distributions
+are not implemented and are not claimed.
+
+The prospective research protocol is pinned to a Git commit and blob SHA
+in [PROTOCOL_V3_FREEZE.md](PROTOCOL_V3_FREEZE.md). GitHub Actions checks its
+content checksum before pilot collection. This is an immutable commit-based
+freeze, not an actual annotated Git tag; the repository maintainer's tag
+command is documented in the freeze file.

@@ -1,7 +1,10 @@
 """Tests for hindsight regret accounting without empirical effectiveness claims."""
 import unittest
 
-from decision_eval import ACTIONS, engineering_rule, evaluate_regret, observed_utility
+from decision_eval import (
+    ACTIONS, engineering_rule, evaluate_regret, observed_utility,
+    evaluate_sensitivity, tune_rule_on_training_groups, tuned_rule_action,
+)
 
 
 class DecisionRegretTests(unittest.TestCase):
@@ -16,13 +19,21 @@ class DecisionRegretTests(unittest.TestCase):
                 for action in ACTIONS:
                     row = {
                         "group": group, "repeat": repeat,
+                        "restart_permitted": True,
+                        "absolute_error_budget_requests": 25,
                         "action": action,
                         "pre_action": {
                             "initial_gateway_allowed_fraction": 0.5,
                             "cache_ttl_ms": 9000,
+                            "requested_rps": 30,
+                            "operator_missing_count": 0,
+                            "operator_revision_spread": 1,
+                            "operator_refresh_failure_count": 0,
+                            "operator_max_cache_age_ms": 2000,
                         },
                         "label_path_exposure": float(action == "resync_policy"),
                         "label_security_exposure": float(action == "gateway_restrict"),
+                        "label_absolute_failed_requests": float(action == "restart_enforcer") * 5,
                         "label_service_failure_fraction": float(action == "restart_enforcer") * 0.2,
                     }
                     rows.append(row)
@@ -30,7 +41,7 @@ class DecisionRegretTests(unittest.TestCase):
                         k: row[k] for k in (
                             "label_path_exposure",
                             "label_security_exposure",
-                            "label_service_failure_fraction",
+                            "label_absolute_failed_requests",
                         )
                     }
         return rows, predictions
@@ -60,10 +71,61 @@ class DecisionRegretTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             evaluate_regret(rows, predictions)
 
+    def test_change_freeze_excludes_restart_even_if_predicted_best(self):
+        """A frozen restart must never be selected by an offline comparator."""
+        rows, predictions = self.cases()
+        for row in rows:
+            row["restart_permitted"] = False
+        report = evaluate_regret(rows, predictions)
+        self.assertEqual(
+            report["policies"]["fixed_restart_or_gateway"]["action_selection_counts"],
+            {"gateway_restrict": 6},
+        )
+        self.assertNotIn(
+            "restart_enforcer", report["policies"]["model"]["action_selection_counts"]
+        )
+
+    def test_predeclared_sensitivity_profiles(self):
+        """Use all three fixed research weights, not a test-selected optimum."""
+        rows, predictions = self.cases()
+        self.assertEqual(len(evaluate_sensitivity(rows, predictions)), 3)
+
+    def test_thresholds_are_fitted_only_on_training_groups(self):
+        """A deterministic threshold grid must never inspect held-out outcomes."""
+        rows, predictions = self.cases()
+        for row in rows:
+            row["partition"] = "train"
+            row["pre_action"]["operator_revision_spread"] = 1
+            row["pre_action"]["requested_rps"] = 20
+        result = tune_rule_on_training_groups(rows)
+        self.assertEqual(result["fitted_partition"], "train")
+        self.assertEqual(result["grid_size"], 216)
+        self.assertFalse(result["test_labels_used_for_fitting"])
+        evaluation = evaluate_regret(
+            rows, predictions, tuned_parameters=result["parameters"]
+        )
+        self.assertIn("train_tuned_rule", evaluation["policies"])
+        rows[0]["partition"] = "test"
+        with self.assertRaises(ValueError):
+            tune_rule_on_training_groups(rows)
+
+    def test_tuned_rule_never_bypasses_change_freeze(self):
+        """Even an aggressive fitted threshold cannot authorize restart."""
+        rows, _ = self.cases()
+        choice = rows[0]
+        choice["restart_permitted"] = False
+        params = {
+            "ttl_threshold_ms": 3500,
+            "load_threshold_rps": 65,
+            "revision_spread_threshold": 0,
+            "gateway_threshold_rps": 55,
+        }
+        self.assertEqual(tuned_rule_action(choice, params), "gateway_restrict")
+
     def test_outcome_normalization_is_mandatory(self):
         """Out-of-range risk or service failure measurements invalidate regret."""
         row = self.cases()[0][0]
-        row["label_service_failure_fraction"] = 1.2
+        row["label_path_exposure"] = 1.2
         with self.assertRaises(ValueError):
             observed_utility(row)
 

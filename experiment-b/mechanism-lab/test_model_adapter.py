@@ -60,16 +60,25 @@ class ModelDecisionIntegrationTests(unittest.TestCase):
             "training_fingerprint": "unit-test-only",
             "calibration_group_count": 20,
             "radii": {"label_security_exposure": .02,
-                      "label_service_failure_fraction": .01},
+                      "label_absolute_failed_requests": 2.0},
             "numeric_feature_bounds": {
                 "cache_ttl_ms": [2500, 15000],
                 "requested_rps": [10, 65],
                 "gateway_visible_enforcer_count": [3, 4],
                 "initial_gateway_allowed_fraction": [0, 1],
+                "operator_observed_count": [0, 4],
+                "operator_missing_count": [0, 4],
+                "operator_revision_spread": [0, 100],
+                "operator_max_cache_age_ms": [0, 100000],
+                "operator_refresh_failure_count": [0, 4],
+                "operator_pending_callback_count": [0, 100],
+                "operator_handled_event_spread": [0, 100],
+                "operator_max_service_latency_ms": [0, 150],
+                "operator_service_latency_spread_ms": [0, 150],
             },
             "models": {
                 "label_security_exposure": FakeActionModel([.20, .10, .02, .90]),
-                "label_service_failure_fraction": FakeActionModel([.10, .25, .80, .02]),
+                "label_absolute_failed_requests": FakeActionModel([8.0, 18.0, 60.0, 2.0]),
             },
         }
         self.actions = (
@@ -86,9 +95,17 @@ class ModelDecisionIntegrationTests(unittest.TestCase):
         selection = select_action(
             self.snapshot, self.actions, predictions, {"authorization": 50.0})
         self.assertFalse(selection.abstained)
-        self.assertEqual(selection.selected.action_id, "resync_policy")
+        # With the mock's lower residual risk, restart is ranked above
+        # resync under this intentionally synthetic safety-gate fixture.
+        self.assertEqual(selection.selected.action_id, "restart_enforcer")
         self.assertTrue(all(item.training_fingerprint == "unit-test-only"
                             for item in predictions))
+        # The model predicts absolute failed HTTP request counts directly;
+        # neither the interval nor its radius is scaled by scheduled RPS.
+        predicted = predictions[0].additional_errors["authorization"]
+        self.assertEqual(predicted.lower, 6.0)
+        self.assertEqual(predicted.estimate, 8.0)
+        self.assertEqual(predicted.upper, 10.0)
 
     def test_incomplete_scope_must_abstain_even_if_model_confident(self):
         """The actual gateway-only experimental setting cannot assert complete scope."""
