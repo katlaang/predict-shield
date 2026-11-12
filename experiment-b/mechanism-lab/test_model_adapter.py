@@ -60,7 +60,7 @@ class ModelDecisionIntegrationTests(unittest.TestCase):
             "training_fingerprint": "unit-test-only",
             "calibration_group_count": 20,
             "radii": {"label_security_exposure": .02,
-                      "label_service_failure_fraction": .01},
+                      "label_absolute_failed_requests": 2.0},
             "numeric_feature_bounds": {
                 "cache_ttl_ms": [2500, 15000],
                 "requested_rps": [10, 65],
@@ -76,7 +76,7 @@ class ModelDecisionIntegrationTests(unittest.TestCase):
             },
             "models": {
                 "label_security_exposure": FakeActionModel([.20, .10, .02, .90]),
-                "label_service_failure_fraction": FakeActionModel([.10, .25, .80, .02]),
+                "label_absolute_failed_requests": FakeActionModel([8.0, 18.0, 60.0, 2.0]),
             },
         }
         self.actions = (
@@ -96,6 +96,12 @@ class ModelDecisionIntegrationTests(unittest.TestCase):
         self.assertEqual(selection.selected.action_id, "resync_policy")
         self.assertTrue(all(item.training_fingerprint == "unit-test-only"
                             for item in predictions))
+        # The model predicts absolute failed HTTP request counts directly;
+        # neither the interval nor its radius is scaled by scheduled RPS.
+        predicted = predictions[0].additional_errors["authorization"]
+        self.assertEqual(predicted.lower, 6.0)
+        self.assertEqual(predicted.point, 8.0)
+        self.assertEqual(predicted.upper, 10.0)
 
     def test_incomplete_scope_must_abstain_even_if_model_confident(self):
         """The actual gateway-only experimental setting cannot assert complete scope."""
