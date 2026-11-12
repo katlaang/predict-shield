@@ -31,9 +31,12 @@ def stable_id(*parts: object) -> str:
 
 def build(seed: int = SEED) -> tuple[list[dict], list[dict]]:
     rng = random.Random(seed)
-    # Stratify by fault and difficulty. Each combination repeats 8 or 9 times.
-    cells = [(fault, level) for fault in FAULTS for level in STRATA]
-    assigned = (cells * (COUNT // len(cells))) + cells[:COUNT % len(cells)]
+    # Each of six faults occurs 25 times, each stratum 50 times. Every
+    # fault-by-stratum cell occurs 8 or 9 times, without 1:1 coupling.
+    assigned = []
+    for index, fault in enumerate(FAULTS):
+        assigned.extend((fault, level) for level in STRATA for _ in range(8))
+        assigned.append((fault, STRATA[index % len(STRATA)]))
     rng.shuffle(assigned)
     # Three independent, balanced traffic-profile assignments for 150 groups.
     routes = list(ROUTES) * (COUNT // len(ROUTES))
