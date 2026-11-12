@@ -116,9 +116,28 @@ def setup_fault(control_token: str, *, ttl_ms: int, delay_ms: int,
         status, _, _ = request(node, f"/admin/reset/{ttl_ms}", method="POST", token=control_token)
         if status != 200:
             raise RuntimeError("Enforcer reset failed: " + node)
-    status, _, _ = request("authority", "/control/reset", method="POST", token=control_token, timeout=10)
+    status, reset_response, _ = request(
+        "authority", "/control/reset", method="POST", token=control_token, timeout=10
+    )
+    if status != 202 or not reset_response.get("trial_id"):
+        raise RuntimeError("Authority reset missing acknowledged trial ID")
+    trial_id = reset_response["trial_id"]
+    # Bind all four caches to the *broker-carried* trial identifier. Events
+    # arriving from prior experiments cannot pass the consumer trial check.
+    for node in ENFORCERS:
+        bind_status, _, _ = request(
+            node, "/admin/bind/" + trial_id,
+            method="POST", token=control_token
+        )
+        if bind_status != 200:
+            raise RuntimeError("Could not bind " + node + " to current trial")
+    # Guarantee that every JVM receives the new authority revision, even
+    # when the reset publication preceded a particular binding request.
+    status, _, _ = request(
+        "authority", "/control/resync", method="POST", token=control_token, timeout=10
+    )
     if status != 202:
-        raise RuntimeError("Authority reset was not acknowledged (HTTP " + str(status) + ")")
+        raise RuntimeError("Failed to announce newly bound trial")
     # Each JVM reset advances its local epoch. Delayed callbacks from prior
     # trials are rejected under the same synchronized monitor. The oracle
     # then verifies that all four JVMs reached the same authority revision
@@ -131,7 +150,9 @@ def setup_fault(control_token: str, *, ttl_ms: int, delay_ms: int,
                 baseline = oracle_snapshot(oracle_token)
                 desired = baseline["authority"]
                 if (desired.get("revoked") is False
-                        and all(t["admin"]["revision"] == desired["revision"]
+                        and desired.get("trialId") == trial_id
+                        and all(t["admin"].get("trial_id") == trial_id
+                                and t["admin"]["revision"] == desired["revision"]
                                 and t["admin"]["revoked"] is False
                                 and t["admin"].get("pending_scheduled_callbacks") == 0
                                 and isinstance(t["admin"].get("experiment_epoch"), int)
@@ -156,6 +177,13 @@ def setup_fault(control_token: str, *, ttl_ms: int, delay_ms: int,
     status, _, _ = request("authority", "/control/revoke", method="POST", token=control_token, timeout=10)
     if status != 202:
         raise RuntimeError("Policy revocation rejected")
+    if fault_mode == "reorder":
+        # Two distinct broker revisions are necessary to exercise true
+        # out-of-order consumer delivery; a single held message is not enough.
+        status, _, _ = request("authority", "/control/reaffirm",
+                               method="POST", token=control_token, timeout=10)
+        if status != 202:
+            raise RuntimeError("Second reorder revision was not published")
     time.sleep(1.2)
 
 
@@ -191,7 +219,8 @@ def perform_action(action: str, control_token: str,
     if fault_target not in ENFORCERS:
         raise ValueError("Unrecognized laboratory fault target")
     if action == "resync_policy":
-        request(fault_target, "/admin/fault/none/0", method="POST", token=control_token)
+        # A resync cannot magically repair a broken Kafka consumer. Keep the
+        # injected event-loss/latency fault active throughout the action.
         status, _, _ = request("authority", "/control/resync", method="POST", token=control_token, timeout=10)
         if status != 202:
             raise RuntimeError("Resynchronization not published")
