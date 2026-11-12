@@ -197,7 +197,11 @@ public final class EnforcementController {
     /**
      * Performs an actual HTTP refresh after TTL expiration, if enabled.
      *
-     * <p>An unreachable authority leaves the last known revision cached and
+     * <p>A freshly restarted process may initially have an unassigned trial;
+     * its first successful authority HTTP refresh binds the current authoritative
+     * trial and recovers desired policy. This gives process restart an actual
+     * recovery mechanism without clearing the Kafka consumer fault. An
+     * unreachable authority leaves the last known revision cached and
      * records the failure for privileged inspection. This models stale
      * enforcement under connectivity faults but does not claim to implement
      * a production fail-closed identity system.</p>
@@ -209,8 +213,10 @@ public final class EnforcementController {
                     .uri(URI.create(authorityUrl + "/internal/policy"))
                     .header("X-Lab-Internal", internalToken)
                     .retrieve().body(PolicyRevision.class);
-            if (result != null && result.trialId().equals(cached.trialId())
-                    && result.revision() >= cached.revision()) {
+            if (result != null
+                    && (cached.trialId().equals("unassigned")
+                        || (result.trialId().equals(cached.trialId())
+                            && result.revision() >= cached.revision()))) {
                 cached = result;
             }
             refreshedAtMs = System.currentTimeMillis();
