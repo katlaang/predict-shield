@@ -193,6 +193,7 @@ def load_executed_dataset(path: Path) -> list[dict]:
         # Target labels are isolated until this post-hoc training/evaluation phase.
         examples.append({
             "group": conf, "partition": partition,
+            "complexity_stratum": a.get("complexity_stratum", "SIMPLE"),
             "repeat": a["repeat"],
             "restart_permitted": policy["restart_permitted"],
             "absolute_error_budget_requests": policy["absolute_error_budget_requests"],
@@ -398,6 +399,20 @@ def train_evaluate(rows: list[dict], seed: int = 20261110,
     report["offline_decision_sensitivity"] = evaluate_sensitivity(
         test_rows, offline_predictions
     )
+    # Prospective crossover: describe results at every declared difficulty
+    # level without filtering for strata where AI happens to outperform a rule.
+    report["complexity_crossover"] = {}
+    for level in ("SIMPLE", "INTERACTION", "PARTIAL_VISIBILITY"):
+        selected = [r for r in test_rows if r["complexity_stratum"] == level]
+        if selected:
+            keys = {(r["group"], r["repeat"], r["action"]) for r in selected}
+            report["complexity_crossover"][level] = evaluate_sensitivity(
+                selected, {k: p for k, p in offline_predictions.items() if k in keys}
+            )
+        else:
+            report["complexity_crossover"][level] = {
+                "not_evaluable": "No registered held-out groups in this stratum"
+            }
     if export_path is not None:
         # Only load model artifacts created in a trusted local environment.
         # The scikit-learn serialization is pickle-based and unsafe to load
