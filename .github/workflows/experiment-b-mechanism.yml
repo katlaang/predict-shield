@@ -70,6 +70,20 @@ jobs:
           assert omitted["full_scope_verification_status"] == "INDETERMINATE"
           print("PASS: separate enforcers, Kafka fault, action effects and regression")
           PY
+      - name: Exercise physical authority outage and fail-closed recovery constraints
+        working-directory: experiment-b/mechanism-lab
+        run: |
+          python physical_faults.py --execute-lab --output reports/ci-authority-outage.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          result=json.loads(Path("reports/ci-authority-outage.json").read_text())
+          assert result["outcome"] == "MECHANISM_CONSTRAINT_OBSERVED"
+          assert result["resync_unavailable"] is True
+          assert result["authority_still_unavailable"] is True
+          assert result["enforcer_restart_ready_seconds"] >= 0
+          print("PASS: external authority physically down through resync and local restart")
+          PY
       - name: Generate grouped 100 by 4 by 3 mechanism experiment plan
         working-directory: experiment-b/mechanism-lab
         run: python plan.py --output plans/ci-mechanism
