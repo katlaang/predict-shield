@@ -101,7 +101,8 @@ def wait_for_target(name: str, timeout_seconds: float = 90) -> float:
 def setup_fault(control_token: str, *, ttl_ms: int, delay_ms: int,
                 fault_target: str = "enforcer-b",
                 fault_mode: str = "loss",
-                oracle_token: str | None = None) -> None:
+                oracle_token: str | None = None,
+                gateway_includes_hidden: bool = True) -> None:
     """Reset all JVMs and inject a configured actual Kafka consumer fault.
 
     Faults are set on a named process before the policy event is published.
@@ -112,6 +113,10 @@ def setup_fault(control_token: str, *, ttl_ms: int, delay_ms: int,
     status, _, _ = request("gateway", "/admin/restore", method="POST", token=control_token)
     if status != 200:
         raise RuntimeError("Gateway restore failed")
+    routing = "/admin/include-hidden" if gateway_includes_hidden else "/admin/omit-hidden"
+    route_status, _, _ = request("gateway", routing, method="POST", token=control_token)
+    if route_status != 200:
+        raise RuntimeError("Could not establish experimental gateway inventory")
     for node in ENFORCERS:
         status, _, _ = request(node, f"/admin/reset/{ttl_ms}", method="POST", token=control_token)
         if status != 200:
@@ -290,18 +295,19 @@ def measure_under_load(action: str, control_token: str, *,
 def run_case(action: str, control_token: str, oracle_token: str,
              *, ttl_ms: int = 30000, rps: int = 30,
              fault_mode: str = "loss", fault_target: str = "enforcer-b",
-             delay_ms: int = 200, duration_seconds: float = 5) -> dict:
+             delay_ms: int = 200, duration_seconds: float = 5,
+             gateway_includes_hidden: bool = True) -> dict:
     """Reset all processes, inject event loss and measure one candidate action."""
     setup_fault(control_token, ttl_ms=ttl_ms, delay_ms=delay_ms,
                 fault_target=fault_target, fault_mode=fault_mode,
-                oracle_token=oracle_token)
-    before_probes = gateway_probes()
+                oracle_token=oracle_token, gateway_includes_hidden=gateway_includes_hidden)
+    before_probes = gateway_probes(count=8)
     before_truth = oracle_snapshot(oracle_token)
     operations = measure_under_load(action, control_token, requests_per_second=rps,
                                     duration_seconds=duration_seconds,
                                     fault_target=fault_target)
     time.sleep(0.7)
-    after_probes = gateway_probes()
+    after_probes = gateway_probes(count=8)
     recovery_wait_seconds = (
         wait_for_target(fault_target) if action == "restart_enforcer" else 0.0
     )
@@ -312,6 +318,8 @@ def run_case(action: str, control_token: str, oracle_token: str,
         "fault_target": fault_target,
         "cache_ttl_ms": ttl_ms,
         "event_delay_ms": delay_ms,
+        "gateway_includes_hidden": gateway_includes_hidden,
+        "path_access_exposed": any(p["http_status"] == 200 for p in after_probes),
         "action": action,
         "before": {"verifier_gateway_probes": before_probes,
                    "oracle": before_truth},
@@ -361,7 +369,8 @@ def run_hidden_target_case(control_token: str, oracle_token: str) -> dict:
     independent inventory reconciliation.
     """
     setup_fault(control_token, ttl_ms=30000, delay_ms=0,
-                fault_target="enforcer-hidden", oracle_token=oracle_token)
+                fault_target="enforcer-hidden", oracle_token=oracle_token,
+                gateway_includes_hidden=False)
     gateway = gateway_probes(count=6)
     oracle = oracle_snapshot(oracle_token)
     return {
