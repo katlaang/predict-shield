@@ -53,9 +53,9 @@ jobs:
           r=d["silent_regression"]
           assert r["pre_regression_oracle"]["all_revoked_access_denied"] is True
           assert r["post_regression_oracle"]["all_revoked_access_denied"] is False
-          # Gateway restriction now denies only the protected revoked route;
-          # legitimate service traffic must continue without deliberate 503s.
-          assert cases["gateway_restrict"]["operations"]["non_200_requests"] == 0
+          # Gateway restriction denies the protected operation for both
+          # revoked and authorized test identities, producing real collateral cost.
+          assert cases["gateway_restrict"]["operations"]["non_200_requests"] > 0
           omitted=d["omitted_enforcement_point"]
           assert omitted["gateway_only_looks_clean"] is True
           assert omitted["oracle"]["all_revoked_access_denied"] is False
@@ -71,7 +71,7 @@ jobs:
           for start in 0 4 12 16 24 28 228 232 336 340; do
             python campaign.py --execute-lab --plan plans/ci-mechanism --records results/ci-mechanism --start "$start" --max-trials 4
           done
-      - name: Audit 24 executed records, preserving four separate streams
+      - name: Audit 40 executed records across five configurations and four streams
         working-directory: experiment-b/mechanism-lab
         run: |
           python campaign.py --audit --plan plans/ci-mechanism --records results/ci-mechanism > reports/ci-campaign-audit.json
@@ -93,7 +93,7 @@ jobs:
           assert len({r["configuration_id"] for r in records}) == 5
           assert {r["repeat"] for r in records} == {0,1}
           assert {r["experimental_conditions"]["fault_mode"] for r in records} == {
-              "loss","delay","reorder"
+              "loss","delay","duplicate","reorder"
           }
           assert all(r["oracle_features_excluded"] for r in records)
           assert {r["complexity_stratum"] for r in records} == {
@@ -108,8 +108,13 @@ jobs:
           for r in reorder:
               oracle=json.loads((root/"oracle"/(r["run_id"]+".json")).read_text())
               target=r["experimental_conditions"]["fault_target"]
+              # Oracle entries use upstream URLs, not short service names.
+              # Normalize the real URL host instead of claiming the fault was
+              # exercised based on a mismatched node identifier.
+              from urllib.parse import urlsplit
               selected=[x["admin"].get("reordered_event_pairs",0)
-                        for x in oracle["after"]["targets"] if x["node"]==target]
+                        for x in oracle["after"]["targets"]
+                        if urlsplit(x["node"]).hostname==target]
               assert len(selected)==1
               observed_pairs.extend(selected)
           assert any(n > 0 for n in observed_pairs), "Real reordered Kafka events were not observed"
