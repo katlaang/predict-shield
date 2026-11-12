@@ -42,6 +42,8 @@ OPERATOR_FEATURES = (
     "operator_revision_spread", "operator_max_cache_age_ms",
     "operator_refresh_failure_count", "operator_pending_callback_count",
     "operator_handled_event_spread",
+    "operator_max_service_latency_ms",
+    "operator_service_latency_spread_ms",
 )
 FEATURES = (
     "cache_ttl_ms", "requested_rps", "gateway_visible_enforcer_count",
@@ -65,6 +67,9 @@ def summarize_operator_telemetry(observations: list[dict]) -> dict[str, float]:
     missing = (len(observations) - len(observed)) if observations else 4
     revisions = [int(x["applied_revision"]) for x in observed]
     handled = [int(x["handled_events"]) for x in observed]
+    configured_latency = [
+        int(x.get("legitimate_service_latency_ms", 0)) for x in observed
+    ]
     return {
         "operator_observed_count": float(len(observed)),
         "operator_missing_count": float(missing),
@@ -77,6 +82,11 @@ def summarize_operator_telemetry(observations: list[dict]) -> dict[str, float]:
             x["scheduled_callbacks_pending"] for x in observed)),
         "operator_handled_event_spread": float(
             max(handled) - min(handled)) if handled else 0.,
+        "operator_max_service_latency_ms": float(
+            max(configured_latency) if configured_latency else 0),
+        "operator_service_latency_spread_ms": float(
+            max(configured_latency) - min(configured_latency)
+        ) if configured_latency else 0.,
     }
 
 
