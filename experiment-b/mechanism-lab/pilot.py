@@ -103,7 +103,8 @@ def setup_fault(control_token: str, *, ttl_ms: int, delay_ms: int,
                 fault_target: str = "enforcer-b",
                 fault_mode: str = "loss",
                 oracle_token: str | None = None,
-                gateway_includes_hidden: bool = True) -> None:
+                gateway_includes_hidden: bool = True,
+                routing_profile: str = "balanced") -> None:
     """Reset all JVMs and inject a configured actual Kafka consumer fault.
 
     Faults are set on a named process before the policy event is published.
@@ -118,6 +119,14 @@ def setup_fault(control_token: str, *, ttl_ms: int, delay_ms: int,
     route_status, _, _ = request("gateway", routing, method="POST", token=control_token)
     if route_status != 200:
         raise RuntimeError("Could not establish experimental gateway inventory")
+    if routing_profile not in {"balanced", "skewed_a", "skewed_hidden"}:
+        raise ValueError("Unregistered gateway profile")
+    route_status, _, _ = request(
+        "gateway", "/admin/traffic/" + routing_profile,
+        method="POST", token=control_token
+    )
+    if route_status != 200:
+        raise RuntimeError("Could not configure registered gateway profile")
     for node in ENFORCERS:
         status, _, _ = request(node, f"/admin/reset/{ttl_ms}", method="POST", token=control_token)
         if status != 200:
@@ -452,11 +461,13 @@ def run_case(action: str, control_token: str, oracle_token: str,
              *, ttl_ms: int = 30000, rps: int = 30,
              fault_mode: str = "loss", fault_target: str = "enforcer-b",
              delay_ms: int = 200, duration_seconds: float = 5,
-             gateway_includes_hidden: bool = True) -> dict:
+             gateway_includes_hidden: bool = True,
+             routing_profile: str = "balanced") -> dict:
     """Reset all processes, inject event loss and measure one candidate action."""
     setup_fault(control_token, ttl_ms=ttl_ms, delay_ms=delay_ms,
                 fault_target=fault_target, fault_mode=fault_mode,
-                oracle_token=oracle_token, gateway_includes_hidden=gateway_includes_hidden)
+                oracle_token=oracle_token, gateway_includes_hidden=gateway_includes_hidden,
+                routing_profile=routing_profile)
     before_probes = gateway_probes(count=8)
     before_operator_telemetry = operator_telemetry(control_token)
     before_scope = gateway_scope_evidence(control_token, before_probes)
@@ -481,6 +492,7 @@ def run_case(action: str, control_token: str, oracle_token: str,
         "cache_ttl_ms": ttl_ms,
         "event_delay_ms": delay_ms,
         "gateway_includes_hidden": gateway_includes_hidden,
+        "routing_profile": routing_profile,
         "path_access_exposed": any(p["http_status"] == 200 for p in after_probes),
         "action": action,
         "before": {"verifier_gateway_probes": before_probes,
