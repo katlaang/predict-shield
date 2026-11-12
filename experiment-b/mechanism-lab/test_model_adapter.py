@@ -93,7 +93,9 @@ class ModelDecisionIntegrationTests(unittest.TestCase):
         selection = select_action(
             self.snapshot, self.actions, predictions, {"authorization": 50.0})
         self.assertFalse(selection.abstained)
-        self.assertEqual(selection.selected.action_id, "resync_policy")
+        # With the mock's lower residual risk, restart is ranked above
+        # resync under this intentionally synthetic safety-gate fixture.
+        self.assertEqual(selection.selected.action_id, "restart_enforcer")
         self.assertTrue(all(item.training_fingerprint == "unit-test-only"
                             for item in predictions))
         # The model predicts absolute failed HTTP request counts directly;
