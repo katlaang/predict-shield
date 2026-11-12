@@ -214,6 +214,7 @@ def collect_batch(configs: list[dict], trials: list[dict], output: Path,
             fault_target=conf["fault_target"],
             delay_ms=conf["event_delay_ms"],
             duration_seconds=conf["measurement_seconds"],
+            gateway_includes_hidden=conf.get("gateway_includes_hidden", True),
         )
         records = separate_records(conf, trial, measured)
         write_trial_records(output, records)
