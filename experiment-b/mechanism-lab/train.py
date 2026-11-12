@@ -24,6 +24,7 @@ import json
 import math
 import os
 from collections import Counter
+from decision_eval import evaluate_regret
 from pathlib import Path
 
 FAULTS = ("loss", "delay", "duplicate", "reorder")
@@ -310,6 +311,24 @@ def train_evaluate(rows: list[dict], seed: int = 20261110,
             "heldout_test_count": len(test),
             "caveat": "Only measured laboratory behavior; not conditional service safety",
         }
+    # Evaluate the complete *decision*, not only per-target regression MAE.
+    # The hidden test outcomes are read exclusively by evaluate_regret as a
+    # hindsight scoring oracle, never as model features or action preferences.
+    test_rows = groups["test"]
+    offline_predictions = {}
+    for i, row in enumerate(test_rows):
+        key = (row["group"], row["repeat"], row["action"])
+        if key in offline_predictions:
+            raise ValueError("Duplicate held-out decision candidate")
+        offline_predictions[key] = {
+            label: max(0.0, min(1.0, float(model.predict(
+                matrices["test"][i:i+1]
+            )[0])))
+            for label, model in fitted_models.items()
+        }
+    report["offline_decision_evaluation"] = evaluate_regret(
+        test_rows, offline_predictions
+    )
     if export_path is not None:
         # Only load model artifacts created in a trusted local environment.
         # The scikit-learn serialization is pickle-based and unsafe to load
