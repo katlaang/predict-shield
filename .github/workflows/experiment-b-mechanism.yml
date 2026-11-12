@@ -65,10 +65,10 @@ jobs:
       - name: Generate grouped 100 by 4 by 3 mechanism experiment plan
         working-directory: experiment-b/mechanism-lab
         run: python plan.py --output plans/ci-mechanism
-      - name: 'Execute repeated pilot: loss, delay and genuine two-revision reorder'
+      - name: 'Execute repeated pilot: loss, delay, reorder and restart-prohibited loss'
         working-directory: experiment-b/mechanism-lab
         run: |
-          for start in 0 4 12 16 36 40; do
+          for start in 0 4 12 16 36 40 96 100; do
             python campaign.py --execute-lab --plan plans/ci-mechanism --records results/ci-mechanism --start "$start" --max-trials 4
           done
       - name: Audit 24 executed records, preserving four separate streams
@@ -79,23 +79,25 @@ jobs:
           import json
           from pathlib import Path
           d=json.loads(Path("reports/ci-campaign-audit.json").read_text())
-          assert d["complete"] == 24 and d["missing"] == 1176
+          assert d["complete"] == 32 and d["missing"] == 1168
           assert d["partial"] == d["invalid"] == d["unexpected_files"] == 0
           assert not d["ready_for_training"]
           root=Path("results/ci-mechanism")
           id_sets=[]
           for stream in ("pre_action","verification","operations","oracle"):
               paths=list((root/stream).glob("*.json"))
-              assert len(paths)==24, (stream, len(paths))
+              assert len(paths)==32, (stream, len(paths))
               id_sets.append({p.name for p in paths})
           assert all(items == id_sets[0] for items in id_sets)
           records=[json.loads(p.read_text()) for p in (root/"pre_action").glob("*.json")]
-          assert len({r["configuration_id"] for r in records}) == 3
+          assert len({r["configuration_id"] for r in records}) == 4
           assert {r["repeat"] for r in records} == {0,1}
           assert {r["experimental_conditions"]["fault_mode"] for r in records} == {
               "loss","delay","reorder"
           }
           assert all(r["oracle_features_excluded"] for r in records)
+          frozen=[r for r in records if not r["decision_policy_metadata"]["restart_permitted"]]
+          assert len(frozen)==8 and {r["configuration_id"] for r in frozen}=={"mechanism-008"}
           reorder=[r for r in records
                    if r["experimental_conditions"]["fault_mode"] == "reorder"]
           observed_pairs=[]
@@ -107,12 +109,12 @@ jobs:
               assert len(selected)==1
               observed_pairs.extend(selected)
           assert any(n > 0 for n in observed_pairs), "Real reordered Kafka events were not observed"
-          print("PASS: 24 genuine paired replays; two repetitions per configuration; broker reordering observed")
+          print("PASS: 32 genuine paired replays, repeated fault/freeze conditions, broker reordering observed")
           PY
       - name: Score observed engineering rule and fixed playbooks across sensitivity weights
         working-directory: experiment-b/mechanism-lab
         run: |
-          python pilot_regret.py --plan plans/ci-mechanism --records results/ci-mechanism --configurations mechanism-000 mechanism-001 mechanism-003 --report reports/ci-repeated-pilot-regret.json
+          python pilot_regret.py --plan plans/ci-mechanism --records results/ci-mechanism --configurations mechanism-000 mechanism-001 mechanism-003 mechanism-008 --report reports/ci-repeated-pilot-regret.json
       - name: Remove restricted research and oracle trial files before artifact upload
         if: always()
         working-directory: experiment-b/mechanism-lab
