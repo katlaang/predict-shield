@@ -62,7 +62,13 @@ def create_plan(seed: int = SEED) -> tuple[list[dict], list[dict]]:
             "routing_profile": ("balanced", "skewed_a", "skewed_hidden")[
                 (i // 4) % 3
             ],
-            "node_service_latency_ms": [0, 15, 50, 100],
+            # Values affect actual JVM handler execution, not generated
+            # result labels. SIMPLE has uniform service time; harder strata
+            # vary independent per-node latency for each configuration.
+            "node_service_latency_ms": (
+                [15, 15, 15, 15] if (i // 12) % 3 == 0
+                else [rng.choice((0, 10, 25, 55, 100, 140)) for _ in range(4)]
+            ),
             # Complexity uses a 12-case block, independent of the
             # 4-case routing-profile cycle. Every 12-case block contains
             # all three routing profiles and every fault family, so
