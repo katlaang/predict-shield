@@ -35,6 +35,21 @@ class MechanismDatasetTests(unittest.TestCase):
         self.assertTrue(any(x["fault_target"] == "enforcer-hidden"
                             for x in configs))
 
+    def test_strata_have_multiple_routing_profiles(self):
+        """Difficulty cannot merely re-label balanced versus skewed traffic."""
+        configs, _ = create_plan()
+        for level in ("SIMPLE", "INTERACTION", "PARTIAL_VISIBILITY"):
+            group = [c for c in configs if c["complexity_stratum"] == level]
+            self.assertGreaterEqual(len(group), 12)
+            self.assertEqual(
+                {c["routing_profile"] for c in group},
+                {"balanced", "skewed_a", "skewed_hidden"}
+            )
+            self.assertEqual(
+                {c["fault_mode"] for c in group},
+                {"loss", "delay", "duplicate", "reorder"}
+            )
+
     def test_no_manifest_oracle_labels(self):
         """Manifest never substitutes for an executed measurement."""
         _, trials = create_plan()
