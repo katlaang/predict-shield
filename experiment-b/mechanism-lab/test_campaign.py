@@ -6,7 +6,7 @@ import unittest
 from pathlib import Path
 
 from audit import audit_campaign
-from campaign import exclusive_lock, next_trials, register_plan
+from campaign import exclusive_lock, next_trials, register_plan, register_source
 from plan import create_plan
 
 
@@ -28,6 +28,15 @@ class CampaignTests(unittest.TestCase):
         modified[0]["cache_ttl_ms"] += 1
         with self.assertRaises(ValueError):
             register_plan(self.root, modified, self.trials)
+
+    def test_campaign_source_revision_is_pinned(self):
+        """Replays cannot silently mix measurements from different code commits."""
+        register_source(self.root, "a" * 40)
+        register_source(self.root, "a" * 40)
+        with self.assertRaises(ValueError):
+            register_source(self.root, "b" * 40)
+        with self.assertRaises(ValueError):
+            register_source(self.root, "not-a-commit")
 
     def test_resume_chooses_only_missing_trial_ids(self):
         """A new campaign starts with exactly its declared first bounded batch."""
