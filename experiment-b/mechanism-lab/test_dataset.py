@@ -25,6 +25,16 @@ class MechanismDatasetTests(unittest.TestCase):
             self.assertEqual({x["action_id"] for x in group}, set(ACTIONS))
             self.assertEqual(len({x["initial_state_seed"] for x in group}), 1)
 
+    def test_topology_is_not_confounded_with_fault_family(self):
+        """Every fault family must include both full and omitted gateway scope."""
+        configs, _ = create_plan()
+        for fault in ("loss", "delay", "duplicate", "reorder"):
+            coverage = {x["gateway_includes_hidden"] for x in configs
+                        if x["fault_mode"] == fault}
+            self.assertEqual(coverage, {True, False})
+        self.assertTrue(any(x["fault_target"] == "enforcer-hidden"
+                            for x in configs))
+
     def test_no_manifest_oracle_labels(self):
         """Manifest never substitutes for an executed measurement."""
         _, trials = create_plan()
