@@ -32,9 +32,6 @@ def run_consumer_pause(control_token: str, oracle_token: str) -> dict:
     health, _, _ = request("enforcer-b", "/healthz")
     if health != 200:
         raise RuntimeError("Target JVM not initially healthy")
-    status, pre, _ = request("enforcer-b", "/admin/state", oracle=oracle_token)
-    if status != 200:
-        raise RuntimeError("Private pre-state unavailable")
     paused = False
     try:
         response, _, _ = request("enforcer-b", "/admin/consumer/pause",
@@ -43,6 +40,9 @@ def run_consumer_pause(control_token: str, oracle_token: str) -> dict:
             raise RuntimeError("Kafka pause not accepted")
         paused = True
         state = wait_state(control_token, True)
+        status, pre, _ = request("enforcer-b", "/admin/state", oracle=oracle_token)
+        if status != 200:
+            raise RuntimeError("Private state unavailable after pause")
         health_during_pause, _, _ = request("enforcer-b", "/healthz")
         if health_during_pause != 200:
             raise RuntimeError("Whole JVM stopped instead of Kafka-only listener")
