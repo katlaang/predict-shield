@@ -1,0 +1,54 @@
+name: Verify pinned historical threat-data acquisition
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'engine/predict_shield/archive_acquire.py'
+      - 'engine/predict_shield/threat_intel.py'
+      - 'docs/research/data/historical_sources_2026_10.json'
+      - '.github/workflows/threat-archive-audit.yml'
+jobs:
+  pinned-source-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify source commits predate research cutoff
+        run: |
+          python - <<'PY'
+          import json
+          from datetime import date
+          from pathlib import Path
+          x=json.loads(Path("docs/research/data/historical_sources_2026_10.json").read_text())
+          assert x["as_of"]=="2026-10-02"
+          assert all(date.fromisoformat(x[k]["commit_observed_date"])<=date.fromisoformat(x["as_of"])
+                     for k in ("epss","kev_before"))
+          PY
+      - name: Fetch actual pinned archive bytes and validate source dates
+        run: |
+          PYTHONPATH=engine python -m predict_shield.archive_acquire \
+            --manifest docs/research/data/historical_sources_2026_10.json \
+            --output-dir /tmp/predict-shield-archives
+      - name: Verify acquired bytes and record non-sensitive SHA manifest only
+        run: |
+          python - <<'PY'
+          import hashlib,json
+          from pathlib import Path
+          root=Path("/tmp/predict-shield-archives")
+          evidence=json.loads((root/"acquisition.json").read_text())
+          assert set(evidence["artifacts"])=={"epss","kev_before","kev_after"}
+          for x in evidence["artifacts"].values():
+              assert hashlib.sha256((root/x["filename"]).read_bytes()).hexdigest()==x["sha256"]
+              print(x["filename"],x["sha256"],x["record_count"])
+          Path("threat-source-hashes.json").write_text(json.dumps(evidence,indent=2)+"\n")
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pinned-threat-source-provenance
+          path: threat-source-hashes.json
+      - name: Remove original threat archives
+        if: always()
+        run: rm -rf /tmp/predict-shield-archives
