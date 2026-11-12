@@ -243,3 +243,41 @@ established service error budgets.
 defensive selection, or that it can be deployed safely.** The existing
 model-to-gate-to-selector code can abstain, but automatic action dispatch
 remains intentionally disabled.
+
+
+## Trial epoch isolation (implementation hardening)
+
+The enforcement JVM now increments an internal experiment epoch whenever its
+admin reset endpoint starts a new trial. Real delayed and duplicate Kafka
+consumer callbacks capture their originating epoch and are prevented from
+mutating the next trial's cache after a reset. This closes a previously
+uncontrolled cross-trial callback race. Each newly declared Java method and
+the focused JUnit suite document the exact synchronization and invalidation
+semantics. The Java image build now runs JUnit tests rather than skipping
+them. An oracle snapshot can expose pending scheduled callbacks and requires
+the scheduled callback queue to reach quiescence before a new policy fault is
+injected.
+
+The safeguard protects callback execution in the JVM. It does **not** prove
+external broker/network quiescence or eliminate the effects of an unconsumed
+Kafka event that arrives after a reset. An independently replayable experiment
+will also need a per-trial event envelope with an authoritative event epoch,
+a consumer-acknowledgment barrier, and controlled treatment of retries.
+
+## Quality gate before model-effectiveness claims
+
+After all 1,200 trials have actually been collected and independently audited:
+
+~~~bash
+python quality.py --records results/mechanism \
+  --report reports/mechanism-data-quality.json
+~~~
+
+This is a read-only, measured-only diagnostic. It counts fault-family
+coverage, configurations per split, repeated-label variation and distinct
+observed service-health outcomes. It cannot train a model, manufacture a
+label, or prove a generalizable cybersecurity benefit. In particular,
+duplicates of a monotonic revision may be correctly ignored by an
+idempotent consumer, and one held event does not constitute a meaningful
+multi-revision reordering trial. Both situations require explicit analysis
+before claiming that the corresponding fault family has been evaluated.
