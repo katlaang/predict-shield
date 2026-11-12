@@ -240,12 +240,33 @@ public final class EnforcementController {
     }
 
     /**
-     * Enforces authorization for the revoked synthetic principal over HTTP.
+     * Enforces a disposable revoked principal and a separate authorized
+     * laboratory principal on the same protected resource.
      *
-     * @return 403 when the local policy denies access; 200 when it permits
+     * <p>Authorized-protected traffic incurs a real denial when a gateway
+     * restriction blocks the protected route wholesale. This is essential
+     * for measuring intervention cost instead of giving gateway restriction
+     * a zero-disruption advantage. The X-Lab-Principal header is a synthetic
+     * test marker, NOT authenticated identity or a production security
+     * boundary. It is accepted only inside the isolated testbed.</p>
+     *
+     * @param principal synthetic test-only principal type; "authorized" is
+     *                  permitted, missing values represent the revoked test user
+     * @return 403 for denied revoked access; 200 for genuinely permitted
+     *         laboratory operations
      */
     @GetMapping("/protected")
-    public synchronized ResponseEntity<Map<String, Object>> protectedOperation() {
+    public synchronized ResponseEntity<Map<String, Object>> protectedOperation(
+            @RequestHeader(value = "X-Lab-Principal", required = false) String principal) {
+        // Test-only identity: the header is NOT authenticated and must not
+        // be used as an authorization mechanism outside this isolated lab.
+        // Its purpose is to observe how coarse gateway restriction affects
+        // authorized users of the SAME protected operation.
+        if ("authorized".equals(principal)) {
+            return ResponseEntity.ok(Map.of(
+                    "decision", "ALLOW", "instance", identity,
+                    "principal_type", "authorized_test_identity"));
+        }
         refreshIfExpired();
         return cached.revoked()
                 ? ResponseEntity.status(HttpStatus.FORBIDDEN)
