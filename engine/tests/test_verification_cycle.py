@@ -27,7 +27,7 @@ class VerificationFeedbackTests(unittest.TestCase):
                                  policy="adaptive")
         self.assertEqual(len(requests), 1)
         updated, record = record_probe(control, requests[0],
-                                       [self.evidence()], observed_at=self.NOW)
+                                       [self.evidence()], observed_at=self.NOW, requested_at=self.NOW - 50)
         self.assertEqual(record.outcome, Outcome.VERIFIED)
         self.assertEqual(updated.last_verified_at, self.NOW)
         self.assertIsNone(updated.changed_at)
@@ -40,7 +40,7 @@ class VerificationFeedbackTests(unittest.TestCase):
                                 budget=1, policy="change")[0]
         updated, record = record_probe(control, request,
                                        [self.evidence(independent=False)],
-                                       observed_at=self.NOW)
+                                       observed_at=self.NOW, requested_at=self.NOW - 50)
         self.assertEqual(record.outcome, Outcome.INDETERMINATE)
         self.assertEqual(updated, control)
 
@@ -49,7 +49,7 @@ class VerificationFeedbackTests(unittest.TestCase):
         request = select_probes([control], now=self.NOW,
                                 budget=1, policy="change")[0]
         updated, record = record_probe(control, request, [self.evidence(False)],
-                                       observed_at=self.NOW)
+                                       observed_at=self.NOW, requested_at=self.NOW - 50)
         self.assertEqual(record.outcome, Outcome.NOT_VERIFIED)
         self.assertEqual(updated, control)
         self.assertEqual(len(select_probes([updated], now=self.NOW,
@@ -62,7 +62,7 @@ class VerificationFeedbackTests(unittest.TestCase):
         updated, record = record_probe(control, request,
                                        [self.evidence(True, False, "self"),
                                         self.evidence(False, True, "probe")],
-                                       observed_at=self.NOW)
+                                       observed_at=self.NOW, requested_at=self.NOW - 50)
         self.assertEqual(record.outcome, Outcome.NOT_VERIFIED)
         self.assertTrue(record.conflicting_evidence)
         self.assertEqual(updated, control)
@@ -71,7 +71,7 @@ class VerificationFeedbackTests(unittest.TestCase):
         from predict_shield.reverification import ProbeRequest
         with self.assertRaisesRegex(ValueError, "does not match"):
             record_probe(self.control(), ProbeRequest("other", "test", 1),
-                         [self.evidence()], observed_at=self.NOW)
+                         [self.evidence()], observed_at=self.NOW, requested_at=self.NOW - 50)
 
     def test_outdated_evidence_does_not_advance_clock(self):
         control = self.control()
@@ -81,9 +81,19 @@ class VerificationFeedbackTests(unittest.TestCase):
                          datetime.fromtimestamp(self.NOW-4000, tz=timezone.utc),
                          "independent-prober", True)
         updated, record = record_probe(control, request, [stale],
-                                       observed_at=self.NOW)
+                                       observed_at=self.NOW, requested_at=self.NOW - 50)
         self.assertEqual(record.outcome, Outcome.INDETERMINATE)
         self.assertEqual(updated.last_verified_at, control.last_verified_at)
+
+    def test_change_after_request_must_remain_pending(self):
+        control = TrackedControl("control-1", "enforcer-b", "revoked-denied",
+                                 self.NOW - 100, 0.9, changed_at=self.NOW - 10)
+        request = select_probes([control], now=self.NOW, budget=1,
+                                policy="change")[0]
+        updated, record = record_probe(control, request, [self.evidence()],
+                                       observed_at=self.NOW, requested_at=self.NOW - 50)
+        self.assertEqual(record.outcome, Outcome.INDETERMINATE)
+        self.assertEqual(updated, control)
 
     def test_budget_restricts_probe_requests(self):
         a = self.control()
