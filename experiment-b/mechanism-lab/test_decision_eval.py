@@ -1,7 +1,7 @@
 """Tests for hindsight regret accounting without empirical effectiveness claims."""
 import unittest
 
-from decision_eval import ACTIONS, engineering_rule, evaluate_regret, observed_utility
+from decision_eval import ACTIONS, engineering_rule, evaluate_regret, observed_utility, evaluate_sensitivity
 
 
 class DecisionRegretTests(unittest.TestCase):
@@ -16,6 +16,8 @@ class DecisionRegretTests(unittest.TestCase):
                 for action in ACTIONS:
                     row = {
                         "group": group, "repeat": repeat,
+                        "restart_permitted": True,
+                        "absolute_error_budget_requests": 25,
                         "action": action,
                         "pre_action": {
                             "initial_gateway_allowed_fraction": 0.5,
@@ -23,6 +25,7 @@ class DecisionRegretTests(unittest.TestCase):
                         },
                         "label_path_exposure": float(action == "resync_policy"),
                         "label_security_exposure": float(action == "gateway_restrict"),
+                        "label_absolute_failed_requests": float(action == "restart_enforcer") * 5,
                         "label_service_failure_fraction": float(action == "restart_enforcer") * 0.2,
                     }
                     rows.append(row)
@@ -30,7 +33,7 @@ class DecisionRegretTests(unittest.TestCase):
                         k: row[k] for k in (
                             "label_path_exposure",
                             "label_security_exposure",
-                            "label_service_failure_fraction",
+                            "label_absolute_failed_requests",
                         )
                     }
         return rows, predictions
@@ -60,10 +63,29 @@ class DecisionRegretTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             evaluate_regret(rows, predictions)
 
+    def test_change_freeze_excludes_restart_even_if_predicted_best(self):
+        """A frozen restart must never be selected by an offline comparator."""
+        rows, predictions = self.cases()
+        for row in rows:
+            row["restart_permitted"] = False
+        report = evaluate_regret(rows, predictions)
+        self.assertEqual(
+            report["policies"]["fixed_restart_or_gateway"]["action_selection_counts"],
+            {"gateway_restrict": 6},
+        )
+        self.assertNotIn(
+            "restart_enforcer", report["policies"]["model"]["action_selection_counts"]
+        )
+
+    def test_predeclared_sensitivity_profiles(self):
+        """Use all three fixed research weights, not a test-selected optimum."""
+        rows, predictions = self.cases()
+        self.assertEqual(len(evaluate_sensitivity(rows, predictions)), 3)
+
     def test_outcome_normalization_is_mandatory(self):
         """Out-of-range risk or service failure measurements invalidate regret."""
         row = self.cases()[0][0]
-        row["label_service_failure_fraction"] = 1.2
+        row["label_path_exposure"] = 1.2
         with self.assertRaises(ValueError):
             observed_utility(row)
 
