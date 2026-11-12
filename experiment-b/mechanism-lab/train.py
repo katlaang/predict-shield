@@ -36,10 +36,46 @@ EXPECTED_TRIALS = 1200
 # The trained model must not see laboratory-injected fault labels or timing.
 # Those variables remain available only for post-hoc stratification and an
 # explicitly *privileged* diagnostic lookup baseline.
+OPERATOR_FEATURES = (
+    "operator_observed_count", "operator_missing_count",
+    "operator_revision_spread", "operator_max_cache_age_ms",
+    "operator_refresh_failure_count", "operator_pending_callback_count",
+    "operator_handled_event_spread",
+)
 FEATURES = (
     "cache_ttl_ms", "requested_rps", "gateway_visible_enforcer_count",
     "initial_gateway_allowed_fraction",
-) + tuple("action=" + x for x in ACTIONS)
+) + OPERATOR_FEATURES + tuple("action=" + x for x in ACTIONS)
+
+
+def summarize_operator_telemetry(observations: list[dict]) -> dict[str, float]:
+    """Derive only real pre-action operational signals and missingness.
+
+    Read-only operator telemetry is NOT the private oracle and does not
+    disclose injected fault identity, injection delay or a future outcome.
+    Differences in cached revisions are a proxy for synchronization state,
+    not a direct measurement of Kafka broker consumer lag. Missing endpoint
+    responses are counted explicitly rather than filled with success.
+    """
+    if not isinstance(observations, list):
+        raise ValueError("Operator observations must be an ordered list")
+    observed = [x for x in observations if x.get("observed") is True]
+    missing = len(observations) - len(observed)
+    revisions = [int(x["applied_revision"]) for x in observed]
+    handled = [int(x["handled_events"]) for x in observed]
+    return {
+        "operator_observed_count": float(len(observed)),
+        "operator_missing_count": float(missing),
+        "operator_revision_spread": float(max(revisions) - min(revisions)) if revisions else 0.,
+        "operator_max_cache_age_ms": float(max(
+            (x["cache_age_ms"] for x in observed), default=0)),
+        "operator_refresh_failure_count": float(sum(
+            x["refresh_failed"] is True for x in observed)),
+        "operator_pending_callback_count": float(sum(
+            x["scheduled_callbacks_pending"] for x in observed)),
+        "operator_handled_event_spread": float(
+            max(handled) - min(handled)) if handled else 0.,
+    }
 
 
 def _read_stream(path: Path) -> dict[str, dict]:
@@ -158,6 +194,7 @@ def load_executed_dataset(path: Path) -> list[dict]:
             "action": a["action_id"], "fault": conditions["fault_mode"],
             "target": conditions["fault_target"],
             "pre_action": {
+                **summarize_operator_telemetry(a.get("operator_observations", [])),
                 "cache_ttl_ms": features["cache_ttl_ms"],
                 "requested_rps": features["requested_rps"],
                 "gateway_visible_enforcer_count": features["visible_enforcement_processes"],
@@ -193,6 +230,7 @@ def to_features(row: dict) -> list[float]:
     return [float(p[k]) for k in (
         "cache_ttl_ms", "requested_rps",
         "gateway_visible_enforcer_count", "initial_gateway_allowed_fraction",
+        *OPERATOR_FEATURES,
     )] + [float(row["action"] == x) for x in ACTIONS]
 
 
@@ -388,7 +426,7 @@ def train_evaluate(rows: list[dict], seed: int = 20261110,
                 name: [float(matrices["train"][:, i].min()),
                        float(matrices["train"][:, i].max())]
                 for i, name in enumerate(FEATURES)
-                if i < 4
+                if i < 4 + len(OPERATOR_FEATURES)
             },
             "radii": calibration_radii,
             "models": fitted_models,
