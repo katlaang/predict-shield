@@ -103,6 +103,86 @@ def observable_telemetry_rule(row: dict) -> str:
     return "resync_policy"
 
 
+def tuned_rule_action(row: dict, parameters: dict) -> str:
+    """Choose a candidate using only pre-action data and training-fitted rules.
+
+    The parameters are selected exclusively on registered training groups.
+    Neither the true fault identity nor the observed action outcomes are
+    consulted at inference time. A restart freeze is a hard constraint.
+    """
+    pre = row["pre_action"]
+    if pre["initial_gateway_allowed_fraction"] <= 0:
+        return "monitor_only"
+    if not row["restart_permitted"]:
+        return "gateway_restrict"
+    if (pre["cache_ttl_ms"] >= parameters["ttl_threshold_ms"]
+            and pre["requested_rps"] <= parameters["load_threshold_rps"]
+            and pre.get("operator_revision_spread", 0) >=
+            parameters["revision_spread_threshold"]):
+        return "restart_enforcer"
+    if pre["requested_rps"] >= parameters["gateway_threshold_rps"]:
+        return "gateway_restrict"
+    return "resync_policy"
+
+
+def tune_rule_on_training_groups(rows: list[dict]) -> dict:
+    """Fit a finite, preregistered deterministic-rule grid on training groups.
+
+    Four replayed actions are required for each registered configuration and
+    repetition. Their measured outcomes may tune parameters *only in the
+    training split*. Validation/test outcomes never influence the grid choice.
+    The primary objective weights are frozen; ties break lexicographically.
+    """
+    from itertools import product
+    if not rows or any(r.get("partition") != "train" for r in rows):
+        raise ValueError("Rule tuning requires training partition only")
+    by_group = defaultdict(dict)
+    for r in rows:
+        key = (r["group"], r["repeat"])
+        if r["action"] in by_group[key]:
+            raise ValueError("Duplicate action in rule-fitting group")
+        by_group[key][r["action"]] = r
+    if any(set(group) != set(ACTIONS) for group in by_group.values()):
+        raise ValueError("Rule-fitting groups are incomplete")
+    grid = (
+        {"ttl_threshold_ms": ttl, "load_threshold_rps": load,
+         "revision_spread_threshold": spread,
+         "gateway_threshold_rps": gateway}
+        for ttl, load, spread, gateway in product(
+            (3500, 6500, 10000, 14000),
+            (15, 25, 35, 45, 55, 65),
+            (0, 1, 2),
+            (25, 40, 55),
+        )
+    )
+    best = None
+    for candidate in grid:
+        regrets = []
+        for group in by_group.values():
+            reference = next(iter(group.values()))
+            permitted = eligible_actions(reference)
+            actual = {action: observed_utility(group[action]) for action in permitted}
+            selected = tuned_rule_action(reference, candidate)
+            if selected not in permitted:
+                raise ValueError("Tuned deterministic rule selected prohibited action")
+            regrets.append(actual[selected] - min(actual.values()))
+        loss = sum(regrets) / len(regrets)
+        order = (loss, tuple(candidate[key] for key in (
+            "ttl_threshold_ms", "load_threshold_rps",
+            "revision_spread_threshold", "gateway_threshold_rps"
+        )))
+        if best is None or order < best[0]:
+            best = (order, candidate)
+    return {
+        "parameters": best[1],
+        "training_mean_hindsight_regret": best[0][0],
+        "training_configuration_groups": len({r["group"] for r in rows}),
+        "fitted_partition": "train",
+        "grid_size": 4 * 6 * 3 * 3,
+        "test_labels_used_for_fitting": False,
+    }
+
+
 def eligible_actions(row: dict) -> tuple[str, ...]:
     """Screen candidates using declared change-freeze constraints only.
 
@@ -120,6 +200,7 @@ def evaluate_regret(
     rows: list[dict],
     predictions: dict[tuple[str, int, str], dict[str, float]],
     weights: dict[str, float] = METRIC_WEIGHTS,
+    tuned_parameters: dict | None = None,
 ) -> dict:
     """Compare offline feasible model choices to human rules and fixed policies.
 
@@ -139,6 +220,8 @@ def evaluate_regret(
         raise ValueError("No measured matched action groups")
     names = ("model", "engineer_rule", "observable_telemetry_rule", "fixed_resync",
              "fixed_restart_or_gateway", "fixed_gateway", "fixed_monitor")
+    if tuned_parameters is not None:
+        names = (*names, "train_tuned_rule")
     totals = {name: {"regret": [], "utility": [], "optimal_matches": 0,
                      "choices": Counter()} for name in names}
     optimal_choice_counts = Counter()
@@ -177,6 +260,10 @@ def evaluate_regret(
             "fixed_gateway": "gateway_restrict",
             "fixed_monitor": "monitor_only",
         }
+        if tuned_parameters is not None:
+            selected["train_tuned_rule"] = tuned_rule_action(
+                reference, tuned_parameters
+            )
         for name, action in selected.items():
             if action not in allowed:
                 raise ValueError("An offline policy selected an ineligible action")
@@ -209,6 +296,7 @@ def evaluate_regret(
 def evaluate_sensitivity(
     rows: list[dict],
     predictions: dict[tuple[str, int, str], dict[str, float]],
+    tuned_parameters: dict | None = None,
 ) -> list[dict]:
     """Report all three preregistered utility choices without choosing a winner.
 
@@ -216,5 +304,6 @@ def evaluate_sensitivity(
     weaker evidence of robust decision improvement. Sensitivity calculations
     never alter the training split or the fitted model.
     """
-    return [evaluate_regret(rows, predictions, weights=w)
-            for w in SENSITIVITY_WEIGHTS]
+    return [evaluate_regret(
+        rows, predictions, weights=w, tuned_parameters=tuned_parameters
+    ) for w in SENSITIVITY_WEIGHTS]
