@@ -57,8 +57,22 @@ def acquire(manifest: dict, directory: Path, fetcher=None) -> dict:
     horizon_end = cutoff + timedelta(days=int(manifest["horizon_days"]))
     if int(manifest["horizon_days"]) < 1:
         raise ValueError("Horizon must be positive")
-    rows = {}
+    if directory.exists() and any(directory.iterdir()):
+        raise FileExistsError("Acquisition destination must be empty")
+    directory.mkdir(parents=True, exist_ok=True)
     artifacts = {}
+    written = []
+    try:
+        return _acquire_to_empty_directory(manifest, directory, fetcher, cutoff, horizon_end, artifacts, written)
+    except Exception:
+        for file in written:
+            file.unlink(missing_ok=True)
+        raise
+
+
+def _acquire_to_empty_directory(manifest: dict, directory: Path, fetcher,
+                                cutoff: date, horizon_end: date,
+                                artifacts: dict, written: list[Path]) -> dict:
     for key in FIELDS:
         source = manifest[key]
         date_value = date.fromisoformat(source["snapshot_date"])
@@ -73,11 +87,11 @@ def acquire(manifest: dict, directory: Path, fetcher=None) -> dict:
             raise ValueError("Empty or oversized archive content")
         filename = {"epss": "epss.csv.gz", "kev_before": "kev-before.json",
                     "kev_after": "kev-after.json"}[key]
-        directory.mkdir(parents=True, exist_ok=True)
         path = directory / filename
         if path.exists():
             raise FileExistsError("Archive already exists: refusing overwrite")
         path.write_bytes(raw)
+        written.append(path)
         try:
             if key == "epss":
                 _, details = read_epss(path, source["snapshot_date"], manifest["as_of"])
