@@ -236,6 +236,7 @@ def collect_batch(configs: list[dict], trials: list[dict], output: Path,
             gateway_includes_hidden=conf.get("gateway_includes_hidden", True),
             routing_profile=conf.get("routing_profile", "balanced"),
             complexity_stratum=conf.get("complexity_stratum", "SIMPLE"),
+            node_service_latency_ms=tuple(conf["node_service_latency_ms"]),
         )
         records = separate_records(conf, trial, measured)
         write_trial_records(output, records)
