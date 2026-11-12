@@ -22,6 +22,11 @@ class DecisionRegretTests(unittest.TestCase):
                         "pre_action": {
                             "initial_gateway_allowed_fraction": 0.5,
                             "cache_ttl_ms": 9000,
+                            "requested_rps": 30,
+                            "operator_missing_count": 0,
+                            "operator_revision_spread": 1,
+                            "operator_refresh_failure_count": 0,
+                            "operator_max_cache_age_ms": 2000,
                         },
                         "label_path_exposure": float(action == "resync_policy"),
                         "label_security_exposure": float(action == "gateway_restrict"),
