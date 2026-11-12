@@ -63,8 +63,12 @@ def create_plan(seed: int = SEED) -> tuple[list[dict], list[dict]]:
                 (i // 4) % 3
             ],
             "node_service_latency_ms": [0, 15, 50, 100],
+            # Complexity uses a 12-case block, independent of the
+            # 4-case routing-profile cycle. Every 12-case block contains
+            # all three routing profiles and every fault family, so
+            # stratum is not merely another name for traffic weighting.
             "complexity_stratum": ("SIMPLE", "INTERACTION",
-                                   "PARTIAL_VISIBILITY")[(i // 4) % 3],
+                                   "PARTIAL_VISIBILITY")[(i // 12) % 3],
             # Decision-policy eligibility is not a fault-injection feature.
             # Replays still execute every candidate in a disposable lab to
             # estimate counterfactual outcomes; an offline policy must never
