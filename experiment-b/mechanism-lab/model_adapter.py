@@ -10,7 +10,7 @@ from __future__ import annotations
 
 from datetime import datetime, timezone
 
-from train import ACTIONS, FEATURES, to_features
+from train import ACTIONS, FEATURES, summarize_operator_telemetry, to_features
 
 from predict_shield.ai_contracts import (
     ActionPrediction, CandidateAction, EvidenceSnapshot, Interval,
@@ -76,6 +76,7 @@ def predictions_from_bundle(
         "requested_rps": features["requested_rps"],
         "gateway_visible_enforcer_count": features["visible_enforcement_processes"],
         "initial_gateway_allowed_fraction": allowed,
+        **summarize_operator_telemetry(pre_action.get("operator_observations", [])),
     }
     out_of_distribution = any(
         name not in bounds or float(value) < bounds[name][0]
