@@ -74,6 +74,7 @@ def load_executed_dataset(path: Path) -> list[dict]:
     partition_by_config: dict[str, str] = {}
     action_groups: dict[tuple[str, int], set[str]] = {}
     paired_static_features: dict[tuple[str, int], tuple] = {}
+    source_revisions: set[str] = set()
     for run_id in sorted(ids):
         a, v, o, oracle = (streams[key][run_id] for key in
                            ("pre_action", "verification", "operations", "oracle"))
@@ -81,8 +82,14 @@ def load_executed_dataset(path: Path) -> list[dict]:
             if (other["run_id"] != run_id or
                     other["configuration_id"] != a["configuration_id"] or
                     other["partition"] != a["partition"] or
-                    other["action_id"] != a["action_id"]):
-                raise ValueError("Cross-stream record identity mismatch")
+                    other["action_id"] != a["action_id"] or
+                    other.get("source_commit") != a.get("source_commit")):
+                raise ValueError("Cross-stream record identity or revision mismatch")
+        revision = a.get("source_commit")
+        if (not isinstance(revision, str) or len(revision) != 40
+                or any(c not in "0123456789abcdef" for c in revision)):
+            raise ValueError("Measured run has no valid source revision")
+        source_revisions.add(revision)
         if (a["experiment_type"] != "real_kafka_multijvm_lab"
                 or a.get("model_prediction_recorded") is not False
                 or a.get("oracle_features_excluded") is not True):
@@ -143,6 +150,8 @@ def load_executed_dataset(path: Path) -> list[dict]:
                 not oracle["after"]["all_revoked_access_denied"]),
             "label_service_failure_fraction": failures / attempted,
         })
+    if len(source_revisions) != 1:
+        raise ValueError("Refusing to fit a model on results from mixed source revisions")
     if Counter(partition_by_config.values()) != SPLITS:
         raise ValueError("Expected exactly 60/20/20 distinct configuration groups")
     if len(action_groups) != 300 or any(actions != set(ACTIONS)
