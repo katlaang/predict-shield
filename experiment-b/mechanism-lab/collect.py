@@ -133,6 +133,8 @@ def separate_records(config: dict, trial: dict, observed: dict) -> dict[str, dic
                 "fault_mode", "fault_target", "event_delay_ms",
             )},
             "gateway_includes_hidden": config.get("gateway_includes_hidden", True),
+            "routing_profile": config.get("routing_profile", "balanced"),
+            "complexity_stratum": config.get("complexity_stratum", "SIMPLE"),
             "decision_policy_metadata": {
                 "restart_permitted": config.get("restart_permitted", True),
                 "absolute_error_budget_requests": config.get(
