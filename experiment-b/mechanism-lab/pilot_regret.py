@@ -15,15 +15,89 @@ from __future__ import annotations
 import argparse
 import json
 from collections import Counter, defaultdict
+from itertools import product
 from pathlib import Path
 
 from audit import inspect_trial
 from collect import load_plan
 from decision_eval import (
     ACTIONS, SENSITIVITY_WEIGHTS, eligible_actions, engineering_rule,
-    observable_telemetry_rule, observed_utility,
+    observable_telemetry_rule, observed_utility, tuned_rule_action,
 )
 from train import summarize_operator_telemetry
+
+
+def exploratory_leave_one_config_out(
+    paired: dict[tuple[str, int], dict[str, dict]],
+) -> dict:
+    """Exploratorily fit a deterministic rule on *other* pilot configurations.
+
+    Each fold holds out a complete operating configuration and both repeats.
+    A fixed finite threshold grid is evaluated on the other pilot groups
+    using their measured outcomes. The held-out configuration labels are
+    used only to score the already fitted rule. This is deliberately **not**
+    the preregistered 60-configuration training fit, does not involve a
+    trained AI model, and is far too small for reliable model comparison.
+    """
+    names = sorted({config for config, _ in paired})
+    if len(names) < 3:
+        raise ValueError("At least three independent pilot configs are needed")
+    grid = [
+        {"ttl_threshold_ms": ttl, "load_threshold_rps": load,
+         "revision_spread_threshold": spread,
+         "gateway_threshold_rps": gateway}
+        for ttl, load, spread, gateway in product(
+            (3500, 6500, 10000, 14000),
+            (15, 25, 35, 45, 55, 65),
+            (0, 1, 2),
+            (25, 40, 55),
+        )
+    ]
+    results = []
+    for heldout in names:
+        fit = [set_of_actions for (config, _), set_of_actions in paired.items()
+               if config != heldout]
+        if len(fit) < 4:
+            raise ValueError("Pilot fit has insufficient independent repeated arms")
+        best = None
+        for p in grid:
+            cost = 0.0
+            for group in fit:
+                sample = next(iter(group.values()))
+                possible = eligible_actions(sample)
+                actual = {a: observed_utility(group[a]) for a in possible}
+                choice = tuned_rule_action(sample, p)
+                cost += actual[choice] - min(actual.values())
+            key = (cost / len(fit), tuple(p.values()))
+            if best is None or key < best[0]:
+                best = (key, p)
+        held = [set_of_actions for (config, _), set_of_actions in paired.items()
+                if config == heldout]
+        fold_regret = []
+        for group in held:
+            sample = next(iter(group.values()))
+            choices = eligible_actions(sample)
+            true_cost = {a: observed_utility(group[a]) for a in choices}
+            decision = tuned_rule_action(sample, best[1])
+            fold_regret.append(true_cost[decision] - min(true_cost.values()))
+        results.append({
+            "configuration": heldout,
+            "fitted_on_other_configuration_groups": len(names) - 1,
+            "mean_heldout_regret": sum(fold_regret) / len(fold_regret),
+            "repeat_count": len(fold_regret),
+            "training_only_pilot_fold": True,
+        })
+    return {
+        "procedure": "exploratory_leave_one_configuration_out_threshold_tuning",
+        "pilot_independent_configurations": len(names),
+        "grid_size": len(grid),
+        "mean_crossfit_hindsight_regret": sum(
+            fold["mean_heldout_regret"] for fold in results
+        ) / len(results),
+        "heldout_folds": results,
+        "not_the_frozen_60_group_tuned_baseline": True,
+        "not_ai_model_comparison": True,
+    }
 
 
 def assess_pilot(plan_dir: Path, record_dir: Path, *,
@@ -140,6 +214,7 @@ def assess_pilot(plan_dir: Path, record_dir: Path, *,
             if c["configuration_id"] in selected_configs
         }),
         "sensitivity": sensitivity,
+        "exploratory_tuned_rule": exploratory_leave_one_config_out(records),
         "uncertain_probe_time_seconds": sum(
             row["unknown_exposure_seconds"] for actions in records.values()
             for row in actions.values()
