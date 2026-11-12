@@ -27,10 +27,11 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from audit import audit_campaign, inspect_trial, plan_fingerprint
-from collect import load_plan, separate_records, write_trial_records
+from collect import load_plan, separate_records, source_commit, write_trial_records
 from pilot import run_case, wait_ready
 
 FINGERPRINT = "registered-plan.sha256"
+SOURCE_REVISION = "registered-source.sha"
 LOCK_NAME = ".campaign.lock"
 
 
@@ -76,6 +77,26 @@ def register_plan(root: Path, configs: list[dict], trials: list[dict]) -> str:
     return fingerprint
 
 
+def register_source(root: Path, revision: str) -> None:
+    """Require every experiment in this campaign to use one fixed source commit.
+
+    This prevents a resumed experiment from silently mixing different
+    deployed enforcement, collector or oracle logic after a code update.
+    A genuine protocol revision needs a new result directory, not an
+    in-place continuation masquerading as the same trial campaign.
+    """
+    if len(revision) != 40 or any(c not in "0123456789abcdef" for c in revision):
+        raise ValueError("Source revision must be an exact Git commit hash")
+    file = root / SOURCE_REVISION
+    if file.exists():
+        if file.read_text(encoding="ascii").strip() != revision:
+            raise ValueError("Source revision changed; start a new experimental campaign")
+    else:
+        fd = os.open(file, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
+        with os.fdopen(fd, "w", encoding="ascii") as output:
+            output.write(revision + "\n")
+
+
 def next_trials(trials: list[dict], records: Path, *, start: int = 0,
                 max_trials: int = 4, resume: bool = False) -> list[dict]:
     """Choose a limited set of missing runs without accepting partial records.
@@ -116,8 +137,10 @@ def run_batch(configs: list[dict], trials: list[dict], records: Path,
     """
     with exclusive_lock(records):
         digest = register_plan(records, configs, trials)
+        register_source(records, source_commit())
         audit = audit_campaign(configs, trials, records)
-        if audit["partial"] or audit["invalid"] or audit["unexpected_files"]:
+        if (audit["partial"] or audit["invalid"] or audit["unexpected_files"]
+                or not audit["single_source_revision"]):
             raise RuntimeError("Existing campaign records fail independent integrity audit")
         work = next_trials(trials, records, start=start,
                            max_trials=max_trials, resume=resume)
