@@ -55,9 +55,22 @@ jobs:
       - name: Generate grouped 100 by 4 by 3 mechanism experiment plan
         working-directory: experiment-b/mechanism-lab
         run: python plan.py --output plans/ci-mechanism
-      - name: Collect four actual mechanism action replays into separate evidence records
+      - name: Collect four real actions through the audited bounded campaign runner
         working-directory: experiment-b/mechanism-lab
-        run: python collect.py --execute-lab --manifest plans/ci-mechanism --output results/ci-mechanism --limit 4
+        run: python campaign.py --execute-lab --plan plans/ci-mechanism --records results/ci-mechanism --max-trials 4
+      - name: Audit registered campaign completion and reject fabricated outcomes
+        working-directory: experiment-b/mechanism-lab
+        run: |
+          python campaign.py --audit --plan plans/ci-mechanism --records results/ci-mechanism > reports/ci-campaign-audit.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          d = json.loads(Path("reports/ci-campaign-audit.json").read_text())
+          assert d["complete"] == 4 and d["missing"] == 1196
+          assert d["partial"] == d["invalid"] == d["unexpected_files"] == 0
+          assert not d["ready_for_training"]
+          print("PASS: four measured trials, no fabricated 1200-run completion")
+          PY
       - name: Validate separate collected records without exposing private oracle data
         working-directory: experiment-b/mechanism-lab
         run: |

@@ -77,6 +77,9 @@ class MechanismDatasetTests(unittest.TestCase):
         }
         records = separate_records(c, trial, observed)
         self.assertEqual(records["verification"]["outcome"], "INDETERMINATE")
+        self.assertNotIn("fault_mode", records["pre_action"]["features"])
+        self.assertEqual(records["pre_action"]["experimental_conditions"]["fault_mode"],
+                         c["fault_mode"])
         self.assertFalse(records["oracle"]["actual_revoked_access_denied"])
         self.assertNotIn("actual_revoked_access_denied",
                          json.dumps(records["pre_action"]))
