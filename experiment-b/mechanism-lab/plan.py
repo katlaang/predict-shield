@@ -57,8 +57,11 @@ def create_plan(seed: int = SEED) -> tuple[list[dict], list[dict]]:
             "event_delay_ms": rng.randint(0, 2500),
             "requested_rps": rng.randint(10, 65),
             "measurement_seconds": 4,
-            "gateway_includes_hidden": i % 2 == 0,
-            "visible_enforcement_processes": (4 if i % 2 == 0 else 3),
+            # Each four-scenario block includes every fault family. Alternate
+            # topology only between blocks, avoiding deterministic confounding
+            # between fault type and whether the hidden target is routable.
+            "gateway_includes_hidden": (i // 4) % 2 == 0,
+            "visible_enforcement_processes": (4 if (i // 4) % 2 == 0 else 3),
             "oracle_inventory_processes": 4,
             "scenario_seed": rng.getrandbits(63),
         }
