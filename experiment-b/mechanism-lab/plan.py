@@ -57,6 +57,14 @@ def create_plan(seed: int = SEED) -> tuple[list[dict], list[dict]]:
             "event_delay_ms": rng.randint(0, 2500),
             "requested_rps": rng.randint(10, 65),
             "measurement_seconds": 4,
+            # Fault and routing profile are assigned on different cycles;
+            # each fault family occurs under balanced and skewed traffic.
+            "routing_profile": ("balanced", "skewed_a", "skewed_hidden")[
+                (i // 4) % 3
+            ],
+            "node_service_latency_ms": [0, 15, 50, 100],
+            "complexity_stratum": ("SIMPLE", "INTERACTION",
+                                   "PARTIAL_VISIBILITY")[(i // 4) % 3],
             # Decision-policy eligibility is not a fault-injection feature.
             # Replays still execute every candidate in a disposable lab to
             # estimate counterfactual outcomes; an offline policy must never
