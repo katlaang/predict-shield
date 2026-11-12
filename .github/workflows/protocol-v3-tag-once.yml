@@ -1,0 +1,36 @@
+name: Create historical Experiment B v3 annotated protocol tag once
+on:
+  push:
+    branches: [master]
+    paths:
+      - '.github/workflows/protocol-v3-tag-once.yml'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  tag-frozen-protocol:
+    if: github.repository == 'katlaang/predict-shield'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+      - name: Validate historical target and create unbackdated annotated tag
+        shell: bash
+        run: |
+          set -euo pipefail
+          target="$(git rev-parse '8f1c510^{commit}')"
+          protocol_blob="$(git rev-parse "$target:experiment-b/mechanism-lab/PROTOCOL_V3_AI_EVALUATION.md")"
+          test "$protocol_blob" = "3ac868036435720d6a809c3de3b3e265ea766fcf"
+          git cat-file -e "$target:experiment-b/mechanism-lab/PROTOCOL_V3_FREEZE.md"
+          if git ls-remote --exit-code --tags origin refs/tags/protocol-v3 >/dev/null; then
+            echo "Tag already exists; refusing to overwrite or reinterpret historical provenance"
+            exit 1
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag -a protocol-v3 "$target" -m "Experiment B v3 protocol and freeze record; historical source unchanged; tag created after pilot"
+          git push origin refs/tags/protocol-v3
+          echo "Annotated protocol-v3 tag created at original freeze commit $target"
