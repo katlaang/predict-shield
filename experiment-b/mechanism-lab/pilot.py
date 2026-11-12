@@ -104,7 +104,8 @@ def setup_fault(control_token: str, *, ttl_ms: int, delay_ms: int,
                 fault_mode: str = "loss",
                 oracle_token: str | None = None,
                 gateway_includes_hidden: bool = True,
-                routing_profile: str = "balanced") -> None:
+                routing_profile: str = "balanced",
+                complexity_stratum: str = "SIMPLE") -> None:
     """Reset all JVMs and inject a configured actual Kafka consumer fault.
 
     Faults are set on a named process before the policy event is published.
@@ -119,6 +120,8 @@ def setup_fault(control_token: str, *, ttl_ms: int, delay_ms: int,
     route_status, _, _ = request("gateway", routing, method="POST", token=control_token)
     if route_status != 200:
         raise RuntimeError("Could not establish experimental gateway inventory")
+    if complexity_stratum not in {"SIMPLE", "INTERACTION", "PARTIAL_VISIBILITY"}:
+        raise ValueError("Unregistered complexity stratum")
     if routing_profile not in {"balanced", "skewed_a", "skewed_hidden"}:
         raise ValueError("Unregistered gateway profile")
     route_status, _, _ = request(
@@ -131,6 +134,19 @@ def setup_fault(control_token: str, *, ttl_ms: int, delay_ms: int,
         status, _, _ = request(node, f"/admin/reset/{ttl_ms}", method="POST", token=control_token)
         if status != 200:
             raise RuntimeError("Enforcer reset failed: " + node)
+    # The independent operator feed is deliberately unavailable on exactly
+    # one process only in the preregistered partial-visibility stratum.
+    # Oracle observation remains separately available and unchanged.
+    for node in ENFORCERS:
+        visible = not (
+            complexity_stratum == "PARTIAL_VISIBILITY" and node == "enforcer-hidden"
+        )
+        status, _, _ = request(
+            node, "/admin/operator-visible/" + str(visible).lower(),
+            method="POST", token=control_token
+        )
+        if status != 200:
+            raise RuntimeError("Failed to establish operator telemetry visibility")
     status, reset_response, _ = request(
         "authority", "/control/reset", method="POST", token=control_token, timeout=10
     )
@@ -462,12 +478,14 @@ def run_case(action: str, control_token: str, oracle_token: str,
              fault_mode: str = "loss", fault_target: str = "enforcer-b",
              delay_ms: int = 200, duration_seconds: float = 5,
              gateway_includes_hidden: bool = True,
-             routing_profile: str = "balanced") -> dict:
+             routing_profile: str = "balanced",
+             complexity_stratum: str = "SIMPLE") -> dict:
     """Reset all processes, inject event loss and measure one candidate action."""
     setup_fault(control_token, ttl_ms=ttl_ms, delay_ms=delay_ms,
                 fault_target=fault_target, fault_mode=fault_mode,
                 oracle_token=oracle_token, gateway_includes_hidden=gateway_includes_hidden,
-                routing_profile=routing_profile)
+                routing_profile=routing_profile,
+                complexity_stratum=complexity_stratum)
     before_probes = gateway_probes(count=8)
     before_operator_telemetry = operator_telemetry(control_token)
     before_scope = gateway_scope_evidence(control_token, before_probes)
@@ -493,6 +511,7 @@ def run_case(action: str, control_token: str, oracle_token: str,
         "event_delay_ms": delay_ms,
         "gateway_includes_hidden": gateway_includes_hidden,
         "routing_profile": routing_profile,
+        "complexity_stratum": complexity_stratum,
         "path_access_exposed": any(p["http_status"] == 200 for p in after_probes),
         "action": action,
         "before": {"verifier_gateway_probes": before_probes,
