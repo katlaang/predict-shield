@@ -70,6 +70,20 @@ jobs:
           assert omitted["full_scope_verification_status"] == "INDETERMINATE"
           print("PASS: separate enforcers, Kafka fault, action effects and regression")
           PY
+      - name: Verify consumer-only Kafka pause with live authority publication
+        working-directory: experiment-b/mechanism-lab
+        run: |
+          python consumer_pause_smoke.py --execute-lab --output reports/ci-consumer-pause.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          observed=json.loads(Path("reports/ci-consumer-pause.json").read_text())
+          assert observed["pause_physically_observed"] is True
+          assert observed["http_healthy_during_pause"] is True
+          assert observed["broker_publish_accepted"] is True
+          assert observed["handled_events_before"] == observed["handled_events_while_paused"]
+          print("PASS: listener pause is physical, not a stopped HTTP JVM")
+          PY
       - name: Generate grouped 100 by 4 by 3 mechanism experiment plan
         working-directory: experiment-b/mechanism-lab
         run: python plan.py --output plans/ci-mechanism
