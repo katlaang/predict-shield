@@ -1,0 +1,49 @@
+name: Experiment A physical incomplete-remediation smoke
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'experiment-a/**'
+      - '.github/workflows/experiment-a-partial.yml'
+jobs:
+  physical-partial-remediation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Generate distinct disposable lab credentials
+        run: |
+          for name in LAB_CONTROL_TOKEN LAB_ORACLE_TOKEN LAB_INTERNAL_TOKEN; do
+            value="$(python -c 'import secrets;print(secrets.token_urlsafe(32))')"
+            echo "::add-mask::$value"
+            echo "$name=$value" >> "$GITHUB_ENV"
+          done
+      - name: Build and start isolated four-JVM Kafka mechanism
+        working-directory: experiment-b/mechanism-lab
+        run: docker compose up --build -d
+      - name: Execute real incomplete-remediation test
+        working-directory: experiment-b/mechanism-lab
+        run: |
+          python ../../experiment-a/partial_remediation.py \
+            --execute-lab --output reports/ci-experiment-a.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path("reports/ci-experiment-a.json").read_text())
+          assert r["outcome"] == "INCOMPLETE_REMEDIATION_DETECTED"
+          assert r["physical_jvm_remediation_executed"] is True
+          assert r["gateway_only_appears_clean"] is True
+          assert r["independent_oracle_full_scope_remediated"] is False
+          assert r["independent_scope_verification"] != "VERIFIED"
+          print("PASS: real partial remediation not falsely verified")
+          PY
+      - name: Shut down disposable services
+        if: always()
+        working-directory: experiment-b/mechanism-lab
+        run: |
+          docker compose ps
+          docker compose logs --tail=60
+          docker compose down --remove-orphans --volumes
