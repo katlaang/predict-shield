@@ -13,6 +13,9 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.annotation.KafkaListener;
+import org.springframework.kafka.config.KafkaListenerEndpointRegistry;
+import org.springframework.kafka.listener.MessageListenerContainer;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -69,6 +72,8 @@ public final class EnforcementController {
 
     private volatile long cacheTtlMs = 3000;
     private volatile String fault = "none";
+    @Autowired(required = false)
+    private KafkaListenerEndpointRegistry listenerRegistry;
     private volatile String heldEvent;
     private volatile long delayedMs = 0;
     private volatile long handledEvents = 0;
@@ -115,7 +120,7 @@ public final class EnforcementController {
      *
      * @param value serialized revision and Boolean revocation value
      */
-    @KafkaListener(topics = "lab-policy", groupId = "${lab.instance:enforcer}")
+    @KafkaListener(id = "lab-policy-consumer", topics = "lab-policy", groupId = "${lab.instance:enforcer}")
     public synchronized void onEvent(String value) {
         // Malformed and old-trial broker messages must never enter this
         // trial's fault handler or consume a matched action's fault budget.
@@ -330,6 +335,59 @@ public final class EnforcementController {
         delayedMs = delayMs;
         heldEvent = null;
         return ResponseEntity.ok(Map.of("instance", identity, "fault", mode));
+    }
+
+    /**
+     * Controls only this JVM's actual Kafka listener container, preserving HTTP
+     * service availability. Pause is asynchronous; callers must independently
+     * observe isContainerPaused() before publishing fault events.
+     *
+     * @param token disposable lab control credential
+     * @param command "pause" or "resume" only
+     * @return observed container state without asserting a fault outcome
+     */
+    @PostMapping("/admin/consumer/{command}")
+    public ResponseEntity<Map<String, Object>> controlConsumer(
+            @RequestHeader(value = "X-Lab-Control", required = false) String token,
+            @PathVariable String command) {
+        if (!authorized(token, controlToken)) return forbidden();
+        if (!java.util.Set.of("pause", "resume").contains(command)) {
+            return ResponseEntity.badRequest().body(Map.of("error", "invalid command"));
+        }
+        MessageListenerContainer container = listenerRegistry == null ? null
+                : listenerRegistry.getListenerContainer("lab-policy-consumer");
+        if (container == null || !container.isRunning()) {
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
+                    .body(Map.of("error", "Kafka listener not running"));
+        }
+        if ("pause".equals(command)) container.pause();
+        else container.resume();
+        return ResponseEntity.ok(Map.of("instance", identity,
+                "pause_requested", container.isPauseRequested(),
+                "container_paused", container.isContainerPaused()));
+    }
+
+    /**
+     * Reports physical Kafka listener pause state with no injected fault label.
+     *
+     * @param token disposable lab control credential
+     * @return actual listener lifecycle indicators
+     */
+    @GetMapping("/admin/consumer/status")
+    public ResponseEntity<Map<String, Object>> consumerStatus(
+            @RequestHeader(value = "X-Lab-Control", required = false) String token) {
+        if (!authorized(token, controlToken)) return forbidden();
+        MessageListenerContainer container = listenerRegistry == null ? null
+                : listenerRegistry.getListenerContainer("lab-policy-consumer");
+        if (container == null) {
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
+                    .body(Map.of("error", "Kafka listener unavailable"));
+        }
+        return ResponseEntity.ok(Map.of("instance", identity,
+                "running", container.isRunning(),
+                "pause_requested", container.isPauseRequested(),
+                "container_paused", container.isContainerPaused(),
+                "http_service_alive", true));
     }
 
     /**
