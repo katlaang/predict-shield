@@ -304,6 +304,7 @@ def operator_telemetry(control_token: str) -> list[dict]:
                 "applied_revision": payload["applied_revision"],
                 "cache_age_ms": payload["cache_age_ms"],
                 "cache_ttl_ms": payload["cache_ttl_ms"],
+                "legitimate_service_latency_ms": payload["legitimate_service_latency_ms"],
                 "handled_events": payload["handled_events"],
                 "refresh_failed": payload["refresh_failed"],
                 "scheduled_callbacks_pending": payload["scheduled_callbacks_pending"],
