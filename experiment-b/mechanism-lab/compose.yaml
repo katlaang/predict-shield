@@ -57,7 +57,8 @@ services:
     environment:
       LAB_CONTROL_TOKEN: ${LAB_CONTROL_TOKEN:?Provide control token}
       ENFORCERS: http://enforcer-a:8080,http://enforcer-b:8080,http://enforcer-c:8080
-    depends_on: [enforcer-a, enforcer-b, enforcer-c]
+      HIDDEN_ENFORCER: http://enforcer-hidden:8080
+    depends_on: [enforcer-a, enforcer-b, enforcer-c, enforcer-hidden]
     ports: ["127.0.0.1:18280:8080"]
     networks: [lab]
   oracle:

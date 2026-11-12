@@ -1,5 +1,13 @@
 # Development changelog
 
+## 2026-11-11: Mechanism-based Experiment B research hardening
+
+- Implemented real Kafka broker, separate Java enforcement instances, a separate oracle and a measured HTTP gateway; no synthetic-formula results are claimed.
+- Added source- and protocol-pinned measured-only campaign collection, independent group splits, separate oracle streams and offline model training.
+- Added synchronized trial-epoch invalidation and broker-carried trial identifiers so late events from an old experiment are not applied to the next experiment.
+- Corrected resync to retain persistent consumer loss, and made reordering use two distinct published revisions.
+- Added independent Compose-versus-gateway scope checks, distinct path/control/service outcomes, a declared (not verified remaining) laboratory SLO budget and offline decision-regret comparisons.
+- Experimental branch changes remain subject to their own tests and review; full 1,200-trial collection and scientific model superiority are not established.
 ## 2026-11-10: AI-centered implementation foundation and laboratory extensions
 
 - Added typed pre-action prediction and measured-outcome contracts, with independent safety screening.

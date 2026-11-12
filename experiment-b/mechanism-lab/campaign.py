@@ -156,6 +156,7 @@ def run_batch(configs: list[dict], trials: list[dict], records: Path,
                 fault_mode=cfg["fault_mode"], fault_target=cfg["fault_target"],
                 delay_ms=cfg["event_delay_ms"],
                 duration_seconds=cfg["measurement_seconds"],
+                gateway_includes_hidden=cfg.get("gateway_includes_hidden", True),
             )
             records_by_stream = separate_records(cfg, trial, observation)
             write_trial_records(records, records_by_stream)

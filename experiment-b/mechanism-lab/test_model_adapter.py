@@ -47,6 +47,7 @@ class ModelDecisionIntegrationTests(unittest.TestCase):
             "features": {
                 "cache_ttl_ms": 6000,
                 "requested_rps": 20,
+                "visible_enforcement_processes": 3,
                 "measurement_seconds": 4,
             },
             "external_deny_observations": [
@@ -63,6 +64,7 @@ class ModelDecisionIntegrationTests(unittest.TestCase):
             "numeric_feature_bounds": {
                 "cache_ttl_ms": [2500, 15000],
                 "requested_rps": [10, 65],
+                "gateway_visible_enforcer_count": [3, 4],
                 "initial_gateway_allowed_fraction": [0, 1],
             },
             "models": {

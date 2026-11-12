@@ -92,7 +92,14 @@ def separate_records(config: dict, trial: dict, observed: dict) -> dict[str, dic
         raise ValueError("Oracle cannot establish complete applicable scope")
     if health.get("attempts", 0) <= 0 or not (0 <= health.get("non_200_requests", -1) <= health["attempts"]):
         raise ValueError("Actual measured service-health denominator is missing")
-    verification, reason = assess_gateway(after["verifier_gateway_probes"])
+    scope_assessment = after.get("verifier_scope")
+    if scope_assessment is None:
+        verification, reason = assess_gateway(after["verifier_gateway_probes"])
+        reconciled = False
+    else:
+        verification = scope_assessment["status"]
+        reason = scope_assessment["reason"]
+        reconciled = scope_assessment["inventory_reconciled"]
     base = {
         "run_id": trial["run_id"],
         "configuration_id": trial["configuration_id"],
@@ -117,6 +124,7 @@ def separate_records(config: dict, trial: dict, observed: dict) -> dict[str, dic
             "experimental_conditions": {k: config[k] for k in (
                 "fault_mode", "fault_target", "event_delay_ms",
             )},
+            "gateway_includes_hidden": config.get("gateway_includes_hidden", True),
             "external_deny_observations": before["verifier_gateway_probes"],
             "model_prediction_recorded": False,
             "oracle_features_excluded": True,
@@ -126,7 +134,12 @@ def separate_records(config: dict, trial: dict, observed: dict) -> dict[str, dic
             "outcome": verification,
             "reason": reason,
             "observations": after["verifier_gateway_probes"],
-            "independent_inventory_reconciled": False,
+            "scope_evidence": scope_assessment,
+            "path_exposure_observed": any(
+                x.get("http_status") == 200
+                for x in after["verifier_gateway_probes"]
+            ),
+            "independent_inventory_reconciled": reconciled,
             "verification_did_not_read_oracle": True,
         },
         "operations": {
@@ -144,6 +157,12 @@ def separate_records(config: dict, trial: dict, observed: dict) -> dict[str, dic
             "before": before["oracle"],
             "after": oracle,
             "actual_revoked_access_denied": oracle["all_revoked_access_denied"],
+            "gateway_path_exposure_observed": bool(
+                observed.get("path_access_exposed",
+                    any(x.get("http_status") == 200
+                        for x in after["verifier_gateway_probes"]))
+            ),
+            "control_remediation_label_is_not_path_reachability": True,
             "target_direct_probes": oracle["targets"],
             "oracle_role": "separate_process_admin_plus_direct_probe",
             "not_cryptographically_attested": True,
@@ -195,6 +214,7 @@ def collect_batch(configs: list[dict], trials: list[dict], output: Path,
             fault_target=conf["fault_target"],
             delay_ms=conf["event_delay_ms"],
             duration_seconds=conf["measurement_seconds"],
+            gateway_includes_hidden=conf.get("gateway_includes_hidden", True),
         )
         records = separate_records(conf, trial, measured)
         write_trial_records(output, records)

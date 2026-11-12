@@ -21,6 +21,9 @@ import org.junit.jupiter.api.Test;
  */
 final class EnforcementControllerEpochTest {
 
+    private static final String TRIAL = "11111111-1111-1111-1111-111111111111";
+    private static final String OTHER = "22222222-2222-2222-2222-222222222222";
+
     private final EnforcementController controller = new EnforcementController(
             "test-enforcer", "test-control", "test-oracle",
             "http://127.0.0.1:1", "test-internal");
@@ -41,8 +44,9 @@ final class EnforcementControllerEpochTest {
     @Test
     void pendingDelayedEventCannotMutateNewEpoch() throws InterruptedException {
         controller.reset("test-control", 30000);
+        controller.bindTrial("test-control", TRIAL);
         controller.setFault("test-control", "delay", 200);
-        controller.onEvent("7,true");
+        controller.onEvent(TRIAL + ",7,true");
         controller.reset("test-control", 30000);
         Thread.sleep(400);
 
@@ -61,14 +65,55 @@ final class EnforcementControllerEpochTest {
     @Test
     void delayedEventAppliesWithinItsOwnEpoch() throws InterruptedException {
         controller.reset("test-control", 30000);
+        controller.bindTrial("test-control", TRIAL);
         controller.setFault("test-control", "delay", 25);
-        controller.onEvent("8,true");
+        controller.onEvent(TRIAL + ",8,true");
         Thread.sleep(220);
 
         Map<?, ?> state = (Map<?, ?>) controller.adminState("test-oracle").getBody();
         assertEquals(8L, state.get("revision"));
         assertEquals(Boolean.TRUE, state.get("revoked"));
         assertEquals(0L, state.get("pending_scheduled_callbacks"));
+    }
+
+    /**
+     * Verifies a late broker event with a high revision cannot cross trials.
+     *
+     * <p>Unlike delayed callbacks that already entered the consumer scheduler,
+     * this case injects the old trial message after the successor has bound a
+     * new authoritative trial ID, modelling broker-side delivery latency.</p>
+     */
+    @Test
+    void lateBrokerMessageIsRejectedByTrialId() {
+        controller.reset("test-control", 30000);
+        controller.bindTrial("test-control", TRIAL);
+        controller.onEvent(TRIAL + ",7,true");
+        controller.reset("test-control", 30000);
+        controller.bindTrial("test-control", OTHER);
+        controller.onEvent(TRIAL + ",999,true");
+
+        Map<?, ?> state = (Map<?, ?>) controller.adminState("test-oracle").getBody();
+        assertEquals(0L, state.get("revision"));
+        assertEquals(Boolean.FALSE, state.get("revoked"));
+        assertEquals(OTHER, state.get("trial_id"));
+        assertTrue(((Number) state.get("rejected_trial_events")).longValue() > 0);
+    }
+
+    /**
+     * Verifies two distinct Kafka revisions actually exercise the reorder path.
+     */
+    @Test
+    void twoRevisionsTriggerReorderAndRespectMonotonicity() {
+        controller.reset("test-control", 30000);
+        controller.bindTrial("test-control", TRIAL);
+        controller.setFault("test-control", "reorder", 0);
+        controller.onEvent(TRIAL + ",7,true");
+        controller.onEvent(TRIAL + ",8,true");
+
+        Map<?, ?> state = (Map<?, ?>) controller.adminState("test-oracle").getBody();
+        assertEquals(8L, state.get("revision"));
+        assertEquals(Boolean.TRUE, state.get("revoked"));
+        assertEquals(1L, state.get("reordered_event_pairs"));
     }
 
     /**
@@ -79,8 +124,9 @@ final class EnforcementControllerEpochTest {
     @Test
     void duplicateCallbackFromOldTrialIsDiscarded() throws InterruptedException {
         controller.reset("test-control", 30000);
+        controller.bindTrial("test-control", TRIAL);
         controller.setFault("test-control", "duplicate", 0);
-        controller.onEvent("11,true");
+        controller.onEvent(TRIAL + ",11,true");
         controller.reset("test-control", 30000);
         Thread.sleep(100);
 
