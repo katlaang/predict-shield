@@ -62,7 +62,7 @@ def summarize_operator_telemetry(observations: list[dict]) -> dict[str, float]:
     if not isinstance(observations, list):
         raise ValueError("Operator observations must be an ordered list")
     observed = [x for x in observations if x.get("observed") is True]
-    missing = len(observations) - len(observed)
+    missing = (len(observations) - len(observed)) if observations else 4
     revisions = [int(x["applied_revision"]) for x in observed]
     handled = [int(x["handled_events"]) for x in observed]
     return {
@@ -233,7 +233,8 @@ def to_features(row: dict) -> list[float]:
     turning a hidden experimental intervention into a model shortcut.
     """
     p = row["pre_action"]
-    return [float(p[k]) for k in (
+    return [float(p.get(k, 4.0 if k == "operator_missing_count" else 0.0))
+            for k in (
         "cache_ttl_ms", "requested_rps",
         "gateway_visible_enforcer_count", "initial_gateway_allowed_fraction",
         *OPERATOR_FEATURES,
