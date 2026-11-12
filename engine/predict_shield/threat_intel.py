@@ -31,13 +31,13 @@ def read_epss(path: str | Path, snapshot_date: str, as_of: str) -> tuple[dict, d
         raise ValueError("EPSS snapshot is after as_of: look-ahead prohibited")
     raw = Path(path).read_bytes()
     # Official historical EPSS archive files are usually gzip-compressed.
-    decoded = gzip.decompress(raw) if raw.startswith(b"\\x1f\\x8b") else raw
+    decoded = gzip.decompress(raw) if raw.startswith(b"\x1f\x8b") else raw
     text = decoded.decode("utf-8-sig")
     comments = [line.lstrip()[1:].strip() for line in text.splitlines()
                 if line.lstrip().startswith("#")]
     embedded_dates = []
     for comment in comments:
-        match = re.search(r"(?:^|,)\\s*score_date\\s*[:=]\\s*(\\d{4}-\\d{2}-\\d{2})", comment)
+        match = re.search(r"(?:^|,)\s*score_date\s*[:=]\s*(\d{4}-\d{2}-\d{2})", comment)
         if match:
             embedded_dates.append(match.group(1))
     if len(set(embedded_dates)) > 1 or (
@@ -61,7 +61,7 @@ def read_epss(path: str | Path, snapshot_date: str, as_of: str) -> tuple[dict, d
     return scores, {"source": "EPSS", "snapshot_date": observed.isoformat(),
                     "sha256": _hash(raw), "record_count": len(scores),
                     "embedded_score_date": embedded_dates[0] if embedded_dates else None,
-                    "compressed_gzip": raw.startswith(b"\\x1f\\x8b")}
+                    "compressed_gzip": raw.startswith(b"\x1f\x8b")}
 
 
 def read_kev(path: str | Path, snapshot_date: str, as_of: str) -> tuple[dict, dict]:
