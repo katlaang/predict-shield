@@ -414,6 +414,15 @@ def train_evaluate(rows: list[dict], seed: int = 20261110,
     report["offline_decision_sensitivity"] = evaluate_sensitivity(
         test_rows, offline_predictions, tuned_rule["parameters"]
     )
+    # A model beating the mean-action baseline in regression MAE is NOT the
+    # same as selecting better interventions. The following paired decision
+    # audit selects its strongest deterministic comparator on calibration
+    # configurations only, then tests the AI on never-used held-out groups.
+    # Even a positive lab result explicitly does not imply field efficacy.
+    from decision_superiority_audit import evaluate as audit_decision_superiority
+    report["heldout_decision_superiority_audit"] = audit_decision_superiority(
+        rows, offline_predictions, tuned_rule["parameters"]
+    )
     # Prospective crossover: describe results at every declared difficulty
     # level without filtering for strata where AI happens to outperform a rule.
     report["complexity_crossover"] = {}
