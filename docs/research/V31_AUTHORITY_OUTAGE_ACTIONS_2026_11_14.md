@@ -24,7 +24,7 @@ Every intervention's authoritative policy status remains `UNKNOWN` and verificat
 
 ## What the result does not establish
 
-This study covers one physical condition with four interventions and no preregistered group-level repeats. It cannot pass the six-family v3.1 feasibility gate, prove the model predicts best actions, or demonstrate superior adaptive defense. Authorized-user HTTP status samples were collected but are not an independently validated continuous disruption cost. The March-like `protocol-v3` tag remains a separate provenance issue; this report makes no statement that the tag exists.
+This study covers one physical condition with four interventions and no preregistered group-level repeats. It cannot pass the six-family v3.1 feasibility gate, prove the model predicts best actions, or demonstrate superior adaptive defense. Authorized-user HTTP status samples were collected but are not an independently validated continuous disruption cost. The `protocol-v3` tag remains a separate provenance issue; this report makes no statement that the tag exists.
 
 ## Next scientific gates
 
