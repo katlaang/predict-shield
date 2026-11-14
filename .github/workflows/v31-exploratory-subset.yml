@@ -7,8 +7,11 @@ on:
       - 'experiment-b/mechanism-lab/run_v31_subset.py'
       - 'experiment-b/mechanism-lab/test_v31_subset.py'
       - '.github/workflows/v31-exploratory-subset.yml'
+permissions:
+  contents: read
 jobs:
   five-group-physical-subset:
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
