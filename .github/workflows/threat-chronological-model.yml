@@ -7,6 +7,8 @@ on:
       - 'engine/tests/test_chronological_model.py'
       - 'docs/research/data/exploratory_model_windows_2026.json'
       - '.github/workflows/threat-chronological-model.yml'
+permissions:
+  contents: read
 jobs:
   exploratory-ranking:
     runs-on: ubuntu-latest
