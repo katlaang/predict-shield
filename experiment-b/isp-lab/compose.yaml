@@ -25,6 +25,22 @@ services:
       LAB_SNMP_PRIV: ${LAB_SNMP_PRIV:?}
     ports: ["127.0.0.1:11613:161/udp"]
     networks: [isp]
+  core-d:
+    build: ./agent
+    environment:
+      LAB_DEVICE_ID: core-d
+      LAB_SNMP_AUTH: ${LAB_SNMP_AUTH:?}
+      LAB_SNMP_PRIV: ${LAB_SNMP_PRIV:?}
+    ports: ["127.0.0.1:11614:161/udp"]
+    networks: [isp]
+  radio-e:
+    build: ./agent
+    environment:
+      LAB_DEVICE_ID: radio-e
+      LAB_SNMP_AUTH: ${LAB_SNMP_AUTH:?}
+      LAB_SNMP_PRIV: ${LAB_SNMP_PRIV:?}
+    ports: ["127.0.0.1:11615:161/udp"]
+    networks: [isp]
   simulated-access:
     image: python:3.12-slim
     command: ["python", "/app/access_service.py"]

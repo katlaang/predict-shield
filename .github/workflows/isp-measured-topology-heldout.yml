@@ -1,0 +1,68 @@
+name: Measured ISP SNMP topology heldout AI-versus-rule study
+on:
+  pull_request:
+    paths:
+      - 'experiment-b/isp-lab/**'
+      - '.github/workflows/isp-measured-topology-heldout.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  physical-study:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    defaults:
+      run:
+        working-directory: experiment-b/isp-lab
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Fit model and validate locked experiment protocol
+        run: |
+          python -m pip install -r ../requirements-ml.txt
+          PYTHONPATH=../../engine:../telecom-topology python -m unittest test_measured_topology_lab -v
+      - name: Launch five disposable real SNMPv3 management agents
+        run: |
+          export LAB_SNMP_AUTH="$(python -c 'import secrets;print(secrets.token_urlsafe(20))')"
+          export LAB_SNMP_PRIV="$(python -c 'import secrets;print(secrets.token_urlsafe(20))')"
+          export LAB_ACCESS_TOKEN="$(python -c 'import secrets;print(secrets.token_urlsafe(32))')"
+          printf 'LAB_SNMP_AUTH=%s\nLAB_SNMP_PRIV=%s\nLAB_ACCESS_TOKEN=%s\n' "$LAB_SNMP_AUTH" "$LAB_SNMP_PRIV" "$LAB_ACCESS_TOKEN" > .env
+          docker compose -p psispstudy up -d --build
+      - name: Collect physical virtual-network topology groups and compare AI with rules
+        env:
+          PYTHONPATH: ../../engine:../telecom-topology
+        run: |
+          set -a
+          . ./.env
+          set +a
+          python measured_topology_lab.py --project psispstudy \
+            --output /tmp/isp-measured-topology-study.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          report=json.loads(Path('/tmp/isp-measured-topology-study.json').read_text())
+          assert report['preregistered_topology_reconfigurations']==28
+          assert report['original_train_groups']==20
+          assert report['heldout_reconfigured_groups']==8
+          assert report['actual_candidate_pairs']==280
+          assert report['heldout_candidate_pairs']==80
+          assert report['external_ai_superiority_established'] is False
+          print('Registered paired real network benchmark completed without cherry-picking.')
+          PY
+      - name: Save all observed network topology comparisons
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: real-snmp-topology-grouped-ai-rule-comparison
+          path: /tmp/isp-measured-topology-study.json
+          retention-days: 30
+      - name: Remove testbed and disposable credentials
+        if: always()
+        run: |
+          docker compose -p psispstudy down -v --remove-orphans || true
+          for network in psispstudy-probe-segment0 psispstudy-probe-segment1 psispstudy-probe-segment2; do
+            docker network rm "$network" >/dev/null 2>&1 || true
+          done
+          rm -f .env
