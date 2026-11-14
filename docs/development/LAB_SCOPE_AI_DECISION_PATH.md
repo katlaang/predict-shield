@@ -1,0 +1,9 @@
+# Live lab-scope evidence for learned policy-gated decisions
+
+The previous discovery-to-risk bridge was correctly conservative about *unvalidated advisory matches*. It is not intended to be the only evidence construction path. This separate implementation gathers actual Docker runtime identities, the existing authenticated gateway inventory and bounded live external gateway-forwarded probes. Exact service agreement and direct-forwarding witnesses can establish **bounded lab scope support**, allowing a separately calibrated local model to pass to the existing deterministic selector when measured service budgets are also available.
+
+`collect_live_scope(project="psdiscovery", token=<disposable lab token>, case_id=<run ID>)` returns a typed `EvidenceSnapshot`, scope assessment and discovery report. An omitted hidden enforcer, a gateway-only response, or insufficient coverage refuses trust. This is intentionally **not** tied to package vulnerability applicability: a routing-scope proof does not prove a CVE is exploitable.
+
+The existing `experiment-b/mechanism-lab/model_adapter.py` accepts trained model bundles from measured records, constructs typed action-outcome intervals, and the `predict_shield.selector.select_action` contract checks safety constraints. This change permits the *positive lab-scope path* rather than forcing every laboratory decision to abstain. It does not expose an execution capability or invent an error budget.
+
+Do not reuse this bounded laboratory trust in production. No cryptographic source identity attestation or enterprise inventory completeness is claimed. Future implementation must link a **verified, applicable security finding** and a measured service error budget to a named approved execution scope, then run independently verified post-action probes.
