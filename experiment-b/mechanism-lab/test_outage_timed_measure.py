@@ -31,6 +31,7 @@ class OutageTimedMeasurementTests(unittest.TestCase):
             {"principal": "authorized", "seconds_after_start": 0.2, "http_status": 200},
             {"principal": "legitimate", "seconds_after_start": 0.3, "http_status": 200},
             {"principal": "revoked", "seconds_after_start": 1.0, "http_status": 403},
+            {"principal": "revoked", "seconds_after_start": 1.5, "http_status": 403},
         ]
         result = summarize_samples(rows, window_seconds=2)
         bounds = result["revoked_gateway_exposure"]
