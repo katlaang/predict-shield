@@ -155,11 +155,33 @@ def evaluate(rows: list[dict], heldout_predictions: dict,
     ci_relative = None if any(v is None for v in relative) else [
         _quantile(sorted(relative), .025), _quantile(sorted(relative), .975)]
     is_sufficient = len(test) >= MIN_TEST_GROUPS_FOR_CLAIM
-    target_met = (is_sufficient and observed_baseline > 1e-12
-                  and ci_relative is not None
-                  and ci_relative[0] > RELATIVE_IMPROVEMENT_TARGET)
     other_rules = {name: sum(test[g][name] for g in test_groups)/n
                    for name in COMPARATOR_NAMES}
+    # Stronger, family-wise conclusion: the model must outperform EACH
+    # prespecified non-AI comparator, not merely a favorable selected rule.
+    # One-sided Bonferroni-adjusted lower bootstrap bounds (alpha=0.05/7)
+    # preserve a conservative 5% family-wise error target for seven contrasts.
+    familywise_alpha = .05 / len(COMPARATOR_NAMES)
+    corrected_lower = {}
+    for name in COMPARATOR_NAMES:
+        base = [test[g][name] for g in test_groups]
+        contrast_rng = random.Random(seed)
+        improvement_samples = []
+        for _ in range(replicates):
+            idx = [contrast_rng.randrange(n) for _ in range(n)]
+            b = sum(base[i] for i in idx)/n
+            m = sum(model[i] for i in idx)/n
+            improvement_samples.append((b-m)/b if b > 1e-12 else None)
+        corrected_lower[name] = (
+            None if any(value is None for value in improvement_samples)
+            else _quantile(sorted(improvement_samples), familywise_alpha))
+    all_rule_contrasts_pass = all(
+        value is not None and value > RELATIVE_IMPROVEMENT_TARGET
+        for value in corrected_lower.values())
+    target_met = (is_sufficient and observed_baseline > 1e-12
+                  and ci_relative is not None
+                  and ci_relative[0] > RELATIVE_IMPROVEMENT_TARGET
+                  and all_rule_contrasts_pass)
     return {
         "schema": "predict-shield/heldout-ai-decision-superiority-audit/1",
         "heldout_group_count": n,
@@ -169,6 +191,9 @@ def evaluate(rows: list[dict], heldout_predictions: dict,
         "locked_non_ai_comparator": locked,
         "calibration_non_ai_regret": cal_scores,
         "heldout_non_ai_comparator_regret": other_rules,
+        "bonferroni_one_sided_alpha_per_comparator": familywise_alpha,
+        "familywise_adjusted_relative_improvement_lower_by_rule": corrected_lower,
+        "all_prespecified_non_ai_comparators_beaten": all_rule_contrasts_pass,
         "heldout_model_mean_regret": observed_model,
         "heldout_locked_baseline_mean_regret": observed_baseline,
         "heldout_paired_mean_regret_improvement": sum(deltas)/n,
