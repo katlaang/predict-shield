@@ -1,0 +1,101 @@
+name: Measured AI versus deterministic defenses, 24-config physical exploratory pilot
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'experiment-b/mechanism-lab/ai_comparison_plan.py'
+      - 'experiment-b/mechanism-lab/actual_ai_comparison.py'
+      - 'experiment-b/mechanism-lab/run_actual_ai_pilot.py'
+      - 'experiment-b/mechanism-lab/test_actual_ai_comparison.py'
+      - '.github/workflows/ai-physical-decision-pilot.yml'
+permissions:
+  contents: read
+concurrency:
+  group: physical-ai-decision-pilot-${{ github.head_ref || github.ref }}
+  cancel-in-progress: false
+jobs:
+  physical-ai-heldout:
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 95
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install real scikit-learn prediction dependencies
+        run: python -m pip install -r experiment-b/requirements-ml.txt
+      - name: Verify no-label-leakage and group-split contracts (unit tests only)
+        working-directory: experiment-b/mechanism-lab
+        run: |
+          python -m unittest test_actual_ai_comparison test_training test_decision_eval -v
+          python ai_comparison_plan.py --output /tmp/physical-ai-plan-registration
+          sha256sum /tmp/physical-ai-plan-registration/configurations.jsonl \
+            /tmp/physical-ai-plan-registration/trials.jsonl
+      - name: Verify frozen original v3 protocol hash
+        run: |
+          test "$(git hash-object experiment-b/mechanism-lab/PROTOCOL_V3_AI_EVALUATION.md)" = "3ac868036435720d6a809c3de3b3e265ea766fcf"
+      - name: Create three unique disposable masked lab tokens
+        run: |
+          for key in LAB_CONTROL_TOKEN LAB_ORACLE_TOKEN LAB_INTERNAL_TOKEN; do
+            value="$(python -c 'import secrets;print(secrets.token_urlsafe(32))')"
+            echo "::add-mask::$value"
+            echo "$key=$value" >> "$GITHUB_ENV"
+          done
+      - name: Start physical Kafka and separate Java enforcement containers
+        working-directory: experiment-b/mechanism-lab
+        run: |
+          for attempt in 1 2 3; do
+            if docker compose up --build -d; then exit 0; fi
+            docker compose down --remove-orphans --volumes || true
+            if [ "$attempt" -lt 3 ]; then sleep $((attempt*8)); fi
+          done
+          exit 1
+      - name: Physically execute 96 registered action trials, independently audit, train AI and test on untouched groups
+        working-directory: experiment-b/mechanism-lab
+        run: |
+          python run_actual_ai_pilot.py --execute-lab \
+            --root /tmp/physical-ai-vs-rules \
+            --report reports/ci-physical-ai-decision-pilot.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          d=json.loads(Path('reports/ci-physical-ai-decision-pilot.json').read_text())
+          assert d['executed_physical_action_replays']==96
+          assert d['independently_configured_groups']==24
+          assert d['heldout_groups']==6 and d['calibration_groups']==6 and d['train_groups']==12
+          assert d['four_streams_per_trial_verified'] is True
+          assert d['oracle_used_in_model_inputs'] is False
+          assert d['model_trained_on_real_physical_outcomes'] is True
+          assert d['model_selected_actions_without_heldout_outcomes'] is True
+          assert d['exploratory_only_not_superiority_proof'] is True
+          assert d['critical_infrastructure_field_evidence'] is False
+          assert d['physical_four_stream_integrity_audit']['complete']==96
+          print('AI_HELDOUT_ACTUAL_RESULT',json.dumps({
+            'locked_baseline':d['locked_comparator_selected_using_calibration_only'],
+            'ai_regret':d['test_ai_mean_hindsight_regret'],
+            'baseline_regret':d['test_locked_rule_mean_hindsight_regret'],
+            'paired_95_ci':d['paired_group_bootstrap_regret_reduction_95'],
+            'ai_better_mean':d['ai_better_than_locked_baseline_in_these_test_groups'],
+            'confirmatory_proof':False,
+          },sort_keys=True))
+          PY
+      - name: Record exact report SHA-256 and registered source revision
+        if: success()
+        working-directory: experiment-b/mechanism-lab
+        run: sha256sum reports/ci-physical-ai-decision-pilot.json > reports/ci-physical-ai-report.sha256
+      - name: Publish only sanitized held-out metrics, never private full oracle streams
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ai-physical-heldout-exploratory-evidence
+          path: |
+            experiment-b/mechanism-lab/reports/ci-physical-ai-decision-pilot.json
+            experiment-b/mechanism-lab/reports/ci-physical-ai-report.sha256
+          if-no-files-found: warn
+      - name: Remove raw privileged records and destroy physical lab
+        if: always()
+        working-directory: experiment-b/mechanism-lab
+        run: |
+          rm -rf /tmp/physical-ai-vs-rules /tmp/physical-ai-plan-registration
+          docker compose down --remove-orphans --volumes
