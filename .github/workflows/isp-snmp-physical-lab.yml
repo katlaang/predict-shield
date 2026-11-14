@@ -25,7 +25,8 @@ jobs:
         run: |
           export LAB_SNMP_AUTH="$(python -c 'import secrets;print(secrets.token_urlsafe(20))')"
           export LAB_SNMP_PRIV="$(python -c 'import secrets;print(secrets.token_urlsafe(20))')"
-          printf 'LAB_SNMP_AUTH=%s\nLAB_SNMP_PRIV=%s\n' "$LAB_SNMP_AUTH" "$LAB_SNMP_PRIV" > .env
+          export LAB_ACCESS_TOKEN="$(python -c 'import secrets;print(secrets.token_urlsafe(32))')"
+          printf 'LAB_SNMP_AUTH=%s\nLAB_SNMP_PRIV=%s\nLAB_ACCESS_TOKEN=%s\n' "$LAB_SNMP_AUTH" "$LAB_SNMP_PRIV" "$LAB_ACCESS_TOKEN" > .env
           docker compose -p psisp up -d --build
       - name: Capture live encrypted SNMP observations against incomplete OSS
         env:
