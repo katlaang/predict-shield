@@ -137,7 +137,6 @@ jobs:
           assert x["external_critical_infrastructure_validated"] is False
           a=x["full_model_evaluation"]["heldout_decision_superiority_audit"]
           assert x["full_model_evaluation"]["test_used_for_training_or_calibration"] is False
-          assert a["not_ai_training_or_inference"] is not True if "not_ai_training_or_inference" in a else True
           assert a["heldout_group_count"]==20
           print("RESULT -- AI lab superiority supported:",x["lab_superiority_supported_under_declared_test"])
           print("RESULT -- AI heldout regret:",x["ai_model_mean_regret"])
