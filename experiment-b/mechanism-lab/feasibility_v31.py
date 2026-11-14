@@ -77,6 +77,7 @@ def evaluate(records: list[dict], *, fixed_action: str = "resync_policy") -> dic
     if len(groups) < 3:
         raise ValueError("At least three independent pilot configurations required")
     mismatch_count = 0
+    instance_mismatch_count = 0
     instance_count = 0
     pv_unique = set()
     group_regrets = []
@@ -86,21 +87,34 @@ def evaluate(records: list[dict], *, fixed_action: str = "resync_policy") -> dic
             raise ValueError("Missing or duplicate paired repeats")
         if len({x["stratum"] for x in rows}) != 1:
             raise ValueError("Difficulty varied within paired configuration")
+        # Evaluate one decision per independent configuration by averaging
+        # the two measured replay costs for each action. Counting repeats as
+        # independent decisions would inflate the apparent pilot sample.
+        if len({tuple(sorted(x["eligible_actions"])) for x in rows}) != 1:
+            raise ValueError("Action eligibility varied within paired configuration")
+        allowed = rows[0]["eligible_actions"]
+        mean_cost = {a: sum(r["action_costs"][a] for r in rows) / 2
+                     for a in ACTIONS}
+        best_cost = min(mean_cost[a] for a in allowed)
+        best = {a for a in allowed if mean_cost[a] - best_cost <= TOLERANCE}
+        group_mismatch = fixed_action not in best
+        mismatch_count += group_mismatch
+        if rows[0]["stratum"] == "PARTIAL_VISIBILITY" and len(best) == 1:
+            pv_unique.update(best)
         instance_regret = []
         for row in rows:
             costs = row["action_costs"]
-            allowed = row["eligible_actions"]
             optimal = min(costs[a] for a in allowed)
-            best = {a for a in allowed if costs[a] - optimal <= TOLERANCE}
-            mismatch_count += fixed_action not in best
+            best_replay = {a for a in allowed if costs[a] - optimal <= TOLERANCE}
+            instance_mismatch_count += fixed_action not in best_replay
             instance_count += 1
             instance_regret.append(max(0.0, costs[fixed_action] - optimal))
-            if row["stratum"] == "PARTIAL_VISIBILITY" and len(best) == 1:
-                pv_unique.update(best)
         group_regrets.append(sum(instance_regret) / 2)
         group_summary.append({"configuration_id": ident,
                               "stratum": rows[0]["stratum"],
-                              "fixed_mean_regret": group_regrets[-1]})
+                              "fixed_mean_regret": group_regrets[-1],
+                              "fixed_action_outside_group_optimal_set": group_mismatch,
+                              "group_optimal_actions": sorted(best)})
     mean_regret = sum(group_regrets) / len(group_regrets)
     rng = random.Random(BOOTSTRAP_SEED)
     means = [sum(rng.choice(group_regrets) for _ in group_regrets) / len(group_regrets)
@@ -108,7 +122,7 @@ def evaluate(records: list[dict], *, fixed_action: str = "resync_policy") -> dic
     lo, hi = _percentile(means, .025), _percentile(means, .975)
     target = .10 * mean_regret
     half_width = (hi - lo) / 2
-    diversity = mismatch_count / instance_count
+    diversity = mismatch_count / len(groups)
     failures = []
     if diversity < DIVERSITY_THRESHOLD:
         failures.append("insufficient_fixed_policy_decision_diversity")
@@ -126,6 +140,9 @@ def evaluate(records: list[dict], *, fixed_action: str = "resync_policy") -> dic
             "fixed_action": fixed_action,
             "tie_tolerance": TOLERANCE,
             "mismatched_decisions": mismatch_count,
+            "mismatched_configuration_groups": mismatch_count,
+            "repeat_level_mismatches_descriptive_only": instance_mismatch_count,
+            "decision_diversity_denominator": len(groups),
             "decision_diversity": diversity,
             "minimum_diversity": DIVERSITY_THRESHOLD,
             "partial_visibility_unique_optima": sorted(pv_unique),
