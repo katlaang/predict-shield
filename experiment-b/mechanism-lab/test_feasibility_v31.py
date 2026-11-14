@@ -37,11 +37,43 @@ class FeasibilityGateTests(unittest.TestCase):
         result = evaluate(self.sample())
         self.assertEqual(result["pilot_configuration_groups"],3)
         self.assertEqual(result["paired_decision_instances"],6)
-        self.assertEqual(result["mismatched_decisions"],6)
-        self.assertEqual(set(result["partial_visibility_unique_optima"]),
-                         {"monitor_only","restart_enforcer"})
+        self.assertEqual(result["mismatched_decisions"],3)
+        self.assertEqual(result["decision_diversity_denominator"],3)
+        self.assertEqual(result["repeat_level_mismatches_descriptive_only"],6)
+        self.assertEqual(result["partial_visibility_unique_optima"], [])
         self.assertFalse(result["trained_ai_evaluated"])
         self.assertTrue(result["precision_not_a_model_power_calculation"])
+
+    def test_repeats_do_not_fabricate_pv_optimal_diversity(self):
+        rows = self.sample()
+        result = evaluate(rows)
+        # The two PV repeats favor different actions, but the group-level
+        # means tie: this is NOT evidence of two independent PV optima.
+        self.assertEqual(result["partial_visibility_unique_optima"], [])
+        self.assertIn("insufficient_unique_partial_visibility_optimal_actions",
+                      result["failures"])
+
+    def test_group_decision_differs_from_repeat_majority(self):
+        rows = self.sample()
+        # Group 001 has one repeat favoring resync and the other favoring
+        # monitor very strongly; group mean monitor wins, even though raw
+        # repeat-level counts are mixed.
+        rows[0]["action_costs"] = {
+            "resync_policy": 0.0, "restart_enforcer": 0.2,
+            "gateway_restrict": 0.5, "monitor_only": 0.1}
+        rows[1]["action_costs"] = {
+            "resync_policy": 0.5, "restart_enforcer": 0.6,
+            "gateway_restrict": 0.8, "monitor_only": 0.0}
+        result = evaluate(rows)
+        group = next(x for x in result["per_group"] if x["configuration_id"]=="v31-pilot-001")
+        self.assertEqual(group["group_optimal_actions"], ["monitor_only"])
+        self.assertEqual(result["decision_diversity_denominator"],3)
+
+    def test_rejects_eligibility_changing_across_repeats(self):
+        rows = self.sample()
+        rows[1]["eligible_actions"] = ["resync_policy","gateway_restrict","monitor_only"]
+        with self.assertRaisesRegex(ValueError, "Action eligibility varied"):
+            evaluate(rows)
 
     def test_refuse_missing_repeat(self):
         with self.assertRaises(ValueError):
