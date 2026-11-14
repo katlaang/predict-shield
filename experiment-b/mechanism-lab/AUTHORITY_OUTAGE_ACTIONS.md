@@ -15,3 +15,12 @@ The authority is restored in `finally` before the next registered action. The pu
 - The next scientific milestone is independently registered multi-configuration outage trials with continuous probe timing, eligibility-safe action handling and measured costs under a predeclared conservative UNKNOWN policy. Do not start 1,200 trials until all six families meet the feasibility and precision gates.
 
 Run: `python authority_outage_actions.py --execute-lab --output reports/outage-actions.json` from the disposable Compose lab.
+
+
+## Timed physical observation extension
+
+The follow-up implementation `outage_timed_measure.py` performs one measured 6-second observation window **per action**, starting intervention at the registered +1-second mark while independent revoked, authorized-protected and legitimate-endpoint HTTP probes continue. It uses the already audited monotonic HTTP step-integral to produce lower/upper **sampled gateway exposure duration**. Missing probe periods are UNKNOWN and increase the upper bound; they are not considered denials.
+
+For the two legitimate identities/routes the output records actual HTTP status counts, requests and failed requests, rather than inventing disruption from action names. The timed sampler records late probe counts and propagates failed restart/restrict actions. Full externally authoritative policy verification remains INDETERMINATE during outage.
+
+These are separate **observation dimensions**, not a combined cost. No 0–1 risk/disruption score has been preregistered for an outage with historical, potentially stale desired policy. Comparing actions by a weighted sum or integrating results into `feasibility_v31.py` would be premature. This four-arm experiment is still one exploratory configuration with no independent repeats.
