@@ -35,7 +35,8 @@ def wait_authority_unavailable(*, attempts: int = 10, sleep_seconds: float = 0.5
     raise RuntimeError("Authority remains reachable; physical stop not established")
 
 
-def run_outage(control_token: str, *, compose_dir: str | Path) -> dict:
+def run_outage(control_token: str, *, compose_dir: str | Path,
+               oracle_token: str | None = None) -> dict:
     """Physically stop the authority, attempt resync and local restart.
 
     Resync must not publish through an unavailable HTTP endpoint. A local
@@ -70,6 +71,23 @@ def run_outage(control_token: str, *, compose_dir: str | Path) -> dict:
         observations["authority_still_unavailable"] = authority_http is None
         if not observations["authority_still_unavailable"]:
             raise RuntimeError("Authority unexpectedly recovered during local restart")
+        if oracle_token is not None:
+            if len(oracle_token) < 24 or oracle_token == control_token:
+                raise ValueError("Independent lab oracle credential required")
+            # A physically stopped authority must not be reclassified as
+            # VERIFIED merely because all direct target probes answer.
+            observer_http, observer, _ = request(
+                "oracle", "/oracle/observe", oracle=oracle_token, timeout=5)
+            if (observer_http != 200 or
+                    observer.get("authority_truth_available") is not False or
+                    observer.get("inventory_complete") is not False or
+                    observer.get("all_revoked_access_denied") is not None):
+                raise RuntimeError("Oracle invented authority truth during real outage")
+            observations["oracle_authority_truth_available"] = False
+            observations["oracle_scope_complete"] = False
+            observations["oracle_policy_verdict"] = "UNKNOWN"
+            observations["direct_target_observations_complete"] = observer.get(
+                "direct_target_observations_complete") is True
         observations["outcome"] = "MECHANISM_CONSTRAINT_OBSERVED"
     finally:
         if stopped:
@@ -86,7 +104,9 @@ def main() -> None:
     if not options.execute_lab:
         parser.error("Physical mutation requires --execute-lab")
     token = os.getenv("LAB_CONTROL_TOKEN", "")
-    outcome = run_outage(token, compose_dir=Path(__file__).resolve().parent)
+    outcome = run_outage(
+        token, compose_dir=Path(__file__).resolve().parent,
+        oracle_token=os.getenv("LAB_ORACLE_TOKEN", ""))
     Path(options.output).parent.mkdir(parents=True, exist_ok=True)
     Path(options.output).write_text(json.dumps(outcome, indent=2) + "\n", encoding="utf-8")
 
