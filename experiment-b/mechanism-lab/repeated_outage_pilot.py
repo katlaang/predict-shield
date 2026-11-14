@@ -153,9 +153,19 @@ def main() -> None:
         row = summarize(batch, evaluation)
         row["batch_number"] = index + 1
         row["observed_utc"] = datetime.now(timezone.utc).isoformat()
+        # Commit each FULL action batch separately before attempting the
+        # next one; failed later batches cannot erase earlier observations.
+        a.output.parent.mkdir(parents=True, exist_ok=True)
+        partial = a.output.parent / ("physical-batch-%02d.json" % (index + 1))
+        with partial.open("x", encoding="utf-8") as stream:
+            json.dump({"schema": "predict-shield/single-physical-batch/1",
+                       "source_commit_sha": source_revision(root),
+                       "four_physical_actions_observed": True,
+                       "batch": row, "not_independent_configuration": True},
+                      stream, sort_keys=True, indent=2)
+            stream.write("\\n")
         recorded.append(row)
     report = aggregate(recorded, source_revision(root))
-    a.output.parent.mkdir(parents=True, exist_ok=True)
     with a.output.open("x", encoding="utf-8") as f:
         json.dump(report, f, sort_keys=True, indent=2)
         f.write("\n")
