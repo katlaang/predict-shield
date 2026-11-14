@@ -1,0 +1,21 @@
+name: Discovered risk evidence to AI policy gate contracts
+on:
+  pull_request:
+    paths:
+      - 'engine/predict_shield/risk_evidence.py'
+      - 'engine/tests/test_risk_evidence.py'
+      - '.github/workflows/risk-evidence-tests.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run full engine unit contract suite
+        run: PYTHONPATH=engine python -m unittest discover -s engine/tests -v
