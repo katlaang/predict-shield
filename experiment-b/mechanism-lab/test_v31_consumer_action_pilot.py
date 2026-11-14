@@ -27,6 +27,10 @@ class V31ConsumerActionTests(unittest.TestCase):
     def test_refuses_unobserved_physical_fault(self, run_case, resume, ready):
         run_case.return_value = {
             "fault_mode": "consumer_paused",
+            "physical_fault_evidence": {
+                "listener_pause_physically_observed": True,
+                "target_http_status": 200,
+            },
             "before": {"oracle": {"all_revoked_access_denied": True}},
         }
         with self.assertRaisesRegex(RuntimeError, "did not cause initial stale"):
