@@ -1,0 +1,22 @@
+name: Prospective 99.9 percent AI discovery advantage gates
+on:
+  pull_request:
+    paths:
+      - 'experiment-b/telecom-topology/prospective_advantage.py'
+      - 'experiment-b/telecom-topology/test_prospective_advantage.py'
+      - '.github/workflows/prospective-ai-advantage-tests.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  prospective-contract:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Test statistical quality and independently auditable superiority safeguards
+        working-directory: experiment-b/telecom-topology
+        run: python -m unittest test_prospective_advantage -v
