@@ -6,6 +6,7 @@ A copied Docker inventory is not independent evidence. No VERIFIED claim is made
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import re
 import subprocess
@@ -102,6 +103,9 @@ def main() -> None:
         "status": "NOT_REQUESTED", "note": "SBOM status is unknown, not clean"}
     report["live_gateway_source_authenticated"] = False
     report["complete_enterprise_inventory_verified"] = False
+    report.pop("sha256", None)
+    canonical = json.dumps(report, sort_keys=True, separators=(",", ":")).encode()
+    report["sha256"] = hashlib.sha256(canonical).hexdigest()
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     print("Assets:", len(report["assets"]), "scope:", report["reconciliation"]["scope_status"])
