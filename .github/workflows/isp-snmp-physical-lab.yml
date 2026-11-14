@@ -1,0 +1,54 @@
+name: Real read-only ISP SNMPv3 asset pilot
+on:
+  pull_request:
+    paths:
+      - 'experiment-b/isp-lab/**'
+      - '.github/workflows/isp-snmp-physical-lab.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  live-agents:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: experiment-b/isp-lab
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install read-only Net-SNMP CLI
+        run: sudo apt-get update && sudo apt-get install -y snmp
+      - name: Launch three real isolated SNMPv3 agents
+        run: |
+          export LAB_SNMP_AUTH="$(python -c 'import secrets;print(secrets.token_urlsafe(20))')"
+          export LAB_SNMP_PRIV="$(python -c 'import secrets;print(secrets.token_urlsafe(20))')"
+          printf 'LAB_SNMP_AUTH=%s\nLAB_SNMP_PRIV=%s\n' "$LAB_SNMP_AUTH" "$LAB_SNMP_PRIV" > .env
+          docker compose -p psisp up -d --build
+      - name: Capture live encrypted SNMP observations against incomplete OSS
+        env:
+          PYTHONPATH: ../../engine
+        run: |
+          set -a
+          . ./.env
+          set +a
+          for attempt in $(seq 1 12); do
+            if python collect_live.py --output /tmp/isp-lab-observation.json; then
+              exit 0
+            fi
+            if [ "$attempt" = 12 ]; then exit 1; fi
+            sleep 3
+          done
+      - name: Retain evidence from actual agent responses
+        uses: actions/upload-artifact@v4
+        with:
+          name: live-snmpv3-isp-lab-observation
+          path: /tmp/isp-lab-observation.json
+          retention-days: 30
+      - name: Remove lab and disposable credentials
+        if: always()
+        run: |
+          docker compose -p psisp down -v --remove-orphans || true
+          rm -f .env
