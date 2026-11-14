@@ -223,12 +223,35 @@ def setup_fault(control_token: str, *, ttl_ms: int, delay_ms: int,
         time.sleep(1.5)
     if fault_target not in ENFORCERS:
         raise ValueError("Unexpected fault target")
-    if fault_mode not in {"loss", "delay", "duplicate", "reorder"}:
+    if fault_mode not in {"loss", "delay", "duplicate", "reorder", "consumer_paused"}:
         raise ValueError("Unsupported Kafka fault mode")
-    status, _, _ = request(fault_target, f"/admin/fault/{fault_mode}/{delay_ms}",
-                           method="POST", token=control_token)
-    if status != 200:
-        raise RuntimeError("Consumer fault setup failed")
+    if fault_mode == "consumer_paused":
+        # v3.1 ONLY: pause the actual Spring Kafka listener container
+        # after clean trial convergence, before publishing the revocation.
+        # HTTP service stays available. This is not a synthetic loss flag.
+        status, _, _ = request(fault_target, "/admin/fault/none/0",
+                               method="POST", token=control_token)
+        if status != 200:
+            raise RuntimeError("Cannot clear callback fault before listener pause")
+        status, _, _ = request(fault_target, "/admin/consumer/pause",
+                               method="POST", token=control_token)
+        if status != 200:
+            raise RuntimeError("Kafka listener pause command rejected")
+        deadline = time.monotonic() + 12
+        while time.monotonic() < deadline:
+            status, pause_state, _ = request(
+                fault_target, "/admin/consumer/status", token=control_token)
+            health, _, _ = request(fault_target, "/healthz")
+            if status == 200 and pause_state.get("container_paused") is True and health == 200:
+                break
+            time.sleep(0.25)
+        else:
+            raise RuntimeError("Kafka listener not physically paused with HTTP available")
+    else:
+        status, _, _ = request(fault_target, f"/admin/fault/{fault_mode}/{delay_ms}",
+                               method="POST", token=control_token)
+        if status != 200:
+            raise RuntimeError("Consumer fault setup failed")
     status, _, _ = request("authority", "/control/revoke", method="POST", token=control_token, timeout=10)
     if status != 202:
         raise RuntimeError("Policy revocation rejected")
