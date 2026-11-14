@@ -1,0 +1,23 @@
+name: Read-only Docker asset discovery unit contracts
+on:
+  pull_request:
+    paths:
+      - 'engine/predict_shield/asset_discovery.py'
+      - 'engine/tests/test_asset_discovery.py'
+      - '.github/workflows/asset-discovery-tests.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  unit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run synthetic contract tests without Docker permissions
+        run: PYTHONPATH=engine python -m unittest engine.tests.test_asset_discovery -v
+      - name: Run all existing engine unit tests
+        run: PYTHONPATH=engine python -m unittest discover -s engine/tests -v
