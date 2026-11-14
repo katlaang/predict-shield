@@ -544,6 +544,17 @@ def run_case(action: str, control_token: str, oracle_token: str,
                 routing_profile=routing_profile,
                 complexity_stratum=complexity_stratum,
                 node_service_latency_ms=node_service_latency_ms)
+    physical_fault_evidence = None
+    if fault_mode == "consumer_paused":
+        status, listener, _ = request(
+            fault_target, "/admin/consumer/status", token=control_token)
+        healthy, _, _ = request(fault_target, "/healthz")
+        if status != 200 or listener.get("container_paused") is not True or healthy != 200:
+            raise RuntimeError("Physical Kafka listener pause not observed before action")
+        physical_fault_evidence = {
+            "listener_pause_physically_observed": True,
+            "target_http_status": healthy,
+        }
     before_probes = gateway_probes(count=8)
     before_operator_telemetry = operator_telemetry(control_token)
     before_scope = gateway_scope_evidence(control_token, before_probes)
@@ -564,6 +575,7 @@ def run_case(action: str, control_token: str, oracle_token: str,
     return {
         "case": "experiment-b-kafka-revocation",
         "fault_mode": fault_mode,
+        "physical_fault_evidence": physical_fault_evidence,
         "fault_target": fault_target,
         "cache_ttl_ms": ttl_ms,
         "event_delay_ms": delay_ms,
