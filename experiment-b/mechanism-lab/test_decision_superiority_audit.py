@@ -17,8 +17,8 @@ def fixture(calibration_groups=5, test_groups=20, *, model_wins=True):
                     # Calibration chooses monitor-only on genuinely distinct
                     # groups. The blinded test scenario favors restart, which
                     # the synthetic predictor (not real AI!) forecasts.
-                    optimal=("monitor_only" if partition=="calibration"
-                             else "restart_enforcer")
+                    optimal=("monitor_only" if partition=="calibration" else
+                             ("restart_enforcer" if i % 2 == 0 else "gateway_restrict"))
                     bad=0.0 if action==optimal else 1.0
                     row={
                         "group":group, "partition":partition, "repeat":repeat,
@@ -63,6 +63,9 @@ class DecisionSuperiorityAuditTests(unittest.TestCase):
         self.assertEqual(result["locked_non_ai_comparator"] in (
             "fixed_monitor","engineering_rule","observable_telemetry_rule"),True)
         self.assertTrue(result["improvement_target_supported_in_lab"])
+        self.assertTrue(result["all_prespecified_non_ai_comparators_beaten"])
+        self.assertTrue(all(v > 0.10 for v in result[
+            "familywise_adjusted_relative_improvement_lower_by_rule"].values()))
         self.assertEqual(result["paired_group_bootstrap_relative_95"],[1.0,1.0])
         self.assertTrue(result["no_external_critical_infrastructure_validation"])
 
@@ -70,6 +73,7 @@ class DecisionSuperiorityAuditTests(unittest.TestCase):
         rows,pred=fixture(model_wins=False)
         report=evaluate(rows,pred,PARAMS,replicates=500)
         self.assertFalse(report["improvement_target_supported_in_lab"])
+        self.assertFalse(report["all_prespecified_non_ai_comparators_beaten"])
         self.assertEqual(report["research_status"],"LAB_SUPERIORITY_NOT_ESTABLISHED")
 
     def test_insufficient_test_groups_never_prove_superiority(self):
