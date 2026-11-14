@@ -1,0 +1,22 @@
+name: Measured pilot evidence and UNKNOWN continuity contract
+on:
+  pull_request:
+    paths:
+      - 'experiment-b/isp-lab/isp_defense.py'
+      - 'experiment-b/isp-lab/test_service_continuity_truth.py'
+      - '.github/workflows/isp-evidence-truth-tests.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  truthful-evidence:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Preserve unmeasured service impacts as UNKNOWN
+        working-directory: experiment-b/isp-lab
+        run: python -m unittest test_service_continuity_truth test_isp_defense -v
