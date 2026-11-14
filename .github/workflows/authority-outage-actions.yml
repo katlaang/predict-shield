@@ -7,6 +7,8 @@ on:
       - 'experiment-b/mechanism-lab/test_authority_outage_actions.py'
       - 'experiment-b/mechanism-lab/outage_timed_measure.py'
       - 'experiment-b/mechanism-lab/test_outage_timed_measure.py'
+      - 'experiment-b/mechanism-lab/outage_interval_diagnostic.py'
+      - 'experiment-b/mechanism-lab/test_outage_interval_diagnostic.py'
       - '.github/workflows/authority-outage-actions.yml'
 permissions:
   contents: read
@@ -22,7 +24,7 @@ jobs:
           python-version: '3.12'
       - name: Test measurement contracts
         working-directory: experiment-b/mechanism-lab
-        run: python -m unittest test_authority_outage_witness test_authority_outage_actions test_outage_timed_measure -v
+        run: python -m unittest test_authority_outage_witness test_authority_outage_actions test_outage_timed_measure test_outage_interval_diagnostic -v
       - name: Create separate disposable lab credentials
         run: |
           for name in LAB_CONTROL_TOKEN LAB_ORACLE_TOKEN LAB_INTERNAL_TOKEN; do
@@ -75,12 +77,34 @@ jobs:
                     "allow_upper",x["observed_allow_fraction_upper_bound"])
           print("PASS: physical outage observations, no fabricated decision utility")
           PY
+      - name: Evaluate bounded exploratory intervals without selecting a winner by point estimate
+        working-directory: experiment-b/mechanism-lab
+        run: |
+          python outage_interval_diagnostic.py \
+            --physical-report reports/ci-outage-actions.json \
+            --error-budget-requests 25 --restart-permitted \
+            --output reports/ci-outage-interval-diagnostic.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          x=json.loads(Path("reports/ci-outage-interval-diagnostic.json").read_text())
+          assert x["status"] == "EXPLORATORY_INTERVALS_ONLY"
+          assert x["not_a_frozen_v31_primary_utility"] is True
+          assert x["not_ai_training_or_inference"] is True
+          assert x["not_v31_feasibility_or_campaign_authorization"] is True
+          assert len(x["action_intervals"]) == 4
+          for row in x["action_intervals"]:
+              assert row["cost_lower_bound"] <= row["cost_upper_bound"]
+          print("PASS: conservative intervals computed; no confirmed AI effect")
+          PY
       - name: Upload only summarized observations without raw oracle truth
         if: success()
         uses: actions/upload-artifact@v4
         with:
           name: physical-authority-outage-action-observations
-          path: experiment-b/mechanism-lab/reports/ci-outage-actions.json
+          path: |
+            experiment-b/mechanism-lab/reports/ci-outage-actions.json
+            experiment-b/mechanism-lab/reports/ci-outage-interval-diagnostic.json
       - name: Shut down disposable lab
         if: always()
         working-directory: experiment-b/mechanism-lab
