@@ -28,7 +28,7 @@ jobs:
       - name: Verify no-label-leakage and group-split contracts (unit tests only)
         working-directory: experiment-b/mechanism-lab
         run: |
-          python -m unittest test_actual_ai_comparison test_training test_decision_eval -v
+          PYTHONPATH=../../engine python -m unittest test_actual_ai_comparison test_training test_decision_eval -v
           python ai_comparison_plan.py --output /tmp/physical-ai-plan-registration
           sha256sum /tmp/physical-ai-plan-registration/configurations.jsonl \
             /tmp/physical-ai-plan-registration/trials.jsonl
@@ -98,4 +98,7 @@ jobs:
         working-directory: experiment-b/mechanism-lab
         run: |
           rm -rf /tmp/physical-ai-vs-rules /tmp/physical-ai-plan-registration
-          docker compose down --remove-orphans --volumes
+          export LAB_CONTROL_TOKEN="${LAB_CONTROL_TOKEN:-cleanup-only-control}"
+          export LAB_ORACLE_TOKEN="${LAB_ORACLE_TOKEN:-cleanup-only-oracle}"
+          export LAB_INTERNAL_TOKEN="${LAB_INTERNAL_TOKEN:-cleanup-only-internal}"
+          docker compose down --remove-orphans --volumes || true
