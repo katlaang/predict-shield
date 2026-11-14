@@ -13,5 +13,10 @@ rouser reader priv .1.3.6.1.2.1.1
 sysName $LAB_DEVICE_ID
 sysLocation disposable-isp-testbed
 EOF
+cat > /etc/snmp/snmp.conf <<EOF
+defAuthPassphrase $LAB_SNMP_AUTH
+defPrivPassphrase $LAB_SNMP_PRIV
+EOF
+chmod 600 /etc/snmp/snmp.conf
 unset LAB_SNMP_AUTH LAB_SNMP_PRIV
 exec /usr/sbin/snmpd -f -Lo
