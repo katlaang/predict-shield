@@ -74,9 +74,12 @@ def assess(manifest: dict) -> dict:
     if (manifest["operator_pseudonym"] ==
             manifest["independent_assessor_pseudonym"]):
         raise ValueError("Operator and assessor cannot be self-identical")
-    for field in ("source_commit_sha", "protocol_document_sha256",
-                  "operator_consent_sha256", "independent_assessment_sha256",
-                  "measurement_artifact_sha256"):
+    source = manifest.get("source_commit_sha")
+    if (not isinstance(source, str) or len(source) not in (40, 64)
+            or any(c not in SHA for c in source)):
+        raise ValueError("Missing valid Git source commit hash")
+    for field in ("protocol_document_sha256", "operator_consent_sha256",
+                  "independent_assessment_sha256", "measurement_artifact_sha256"):
         _sha256(manifest.get(field), field)
     pairs = manifest.get("matched_conditions")
     if not isinstance(pairs, list) or len(pairs) < 2:
