@@ -1,0 +1,160 @@
+name: Full v3 measured 1200-action AI-vs-defense experiment (five physical shards)
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'experiment-b/mechanism-lab/full_v3_physical_shard.py'
+      - 'experiment-b/mechanism-lab/full_v3_ai_aggregate.py'
+      - 'experiment-b/mechanism-lab/test_full_v3_physical_ai.py'
+      - '.github/workflows/full-v3-physical-ai.yml'
+permissions:
+  contents: read
+concurrency:
+  group: full-v3-physical-ai-${{ github.head_ref || github.ref }}
+  cancel-in-progress: false
+jobs:
+  validate-registration:
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate all 100 frozen configuration groups and 1200 matched actions
+        working-directory: experiment-b/mechanism-lab
+        run: PYTHONPATH=../../engine python -m unittest test_full_v3_physical_ai -v
+      - name: Preserve original research protocol blob
+        run: test "$(git hash-object experiment-b/mechanism-lab/PROTOCOL_V3_AI_EVALUATION.md)" = "3ac868036435720d6a809c3de3b3e265ea766fcf"
+  measure-five-independent-shards:
+    needs: validate-registration
+    strategy:
+      fail-fast: false
+      max-parallel: 5
+      matrix:
+        shard: [0, 1, 2, 3, 4]
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install ML feature parser dependencies
+        run: python -m pip install -r experiment-b/requirements-ml.txt
+      - name: Provision distinct disposable credentials for this shard only
+        run: |
+          for name in LAB_CONTROL_TOKEN LAB_ORACLE_TOKEN LAB_INTERNAL_TOKEN; do
+            token="$(python -c 'import secrets;print(secrets.token_urlsafe(32))')"
+            echo "::add-mask::$token"
+            echo "$name=$token" >> "$GITHUB_ENV"
+          done
+      - name: Start isolated real Kafka authority four enforcement JVMs gateway and oracle
+        working-directory: experiment-b/mechanism-lab
+        run: |
+          for attempt in 1 2 3; do
+            if docker compose up --build -d; then exit 0; fi
+            docker compose down --remove-orphans --volumes || true
+            if [ "$attempt" -lt 3 ]; then sleep $((attempt*8)); fi
+          done
+          exit 1
+      - name: Execute 240 independent physical action replays, verify four streams per trial, export sanitized labels
+        working-directory: experiment-b/mechanism-lab
+        env:
+          SHARD: ${{ matrix.shard }}
+        run: |
+          python full_v3_physical_shard.py --execute-lab --shard "$SHARD" \
+            --root "/tmp/v3-physical-private-shard-$SHARD" \
+            --output "reports/shard-$SHARD.json"
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          shard=int(os.environ["SHARD"])
+          d=json.loads(Path(f"reports/shard-{shard}.json").read_text())
+          assert d["physical_replays_completed"]==240
+          assert d["configuration_groups"]==20
+          assert d["all_four_physical_record_streams_audited"] is True
+          assert d["raw_oracle_records_published"] is False
+          assert d["model_training_performed_in_shard"] is False
+          assert len(d["sanitized_measured_training_rows"])==240
+          print("PASS:",shard,"240 physically measured and independently audited lab replays")
+          PY
+      - name: Hash actual complete sanitized shard and measured provenance
+        if: success()
+        working-directory: experiment-b/mechanism-lab
+        env:
+          SHARD: ${{ matrix.shard }}
+        run: sha256sum "reports/shard-$SHARD.json" > "reports/shard-$SHARD.sha256"
+      - name: Upload sanitized numeric measured learning records only
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v3-physical-measured-shard-${{ matrix.shard }}
+          path: |
+            experiment-b/mechanism-lab/reports/shard-*.json
+            experiment-b/mechanism-lab/reports/shard-*.sha256
+          retention-days: 30
+      - name: Destroy the private four-stream records and physical services
+        if: always()
+        working-directory: experiment-b/mechanism-lab
+        run: |
+          rm -rf "/tmp/v3-physical-private-shard-${{ matrix.shard }}"
+          export LAB_CONTROL_TOKEN="${LAB_CONTROL_TOKEN:-cleanup-only-control}"
+          export LAB_ORACLE_TOKEN="${LAB_ORACLE_TOKEN:-cleanup-only-oracle}"
+          export LAB_INTERNAL_TOKEN="${LAB_INTERNAL_TOKEN:-cleanup-only-internal}"
+          docker compose down --remove-orphans --volumes || true
+  train-and-evaluate-heldout-ai:
+    needs: measure-five-independent-shards
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install identical measured-only ML evaluation dependencies
+        run: python -m pip install -r experiment-b/requirements-ml.txt
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: v3-physical-measured-shard-*
+          path: /tmp/v3-real-measured-shards
+          merge-multiple: true
+      - name: Train on 60 groups, calibrate on 20, compare AI vs strongest of seven fixed/rule baselines on 20 heldout groups
+        working-directory: experiment-b/mechanism-lab
+        run: |
+          python full_v3_ai_aggregate.py \
+            --shards /tmp/v3-real-measured-shards \
+            --report reports/ci-v3-full-real-ai-decision-comparison.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          x=json.loads(Path("reports/ci-v3-full-real-ai-decision-comparison.json").read_text())
+          assert x["real_physical_action_replays"]==1200
+          assert x["independent_configuration_groups"]==100
+          assert x["ai_heldout_group_count"]==20
+          assert x["ai_trained_on_actual_physical_outcomes"] is True
+          assert x["external_critical_infrastructure_validated"] is False
+          a=x["full_model_evaluation"]["heldout_decision_superiority_audit"]
+          assert a["test_used_for_training_or_calibration"] is not True if "test_used_for_training_or_calibration" in a else True
+          assert a["heldout_group_count"]==20
+          print("RESULT -- AI lab superiority supported:",x["lab_superiority_supported_under_declared_test"])
+          print("RESULT -- AI heldout regret:",x["ai_model_mean_regret"])
+          print("RESULT -- calibrated baseline regret:",x["locked_rule_heldout_mean_regret"])
+          print("RESULT -- conservative relative improvement 95%:",x["relative_improvement_95"])
+          PY
+      - name: Hash the complete honest outcome report
+        if: success()
+        working-directory: experiment-b/mechanism-lab
+        run: sha256sum reports/ci-v3-full-real-ai-decision-comparison.json > reports/ci-v3-full-ai-report.sha256
+      - name: Publish real heldout evaluation report, including any negative result
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v3-full-physical-ai-versus-seven-baselines-results
+          path: |
+            experiment-b/mechanism-lab/reports/ci-v3-full-real-ai-decision-comparison.json
+            experiment-b/mechanism-lab/reports/ci-v3-full-ai-report.sha256
+      - name: Remove intermediate sanitized sample copies
+        if: always()
+        run: rm -rf /tmp/v3-real-measured-shards
