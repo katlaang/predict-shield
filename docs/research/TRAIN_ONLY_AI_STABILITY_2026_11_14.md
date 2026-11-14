@@ -25,12 +25,12 @@ The lowest development mean was Extra Trees. We evaluated its **unchanged** hype
 | Folds where AI beat fixed-monitor | 15/25 |
 | Folds where AI lost to fixed-monitor | 9/25 |
 | Folds tied | 1/25 |
-| Average fold-level regret reduction (monitor minus AI) | +0.006059386 |
+| Average fold-level regret reduction (monitor minus AI), local prototype | +0.006059386 |\n| Average fold-level regret reduction, repository canonical feature encoder (CI) | +0.006099724 |
 | Configurations ever used for this stability development | 60 train only |
 
 **Conclusion: TRAINING IMPROVEMENT FOUND, CONSISTENT SUPERIORITY NOT FOUND.** These 25 folds reuse the same 60 independent operating configurations under different partitions, so they are **not 25 independent validation studies**. Selection of Extra Trees is already development tuning and cannot turn this into prospective confirmatory evidence. Do not choose a new fixed threshold or another random seed by inspecting previous TEST outcomes.
 
-The SHA-256 of the independent local training stability JSON is `95e701024e786f8e40f02a7b99c13a30e373c7a237ce22c7cc0a2adb2fe6ad27`. Exact physical source commit: `25f8710ee625f16ffdc288350c6e04865676ee2d`.
+The independently retained local prototype JSON SHA-256 is `95e701024e786f8e40f02a7b99c13a30e373c7a237ce22c7cc0a2adb2fe6ad27`. The canonical repository workflow [43638583298](https://github.com/katlaang/predict-shield/actions/runs/43638583298) used `train.to_features` and produced an independently recorded result SHA-256 `472d46682856654dc35ab7d7b38411d064d8792d06751085bbef4898b21de521`; its 25-fold outcomes also show 15 improvements, 9 losses and 1 tie. Small numerical differences between the local prototype encoding and canonical repository feature encoder are not interpreted as evidence of a different scientific result. Exact physical source commit: `25f8710ee625f16ffdc288350c6e04865676ee2d`.
 
 ## Reproducibility
 
