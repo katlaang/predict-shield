@@ -36,3 +36,7 @@ The GitHub Actions workflow generates the diagnostic report directly from physic
 ## Next research requirements
 
 The full v3.1 methodology still needs a locked contemporaneous-authority uncertainty policy, action-specific operational authority requirements, an independently registered six-family sample, multiple repeated configurations, sufficient partial-visibility decision diversity, and group-level power/precision justification. Neither this diagnostic nor the earlier five-group pilot satisfies those gates. Any future primary utility must be frozen prospectively and evaluated on new independent experiments, not retrofitted to observed action rankings.
+
+## Comparator selection in the stopped-authority stratum
+
+Always-resync is not a defensible *eligible* fixed baseline when the external authority is physically known to be unavailable. Including it would artificially improve any model that simply avoids an impossible action. The policy comparison therefore excludes resync from the feasible choice set while retaining its observed physical transport failure. A new fixed baseline for this stratum, such as a predeclared monitor or gateway restriction policy with safety approval, must be prospectively registered and evaluated against the same eligibility constraints as AI. This is not permission for an agent to activate gateway restrictions automatically.
