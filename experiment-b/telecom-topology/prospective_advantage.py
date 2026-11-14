@@ -108,9 +108,9 @@ def judge(rows: list[dict], *, preregistered_groups: list[str],
                    for _ in range(repeats))
     ci=[samples[int(.025*repeats)],samples[min(repeats-1,int(.975*repeats))]]
     enough=len(rows)>=MIN_CASES and positives>=MIN_EACH_CLASS and negatives>=MIN_EACH_CLASS and len(groups)>=MIN_GROUPS
-    class_reliable=(ai["accuracy_wilson_95_lower"]>=TARGET
-                    and ai["recall_wilson_95_lower"]>=TARGET
-                    and ai["specificity_wilson_95_lower"]>=TARGET)
+    class_reliable=all(value is not None and value>=TARGET for value in (
+        ai["accuracy_wilson_95_lower"], ai["recall_wilson_95_lower"],
+        ai["specificity_wilson_95_lower"]))
     better=ci[0]>0
     # A boolean is an explicit external verifier's assertion, not
     # automatically authenticated. Any scientific publication must attach
