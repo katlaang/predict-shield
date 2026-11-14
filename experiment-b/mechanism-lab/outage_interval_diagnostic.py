@@ -128,7 +128,13 @@ def evaluate(report: dict, *, error_budget_requests: int,
         raise ValueError("Missing independent policy witnesses across the four arms")
     scored = {r["action"]: interval_cost(r, error_budget_requests=error_budget_requests)
               for r in raw}
-    feasible = [a for a in ACTIONS if restart_permitted or a != "restart_enforcer"]
+    # This diagnostic is *only* for a physically stopped authority known to
+    # the operator before action selection. A resync requiring that offline
+    # service is NOT a viable choice. Its physical replay remains necessary
+    # to document mechanism impossibility but cannot earn "model" headroom.
+    feasible = [a for a in ACTIONS
+                if a != "resync_policy"
+                and (restart_permitted or a != "restart_enforcer")]
     dominance = {}
     for a in feasible:
         dominance[a] = [b for b in feasible
@@ -142,6 +148,10 @@ def evaluate(report: dict, *, error_budget_requests: int,
         "weights": COMPONENT_WEIGHTS,
         "registered_error_allowance_assumed": error_budget_requests,
         "restart_permitted": restart_permitted,
+        "authority_known_offline_before_action": True,
+        "resync_replay_preserved_for_mechanism_only": True,
+        "fixed_resync_is_ineligible_comparator": True,
+        "eligible_offline_baseline_requires_prospective_definition": True,
         "physically_replayed_actions": list(ACTIONS),
         "feasible_actions_for_offline_comparison": feasible,
         "action_intervals": [scored[a] for a in ACTIONS],
