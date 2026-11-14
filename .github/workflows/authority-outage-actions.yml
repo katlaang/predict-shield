@@ -28,9 +28,20 @@ jobs:
             echo "::add-mask::$value"
             echo "$name=$value" >> "$GITHUB_ENV"
           done
-      - name: Start isolated physical lab
+      - name: Start isolated physical lab, retry transient Maven Central failures
         working-directory: experiment-b/mechanism-lab
-        run: docker compose up --build -d
+        run: |
+          for attempt in 1 2 3; do
+            if docker compose up --build -d; then
+              echo "Disposable Java/Kafka lab build succeeded"
+              exit 0
+            fi
+            echo "Lab build attempt ${attempt}/3 failed"
+            docker compose down --remove-orphans --volumes || true
+            if [ "$attempt" -lt 3 ]; then sleep $((attempt * 8)); fi
+          done
+          echo "Lab build failed after three attempts"
+          exit 1
       - name: Exercise four actual interventions and retain UNKNOWN policy truth
         working-directory: experiment-b/mechanism-lab
         run: |
