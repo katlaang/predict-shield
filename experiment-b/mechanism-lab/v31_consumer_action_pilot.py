@@ -52,6 +52,10 @@ def execute(token: str, oracle_token: str) -> dict:
                 routing_profile="balanced")
             if measured["fault_mode"] != "consumer_paused":
                 raise RuntimeError("Incorrect physical fault recorded")
+            physical = measured.get("physical_fault_evidence") or {}
+            if (physical.get("listener_pause_physically_observed") is not True
+                    or physical.get("target_http_status") != 200):
+                raise RuntimeError("No observed physical consumer pause immediately before action")
             if measured["before"]["oracle"]["all_revoked_access_denied"] is not False:
                 raise RuntimeError("Consumer pause did not cause initial stale authorization")
             timeline = measured["operations"]["gateway_exposure_timeline"]
@@ -76,7 +80,7 @@ def execute(token: str, oracle_token: str) -> dict:
                 "observed_requests": ops["attempts"],
                 "failed_requests": ops["non_200_requests"],
                 "exposure_upper_fraction": timeline["exposure_fraction_upper_bound"],
-                "physical_consumer_paused_pre_action": True,
+                "physical_consumer_paused_pre_action": physical["listener_pause_physically_observed"],
             })
         finally:
             resume_consumer(token)
