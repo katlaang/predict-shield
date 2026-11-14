@@ -96,8 +96,8 @@ def _paired(rows: list[dict], predictions: dict,
             costs["ai_model"] = true_cost[chosen] - best
         by_group[group].append(costs)
     count_by_group = {g: len(v) for g, v in by_group.items()}
-    if len(set(count_by_group.values())) != 1:
-        raise ValueError("Unequal physical repeat counts across configurations")
+    if set(count_by_group.values()) != {3}:
+        raise ValueError("Expected exactly three independent physical repetitions per configuration")
     if len(by_group) < 2:
         raise ValueError("Too few independent physical configurations")
     return {g: {policy: sum(x[policy] for x in items) / len(items)
@@ -147,13 +147,16 @@ def evaluate(rows: list[dict], heldout_predictions: dict,
         m = sum(model[i] for i in idx)/n
         absolute.append(b-m)
         # A zero-regret baseline leaves no measurable headroom.
-        relative.append((b-m)/b if b > 1e-12 else float("-inf"))
+        relative.append((b-m)/b if b > 1e-12 else None)
     absolute.sort()
-    relative.sort()
     ci_absolute = [_quantile(absolute, .025), _quantile(absolute, .975)]
-    ci_relative = [_quantile(relative, .025), _quantile(relative, .975)]
+    # If even one bootstrap draw has zero baseline regret, there is no
+    # well-defined relative improvement interval under the registered metric.
+    ci_relative = None if any(v is None for v in relative) else [
+        _quantile(sorted(relative), .025), _quantile(sorted(relative), .975)]
     is_sufficient = len(test) >= MIN_TEST_GROUPS_FOR_CLAIM
     target_met = (is_sufficient and observed_baseline > 1e-12
+                  and ci_relative is not None
                   and ci_relative[0] > RELATIVE_IMPROVEMENT_TARGET)
     other_rules = {name: sum(test[g][name] for g in test_groups)/n
                    for name in COMPARATOR_NAMES}
@@ -170,8 +173,7 @@ def evaluate(rows: list[dict], heldout_predictions: dict,
         "heldout_locked_baseline_mean_regret": observed_baseline,
         "heldout_paired_mean_regret_improvement": sum(deltas)/n,
         "paired_group_bootstrap_absolute_95": ci_absolute,
-        "paired_group_bootstrap_relative_95": [
-            value if math.isfinite(value) else None for value in ci_relative],
+        "paired_group_bootstrap_relative_95": ci_relative,
         "relative_improvement_target": RELATIVE_IMPROVEMENT_TARGET,
         "improvement_target_supported_in_lab": target_met,
         "research_status": (
