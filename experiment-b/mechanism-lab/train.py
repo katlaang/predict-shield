@@ -499,6 +499,19 @@ def main() -> None:
     args = parser.parse_args()
     rows = load_executed_dataset(args.records)
     result = train_evaluate(rows, export_path=args.export_model)
+    # CLI provenance marker is attached only after load_executed_dataset()
+    # verifies the expected 1,200 complete four-stream executed records,
+    # identical source revisions, and independent registered partitions.
+    fingerprint = hashlib.sha256(json.dumps(
+        rows, sort_keys=True, separators=(",", ":")).encode("utf-8")).hexdigest()
+    result["physical_dataset_provenance"] = {
+        "four_stream_executed_record_schema_checked": True,
+        "expected_real_physical_replays": EXPECTED_TRIALS,
+        "measured_join_fingerprint_sha256": fingerprint,
+        "group_partitions": dict(SPLITS),
+        "cryptographic_external_attestation": False,
+        "not_independent_field_validation": True,
+    }
     args.report.parent.mkdir(parents=True, exist_ok=True)
     with args.report.open("x", encoding="utf-8") as file:
         json.dump(result, file, indent=2, sort_keys=True)
