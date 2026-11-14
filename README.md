@@ -61,6 +61,14 @@ The first data-collection invocation runs **four candidate actions**, not the wh
 
 Read [the Experiment B guide](experiment-b/README.md) for precise setup, restrictions, data provenance, and study limitations.
 
+## Research demo and repeated physical pilot evidence
+
+A first [read-only research dashboard](demo/README.md) is now available in `demo/index.html`. It displays **actual recorded Java/Kafka/Docker physical trial measurements**, not simulated AI recommendation results, and allows viewing exposure-duration intervals, authorized-user disruption and source provenance.
+
+The [November 14 repeated authority-outage research record](docs/research/PHYSICAL_OUTAGE_REPEATED_PILOT_2026_11_14.md) records **eight physically executed action replays in two repeat batches** of one configuration, with GitHub Actions run ID, separately hashed evidence, per-arm outcomes and explicit scientific limitations. The corresponding [GitHub Actions workflow](.github/workflows/repeated-outage-pilots.yml) is manually rerunnable for further bounded exploratory batches and publishes a standalone dashboard artifact alongside the measured report.
+
+The dashboard demonstrates experimental measurements **only**. It has no production remediation controls. No AI decision-value superiority or independently validated U.S. critical-infrastructure impact has yet been established.
+
 ## Documentation
 
 - [Architecture notes](docs/architecture/README.md)
