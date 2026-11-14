@@ -7,8 +7,11 @@ on:
       - 'experiment-b/mechanism-lab/v31_consumer_action_pilot.py'
       - 'experiment-b/mechanism-lab/test_v31_consumer_action_pilot.py'
       - '.github/workflows/v31-consumer-action-smoke.yml'
+permissions:
+  contents: read
 jobs:
   physically-measured-actions:
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     timeout-minutes: 18
     steps:
