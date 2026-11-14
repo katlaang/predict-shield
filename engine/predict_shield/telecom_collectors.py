@@ -75,8 +75,13 @@ def gnmi_get_interfaces(*, device_id: str, port: int, ca: Path, client_cert: Pat
          "--format","json","get","--path","/interfaces/interface/state"]
     result=runner(cmd,capture_output=True,text=True,timeout=20,check=True)
     data=json.loads(result.stdout)
+    # gNMIc can emit a single-target response inside a JSON array.
+    if isinstance(data,list) and len(data)==1:
+        data=data[0]
     if not isinstance(data,dict) or not isinstance(data.get("updates"),list):
-        raise ValueError("Unexpected gNMI Get JSON response")
+        raise ValueError("Unexpected gNMI Get JSON response shape: "+
+            ("keys="+",".join(sorted(data.keys())) if isinstance(data,dict)
+             else "root="+type(data).__name__))
     # Raw update preservation is intentionally narrow: each bounded response
     # is evidence for the device, not blindly flattened to invented link edges.
     if len(result.stdout)>1024*1024:
