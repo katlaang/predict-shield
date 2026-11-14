@@ -43,7 +43,7 @@ def read_measured(records: Path) -> tuple[list[dict], dict]:
             raise ValueError("Cannot learn from incomplete physical record: " + reason)
         pre, verify, operations, oracle = [
             json.loads((records / kind / (trial["run_id"] + ".json")).read_text())
-            for kind in ("pre_action", "verification", "operations", "oracle")]
+            for kind in ("pre_action", "verification", "operations", "oracle")
         ]
         if (pre["oracle_features_excluded"] is not True or
                 verify["verification_did_not_read_oracle"] is not True or
