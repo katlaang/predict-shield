@@ -1,0 +1,21 @@
+name: Asset SBOM risk-context contracts
+on:
+  pull_request:
+    paths:
+      - 'engine/predict_shield/asset_risk_context.py'
+      - 'engine/tests/test_asset_risk_context.py'
+      - '.github/workflows/asset-risk-context-tests.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  unit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run engine regression tests
+        run: PYTHONPATH=engine python -m unittest discover -s engine/tests -v
