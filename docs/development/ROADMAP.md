@@ -1,6 +1,16 @@
 # PREDICT-SHIELD engineering roadmap and endeavor traceability
 
-**As of November 14, 2026.** Research pre-alpha. A merged implementation or passing CI proves only the documented local or CI behavior, not superior AI performance, commercial adoption, critical-infrastructure field validation or EB-2 NIW eligibility.
+**As of November 14, 2026.**
+
+## AI decision value and infrastructure effectiveness: evidence checkpoint
+
+- **AI has been implemented and trained for historical CVE threat-ranking research.** Its September diagnostic improved on the EPSS proxy but its October exploratory result underperformed EPSS. This is not a positive AI superiority conclusion.
+- **Action-effectiveness AI comparison code is now implemented (PR #51), not empirically demonstrated.** A physical-data trainer requires a complete 1,200-action four-stream lab dataset. Once data exist, its evaluation selects the strongest eligible non-AI comparator on calibration configurations, tests a random-forest selector on 20 separate held-out configuration groups, and requires group-paired bootstrap evidence of at least 10% regret improvement against all seven predeclared deterministic comparators under a Bonferroni safeguard. Current synthetic tests confirm the code contract, not superiority.
+- **External U.S. infrastructure validation is prepared but not conducted (PR #52).** The sector-independent operator-study protocol and fail-closed evidence manifest check demand real operator permission, independent assessor evidence, matched service baselines, and actual exposure, downtime, legitimate-request failure and false-assurance counts. Structural completeness cannot authenticate a real operator or prove impact.
+- **Authority-outage action inference remains limited.** PRs #43–#50 established physical outage witnesses, four action interventions, real timed observations, conservative UNKNOWN intervals, draft six-family feasibility registration and sample-size caution. The complete six-family physical study is not authorized/frozen; no field critical-infrastructure resilience improvement has been quantified.
+- **Research claims must remain separated.** Software CI success, completed exploratory laboratory actions, a positive held-out laboratory comparator result (if eventually observed), and independent operator field impact are four different evidence levels. Neither GitHub traffic nor self-reported records can bridge those levels.
+
+ Research pre-alpha. A merged implementation or passing CI proves only the documented local or CI behavior, not superior AI performance, commercial adoption, critical-infrastructure field validation or EB-2 NIW eligibility.
 
 ## Endeavor capability coverage
 
