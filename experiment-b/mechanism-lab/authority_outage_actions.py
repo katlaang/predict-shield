@@ -13,6 +13,7 @@ from pathlib import Path
 from urllib.parse import urlsplit
 
 from authority_outage_witness import capture_witness, observe_offline
+from outage_timed_measure import observe_during_action
 from physical_faults import compose_command, wait_authority_unavailable
 from pilot import request, setup_fault, wait_for_target, wait_ready
 
@@ -88,9 +89,9 @@ def execute(control: str, oracle: str, compose_dir: Path) -> dict:
             compose_command(["stop", "authority"], cwd=compose_dir)
             stopped = True
             wait_authority_unavailable()
-            initial = sample_gateway()
-            action_result = apply_action(action, control, compose_dir)
-            subsequent = sample_gateway()
+            timed = observe_during_action(
+                action, control, compose_dir, apply_action)
+            action_result = timed["action_observation"]
             code, post, _ = request("oracle", "/oracle/observe",
                                     oracle=oracle, timeout=5)
             if code != 200:
@@ -110,8 +111,7 @@ def execute(control: str, oracle: str, compose_dir: Path) -> dict:
                     "observed_allow_fraction_lower_bound"],
                 "observed_allow_fraction_upper_bound": bounds[
                     "observed_allow_fraction_upper_bound"],
-                "gateway_before": initial,
-                "gateway_after": subsequent,
+                "timed_observations": timed,
                 "action_observation": action_result,
             })
         finally:
@@ -124,6 +124,7 @@ def execute(control: str, oracle: str, compose_dir: Path) -> dict:
             "registered_actions": list(ACTIONS),
             "physical_action_replays": 4,
             "experiment_type": "exploratory_mechanism_only",
+            "time_integrated_gateway_probes_measured": True,
             "decision_value_computed": False,
             "v31_feasibility_evaluated": False,
             "private_policy_truth_not_used_as_live_verification": True,
