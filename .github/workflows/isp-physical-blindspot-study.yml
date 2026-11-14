@@ -1,0 +1,69 @@
+name: Physical incomplete-telemetry AI versus graph rules
+on:
+  pull_request:
+    paths:
+      - 'experiment-b/isp-lab/physical_missing_telemetry.py'
+      - 'experiment-b/isp-lab/test_physical_missing_telemetry.py'
+      - '.github/workflows/isp-physical-blindspot-study.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  physical-blindspot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    defaults:
+      run:
+        working-directory: experiment-b/isp-lab
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install research AI model dependencies
+        run: python -m pip install -r ../requirements-ml.txt
+      - name: Validate leakage controls and observation masking before physical run
+        env:
+          PYTHONPATH: ../../engine:../telecom-topology
+        run: python -m unittest test_physical_missing_telemetry -v
+      - name: Start five real disposable SNMPv3 management agents
+        run: |
+          export LAB_SNMP_AUTH="$(python -c 'import secrets;print(secrets.token_urlsafe(20))')"
+          export LAB_SNMP_PRIV="$(python -c 'import secrets;print(secrets.token_urlsafe(20))')"
+          export LAB_ACCESS_TOKEN="$(python -c 'import secrets;print(secrets.token_urlsafe(32))')"
+          printf 'LAB_SNMP_AUTH=%s\nLAB_SNMP_PRIV=%s\nLAB_ACCESS_TOKEN=%s\n' "$LAB_SNMP_AUTH" "$LAB_SNMP_PRIV" "$LAB_ACCESS_TOKEN" > .env
+          docker compose -p psblindspot up -d --build
+      - name: Measure real missing SNMP telemetry and frozen AI-v-graph-rule comparison
+        env:
+          PYTHONPATH: ../../engine:../telecom-topology
+        run: |
+          set -a
+          . ./.env
+          set +a
+          python physical_missing_telemetry.py --project psblindspot \
+            --output /tmp/ps-physical-blindspot-comparison.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path("/tmp/ps-physical-blindspot-comparison.json").read_text())
+          assert r["real_snmp_management_probes"]["attempted"]==560
+          assert r["heldout_ai_and_rule_comparison"]["heldout_records"]==80
+          assert r["model_accuracy_99_9_verified"] is False
+          assert r["model_superiority_on_independent_isp_sites"] is False
+          print("Preserved complete exploratory measured model-versus-rule result")
+          PY
+      - name: Preserve all measured heldout predictions and errors
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: physical-missing-telemetry-ai-vs-graph-rule
+          path: /tmp/ps-physical-blindspot-comparison.json
+          retention-days: 30
+      - name: Dispose lab and temporary credentials
+        if: always()
+        run: |
+          docker compose -p psblindspot down -v --remove-orphans || true
+          for network in psblindspot-masked-segment0 psblindspot-masked-segment1 psblindspot-masked-segment2; do
+            docker network rm "$network" >/dev/null 2>&1 || true
+          done
+          rm -f .env
