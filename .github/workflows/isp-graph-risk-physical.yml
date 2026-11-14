@@ -1,0 +1,60 @@
+name: Physical ISP graph-aware learned risk inference
+on:
+  pull_request:
+    paths:
+      - 'experiment-b/isp-lab/physical_graph_risk_pilot.py'
+      - 'experiment-b/isp-lab/test_physical_graph_risk.py'
+      - '.github/workflows/isp-graph-risk-physical.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  actual-telemetry-risk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 24
+    defaults:
+      run:
+        working-directory: experiment-b/isp-lab
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install Net-SNMP tools and research model dependencies
+        run: |
+          sudo apt-get update && sudo apt-get install -y snmp
+          python -m pip install -r ../requirements-ml.txt
+      - name: Validate toy-label training and no-action model output
+        env:
+          PYTHONPATH: ../../engine:../telecom-topology
+        run: python -m unittest test_physical_graph_risk -v
+      - name: Launch isolated real SNMP agents and access endpoint
+        run: |
+          export LAB_SNMP_AUTH="$(python -c 'import secrets;print(secrets.token_urlsafe(20))')"
+          export LAB_SNMP_PRIV="$(python -c 'import secrets;print(secrets.token_urlsafe(20))')"
+          export LAB_ACCESS_TOKEN="$(python -c 'import secrets;print(secrets.token_urlsafe(32))')"
+          printf 'LAB_SNMP_AUTH=%s\nLAB_SNMP_PRIV=%s\nLAB_ACCESS_TOKEN=%s\n' "$LAB_SNMP_AUTH" "$LAB_SNMP_PRIV" "$LAB_ACCESS_TOKEN" > .env
+          docker compose -p psgraphrisk up -d --build
+      - name: Reconcile actual devices and perform non-dispatchable graph risk inference
+        env:
+          PYTHONPATH: ../../engine:../telecom-topology
+        run: |
+          set -a
+          . ./.env
+          set +a
+          for attempt in $(seq 1 15); do
+            if python physical_graph_risk_pilot.py --output /tmp/physical-isp-risk.json; then exit 0; fi
+            if [ "$attempt" = 15 ]; then exit 1; fi
+            sleep 3
+          done
+      - name: Retain measured topology and learned risk score
+        uses: actions/upload-artifact@v4
+        with:
+          name: physical-isp-graph-risk-inference
+          path: /tmp/physical-isp-risk.json
+          retention-days: 30
+      - name: Tear down and remove secrets
+        if: always()
+        run: |
+          docker compose -p psgraphrisk down -v --remove-orphans || true
+          rm -f .env
