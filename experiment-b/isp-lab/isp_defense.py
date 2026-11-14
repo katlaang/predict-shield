@@ -63,6 +63,7 @@ def execute_and_verify(*, base, token, proposal, baseline_observation=None, requ
             "post_health_http_status":health[0],
             "postcondition":verdict,
             "action_ack_is_not_verification":True,
-            "measured_disruption_to_other_services":False,
+            "cross_service_disruption_measured":False,
+            "cross_service_disruption_outcome":"UNKNOWN",
             "lab_only":True,
             "real_telecom_network_protected":False}
