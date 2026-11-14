@@ -64,9 +64,9 @@ def vector(row: dict) -> list[int]:
 
 
 def rule_baseline(row: dict) -> float:
-    """Strong transparent discovery baseline: authenticated LLDP or routing seen."""
+    """Strong discovery baseline: LLDP, routing adjacency or observed bidirectional flow."""
     f = row["features"]
-    return float(f["lldp_seen"] or f["routing_adjacency_seen"])
+    return float(f["lldp_seen"] or f["routing_adjacency_seen"] or f["bidirectional_flow_seen"])
 
 
 def confusion(y: list[bool], predictions: list[float], threshold: float = 0.5) -> dict:
@@ -118,6 +118,10 @@ def train_evaluate(rows: list[dict]) -> tuple[dict,dict]:
         "threshold":0.5,
         "test_topologies":sorted({r["topology_id"] for r in test}),
         "test_records":len(test),
+        "paired_test_predictions":[{"topology_id":r["topology_id"],"source":r["source"],
+            "target":r["target"],"verified_link":r["verified_link"],
+            "truth_evidence_id":r.get("truth_evidence_id"),"model_score":p,
+            "baseline_score":b} for r,p,b in zip(test,probs,baseline)],
         "synthetic_or_external_provenance_must_be_reported":True,
         "model_superiority_claim":False,
         "production_topology_verified":False,
