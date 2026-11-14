@@ -223,12 +223,35 @@ def setup_fault(control_token: str, *, ttl_ms: int, delay_ms: int,
         time.sleep(1.5)
     if fault_target not in ENFORCERS:
         raise ValueError("Unexpected fault target")
-    if fault_mode not in {"loss", "delay", "duplicate", "reorder"}:
+    if fault_mode not in {"loss", "delay", "duplicate", "reorder", "consumer_paused"}:
         raise ValueError("Unsupported Kafka fault mode")
-    status, _, _ = request(fault_target, f"/admin/fault/{fault_mode}/{delay_ms}",
-                           method="POST", token=control_token)
-    if status != 200:
-        raise RuntimeError("Consumer fault setup failed")
+    if fault_mode == "consumer_paused":
+        # v3.1 ONLY: pause the actual Spring Kafka listener container
+        # after clean trial convergence, before publishing the revocation.
+        # HTTP service stays available. This is not a synthetic loss flag.
+        status, _, _ = request(fault_target, "/admin/fault/none/0",
+                               method="POST", token=control_token)
+        if status != 200:
+            raise RuntimeError("Cannot clear callback fault before listener pause")
+        status, _, _ = request(fault_target, "/admin/consumer/pause",
+                               method="POST", token=control_token)
+        if status != 200:
+            raise RuntimeError("Kafka listener pause command rejected")
+        deadline = time.monotonic() + 12
+        while time.monotonic() < deadline:
+            status, pause_state, _ = request(
+                fault_target, "/admin/consumer/status", token=control_token)
+            health, _, _ = request(fault_target, "/healthz")
+            if status == 200 and pause_state.get("container_paused") is True and health == 200:
+                break
+            time.sleep(0.25)
+        else:
+            raise RuntimeError("Kafka listener not physically paused with HTTP available")
+    else:
+        status, _, _ = request(fault_target, f"/admin/fault/{fault_mode}/{delay_ms}",
+                               method="POST", token=control_token)
+        if status != 200:
+            raise RuntimeError("Consumer fault setup failed")
     status, _, _ = request("authority", "/control/revoke", method="POST", token=control_token, timeout=10)
     if status != 202:
         raise RuntimeError("Policy revocation rejected")
@@ -521,6 +544,17 @@ def run_case(action: str, control_token: str, oracle_token: str,
                 routing_profile=routing_profile,
                 complexity_stratum=complexity_stratum,
                 node_service_latency_ms=node_service_latency_ms)
+    physical_fault_evidence = None
+    if fault_mode == "consumer_paused":
+        status, listener, _ = request(
+            fault_target, "/admin/consumer/status", token=control_token)
+        healthy, _, _ = request(fault_target, "/healthz")
+        if status != 200 or listener.get("container_paused") is not True or healthy != 200:
+            raise RuntimeError("Physical Kafka listener pause not observed before action")
+        physical_fault_evidence = {
+            "listener_pause_physically_observed": True,
+            "target_http_status": healthy,
+        }
     before_probes = gateway_probes(count=8)
     before_operator_telemetry = operator_telemetry(control_token)
     before_scope = gateway_scope_evidence(control_token, before_probes)
@@ -541,6 +575,7 @@ def run_case(action: str, control_token: str, oracle_token: str,
     return {
         "case": "experiment-b-kafka-revocation",
         "fault_mode": fault_mode,
+        "physical_fault_evidence": physical_fault_evidence,
         "fault_target": fault_target,
         "cache_ttl_ms": ttl_ms,
         "event_delay_ms": delay_ms,

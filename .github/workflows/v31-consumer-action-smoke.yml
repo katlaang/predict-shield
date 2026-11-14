@@ -1,0 +1,65 @@
+name: v3.1 consumer-only physical action smoke
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'experiment-b/mechanism-lab/pilot.py'
+      - 'experiment-b/mechanism-lab/v31_consumer_action_pilot.py'
+      - 'experiment-b/mechanism-lab/test_v31_consumer_action_pilot.py'
+      - '.github/workflows/v31-consumer-action-smoke.yml'
+jobs:
+  physically-measured-actions:
+    runs-on: ubuntu-latest
+    timeout-minutes: 18
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Create separate masked disposable credentials
+        run: |
+          for name in LAB_CONTROL_TOKEN LAB_ORACLE_TOKEN LAB_INTERNAL_TOKEN; do
+            value="$(python -c 'import secrets;print(secrets.token_urlsafe(32))')"
+            echo "::add-mask::$value"
+            echo "$name=$value" >> "$GITHUB_ENV"
+          done
+      - name: Validate test contracts
+        working-directory: experiment-b/mechanism-lab
+        run: python -m unittest test_v31_consumer_action_pilot -v
+      - name: Start disposable Kafka and separate JVMs
+        working-directory: experiment-b/mechanism-lab
+        run: docker compose up --build -d
+      - name: Execute all four actual actions on physically paused consumer
+        working-directory: experiment-b/mechanism-lab
+        run: |
+          python v31_consumer_action_pilot.py --execute-lab --output reports/ci-v31-consumer-actions.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path("reports/ci-v31-consumer-actions.json").read_text())
+          assert r["replays"] == 4
+          assert r["decision_groups"] == 1
+          assert r["not_a_feasibility_gate"] is True
+          assert all(row["physical_consumer_paused_pre_action"] and row["observed_requests"]>0
+                     for row in r["measurements"])
+          assert set(row["action"] for row in r["measurements"]) == {
+              "resync_policy","restart_enforcer","gateway_restrict","monitor_only"
+          }
+          print("PASS: one physical condition, four observed actions; no feasibility claim")
+          for row in r["measurements"]:
+              print(row["action"],"cost",f'{row["measured_cost"]:.6f}',
+                    "verification",row["verification_status"])
+          PY
+      - name: Retain sanitized action summary without private oracle state
+        uses: actions/upload-artifact@v4
+        with:
+          name: v31-consumer-action-physical-smoke
+          path: experiment-b/mechanism-lab/reports/ci-v31-consumer-actions.json
+          if-no-files-found: ignore
+      - name: Shut down and purge disposable lab
+        if: always()
+        working-directory: experiment-b/mechanism-lab
+        run: |
+          docker compose ps
+          docker compose logs --tail=60
+          docker compose down --remove-orphans --volumes
