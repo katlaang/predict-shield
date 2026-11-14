@@ -414,6 +414,15 @@ def train_evaluate(rows: list[dict], seed: int = 20261110,
     report["offline_decision_sensitivity"] = evaluate_sensitivity(
         test_rows, offline_predictions, tuned_rule["parameters"]
     )
+    # A model beating the mean-action baseline in regression MAE is NOT the
+    # same as selecting better interventions. The following paired decision
+    # audit selects its strongest deterministic comparator on calibration
+    # configurations only, then tests the AI on never-used held-out groups.
+    # Even a positive lab result explicitly does not imply field efficacy.
+    from decision_superiority_audit import evaluate as audit_decision_superiority
+    report["heldout_decision_superiority_audit"] = audit_decision_superiority(
+        rows, offline_predictions, tuned_rule["parameters"]
+    )
     # Prospective crossover: describe results at every declared difficulty
     # level without filtering for strata where AI happens to outperform a rule.
     report["complexity_crossover"] = {}
@@ -490,6 +499,19 @@ def main() -> None:
     args = parser.parse_args()
     rows = load_executed_dataset(args.records)
     result = train_evaluate(rows, export_path=args.export_model)
+    # CLI provenance marker is attached only after load_executed_dataset()
+    # verifies the expected 1,200 complete four-stream executed records,
+    # identical source revisions, and independent registered partitions.
+    fingerprint = hashlib.sha256(json.dumps(
+        rows, sort_keys=True, separators=(",", ":")).encode("utf-8")).hexdigest()
+    result["physical_dataset_provenance"] = {
+        "four_stream_executed_record_schema_checked": True,
+        "expected_real_physical_replays": EXPECTED_TRIALS,
+        "measured_join_fingerprint_sha256": fingerprint,
+        "group_partitions": dict(SPLITS),
+        "cryptographic_external_attestation": False,
+        "not_independent_field_validation": True,
+    }
     args.report.parent.mkdir(parents=True, exist_ok=True)
     with args.report.open("x", encoding="utf-8") as file:
         json.dump(result, file, indent=2, sort_keys=True)
