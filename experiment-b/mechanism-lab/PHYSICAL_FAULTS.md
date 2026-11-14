@@ -27,3 +27,9 @@ The workflow calls this test before the v3 40-replay pilot after restoring the o
 3. Define initial state and recovery windows for every persistent fault; record counterfactual action effects under same scenario groups.
 4. Update the v3.1 plan to 150 configurations × 4 actions × 2 repeats only **after** the fault-mechanism tests are verified. Freeze and tag v3.1 before scored full-campaign evidence.
 5. Keep v3's exploratory pilot and the v3.1 amendment rationale visible, including losses or inconclusive results.
+
+## Authority-unavailable oracle semantics
+
+The physically executed authority-outage CI now queries the separate oracle **while authority remains stopped**, after a local enforcer restart. It requires `authority_truth_available=false`, `inventory_complete=false`, and `all_revoked_access_denied=null`. It retains `direct_target_observations_complete` independently so observed HTTP evidence is not lost merely because desired policy is unknowable.
+
+This is a fail-closed distinction, **not** a six-family v3.1 scorer. A new collector must define a separately witnessed pre-outage policy, temporal bounds and conservative handling of unknown outcomes before comparing action regret under an outage. See issue #36.
