@@ -70,7 +70,7 @@ class AuditedExporterTests(unittest.TestCase):
         self.assertEqual(audit.call_count,24)
         self.assertEqual(rows[0]["eligible_actions"],list(ACTIONS))
         self.assertNotIn("restart_enforcer",rows[2]["eligible_actions"])
-        self.assertAlmostEqual(rows[0]["action_costs"]["resync_policy"],0.36)
+        self.assertAlmostEqual(rows[0]["action_costs"]["resync_policy"],0.31)
         self.assertNotIn("physical_fault_evidence",rows[0])
 
     @patch("export_v31_pilot.inspect_trial", return_value=("missing","not executed"))
