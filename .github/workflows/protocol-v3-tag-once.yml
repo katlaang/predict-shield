@@ -1,16 +1,12 @@
-# Re-trigger on an existing default-branch workflow; never overwrite a tag.
+# Manual one-time historical tag operation; do not grant write scope on ordinary pushes.
 name: Create historical Experiment B v3 annotated protocol tag once
 on:
-  push:
-    branches: [master]
-    paths:
-      - '.github/workflows/protocol-v3-tag-once.yml'
   workflow_dispatch:
 permissions:
   contents: write
 jobs:
   tag-frozen-protocol:
-    if: github.repository == 'katlaang/predict-shield'
+    if: github.repository == 'katlaang/predict-shield' && github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
