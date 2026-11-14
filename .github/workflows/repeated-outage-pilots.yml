@@ -1,0 +1,91 @@
+name: Repeated physical authority-outage pilot and demo evidence
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'experiment-b/mechanism-lab/repeated_outage_pilot.py'
+      - 'experiment-b/mechanism-lab/test_repeated_outage_pilot.py'
+      - 'demo/**'
+      - '.github/workflows/repeated-outage-pilots.yml'
+permissions:
+  contents: read
+jobs:
+  repeated-physical-outage:
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Check pilot report and independent outage semantics
+        working-directory: experiment-b/mechanism-lab
+        run: |
+          python -m unittest test_repeated_outage_pilot test_authority_outage_actions test_authority_outage_witness test_outage_timed_measure test_outage_interval_diagnostic -v
+      - name: Provision separate masked disposable credentials
+        run: |
+          for name in LAB_CONTROL_TOKEN LAB_ORACLE_TOKEN LAB_INTERNAL_TOKEN; do
+            value="$(python -c 'import secrets;print(secrets.token_urlsafe(32))')"
+            echo "::add-mask::$value"
+            echo "$name=$value" >> "$GITHUB_ENV"
+          done
+      - name: Start disposable Java/Kafka authority lab
+        working-directory: experiment-b/mechanism-lab
+        run: |
+          for attempt in 1 2 3; do
+            if docker compose up --build -d; then exit 0; fi
+            docker compose down --remove-orphans --volumes || true
+            if [ "$attempt" -lt 3 ]; then sleep $((attempt*8)); fi
+          done
+          exit 1
+      - name: Execute two separately reset physical four-action batches
+        working-directory: experiment-b/mechanism-lab
+        run: |
+          python repeated_outage_pilot.py --execute-lab --batches 2 --output reports/ci-repeated-outage.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p=Path("reports/ci-repeated-outage.json")
+          data=json.loads(p.read_text())
+          assert data["physical_four_action_batches"] == 2
+          assert data["physical_action_replays"] == 8
+          assert data["independent_fault_configuration_count"] == 1
+          assert data["ai_action_model_trained_or_tested"] is False
+          assert data["critical_infrastructure_operator_pilot"] is False
+          assert data["research_conclusion"] == "EXPLORATORY_MECHANISM_REPEATS_ONLY"
+          assert len(data["batch_records"]) == 2
+          assert all(x["verification_status"] == "INDETERMINATE"
+                     and x["policy_truth"] == "UNKNOWN"
+                     for batch in data["batch_records"] for x in batch["actions"])
+          assert len(list(Path("reports").glob("physical-batch-*.json"))) == 2
+          print("PASS: eight measured physical intervention replays in two batches, one fault configuration")
+          PY
+      - name: Save source-identified integrity hashes and bundle read-only dashboard
+        if: success()
+        run: |
+          mkdir -p demo/data
+          cp experiment-b/mechanism-lab/reports/ci-repeated-outage.json demo/data/ci-report.json
+          sha256sum experiment-b/mechanism-lab/reports/ci-repeated-outage.json \
+            experiment-b/mechanism-lab/reports/physical-batch-*.json \
+            > experiment-b/mechanism-lab/reports/ci-evidence-sha256.txt
+      - name: Upload all completed sanitized physical evidence, even if a later repeat failed
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: physical-repeated-outage-evidence
+          path: |
+            experiment-b/mechanism-lab/reports/ci-repeated-outage.json
+            experiment-b/mechanism-lab/reports/physical-batch-*.json
+            experiment-b/mechanism-lab/reports/ci-evidence-sha256.txt
+          if-no-files-found: warn
+      - name: Upload standalone research demo UI with actual pilot JSON
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: predict-shield-research-demo
+          path: demo/
+      - name: Destroy disposable lab
+        if: always()
+        working-directory: experiment-b/mechanism-lab
+        run: docker compose down --remove-orphans --volumes
