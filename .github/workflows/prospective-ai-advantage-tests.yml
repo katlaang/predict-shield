@@ -3,6 +3,8 @@ on:
   pull_request:
     paths:
       - 'experiment-b/telecom-topology/prospective_advantage.py'
+      - 'engine/predict_shield/telemetry_blindspots.py'
+      - 'engine/tests/test_telemetry_blindspots.py'
       - 'experiment-b/telecom-topology/test_prospective_advantage.py'
       - '.github/workflows/prospective-ai-advantage-tests.yml'
   workflow_dispatch:
@@ -20,3 +22,5 @@ jobs:
       - name: Test statistical quality and independently auditable superiority safeguards
         working-directory: experiment-b/telecom-topology
         run: python -m unittest test_prospective_advantage -v
+      - name: Validate telemetry blindspot features and strong graph baseline
+        run: PYTHONPATH=engine python -m unittest engine.tests.test_telemetry_blindspots -v
