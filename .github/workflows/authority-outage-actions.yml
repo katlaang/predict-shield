@@ -1,0 +1,65 @@
+name: Four physical actions under policy-authority outage (exploratory)
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'experiment-b/mechanism-lab/authority_outage_actions.py'
+      - 'experiment-b/mechanism-lab/test_authority_outage_actions.py'
+      - '.github/workflows/authority-outage-actions.yml'
+permissions:
+  contents: read
+jobs:
+  physical-action-observations:
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 23
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Test measurement contracts
+        working-directory: experiment-b/mechanism-lab
+        run: python -m unittest test_authority_outage_witness test_authority_outage_actions -v
+      - name: Create separate disposable lab credentials
+        run: |
+          for name in LAB_CONTROL_TOKEN LAB_ORACLE_TOKEN LAB_INTERNAL_TOKEN; do
+            value="$(python -c 'import secrets;print(secrets.token_urlsafe(32))')"
+            echo "::add-mask::$value"
+            echo "$name=$value" >> "$GITHUB_ENV"
+          done
+      - name: Start isolated physical lab
+        working-directory: experiment-b/mechanism-lab
+        run: docker compose up --build -d
+      - name: Exercise four actual interventions and retain UNKNOWN policy truth
+        working-directory: experiment-b/mechanism-lab
+        run: |
+          python authority_outage_actions.py --execute-lab --output reports/ci-outage-actions.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path("reports/ci-outage-actions.json").read_text())
+          assert r["physical_action_replays"] == 4
+          assert r["decision_value_computed"] is False
+          assert r["v31_feasibility_evaluated"] is False
+          assert {x["action"] for x in r["results"]} == {
+              "resync_policy","restart_enforcer","gateway_restrict","monitor_only"}
+          assert all(x["policy_truth"]=="UNKNOWN"
+                     and x["verification_status"]=="INDETERMINATE"
+                     and len(x["witness_sha256"])==64 for x in r["results"])
+          for x in r["results"]:
+              print(x["action"], x["action_observation"]["action_status"],
+                    "allow_lower",x["observed_allow_fraction_lower_bound"],
+                    "allow_upper",x["observed_allow_fraction_upper_bound"])
+          print("PASS: physical outage observations, no fabricated decision utility")
+          PY
+      - name: Upload only summarized observations without raw oracle truth
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: physical-authority-outage-action-observations
+          path: experiment-b/mechanism-lab/reports/ci-outage-actions.json
+      - name: Shut down disposable lab
+        if: always()
+        working-directory: experiment-b/mechanism-lab
+        run: docker compose down --remove-orphans --volumes
