@@ -1,0 +1,64 @@
+name: Physical authority outage with historical witness and UNKNOWN bounds
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'experiment-b/mechanism-lab/authority_outage_witness.py'
+      - 'experiment-b/mechanism-lab/test_authority_outage_witness.py'
+      - 'experiment-b/mechanism-lab/authority_outage_witness_smoke.py'
+      - '.github/workflows/authority-outage-witness.yml'
+permissions:
+  contents: read
+jobs:
+  physical-witness:
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 16
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify fail-closed observer unit tests
+        working-directory: experiment-b/mechanism-lab
+        run: python -m unittest test_authority_outage_witness -v
+      - name: Create disposable credentials without logging values
+        run: |
+          for name in LAB_CONTROL_TOKEN LAB_ORACLE_TOKEN LAB_INTERNAL_TOKEN; do
+            value="$(python -c 'import secrets;print(secrets.token_urlsafe(32))')"
+            echo "::add-mask::$value"
+            echo "$name=$value" >> "$GITHUB_ENV"
+          done
+      - name: Start isolated lab
+        working-directory: experiment-b/mechanism-lab
+        run: docker compose up --build -d
+      - name: Physically stop authority and verify bounded offline observations
+        working-directory: experiment-b/mechanism-lab
+        run: |
+          python authority_outage_witness_smoke.py --execute-lab --output reports/ci-authority-witness.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path("reports/ci-authority-witness.json").read_text())
+          assert r["physical_authority_stop_observed"] is True
+          assert r["physical_kafka_loss_injected_before_outage"] is True
+          assert r["authority_truth_status"] == "UNKNOWN"
+          assert r["verification_status"] == "INDETERMINATE"
+          assert r["declared_target_count"] == 4
+          assert (r["observed_allow_count"] + r["observed_deny_count"] +
+                  r["unknown_target_count"]) == 4
+          assert 0 <= r["observed_allow_fraction_lower_bound"] <= r["observed_allow_fraction_upper_bound"] <= 1
+          assert r["not_full_v31_utility"] is True
+          print("PASS: offline physical observations bounded, policy verification remains UNKNOWN")
+          PY
+      - name: Publish non-sensitive counts and hashes only
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: authority-outage-witness-mechanism-summary
+          path: experiment-b/mechanism-lab/reports/ci-authority-witness.json
+      - name: Shut down disposable services
+        if: always()
+        working-directory: experiment-b/mechanism-lab
+        run: |
+          docker compose down --remove-orphans --volumes
