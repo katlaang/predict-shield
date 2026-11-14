@@ -163,7 +163,7 @@ def main() -> None:
                        "four_physical_actions_observed": True,
                        "batch": row, "not_independent_configuration": True},
                       stream, sort_keys=True, indent=2)
-            stream.write("\\n")
+            stream.write("\n")
         recorded.append(row)
     report = aggregate(recorded, source_revision(root))
     with a.output.open("x", encoding="utf-8") as f:
