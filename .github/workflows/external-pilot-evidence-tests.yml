@@ -1,0 +1,31 @@
+name: External infrastructure pilot evidence schema tests
+on:
+  pull_request:
+    paths:
+      - 'docs/research/external_pilot_evidence_audit.py'
+      - 'docs/research/test_external_pilot_evidence_audit.py'
+      - 'docs/research/EXTERNAL_PILOT_VALIDATION.md'
+      - '.github/workflows/external-pilot-evidence-tests.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  documentation-evidence-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Test field-evidence failure cases using SYNTHETIC examples only
+        working-directory: docs/research
+        run: python -m unittest test_external_pilot_evidence_audit -v
+      - name: Confirm no actual external critical infrastructure pilots are asserted
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          s=Path("docs/research/external_pilot_evidence_audit.py").read_text()
+          assert '"critical_infrastructure_effectiveness_established": False' in s
+          assert '"external_independence_cryptographically_verified": False' in s
+          print("PASS: field documentation is never self-authenticating")
+          PY
