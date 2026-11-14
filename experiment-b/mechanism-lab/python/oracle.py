@@ -75,10 +75,16 @@ def observe() -> dict:
         and isinstance(policy.get("trialId"), str)
         and bool(policy["trialId"])
     )
-    complete = valid_authority and all(
+    # Direct target reachability is a useful independent observation even
+    # when the separate policy authority is unavailable. It is never proof
+    # of desired policy correctness without authoritative state.
+    direct_target_observations_complete = all(
         t["admin_http"] == 200 and t["direct_probe_http"] in (200, 403)
         and type(t["admin"].get("revoked")) is bool
-        and t["admin"].get("trial_id") == policy.get("trialId")
+        for t in target_records
+    )
+    complete = valid_authority and direct_target_observations_complete and all(
+        t["admin"].get("trial_id") == policy.get("trialId")
         for t in target_records
     )
     if not complete:
@@ -97,6 +103,9 @@ def observe() -> dict:
         "authority_http": policy_status,
         "expected_inventory_count": len(NODES),
         "inventory_complete": bool(complete),
+        "authority_truth_available": bool(valid_authority),
+        "direct_target_observations_complete": direct_target_observations_complete,
+        "target_observations_are_not_policy_truth": True,
         "targets": target_records,
         "all_revoked_access_denied": truth,
         "oracle_limitation": "Known inventory; admin cache state not attested",
