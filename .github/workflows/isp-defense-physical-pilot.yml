@@ -1,0 +1,58 @@
+name: Real ISP simulated-access defense and independent probes
+on:
+  pull_request:
+    paths:
+      - 'experiment-b/isp-lab/**'
+      - '.github/workflows/isp-defense-physical-pilot.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  physical:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: experiment-b/isp-lab
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Unit action-gate and independent-response checks
+        run: python -m unittest test_isp_defense -v
+      - name: Launch disposable ISP agents and simulated service
+        run: |
+          export LAB_SNMP_AUTH="$(python -c 'import secrets;print(secrets.token_urlsafe(20))')"
+          export LAB_SNMP_PRIV="$(python -c 'import secrets;print(secrets.token_urlsafe(20))')"
+          export LAB_ACCESS_TOKEN="$(python -c 'import secrets;print(secrets.token_urlsafe(32))')"
+          printf 'LAB_SNMP_AUTH=%s\nLAB_SNMP_PRIV=%s\nLAB_ACCESS_TOKEN=%s\n' "$LAB_SNMP_AUTH" "$LAB_SNMP_PRIV" "$LAB_ACCESS_TOKEN" > .env
+          docker compose -p psispdefense up -d --build
+      - name: Run actual lab isolation and retain independent post-action HTTP evidence
+        run: |
+          set -a
+          . ./.env
+          set +a
+          python - <<'PY'
+          import time,urllib.request
+          for i in range(45):
+              try:
+                  with urllib.request.urlopen("http://127.0.0.1:18310/healthz",timeout=2) as resp:
+                      if resp.status==200:break
+              except Exception:
+                  pass
+              if i==44:raise RuntimeError("Lab access service never ready")
+              time.sleep(1)
+          PY
+          python physical_defense_pilot.py --output /tmp/isp-defense-outcome.json
+      - name: Save physical outcome
+        uses: actions/upload-artifact@v4
+        with:
+          name: physical-isp-lab-defense-postcondition
+          path: /tmp/isp-defense-outcome.json
+          retention-days: 30
+      - name: Remove lab and disposable secrets
+        if: always()
+        run: |
+          docker compose -p psispdefense down -v --remove-orphans || true
+          rm -f .env
