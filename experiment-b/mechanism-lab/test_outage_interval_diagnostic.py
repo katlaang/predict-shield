@@ -71,7 +71,17 @@ class OutageIntervalTests(unittest.TestCase):
         result = evaluate(sample_report(), error_budget_requests=25,
                           restart_permitted=False)
         self.assertNotIn("restart_enforcer", result["feasible_actions_for_offline_comparison"])
+        self.assertNotIn("resync_policy", result["feasible_actions_for_offline_comparison"])
         self.assertEqual(len(result["action_intervals"]), 4)
+        self.assertTrue(result["fixed_resync_is_ineligible_comparator"])
+
+    def test_unavailable_resync_is_never_eligible_when_authority_offline(self):
+        result = evaluate(sample_report(), error_budget_requests=25,
+                          restart_permitted=True)
+        self.assertEqual(set(result["feasible_actions_for_offline_comparison"]),
+                         {"restart_enforcer", "gateway_restrict", "monitor_only"})
+        self.assertEqual(len(result["physically_replayed_actions"]), 4)
+        self.assertTrue(result["resync_replay_preserved_for_mechanism_only"])
 
     def test_missing_action_and_reused_witness_are_rejected(self):
         r = sample_report()
@@ -95,20 +105,21 @@ class OutageIntervalTests(unittest.TestCase):
 
     def test_strict_interval_dominance_not_overlap(self):
         r = sample_report()
-        # Lower-bound exposure of 1 proves at least a 0.5 exposure cost.
-        # Baseline action's worst-case cost 0.25 remains below that.
-        for a in r["results"][1:]:
+        # Known-outage resync is ineligible even if its cost is numerically
+        # low. Monitor is the eligible clear-dominance candidate here.
+        for a in r["results"][1:3]:
             a["timed_observations"]["revoked_gateway_exposure"].update({
                 "exposure_fraction_lower_bound": 1.0,
                 "exposure_fraction_upper_bound": 1.0})
-        top = r["results"][0]
+        top = r["results"][3]
         top["timed_observations"]["revoked_gateway_exposure"].update({
             "exposure_fraction_lower_bound": 0.0,
             "exposure_fraction_upper_bound": 0.0})
         top["timed_observations"]["authorized_protected"] = {
             "requests": 10, "non_200_requests": 0, "http_status_counts": {"200": 10}}
         report = evaluate(r, error_budget_requests=25, restart_permitted=True)
-        self.assertEqual(report["unique_definite_best_action"], "resync_policy")
+        self.assertEqual(report["unique_definite_best_action"], "monitor_only")
+        self.assertNotIn("resync_policy", report["feasible_actions_for_offline_comparison"])
 
     def test_nan_exposure_and_zero_budget_rejected(self):
         r = sample_report()
