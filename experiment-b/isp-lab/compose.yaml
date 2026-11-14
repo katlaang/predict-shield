@@ -25,5 +25,13 @@ services:
       LAB_SNMP_PRIV: ${LAB_SNMP_PRIV:?}
     ports: ["127.0.0.1:11613:161/udp"]
     networks: [isp]
+  simulated-access:
+    image: python:3.12-slim
+    command: ["python", "/app/access_service.py"]
+    volumes: ["./access_service.py:/app/access_service.py:ro"]
+    environment:
+      LAB_ACCESS_TOKEN: ${LAB_ACCESS_TOKEN:?}
+    ports: ["127.0.0.1:18310:8080"]
+    networks: [isp]
 networks:
   isp: {}
