@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PREDICT-SHIELD | Research evidence console</title>
+  <style>
+    :root { color-scheme: dark; --base:#080e17; --panel:#101b29; --border:#2d3d50; --ink:#eff4fa; --muted:#aec0d2; --red:#f36565; --blue:#78b4ee; --warn:#edca80; }
+    * {box-sizing:border-box} body{margin:0;background:var(--base);color:var(--ink);font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+    .shell{max-width:1250px;margin:auto;padding:28px 20px 80px}
+    .top{display:flex;align-items:center;justify-content:space-between;gap:24px;flex-wrap:wrap}
+    .brand{font-size:15px;letter-spacing:.13em;font-weight:800;color:#fff}.brand span{color:var(--red)}
+    .flag{border:1px solid #664e36;color:#efcd9b;border-radius:30px;padding:5px 12px;font-size:12px;font-weight:700}
+    h1{font-size:clamp(26px,4vw,42px);margin:35px 0 8px;line-height:1.2}h2{font-size:20px;margin:0 0 14px}
+    p{margin:8px 0 15px}.lede{max-width:880px;color:var(--muted);font-size:16px}
+    .layout{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.card{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:20px}
+    .metric{font-size:30px;font-weight:750;font-variant-numeric:tabular-nums}.overline{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.075em}
+    .space{margin-top:18px}.muted{color:var(--muted)}.small{font-size:12px}.controls{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin:25px 0}
+    input[type=file]{max-width:100%;color:var(--ink)}input::file-selector-button{background:#26435d;color:#fff;padding:10px 12px;border:1px solid #3e5d79;border-radius:9px;cursor:pointer;margin-right:12px}
+    button{background:#223b52;color:white;border:1px solid #46607b;padding:9px 14px;border-radius:8px;cursor:pointer}
+    .status{color:var(--warn);font-weight:700}.ok{color:#99ddb5}.bad{color:#ff9898}
+    .table-wrap{overflow-x:auto}table{border-collapse:collapse;width:100%;min-width:810px}th,td{text-align:left;padding:12px;border-bottom:1px solid var(--border);vertical-align:middle}th{color:var(--muted);font-size:12px;font-weight:600}
+    .track{background:#2f4052;min-width:110px;height:14px;border-radius:7px;position:relative;overflow:hidden}.range{background:#e38764;height:100%;position:absolute;left:0;opacity:.95}.possible{background:#f3d093;height:100%;position:absolute;opacity:.55}
+    .key{display:flex;gap:15px;flex-wrap:wrap;font-size:12px;color:var(--muted)}.chip{width:10px;height:10px;border-radius:3px;display:inline-block;background:#e38764;margin-right:5px}.chip.unknown{background:#f3d093}
+    .bar{height:9px;background:#283b50;border-radius:8px;overflow:hidden}.bar>span{display:block;background:var(--blue);height:100%}
+    .columns{display:grid;grid-template-columns:1.1fr .9fr;gap:14px}.notice{border-left:3px solid var(--red);background:#281b23;padding:12px 16px;color:#f5c9c9;border-radius:0 9px 9px 0}
+    code{font-size:12px;word-break:break-word}a{color:#acd2fb}
+    @media(max-width:780px){.layout,.columns{grid-template-columns:1fr}.shell{padding:18px 14px 50px}h1{margin-top:20px}}
+  </style>
+</head>
+<body>
+<main class="shell">
+  <header class="top"><div class="brand"><span>PREDICT</span>-SHIELD <span style="font-weight:400;color:#b9c8dc">/ LAB</span></div><span class="flag">EXPLORATORY RESEARCH ONLY</span></header>
+  <h1>Cyber-defense research console</h1>
+  <p class="lede">A read-only viewer of actual disposable Java/Kafka/Docker pilot measurements. The console never executes remediation actions, invents live results, or represents laboratory measurements as evidence of infrastructure effectiveness.</p>
+  <div class="controls">
+    <label for="report">Open a measured pilot JSON report:</label>
+    <input type="file" id="report" accept=".json,application/json">
+    <button id="clear" type="button">Clear</button>
+    <span id="loadstatus" role="status" class="muted">No recorded pilot loaded</span>
+  </div>
+  <div id="warning" class="notice" role="note">No data loaded. Generate a real repeated-outage pilot report in GitHub Actions or a disposable local Docker lab. This dashboard intentionally does not include simulated success figures.</div>
+
+  <section aria-label="Pilot overview" class="layout space">
+    <div class="card"><div class="overline">Physical action replays</div><div id="replays" class="metric">—</div><p class="muted small">Real measured actions, not planned trials</p></div>
+    <div class="card"><div class="overline">Four-arm repeat batches</div><div id="batches" class="metric">—</div><p class="muted small">These are not independent configurations</p></div>
+    <div class="card"><div class="overline">Authority verification</div><div id="verification" class="metric" style="font-size:22px;color:#efc77d">—</div><p class="muted small">Live authority deliberately unavailable</p></div>
+  </section>
+
+  <section class="card space">
+    <h2>Measured remediation actions</h2>
+    <p class="muted">Values are summed across independently reset physical repetitions of one declared outage configuration. Exposure is the bounded time of sampled revoked-access gateway outcomes, not an exploit probability.</p>
+    <div class="key"><span><i class="chip"></i>Confirmed observed exposure</span><span><i class="chip unknown"></i>Additional possible exposure from unknown intervals</span></div>
+    <div class="table-wrap">
+      <table aria-label="Measured action outcomes">
+        <thead><tr><th>Intervention</th><th>Gateway exposure duration<br>(lower to upper)</th><th>Exposure visualization</th><th>Authorized failures</th><th>Legitimate failures</th></tr></thead>
+        <tbody id="actions"><tr><td colspan="5" class="muted">No physical records loaded</td></tr></tbody>
+      </table>
+    </div>
+  </section>
+
+  <div class="columns space">
+    <section class="card"><h2>Research evidence</h2><div id="metadata" class="muted">Load a report to inspect source revision, recorded batches, and limitations.</div></section>
+    <section class="card"><h2>What this demo does not prove</h2>
+      <p class="muted">These outage studies do not demonstrate that an AI model chose better defenses. The registered action-effectiveness training study has not yielded a complete held-out result. No operator pilot establishes improved U.S. critical-infrastructure resilience.</p>
+      <p class="status">No production action control. No AI superiority or field-impact claim.</p>
+      <a href="https://github.com/katlaang/predict-shield" target="_blank" rel="noopener noreferrer">View source repository</a>
+    </section>
+  </div>
+</main>
+<script>
+"use strict";
+const $=id=>document.getElementById(id);
+const actions={resync_policy:"Resynchronize policy",restart_enforcer:"Restart enforcement JVM",gateway_restrict:"Restrict gateway",monitor_only:"Observe only"};
+const fmt=n=>Number(n).toFixed(2);
+const show=(id,value)=>$(id).textContent=value;
+function clear(){
+  ["replays","batches","verification"].forEach(id=>show(id,"—"));
+  $("actions").replaceChildren();
+  const cell=document.createElement("tr"),td=document.createElement("td");td.colSpan=5;td.className="muted";td.textContent="No physical records loaded";cell.append(td);$("actions").append(cell);
+  $("metadata").textContent="Load a report to inspect source revision, recorded batches, and limitations.";
+  $("warning").textContent="No data loaded. No synthetic measurements displayed.";
+  $("warning").hidden=false;show("loadstatus","No recorded pilot loaded");$("report").value="";
+}
+function assert(x,msg){if(!x)throw Error(msg);}
+function load(data){
+  assert(data && data.schema==="predict-shield/repeated-physical-outage-pilot/1","Unsupported pilot report schema");
+  assert(data.record_type==="MEASURED_DISPOSABLE_DOCKER_PHYSICAL_REPLAYS","Not an executed Docker measurement");
+  assert(data.ai_action_model_trained_or_tested===false && data.v31_feasibility_evaluated===false && data.critical_infrastructure_operator_pilot===false,"Misclassified research evidence");
+  assert(Number.isInteger(data.physical_four_action_batches) && data.physical_four_action_batches>0 && data.physical_four_action_batches<=5,"Invalid repeat batch count");
+  assert(data.physical_action_replays===4*data.physical_four_action_batches && data.batch_records.length===data.physical_four_action_batches,"Incomplete physical pilot");
+  assert(data.independent_fault_configuration_count===1,"Unverified multi-configuration claim");
+  const expected=Object.keys(actions),rows=data.by_action;
+  assert(rows && Object.keys(rows).length===4 && expected.every(a=>rows[a]),"Incomplete action measurements");
+  data.batch_records.forEach(b=>{
+    assert(b.actions.length===4 && new Set(b.actions.map(x=>x.action)).size===4,"Incomplete batch");
+    b.actions.forEach(r=>assert(r.policy_truth==="UNKNOWN"&&r.verification_status==="INDETERMINATE","Authority truth cannot be VERIFIED"));
+  });
+  for(const action of expected){
+    const r=rows[action];
+    const values=[r.observed_gateway_exposure_seconds_lower_total,r.observed_gateway_exposure_seconds_upper_total,r.authorized_failures,r.authorized_attempts,r.legitimate_failures,r.legitimate_attempts];
+    assert(values.every(n=>typeof n==="number"&&Number.isFinite(n)&&n>=0),"Invalid physical measurements");
+    assert(values[0]<=values[1]&&values[2]<=values[3]&&values[4]<=values[5],"Inconsistent exposure or failure bounds");
+    assert(r.physical_repetitions===data.physical_four_action_batches,"Invalid repeated action count");
+  }
+  $("warning").hidden=true;show("loadstatus","Validated measurement schema");
+  show("replays",data.physical_action_replays);
+  show("batches",data.physical_four_action_batches);
+  show("verification","INDETERMINATE");
+  $("actions").replaceChildren();
+  const max=Math.max(.01,...expected.map(a=>rows[a].observed_gateway_exposure_seconds_upper_total));
+  expected.forEach(action=>{
+    const r=rows[action],lo=r.observed_gateway_exposure_seconds_lower_total,hi=r.observed_gateway_exposure_seconds_upper_total;
+    const tr=document.createElement("tr");
+    function td(text){const cell=document.createElement("td");cell.textContent=text;tr.append(cell);return cell;}
+    td(actions[action]);td(fmt(lo)+" to "+fmt(hi)+" s");
+    const barCell=td("");const track=document.createElement("div");track.className="track";
+    const known=document.createElement("span");known.className="range";known.style.width=(100*lo/max)+"%";
+    const possible=document.createElement("span");possible.className="possible";possible.style.left=(100*lo/max)+"%";possible.style.width=(100*(hi-lo)/max)+"%";
+    track.append(known,possible);track.setAttribute("aria-label","Observed exposure range "+fmt(lo)+" to "+fmt(hi)+" seconds");barCell.append(track);
+    td(r.authorized_failures+" / "+r.authorized_attempts);
+    td(r.legitimate_failures+" / "+r.legitimate_attempts);
+    $("actions").append(tr);
+  });
+  const details=$("metadata");details.replaceChildren();
+  const lines=[
+    ["Evidence","Executed disposable Docker physical action replays"],
+    ["Source commit",data.source_commit_sha],
+    ["Declared fault",data.fault_family],
+    ["Independent configurations",String(data.independent_fault_configuration_count)],
+    ["Research status",data.research_conclusion],
+    ["AI decision test","NOT RUN"],
+    ["Critical-infrastructure pilot","NOT RUN"],
+  ];
+  for(const [label,value] of lines){const p=document.createElement("p"),strong=document.createElement("strong");
+    strong.textContent=label+": ";p.append(strong,document.createTextNode(value));details.append(p);}
+  const note=document.createElement("p");note.className="muted small";note.textContent=(data.limitations||[]).join(" • ");details.append(note);
+}
+$("report").addEventListener("change",async event=>{
+  const file=event.target.files[0];if(!file)return;
+  try{const data=JSON.parse(await file.text());load(data);}catch(e){clear();show("loadstatus","File rejected: "+e.message);$("loadstatus").className="bad";}
+});
+$("clear").addEventListener("click",()=>{clear();$("loadstatus").className="muted";});
+fetch("./data/ci-report.json",{cache:"no-store"}).then(r=>{if(!r.ok)throw Error("No attached CI report");return r.json();}).then(load).catch(()=>{});
+</script>
+</body>
+</html>
