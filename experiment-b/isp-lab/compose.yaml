@@ -1,0 +1,29 @@
+# Real isolated Net-SNMPv3 management agents on virtual Ethernet.
+# Not actual router firmware, optical transport, or real ISP infrastructure.
+services:
+  edge-a:
+    build: ./agent
+    environment:
+      LAB_DEVICE_ID: edge-a
+      LAB_SNMP_AUTH: ${LAB_SNMP_AUTH:?}
+      LAB_SNMP_PRIV: ${LAB_SNMP_PRIV:?}
+    ports: ["127.0.0.1:11611:161/udp"]
+    networks: [isp]
+  aggregation-b:
+    build: ./agent
+    environment:
+      LAB_DEVICE_ID: aggregation-b
+      LAB_SNMP_AUTH: ${LAB_SNMP_AUTH:?}
+      LAB_SNMP_PRIV: ${LAB_SNMP_PRIV:?}
+    ports: ["127.0.0.1:11612:161/udp"]
+    networks: [isp]
+  forgotten-c:
+    build: ./agent
+    environment:
+      LAB_DEVICE_ID: forgotten-c
+      LAB_SNMP_AUTH: ${LAB_SNMP_AUTH:?}
+      LAB_SNMP_PRIV: ${LAB_SNMP_PRIV:?}
+    ports: ["127.0.0.1:11613:161/udp"]
+    networks: [isp]
+networks:
+  isp: {}
