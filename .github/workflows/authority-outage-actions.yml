@@ -62,7 +62,7 @@ jobs:
               assert timed["authorized_protected"]["requests"] >= 1
               assert timed["legitimate_endpoint"]["requests"] >= 1
               assert timed["policy_verification_from_this_measurement"]=="NOT_EVALUATED"
-                    assert r["decision_value_computed"] is False
+          assert r["decision_value_computed"] is False
           assert r["v31_feasibility_evaluated"] is False
           assert {x["action"] for x in r["results"]} == {
               "resync_policy","restart_enforcer","gateway_restrict","monitor_only"}
