@@ -5,7 +5,6 @@ allowlisted localhost lab mutations. Not an enterprise remediation executor.
 """
 from __future__ import annotations
 
-from . import __name__ as _ignored  # avoid importing any privileged oracle into engine
 
 def execute_lab_recommendation(recommendation: dict, *, scope_assessment: dict,
                                control_token: str, oracle_token: str,
