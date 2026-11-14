@@ -173,6 +173,9 @@ def separate_records(config: dict, trial: dict, observed: dict) -> dict[str, dic
         },
         "oracle": {
             **base,
+            # Privileged physical fault evidence is kept only with the oracle,
+            # never in pre-action features or model inputs.
+            "physical_fault_evidence": observed.get("physical_fault_evidence"),
             "before": before["oracle"],
             "after": oracle,
             "actual_revoked_access_denied": oracle["all_revoked_access_denied"],
