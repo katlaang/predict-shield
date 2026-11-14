@@ -70,6 +70,7 @@ def main():
     p.add_argument("--trusted-model-sha256", required=True)
     p.add_argument("--remaining-lab-budget", required=True, type=float)
     p.add_argument("--restart-permitted", action="store_true")
+    p.add_argument("--execute-lab", action="store_true", help="Opt in to allowlisted disposable lab actions only")
     p.add_argument("--output", required=True, type=Path)
     args = p.parse_args()
     if args.output.exists():
@@ -87,10 +88,16 @@ def main():
         restart_permitted=args.restart_permitted)
     result["scope_assessment"] = scope
     result["discovery_digest"] = discovery["sha256"]
+    if args.execute_lab:
+        from lab_autonomous_execution import execute_lab_recommendation
+        result["execution"] = execute_lab_recommendation(
+            result, scope_assessment=scope,
+            control_token=os.environ.get("LAB_CONTROL_TOKEN", ""),
+            oracle_token=os.environ.get("LAB_ORACLE_TOKEN", ""))
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(result, indent=2, sort_keys=True) + "\n")
     print("Learned model recommendation:", result["selected_action"] or "ABSTAIN",
-          "action dispatched: false")
+          "action dispatched:", bool(result.get("execution", {}).get("action_executed", False)))
 
 
 if __name__ == "__main__":
