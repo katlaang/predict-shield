@@ -1,0 +1,83 @@
+name: Physical gateway asset discovery lab
+on:
+  pull_request:
+    paths:
+      - 'engine/predict_shield/lab_gateway_discovery.py'
+      - 'engine/tests/test_lab_gateway_discovery.py'
+      - '.github/workflows/physical-asset-discovery.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  contracts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: PYTHONPATH=engine python -m unittest discover -s engine/tests -v
+  physical-lab:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: experiment-b/mechanism-lab
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Launch isolated real JVM/Kafka lab
+        run: |
+          export LAB_CONTROL_TOKEN="$(python -c 'import secrets;print(secrets.token_urlsafe(32))')"
+          export LAB_ORACLE_TOKEN="$(python -c 'import secrets;print(secrets.token_urlsafe(32))')"
+          export LAB_INTERNAL_TOKEN="$(python -c 'import secrets;print(secrets.token_urlsafe(32))')"
+          printf 'LAB_CONTROL_TOKEN=%s\nLAB_ORACLE_TOKEN=%s\nLAB_INTERNAL_TOKEN=%s\n' "$LAB_CONTROL_TOKEN" "$LAB_ORACLE_TOKEN" "$LAB_INTERNAL_TOKEN" > .env
+          docker compose -p psdiscovery up -d --build
+      - name: Observe runtime-only hidden enforcer and then reconcile enabled route
+        env:
+          PYTHONPATH: ../../engine
+        run: |
+          python - <<'PY'
+          import json, os, subprocess, time, urllib.request
+          from pathlib import Path
+          from predict_shield.lab_gateway_discovery import live_gateway_routes, reconcile_lab_services
+          from predict_shield.asset_discovery import docker_inspect
+          url="http://127.0.0.1:18280/admin/inventory"
+          token=Path(".env").read_text().split("LAB_CONTROL_TOKEN=",1)[1].splitlines()[0]
+          for attempt in range(60):
+              try:
+                  routes=live_gateway_routes(url,token)
+                  break
+              except Exception:
+                  if attempt==59: raise
+                  time.sleep(2)
+          before=reconcile_lab_services(docker_inspect(),routes,project="psdiscovery")
+          assert before["reconciliation_status"]=="DRIFT_DETECTED", before
+          assert "enforcer-hidden" in before["runtime_only_services"], before
+          req=urllib.request.Request("http://127.0.0.1:18280/admin/include-hidden",
+              data=b"",method="POST",headers={"X-Lab-Control":token})
+          with urllib.request.urlopen(req,timeout=5) as response:
+              assert response.status==200
+          after=reconcile_lab_services(docker_inspect(),live_gateway_routes(url,token),project="psdiscovery")
+          assert after["reconciliation_status"]=="RECONCILED_SOURCES", after
+          assert after["security_verification_outcome"]=="INDETERMINATE"
+          Path("discovery-results").mkdir(exist_ok=True)
+          for key,result in (("before",before),("after",after)):
+              Path("discovery-results",key+".json").write_text(json.dumps(result,indent=2)+"\n")
+          print("PHYSICAL DISCOVERY PASS: hidden service observed then included; no security VERIFIED claim")
+          PY
+      - name: Retain observed laboratory discovery results
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: physical-gateway-asset-discovery
+          path: experiment-b/mechanism-lab/discovery-results/*.json
+          retention-days: 30
+      - name: Remove disposable lab and secrets
+        if: always()
+        run: |
+          docker compose -p psdiscovery down -v --remove-orphans || true
+          rm -f .env
