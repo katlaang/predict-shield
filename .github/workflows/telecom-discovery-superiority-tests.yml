@@ -1,0 +1,24 @@
+name: Locked telecom discovery superiority adjudicator
+on:
+  pull_request:
+    paths:
+      - 'experiment-b/telecom-topology/independent_discovery_eval.py'
+      - 'experiment-b/telecom-topology/test_independent_discovery_eval.py'
+      - 'experiment-b/telecom-topology/link_learning.py'
+      - '.github/workflows/telecom-discovery-superiority-tests.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  contracts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install -r experiment-b/requirements-ml.txt
+      - name: Check hard cases and grouped model comparison
+        working-directory: experiment-b/telecom-topology
+        run: python -m unittest test_independent_discovery_eval test_link_learning test_graph_risk_training -v
