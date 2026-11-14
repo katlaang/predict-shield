@@ -2,6 +2,7 @@ name: Experiment B real Kafka mechanism lab
 on:
   workflow_dispatch:
   push:
+    branches: [master]
     paths: ['experiment-b/mechanism-lab/**', '.github/workflows/experiment-b-mechanism.yml']
   pull_request:
     paths: ['experiment-b/mechanism-lab/**', '.github/workflows/experiment-b-mechanism.yml']
