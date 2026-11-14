@@ -1,0 +1,75 @@
+name: Physical gNMI mutual TLS Get discovery pilot
+on:
+  pull_request:
+    paths:
+      - 'experiment-b/gnmi-lab/**'
+      - 'engine/predict_shield/telecom_collectors.py'
+      - '.github/workflows/gnmi-mtls-physical-lab.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  physical-gnmi:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.25.x'
+      - name: Compile pinned gNMI protobuf endpoint
+        working-directory: experiment-b/gnmi-lab
+        run: |
+          go mod tidy
+          go build -o /tmp/ps-gnmi-lab .
+      - name: Exercise real localhost gNMI Get with mTLS
+        env:
+          PYTHONPATH: engine
+        run: |
+          set -euo pipefail
+          mkdir -m 700 -p /tmp/ps-gnmi-certs /tmp/ps-gnmi-tools
+          cd /tmp/ps-gnmi-certs
+          openssl req -x509 -newkey rsa:2048 -sha256 -nodes -days 1 -subj "/CN=ps-lab-ca" -keyout ca.key -out ca.pem > /dev/null 2>&1
+          openssl req -newkey rsa:2048 -sha256 -nodes -subj "/CN=localhost" -keyout server.key -out server.csr > /dev/null 2>&1
+          printf 'subjectAltName=IP:127.0.0.1\nextendedKeyUsage=serverAuth\n' > server.ext
+          openssl x509 -req -in server.csr -CA ca.pem -CAkey ca.key -CAcreateserial -days 1 -sha256 -extfile server.ext -out server.pem > /dev/null 2>&1
+          openssl req -newkey rsa:2048 -sha256 -nodes -subj "/CN=disposable-collector" -keyout client.key -out client.csr > /dev/null 2>&1
+          printf 'extendedKeyUsage=clientAuth\n' > client.ext
+          openssl x509 -req -in client.csr -CA ca.pem -CAkey ca.key -CAcreateserial -days 1 -sha256 -extfile client.ext -out client.pem > /dev/null 2>&1
+          chmod 600 *.key
+          LAB_GNMI_SERVER_CERT=/tmp/ps-gnmi-certs/server.pem LAB_GNMI_SERVER_KEY=/tmp/ps-gnmi-certs/server.key LAB_GNMI_CA=/tmp/ps-gnmi-certs/ca.pem /tmp/ps-gnmi-lab >/tmp/ps-gnmi-server.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill $SERVER_PID 2>/dev/null || true; rm -rf /tmp/ps-gnmi-certs /tmp/ps-gnmi-tools' EXIT
+          for attempt in $(seq 1 30); do
+            if python -c 'import socket;s=socket.create_connection(("127.0.0.1",57400),timeout=1);s.close()' >/dev/null 2>&1; then break; fi
+            if [ "$attempt" = 30 ]; then cat /tmp/ps-gnmi-server.log; exit 1; fi
+            sleep 1
+          done
+          cat > /tmp/ps-gnmi-tools/gnmic <<'SH'
+          #!/bin/sh
+          exec docker run --rm --network host -v /tmp/ps-gnmi-certs:/tmp/ps-gnmi-certs:ro ghcr.io/openconfig/gnmic:0.46.0@sha256:d026154a4bd44a141081b018321cc93956d9a18565d8686b65c615000a852f03 "$@"
+          SH
+          chmod 700 /tmp/ps-gnmi-tools/gnmic
+          cd "$GITHUB_WORKSPACE"
+          PATH="/tmp/ps-gnmi-tools:$PATH" python - <<'PY'
+          import json
+          from pathlib import Path
+          from predict_shield.telecom_collectors import gnmi_get_interfaces
+          report=gnmi_get_interfaces(device_id="disposable-gnmi-target",
+            port=57400,ca=Path("/tmp/ps-gnmi-certs/ca.pem"),
+            client_cert=Path("/tmp/ps-gnmi-certs/client.pem"),
+            client_key=Path("/tmp/ps-gnmi-certs/client.key"))
+          assert report["assets"][0]["attributes"]["get_update_count"]>=1
+          assert report["links"]==[]
+          Path("/tmp/ps-gnmi-physical-observation.json").write_text(json.dumps(report,indent=2)+"\n")
+          print("PHYSICAL GNMI MTLS GET: received",report["assets"][0]["attributes"]["get_update_count"],"updates")
+          PY
+      - name: Preserve actual gNMI Get observation
+        uses: actions/upload-artifact@v4
+        with:
+          name: physical-gnmi-mtls-get-observation
+          path: /tmp/ps-gnmi-physical-observation.json
+          retention-days: 30
