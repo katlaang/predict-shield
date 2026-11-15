@@ -30,7 +30,7 @@ What this does NOT do:
       can change a flow rule or a port.
 
 This targets Open vSwitch specifically because that is the data plane behind
-both Mininet/Containernet and ONOS/OpenDaylight-controlled labs — the two
+both Mininet/Containernet and ONOS/OpenDaylight-controlled labs, the two
 open-source options recommended for exercising PREDICT-SHIELD against
 something closer to a real ISP/telecom network than the existing Docker/
 Kafka/Java mechanism lab.

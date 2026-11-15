@@ -8,15 +8,15 @@ and it holds regardless of what this module finds.
 This module adds a second, independent, pre-model layer: look at the raw text
 *before* it reaches the model and flag language that reads as an attempt to
 instruct the agent rather than describe a vulnerability. It is pattern-based,
-not a model, and intentionally conservative — it is here to produce a signal
+not a model, and intentionally conservative. It is here to produce a signal
 an operator can review and to add match examples to over time, not to make an
 unreviewed accept/reject decision on its own, and not to replace the grounding
 check above.
 
 What it is not: a jailbreak classifier trained on attack data (that is a
 larger, separate research effort). This is the fast, auditable first layer the
-rapid-response literature calls for — recognizing a *class* of attack from a
-handful of concrete patterns — so a batch of advisories can be triaged before
+rapid-response literature calls for: recognizing a *class* of attack from a
+handful of concrete patterns, so a batch of advisories can be triaged before
 any of them reach a model prompt.
 """
 from __future__ import annotations
