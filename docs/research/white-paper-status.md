@@ -1,6 +1,8 @@
 # Research documentation status
 
-The technical framework is described in the [v2.2 implementation specification](PREDICT_SHIELD_v2_2_IMPLEMENTATION_SPEC.md). A separate editable white paper draft is maintained outside this repository; it is a working research document, not a peer-reviewed result or validated implementation.
+**For the current measured results, see the [research record index](README.md) — it organizes every dated result and protocol in this directory by research question.** The implementation specification referenced below predates the language-model decision layer now in the engine and should be read as a historical design note, not the current architecture.
+
+The technical framework is described in the [v2.2 implementation specification](PREDICT_SHIELD_v2_2_IMPLEMENTATION_SPEC.md) (2026-11-09, now superseded in part — see the index). A separate editable white paper draft is maintained outside this repository; it is a working research document, not a peer-reviewed result or validated implementation.
 
 ## Research questions
 

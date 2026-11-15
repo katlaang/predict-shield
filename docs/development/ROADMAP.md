@@ -1,4 +1,4 @@
-# PREDICT-SHIELD engineering roadmap and endeavor traceability
+# PREDICT-SHIELD engineering roadmap
 
 **As of November 14, 2026.**
 
@@ -10,11 +10,11 @@
 - **Authority-outage action inference remains limited.** PRs #43–#50 established physical outage witnesses, four action interventions, real timed observations, conservative UNKNOWN intervals, draft six-family feasibility registration and sample-size caution. The complete six-family physical study is not authorized/frozen; no field critical-infrastructure resilience improvement has been quantified.
 - **Research claims must remain separated.** Software CI success, completed exploratory laboratory actions, a positive held-out laboratory comparator result (if eventually observed), and independent operator field impact are four different evidence levels. Neither GitHub traffic nor self-reported records can bridge those levels.
 
- Research pre-alpha. A merged implementation or passing CI proves only the documented local or CI behavior, not superior AI performance, commercial adoption, critical-infrastructure field validation or EB-2 NIW eligibility.
+ Research pre-alpha. A merged implementation or passing CI proves only the documented local or CI behavior, not superior AI performance, commercial adoption or critical-infrastructure field validation.
 
 ## Endeavor capability coverage
 
-| Proposed endeavor capability | Verified development evidence | Outstanding proof |
+| Proposed capability | Verified development evidence | Outstanding proof |
 | --- | --- | --- |
 | Predictive threat intelligence | Dated EPSS/KEV ingestion and official archive integrity; pinned historical sources and chronological CVE-level baseline; first fitted historical reranker in PR #27 | Independent, preregistered later evaluation with additional genuine threat signals and no test leakage; October reranker **lost** to EPSS |
 | Automated cybersecurity risk assessment | Transparent asset/CVE heuristic, explicit missingness and recorded source hashes | Calibrated contextual multi-risk ranking with operational dependencies and real asset evidence; learned model must exceed strong comparator |
@@ -49,4 +49,4 @@ Use precise denominators and versioned sources, distinguish physical observation
 - `docs/research/EXPLORATORY_MODEL_RESULTS_2026_11.md` records September improvement and October loss, with source commit hashes and exact CI identifiers.
 - `docs/research/V31_CONSUMER_PHYSICAL_RESULTS_2026_11_14.md` preserves one real consumer-pause action comparison; `docs/research/V31_FIVE_GROUP_PILOT_2026_11_14.md` records 40 physical replays and the inconclusive scientific feasibility outcome.
 - `experiment-b/mechanism-lab/PROTOCOL_V3_AI_EVALUATION.md` is the unmodified v3 research protocol; `PROTOCOL_V3_1_FEASIBILITY_DRAFT.md` is an amendment, not a freeze.
-- This roadmap is a development artifact, not an immigration legal opinion.
+- This roadmap is a development artifact, not a claim of field-proven effectiveness.

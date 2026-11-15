@@ -44,4 +44,4 @@ Other non-AI means were fixed_gateway 0.2134461857500012, fixed_monitor 0.000090
 3. Prospectively test a **broader operational fault mix including genuine consumer-paused persistent state**. Only include faults and outcomes that the independent oracle can physically verify. Authority-outage scenarios require explicit UNKNOWN-safe separate interval estimands and cannot be assigned fabricated scalar results.
 4. For any future AI superiority claim, report all deterministic comparators, group-level uncertainty, decision diversity, legitimate-user disruption, and physical fault witnesses. Reserve external critical-infrastructure effectiveness for separate independently assessed U.S. operator studies.
 
-No claim of production deployment, U.S. operator field effectiveness, 1,200 completed trials, or EB-2 NIW approval is supported by these 96 observations.
+No claim of production deployment, U.S. operator field effectiveness, or 1,200 completed trials is supported by these 96 observations.

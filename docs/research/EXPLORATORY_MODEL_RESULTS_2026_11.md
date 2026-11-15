@@ -39,4 +39,4 @@ Potential explanations (not established causes) include label sparsity, reliance
 3. Report missing-source coverage, uncertainty, calibratability, rare-event precision/recall and negative results; predefine acceptable operating precision rather than optimizing on test labels.
 4. Do not connect these uncalibrated scores directly to autonomous remediation. Deterministic policy gates, service continuity and independent verification remain separate safety requirements.
 
-This result documents real research progress toward the predictive threat intelligence pillar; it does not prove cybersecurity risk reduction for critical infrastructure or NIW approval criteria.
+This result documents real research progress toward the predictive threat intelligence pillar; it does not prove cybersecurity risk reduction for critical infrastructure.
