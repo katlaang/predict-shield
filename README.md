@@ -24,7 +24,7 @@ Each step produces a signed, hashed record, so a finding, a recommendation, an a
 | --- | --- | --- |
 | Asset & dependency discovery | Docker/container-based discovery, hashed inventory, dependency graph; a read-only Open vSwitch adapter that turns observed switch flow traffic into dependency-graph edges with real evidence IDs, for an SDN lab (e.g. Containernet, ONOS) | Now run against a real Containernet/OVS lab in CI, with explicit per-port flow evidence; discovery against real routers/CPE on a non-containerized network is still open |
 | Vulnerability matching | Advisory ingestion from GitHub Advisory Database, coordinate and artifact-name matching rules | Broader source coverage (CISA KEV, vendor feeds) |
-| AI-read advisories & proposals | Local/hosted language model reads advisory text, proposes only cataloged actions and checks, grounded against the real inventory; advisory text is screened for instruction-injection patterns before it reaches the model | Measured accuracy at scale (see below) before recommending unsupervised use; the injection screen is pattern-based and should keep growing from real examples, not a trained classifier yet |
+| AI-read advisories & proposals | Local/hosted language model reads advisory text, proposes only cataloged actions and checks, grounded against the real inventory; advisory text is screened for instruction-injection patterns before it reaches the model | Measured accuracy at scale, against real production data, before recommending unsupervised use; the injection screen is pattern-based and should keep growing from real examples, not a trained classifier yet |
 | Confirming a finding is real | Text-grounding check (does the package and version really appear in the advisory); a bounded, read-only, catalog-registered HTTP signature check for web-facing targets | Broader confirmation checks per vulnerability class; today's web check only covers CVEs with a reviewed, registered signature |
 | Policy-gated action selection | Deterministic gate: service-continuity budgets, calibrated risk predictions, policy tiers | Calibration against real operator traffic, not just lab traffic |
 | Applying fixes | Executes in an isolated lab (Docker/Kafka/Java) only | A safe, reversible actuator for real operator infrastructure, with the same gate in front of it |
@@ -84,8 +84,6 @@ Read [the Experiment B guide](experiment-b/README.md) for full setup and limitat
 
 The framework's design scopes its one core AI-versus-deterministic research question narrowly: whether a learned drift model for the continuous-assurance re-verification scheduler detects regressions sooner than the transparent priority function it is compared against, under an equal probe budget. The transparent scheduler is built and tested; the learned variant and that comparison have not been run yet.
 
-Separately, as exploratory engineering work alongside the product pipeline, this repository also compares a language model's advisory-reading and threat-ranking output against fixed-rule baselines. These are side studies, not a precondition the framework's value depends on: measured results so far show the model roughly tying or losing to the strongest deterministic baseline in most settings tested, and one promising early result did not replicate in a second independent study. Those results are kept and reported here rather than dropped, consistent with this project's practice of preregistering comparisons and not cherry-picking outcomes; they are not evidence against the core framework, since every real decision there is already made by a deterministic gate regardless of how either exploratory model performs. A model that reads advisory text and proposes a shortlist still saves real analyst time even where it isn't yet beating a hand-tuned rule.
-
 See [the research index](docs/research/README.md) for the full set of studies, and [the roadmap](docs/development/ROADMAP.md) for a capability-by-capability account of what's verified versus still outstanding.
 
 ## Documentation
@@ -93,7 +91,6 @@ See [the research index](docs/research/README.md) for the full set of studies, a
 - [Architecture notes](docs/architecture/README.md)
 - [Asset dashboard prototype](dashboard/README.md)
 - [Unified AI vulnerability-to-defense pipeline](docs/development/UNIFIED_LOCAL_AI_VULNERABILITY_PIPELINE.md)
-- [Advisory-reading corpus and model comparison](experiment-a/advisory-reading/README.md)
 - [Research index](docs/research/README.md)
 - [Engineering roadmap](docs/development/ROADMAP.md)
 - [Development history](docs/development/CHANGELOG.md)
