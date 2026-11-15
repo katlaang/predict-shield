@@ -13,12 +13,14 @@ from typing import Callable
 from predict_shield.ai_contracts import EvidenceSnapshot
 from predict_shield.assessment import Evidence, Outcome, assess
 from predict_shield.pipeline import record_independent_outcome
+from predict_shield.risk_evidence import verify_digest
 
 _ALLOWED_PROJECTS = {"psunified", "psailab"}
 _ALLOWED_MUTATIONS = {"resync_policy", "gateway_restrict"}
 
 
-def execute_bound_lab_case(plan: dict, *, project: str, model_bundle: dict,
+def execute_bound_lab_case(plan: dict, *, project: str, source_discovery: dict,
+                           model_bundle: dict,
                            pre_action: dict, control_token: str,
                            oracle_token: str, remaining_lab_budget: float,
                            applicability_observations: tuple[Evidence, ...],
@@ -27,7 +29,8 @@ def execute_bound_lab_case(plan: dict, *, project: str, model_bundle: dict,
                            lab_selector: Callable | None = None,
                            lab_executor: Callable | None = None,
                            post_oracle_reader: Callable | None = None,
-                           post_gateway_reader: Callable | None = None) -> dict:
+                           post_gateway_reader: Callable | None = None,
+                           asset_inventory_reader: Callable | None = None) -> dict:
     """Recheck all authority and trust bindings on a fixed disposable lab.
 
     Dependency injection exists exclusively for contract tests. The default
@@ -115,8 +118,26 @@ def execute_bound_lab_case(plan: dict, *, project: str, model_bundle: dict,
     if (not isinstance(inventory, dict) or
             inventory.get("sha256") != snapshot.snapshot_id.removeprefix("lab-scope:")):
         raise ValueError("Live inventory is not bound to scoped lab evidence")
-    if not plan.get("discovery_sha256"):
-        raise ValueError("No initial asset discovery provenance recorded")
+    if (not isinstance(source_discovery, dict) or not verify_digest(source_discovery)
+            or source_discovery.get("sha256") != plan.get("discovery_sha256")):
+        raise ValueError("Initial asset discovery evidence not integrity-bound to plan")
+    asset = proposals[0]["asset_id"]
+    declared = [x for x in source_discovery.get("assets", [])
+                if isinstance(x, dict) and x.get("asset_id") == asset]
+    if len(declared) != 1:
+        raise ValueError("Proposed vulnerability asset not in the source discovery")
+    if asset_inventory_reader is None:
+        from predict_shield.asset_discovery import docker_inspect, normalize_runtime
+        asset_inventory_reader = lambda: normalize_runtime(docker_inspect())
+    live = asset_inventory_reader()
+    if not isinstance(live, list):
+        raise ValueError("Fresh Docker runtime asset inventory missing")
+    live_assets = [x for x in live if isinstance(x, dict) and
+                   x.get("asset_id") == asset and x.get("project") == project]
+    if (len(live_assets) != 1 or
+            live_assets[0].get("image_id") != declared[0].get("image_id") or
+            live_assets[0].get("container_id") != declared[0].get("container_id")):
+        raise ValueError("Proposed asset not present with matching image in real testbed")
     recommendation = lab_selector(model_bundle, pre_action, snapshot,
                                   remaining_budget=remaining_lab_budget,
                                   restart_permitted=False)
@@ -131,7 +152,8 @@ def execute_bound_lab_case(plan: dict, *, project: str, model_bundle: dict,
             recommendation.get("model_fingerprint") !=
             plan.get("selected_action_model_fingerprint")):
         raise ValueError("Fresh trained prediction or policy selection does not match plan")
-    if (not isinstance(model_bundle, dict) or model_bundle.get("training_fingerprint")
+    if (not isinstance(model_bundle, dict) or not model_bundle.get("training_fingerprint")
+            or model_bundle.get("training_fingerprint")
             != recommendation.get("model_fingerprint")):
         raise ValueError("Trusted model fingerprint mismatch")
     # The only mutation path is the existing allowlisted JVM/Kafka lab executor.
