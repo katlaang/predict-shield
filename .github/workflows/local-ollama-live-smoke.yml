@@ -1,0 +1,92 @@
+name: Local open-weight AI real inference smoke test
+on:
+  pull_request:
+    paths:
+      - 'engine/predict_shield/local_ai.py'
+      - 'engine/tests/test_local_ai.py'
+      - 'experiment-b/local-ai-smoke/**'
+      - '.github/workflows/local-ollama-live-smoke.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  actual-model:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate local AI and policy pipeline with no model downloads
+        run: PYTHONPATH=engine python -m unittest discover -s engine/tests -v
+      - name: Start isolated CPU-only Ollama locally
+        run: |
+          docker run --rm -d --name ps-local-ollama -p 127.0.0.1:11434:11434 ollama/ollama:latest
+          for attempt in $(seq 1 45); do
+            if curl -fsS http://127.0.0.1:11434/api/version >/dev/null; then exit 0; fi
+            if [ "$attempt" = 45 ]; then docker logs ps-local-ollama; exit 1; fi
+            sleep 2
+          done
+      - name: Pull small real local Qwen model and capture exact digest
+        run: |
+          docker exec ps-local-ollama ollama pull qwen3:0.6b
+          python - <<'PY'
+          import json
+          import urllib.request
+          from pathlib import Path
+          payload=json.load(urllib.request.urlopen("http://127.0.0.1:11434/api/tags",timeout=10))
+          matches=[model for model in payload.get("models",[])
+                   if model.get("name")=="qwen3:0.6b"]
+          if len(matches)!=1 or len(matches[0].get("digest",""))!=64:
+              raise ValueError("Unable to verify exactly one installed model digest")
+          digest=matches[0]["digest"]
+          assert all(ch in "0123456789abcdef" for ch in digest.lower())
+          Path("/tmp/predict-shield-ollama-digest.txt").write_text("sha256:"+digest)
+          print("Downloaded model SHA-256",digest)
+          PY
+      - name: Run actual local inference through the unified pipeline
+        env:
+          PYTHONPATH: engine
+        run: |
+          python experiment-b/local-ai-smoke/generate_case.py --output-dir /tmp/predict-shield-fictional-case
+          MODEL_SHA="$(cat /tmp/predict-shield-ollama-digest.txt)"
+          python -m predict_shield.run_ai_case \
+            --case-id fictional-local-inference-001 \
+            --discovery /tmp/predict-shield-fictional-case/discovery.json \
+            --advisories /tmp/predict-shield-fictional-case/advisories.json \
+            --catalog /tmp/predict-shield-fictional-case/actions.json \
+            --model qwen3:0.6b \
+            --model-fingerprint "$MODEL_SHA" \
+            --output /tmp/predict-shield-local-ai-case.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          report=json.loads(Path("/tmp/predict-shield-local-ai-case.json").read_text())
+          assert report["case_id"]=="fictional-local-inference-001"
+          assert report["selection_status"]=="ESCALATE_FOR_EVIDENCE"
+          assert report["selected_action"] is None
+          assert report["dispatch_authorized"] is False
+          assert report["local_ai_model"]=="qwen3:0.6b"
+          assert report["local_ai_fingerprint"].startswith("sha256:")
+          assert all(p["action_id"]=="request_security_review"
+                     for p in report["ai_proposals"])
+          assert all(p["status"]=="MODEL_PROPOSAL_UNVERIFIED"
+                     for p in report["ai_proposals"])
+          print("ACTUAL LOCAL MODEL RESPONSE VALIDATED, proposal count:",
+                len(report["ai_proposals"]), "no action dispatched.")
+          PY
+      - name: Retain actual local AI result and model source fingerprint
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: actual-local-qwen-0-6b-advisory-smoke
+          path: |
+            /tmp/predict-shield-local-ai-case.json
+            /tmp/predict-shield-ollama-digest.txt
+          retention-days: 30
+      - name: Tear down local model container
+        if: always()
+        run: |
+          docker rm -f ps-local-ollama 2>/dev/null || true
+          rm -rf /tmp/predict-shield-fictional-case
