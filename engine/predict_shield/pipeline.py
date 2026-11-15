@@ -67,6 +67,8 @@ def plan_case(*, case_id: str, discovery: dict, advisories: list[dict],
         "ai_proposals":list(proposed),
         "local_ai_model":model_name,
         "local_ai_fingerprint":model_fp,
+        "scope_snapshot_id":None,
+        "selected_action_model_fingerprint":None,
         "applicability":"UNVERIFIED",
         "selection_status":"ESCALATE_FOR_EVIDENCE",
         "selected_action":None,
@@ -116,6 +118,8 @@ def plan_case(*, case_id: str, discovery: dict, advisories: list[dict],
         report["reason"]="Existing independent action gate abstained: "+screened.reason
         return report
     report["selection_status"]="ELIGIBLE_RESEARCH_LAB_PLAN"
+    report["scope_snapshot_id"]=scope_snapshot.snapshot_id
+    report["selected_action_model_fingerprint"]=next(p.training_fingerprint for p in predictions if p.action_id==screened.selected.action_id)
     report["selected_action"]=screened.selected.action_id
     report["selection_score"]=screened.selected.score
     report["proposed_verification_check_ids"]=item["verification_check_ids"]
