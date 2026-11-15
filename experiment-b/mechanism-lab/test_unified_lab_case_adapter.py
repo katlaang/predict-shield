@@ -5,6 +5,7 @@ from datetime import datetime, timezone
 
 from predict_shield.ai_contracts import EvidenceSnapshot
 from predict_shield.assessment import Evidence
+from predict_shield.risk_evidence import canonical_digest
 from unified_lab_case_adapter import execute_bound_lab_case
 
 NOW=datetime(2026,11,14,22,0,tzinfo=timezone.utc)
@@ -13,6 +14,14 @@ CVE="CVE-2026-12345"
 PURL="pkg:maven/org.example/core@1.0"
 CONTROL="control-"+"x"*32
 ORACLE="oracle-"+"y"*32
+
+
+def discovery():
+    document={"schema":"predict-shield/asset-discovery-report/1",
+             "assets":[{"asset_id":ASSET,"container_id":"b"*64,
+                        "image_id":"sha256:"+"a"*64}]}
+    document["sha256"]=canonical_digest(document)
+    return document
 
 
 def plan():
@@ -24,7 +33,7 @@ def plan():
         "selected_action":"resync_policy",
         "scope_snapshot_id":"lab-scope:lab-sha",
         "selected_action_model_fingerprint":"trained-bundle-fingerprint",
-        "discovery_sha256":"discovery-fixture",
+        "discovery_sha256":discovery()["sha256"],
         "applicability":"VERIFIED",
         "applicability_evidence_sources":["independent-advisory-check"],
         "dispatch_authorized":False,
@@ -42,7 +51,7 @@ def evidence():
 
 
 def responses(verdict=True, action="resync_policy", trusted=True, scope=True,
-              model="trained-bundle-fingerprint"):
+              model="trained-bundle-fingerprint", live_image="sha256:"+"a"*64):
     snapshot=EvidenceSnapshot("lab-scope:lab-sha","test-case",NOW,
                                ("lab-gateway","docker"),trusted,scope)
     def collector(**kwargs):
@@ -67,9 +76,13 @@ def responses(verdict=True, action="resync_policy", trusted=True, scope=True,
                 "all_revoked_access_denied":verdict}
     def gateway_reader():
         return [{"http_status":403 if verdict else 200} for _ in range(6)]
+    def assets():
+        return [{"asset_id":ASSET,"container_id":"b"*64,"image_id":live_image,
+                 "project":"psunified"}]
     return {"scope_collector":collector,"lab_selector":selector,
             "lab_executor":executor,"post_oracle_reader":oracle_reader,
-            "post_gateway_reader":gateway_reader}, calls
+            "post_gateway_reader":gateway_reader,
+            "asset_inventory_reader":assets}, calls
 
 
 def run(p=None, callbacks=None, observations=None, **kw):
@@ -78,6 +91,7 @@ def run(p=None, callbacks=None, observations=None, **kw):
         c=callbacks
     params={
         "project":"psunified",
+        "source_discovery":discovery(),
         "model_bundle":{"training_fingerprint":"trained-bundle-fingerprint"},
         "pre_action":{"run_id":"test-case","oracle_features_excluded":True,
                       "experiment_type":"real_kafka_multijvm_lab"},
@@ -151,6 +165,19 @@ class UnifiedBridgeTests(unittest.TestCase):
         p=plan();p["dispatch_authorized"]=True
         with self.assertRaisesRegex(ValueError,"unexecuted"):
             run(p,callback)
+        self.assertEqual(calls,[])
+
+    def test_discovery_digest_mismatch_no_dispatch(self):
+        callback,calls=responses()
+        bad=discovery();bad["assets"][0]["image_id"]="sha256:forged"
+        with self.assertRaisesRegex(ValueError,"integrity-bound"):
+            run(callbacks=callback,source_discovery=bad)
+        self.assertEqual(calls,[])
+
+    def test_image_changed_between_discovery_and_action_blocks(self):
+        callback,calls=responses(live_image="sha256:"+"f"*64)
+        with self.assertRaisesRegex(ValueError,"matching image"):
+            run(callbacks=callback)
         self.assertEqual(calls,[])
 
     def test_laboratory_projects_only(self):
