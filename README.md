@@ -29,7 +29,7 @@ Each step produces a signed, hashed record, so a finding, a recommendation, an a
 | Policy-gated action selection | Deterministic gate: service-continuity budgets, calibrated risk predictions, policy tiers | Calibration against real operator traffic, not just lab traffic |
 | Applying fixes | Executes in an isolated lab (Docker/Kafka/Java) only | A safe, reversible actuator for real operator infrastructure, with the same gate in front of it |
 | Independent verification | Separate verifier distinguishes VERIFIED/NOT VERIFIED/INDETERMINATE/NOT APPLICABLE | Live, authenticated probes against a real network |
-| Dashboard | Read-only research demo displaying recorded lab trial data (`demo/index.html`) | A live dashboard showing real findings, recommendations, and verification status for an operator's own network |
+| Dashboard | Read-only research demo displaying recorded lab trial data (`demo/index.html`); a separate prototype product UI (`dashboard/index.html`) rendering a live 3D asset graph from a real `sdn_topology_discovery` report | Wiring the dashboard to a live feed instead of a loaded JSON file; a production build instead of CDN-loaded, in-browser JSX; findings and verification status for the Java/Kafka mechanism lab shown the same way |
 
 The one gap that matters most for an ISP/telecom pitch is the dashboard row: the pipeline is real and wired together end to end, but it has only been run against lab/test infrastructure, not a live customer network, and there's no live-data UI yet. Today everything the pipeline produces is a JSON record, not a screen an operator would look at.
 
@@ -89,6 +89,7 @@ See [the research index](docs/research/README.md) for the full set of studies, a
 ## Documentation
 
 - [Architecture notes](docs/architecture/README.md)
+- [Asset dashboard prototype](dashboard/README.md)
 - [Unified AI vulnerability-to-defense pipeline](docs/development/UNIFIED_LOCAL_AI_VULNERABILITY_PIPELINE.md)
 - [Advisory-reading corpus and model comparison](experiment-a/advisory-reading/README.md)
 - [Research index](docs/research/README.md)

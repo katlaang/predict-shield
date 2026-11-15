@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PREDICT-SHIELD Asset Graph</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/react@18.3.1/umd/react.production.min.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js" crossorigin></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.25.6/babel.min.js"></script>
+<style>
+  :root {
+    /* palette: deep slate-blue ops console, teal = healthy/declared flow, amber = unattributed/risk, coral = critical */
+    --bg: #0b1320;
+    --panel: #121d30;
+    --panel-raised: #17253c;
+    --border: #233350;
+    --text: #e7edf7;
+    --text-dim: #93a3bf;
+    --text-faint: #5c6c8a;
+    --accent: #43c6d7;
+    --accent-dim: #1f4b54;
+    --warn: #e3a336;
+    --warn-dim: #4a3a1a;
+    --critical: #e1636a;
+    --good: #52c793;
+    --font-display: 'IBM Plex Mono', 'SFMono-Regular', Consolas, monospace;
+    --font-body: 'IBM Plex Sans', -apple-system, 'Segoe UI', sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    overflow: hidden;
+  }
+  #root { height: 100%; }
+  .app {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+  .topbar {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+    background: var(--panel);
+    flex-wrap: wrap;
+  }
+  .brand {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 15px;
+    letter-spacing: 0.02em;
+    color: var(--text);
+    white-space: nowrap;
+  }
+  .brand span { color: var(--accent); }
+  .tiles {
+    display: flex;
+    gap: 10px;
+    flex: 1;
+    flex-wrap: wrap;
+  }
+  .tile {
+    background: var(--panel-raised);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 7px 12px;
+    min-width: 92px;
+  }
+  .tile .num {
+    font-family: var(--font-display);
+    font-size: 18px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    line-height: 1.1;
+  }
+  .tile .label {
+    font-size: 10.5px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-top: 2px;
+  }
+  .tile.risk .num { color: var(--warn); }
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    font-family: var(--font-display);
+    padding: 4px 9px;
+    border-radius: 20px;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    white-space: nowrap;
+  }
+  .pill .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--text-faint); }
+  .pill.ok .dot { background: var(--good); }
+  .pill.warn { color: var(--warn); border-color: var(--warn-dim); }
+  .pill.warn .dot { background: var(--warn); }
+  .loadbtn {
+    font-family: var(--font-body);
+    font-size: 12.5px;
+    font-weight: 500;
+    color: var(--text);
+    background: var(--accent-dim);
+    border: 1px solid var(--accent);
+    border-radius: 7px;
+    padding: 7px 13px;
+    cursor: pointer;
+  }
+  .loadbtn:hover { filter: brightness(1.15); }
+  .loadbtn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .main {
+    display: flex;
+    flex: 1;
+    min-height: 0;
+  }
+  .scene-wrap {
+    position: relative;
+    flex: 1;
+    min-width: 0;
+  }
+  canvas.scene { display: block; width: 100%; height: 100%; }
+  .scene-caption {
+    position: absolute;
+    bottom: 14px;
+    left: 18px;
+    font-size: 11.5px;
+    color: var(--text-faint);
+    max-width: 440px;
+    line-height: 1.5;
+  }
+  .scene-caption b { color: var(--text-dim); }
+  .legend {
+    position: absolute;
+    top: 14px;
+    left: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 11.5px;
+    color: var(--text-dim);
+  }
+  .legend .row { display: flex; align-items: center; gap: 7px; }
+  .legend .swatch { width: 18px; height: 2.5px; border-radius: 2px; }
+  .sidebar {
+    width: 330px;
+    flex-shrink: 0;
+    border-left: 1px solid var(--border);
+    background: var(--panel);
+    overflow-y: auto;
+    padding: 18px;
+  }
+  .sidebar h2 {
+    font-family: var(--font-display);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-dim);
+    margin: 0 0 10px;
+    font-weight: 600;
+  }
+  .sidebar section { margin-bottom: 22px; }
+  .node-card {
+    background: var(--panel-raised);
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    padding: 13px 14px;
+  }
+  .node-card .name {
+    font-family: var(--font-display);
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    word-break: break-word;
+  }
+  .node-card .name.risk { color: var(--warn); }
+  .kv { display: flex; justify-content: space-between; gap: 10px; padding: 4px 0; font-size: 12.5px; border-top: 1px solid var(--border); }
+  .kv:first-of-type { border-top: none; }
+  .kv .k { color: var(--text-dim); }
+  .kv .v { font-family: var(--font-display); text-align: right; color: var(--text); word-break: break-all; }
+  .edge-list .item {
+    font-size: 12px;
+    padding: 9px 0;
+    border-top: 1px solid var(--border);
+  }
+  .edge-list .item:first-child { border-top: none; }
+  .edge-list .route { font-family: var(--font-display); font-weight: 600; margin-bottom: 3px; }
+  .edge-list .evidence { color: var(--text-faint); word-break: break-all; font-size: 10.5px; }
+  .edge-list .item.risk .route { color: var(--warn); }
+  .empty-hint { color: var(--text-faint); font-size: 12.5px; line-height: 1.6; }
+  .file-input { display: none; }
+  .error-banner {
+    background: #3a1c22;
+    border: 1px solid var(--critical);
+    color: #ffd7da;
+    font-size: 12.5px;
+    padding: 9px 13px;
+    border-radius: 7px;
+    margin: 0 20px 12px;
+  }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel" data-presets="react">
+const { useState, useRef, useEffect, useMemo, useCallback } = React;
+
+// --- Real measured example data -------------------------------------------
+// This is not a fabricated fixture. It was regenerated by replaying the
+// actual ovs-vsctl/ovs-ofctl output captured from a real passing CI run
+// (Containernet/OVS smoke test, PR #108, bridge "s1") through the real
+// sdn_topology_discovery.build_topology_report() code, not hand-written.
+// The two service_dependencies evidence hashes below are byte-identical to
+// what that real run printed. port 3 (s1-eth3) is the lab's "shadow" host,
+// deliberately left out of the operator's declared services, which is why
+// it shows up in active_unnamed_ports instead of a dependency edge.
+const EXAMPLE_REPORT = {
+  "schema": "predict-shield/sdn-topology-report/2",
+  "bridge": "s1",
+  "collected_at": "2026-11-15T12:20:13.923995+00:00",
+  "ports": ["s1-eth1", "s1-eth2", "s1-eth3"],
+  "ofport_to_interface": { "1": "s1-eth1", "2": "s1-eth2", "3": "s1-eth3" },
+  "unresolved_ports": [],
+  "flow_entries": [
+    { "in_port": "2", "out_ports": ["1"], "n_packets": 0, "n_bytes": 0 },
+    { "in_port": "1", "out_ports": ["3"], "n_packets": 0, "n_bytes": 0 },
+    { "in_port": "1", "out_ports": ["2"], "n_packets": 3, "n_bytes": 294 },
+    { "in_port": "2", "out_ports": ["1"], "n_packets": 3, "n_bytes": 294 },
+    { "in_port": "3", "out_ports": ["1"], "n_packets": 1, "n_bytes": 98 },
+    { "in_port": "1", "out_ports": ["3"], "n_packets": 1, "n_bytes": 98 }
+  ],
+  "service_dependencies": [
+    { "service": "db", "depends_on": "web", "evidence_id": "ovs-flow:s1:2->1:ed2281ac5ede5900" },
+    { "service": "web", "depends_on": "db", "evidence_id": "ovs-flow:s1:1->2:ad655693f8bf069d" }
+  ],
+  "active_unnamed_ports": [
+    { "ofport": "3", "interface": "s1-eth3", "max_packets_observed": 1, "flow_count": 2 }
+  ],
+  "live_sdn_evidence": true,
+  "complete_topology_verified": false,
+  "sha256": "b8dae4ba6bd61762aa27e96b63925dd0d1420ae05e4d27153a9619fa8185bba8"
+};
+// This mapping is never stored in the report itself (the adapter only ever
+// names a port if the operator declared it); it is reconstructed here only
+// to label the two known nodes in this one example for display.
+const EXAMPLE_PORT_TO_SERVICE = { "1": "web", "2": "db" };
+
+// --- Derive a graph {nodes, edges, trafficEdges} from a report -----------
+function deriveGraph(report, portToService) {
+  const nodeMap = new Map(); // id -> node
+  const addNode = (id, data) => {
+    if (!nodeMap.has(id)) nodeMap.set(id, { id, ...data });
+    else Object.assign(nodeMap.get(id), data);
+  };
+
+  (report.service_dependencies || []).forEach(dep => {
+    addNode(dep.service, { label: dep.service, kind: "service" });
+    addNode(dep.depends_on, { label: dep.depends_on, kind: "service" });
+  });
+  (report.active_unnamed_ports || []).forEach(p => {
+    addNode("port:" + p.ofport, {
+      label: p.interface || ("ofport " + p.ofport),
+      kind: "risk",
+      ofport: p.ofport,
+      interface: p.interface,
+      maxPacketsObserved: p.max_packets_observed,
+      flowCount: p.flow_count,
+    });
+  });
+  // Any declared-but-otherwise-unmentioned port (named, idle) stays visible too.
+  Object.entries(portToService || {}).forEach(([ofport, service]) => {
+    if (!nodeMap.has(service)) addNode(service, { label: service, kind: "service" });
+  });
+
+  const edges = (report.service_dependencies || []).map(dep => ({
+    from: dep.service, to: dep.depends_on, kind: "declared", evidenceId: dep.evidence_id,
+  }));
+
+  // Unattributed traffic: any flow touching a risk port, drawn as a dashed
+  // line to whichever port it exchanged packets with (never promoted to a
+  // service edge -- the adapter itself never does that either).
+  const riskOfports = new Set((report.active_unnamed_ports || []).map(p => p.ofport));
+  const ofportToNode = (ofport) => {
+    if (portToService && portToService[ofport]) return portToService[ofport];
+    if (riskOfports.has(ofport)) return "port:" + ofport;
+    return null;
+  };
+  const trafficEdges = [];
+  const seen = new Set();
+  (report.flow_entries || []).forEach(entry => {
+    if (entry.n_packets < 1) return;
+    const fromId = ofportToNode(entry.in_port);
+    if (!fromId) return;
+    (entry.out_ports || []).forEach(op => {
+      const toId = ofportToNode(op);
+      if (!toId || toId === fromId) return;
+      const isRisk = riskOfports.has(entry.in_port) || riskOfports.has(op);
+      if (!isRisk) return; // declared pairs are already covered by service_dependencies
+      const key = fromId + ">" + toId;
+      if (seen.has(key)) return;
+      seen.add(key);
+      trafficEdges.push({ from: fromId, to: toId, kind: "unattributed", packets: entry.n_packets });
+    });
+  });
+
+  return { nodes: Array.from(nodeMap.values()), edges, trafficEdges };
+}
+
+// --- Three.js scene, imperative, driven by a ref to current graph --------
+function Scene({ graph, onSelectNode, selectedId }) {
+  const containerRef = useRef(null);
+  const graphRef = useRef(graph);
+  const selectedRef = useRef(selectedId);
+  const threeRef = useRef(null);
+  graphRef.current = graph;
+  selectedRef.current = selectedId;
+
+  useEffect(() => {
+    let disposed = false;
+    import("https://cdnjs.cloudflare.com/ajax/libs/three.js/0.160.0/three.module.min.js").then((THREE) => {
+      if (disposed) return;
+      const container = containerRef.current;
+      const canvas = document.createElement("canvas");
+      canvas.className = "scene";
+      container.appendChild(canvas);
+
+      const scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x0b1320);
+      scene.fog = new THREE.Fog(0x0b1320, 9, 26);
+
+      const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 100);
+      const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+      scene.add(new THREE.AmbientLight(0x6a7fb0, 1.1));
+      const key = new THREE.DirectionalLight(0xffffff, 0.9);
+      key.position.set(5, 8, 6);
+      scene.add(key);
+
+      const ringGeo = new THREE.RingGeometry(5.6, 5.65, 64);
+      const ringMat = new THREE.MeshBasicMaterial({ color: 0x1b2d48, side: THREE.DoubleSide, transparent: true, opacity: 0.6 });
+      const ring = new THREE.Mesh(ringGeo, ringMat);
+      ring.rotation.x = Math.PI / 2;
+      scene.add(ring);
+
+      // orbit state (manual, no external controls dependency)
+      let radius = 13, theta = 0.9, phi = 1.05;
+      let dragging = false, lastX = 0, lastY = 0;
+      const updateCamera = () => {
+        camera.position.set(
+          radius * Math.sin(phi) * Math.cos(theta),
+          radius * Math.cos(phi),
+          radius * Math.sin(phi) * Math.sin(theta)
+        );
+        camera.lookAt(0, 0.4, 0);
+      };
+      updateCamera();
+
+      const onDown = (e) => { dragging = true; lastX = e.clientX; lastY = e.clientY; };
+      const onUp = () => { dragging = false; };
+      const onMove = (e) => {
+        if (!dragging) return;
+        theta -= (e.clientX - lastX) * 0.006;
+        phi = Math.min(Math.max(phi - (e.clientY - lastY) * 0.006, 0.35), 1.5);
+        lastX = e.clientX; lastY = e.clientY;
+        updateCamera();
+      };
+      const onWheel = (e) => {
+        e.preventDefault();
+        radius = Math.min(Math.max(radius + e.deltaY * 0.01, 6), 24);
+        updateCamera();
+      };
+      canvas.addEventListener("pointerdown", onDown);
+      window.addEventListener("pointerup", onUp);
+      window.addEventListener("pointermove", onMove);
+      canvas.addEventListener("wheel", onWheel, { passive: false });
+
+      const raycaster = new THREE.Raycaster();
+      const pointer = new THREE.Vector2();
+      let hitTargets = [];
+      const onClick = (e) => {
+        const rect = canvas.getBoundingClientRect();
+        pointer.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+        pointer.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+        raycaster.setFromCamera(pointer, camera);
+        const hits = raycaster.intersectObjects(hitTargets, false);
+        if (hits.length) onSelectNode(hits[0].object.userData.nodeId);
+      };
+      canvas.addEventListener("click", onClick);
+
+      const group = new THREE.Group();
+      scene.add(group);
+
+      const colors = {
+        service: 0x43c6d7,
+        risk: 0xe3a336,
+        declared: 0x43c6d7,
+        unattributed: 0xe3a336,
+      };
+
+      const particleUserData = [];
+      let nodeMeshes = new Map();
+
+      function layoutPositions(nodes) {
+        const positions = new Map();
+        const n = Math.max(nodes.length, 1);
+        nodes.forEach((node, i) => {
+          const a = (i / n) * Math.PI * 2;
+          const r = node.kind === "risk" ? 4.1 : 3.0;
+          positions.set(node.id, new THREE.Vector3(Math.cos(a) * r, node.kind === "risk" ? 0.55 : 0, Math.sin(a) * r));
+        });
+        return positions;
+      }
+
+      function rebuild() {
+        while (group.children.length) {
+          const c = group.children.pop();
+          c.geometry && c.geometry.dispose();
+          c.material && c.material.dispose();
+        }
+        hitTargets = [];
+        particleUserData.length = 0;
+        nodeMeshes = new Map();
+
+        const g = graphRef.current;
+        const positions = layoutPositions(g.nodes);
+
+        g.nodes.forEach((node) => {
+          const pos = positions.get(node.id);
+          const isRisk = node.kind === "risk";
+          const isSelected = selectedRef.current === node.id;
+          const geo = new THREE.IcosahedronGeometry(isRisk ? 0.34 : 0.4, 1);
+          const mat = new THREE.MeshStandardMaterial({
+            color: isRisk ? colors.risk : colors.service,
+            emissive: isRisk ? colors.risk : colors.service,
+            emissiveIntensity: isSelected ? 0.9 : 0.35,
+            metalness: 0.2, roughness: 0.4,
+          });
+          const mesh = new THREE.Mesh(geo, mat);
+          mesh.position.copy(pos);
+          mesh.userData.nodeId = node.id;
+          group.add(mesh);
+          hitTargets.push(mesh);
+          nodeMeshes.set(node.id, mesh);
+
+          if (isSelected) {
+            const haloGeo = new THREE.RingGeometry(0.52, 0.6, 32);
+            const haloMat = new THREE.MeshBasicMaterial({ color: 0xffffff, side: THREE.DoubleSide, transparent: true, opacity: 0.85 });
+            const halo = new THREE.Mesh(haloGeo, haloMat);
+            halo.position.copy(pos);
+            halo.lookAt(camera.position);
+            group.add(halo);
+          }
+        });
+
+        function addEdge(from, to, color, dashed, packets) {
+          const a = positions.get(from), b = positions.get(to);
+          if (!a || !b) return;
+          const mid = a.clone().add(b).multiplyScalar(0.5);
+          mid.y += 0.5;
+          const curve = new THREE.QuadraticBezierCurve3(a, mid, b);
+          const pts = curve.getPoints(24);
+          const geo = new THREE.BufferGeometry().setFromPoints(pts);
+          const mat = dashed
+            ? new THREE.LineDashedMaterial({ color, dashSize: 0.18, gapSize: 0.12, transparent: true, opacity: 0.85 })
+            : new THREE.LineBasicMaterial({ color, transparent: true, opacity: 0.9 });
+          const line = new THREE.Line(geo, mat);
+          if (dashed) line.computeLineDistances();
+          group.add(line);
+
+          const packetCount = Math.max(packets || 1, 1);
+          const particleCount = Math.min(2 + packetCount, 6);
+          for (let i = 0; i < particleCount; i++) {
+            const pGeo = new THREE.SphereGeometry(0.055, 8, 8);
+            const pMat = new THREE.MeshBasicMaterial({ color });
+            const particle = new THREE.Mesh(pGeo, pMat);
+            group.add(particle);
+            particleUserData.push({ mesh: particle, curve, offset: i / particleCount, speed: 0.12 + Math.random() * 0.05 });
+          }
+        }
+
+        (g.edges || []).forEach(e => addEdge(e.from, e.to, colors.declared, false, 3));
+        (g.trafficEdges || []).forEach(e => addEdge(e.from, e.to, colors.unattributed, true, e.packets));
+      }
+
+      rebuild();
+
+      let raf;
+      const clock = new THREE.Clock();
+      function animate() {
+        raf = requestAnimationFrame(animate);
+        const dt = clock.getDelta();
+        particleUserData.forEach(p => {
+          p.offset = (p.offset + dt * p.speed) % 1;
+          const pos = p.curve.getPoint(p.offset);
+          p.mesh.position.copy(pos);
+        });
+        nodeMeshes.forEach(mesh => { mesh.rotation.y += dt * 0.25; });
+        group.rotation.y += dt * 0.02;
+        renderer.render(scene, camera);
+      }
+      animate();
+
+      function resize() {
+        const w = container.clientWidth, h = container.clientHeight;
+        renderer.setSize(w, h);
+        camera.aspect = w / h;
+        camera.updateProjectionMatrix();
+      }
+      resize();
+      const ro = new ResizeObserver(resize);
+      ro.observe(container);
+
+      threeRef.current = { rebuild, dispose: () => {
+        cancelAnimationFrame(raf);
+        ro.disconnect();
+        canvas.removeEventListener("pointerdown", onDown);
+        window.removeEventListener("pointerup", onUp);
+        window.removeEventListener("pointermove", onMove);
+        canvas.removeEventListener("wheel", onWheel);
+        canvas.removeEventListener("click", onClick);
+        renderer.dispose();
+        container.removeChild(canvas);
+      }};
+    });
+
+    return () => { if (threeRef.current) threeRef.current.dispose(); disposed = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (threeRef.current) threeRef.current.rebuild();
+  }, [graph, selectedId]);
+
+  return <div ref={containerRef} className="scene-wrap" />;
+}
+
+function StatTile({ num, label, risk }) {
+  return (
+    <div className={"tile" + (risk ? " risk" : "")}>
+      <div className="num">{num}</div>
+      <div className="label">{label}</div>
+    </div>
+  );
+}
+
+function App() {
+  const [report, setReport] = useState(EXAMPLE_REPORT);
+  const [portToService, setPortToService] = useState(EXAMPLE_PORT_TO_SERVICE);
+  const [selectedId, setSelectedId] = useState(null);
+  const [error, setError] = useState(null);
+  const fileInputRef = useRef(null);
+
+  const graph = useMemo(() => deriveGraph(report, portToService), [report, portToService]);
+
+  const totalPackets = (report.flow_entries || []).reduce((s, e) => s + (e.n_packets || 0), 0);
+  const riskCount = (report.active_unnamed_ports || []).length;
+  const depCount = (report.service_dependencies || []).length;
+
+  const handleFile = useCallback((e) => {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const parsed = JSON.parse(reader.result);
+        if (!parsed.schema || !String(parsed.schema).startsWith("predict-shield/sdn-topology-report")) {
+          setError("That file doesn't look like a predict-shield/sdn-topology-report. Load the JSON build_topology_report() wrote.");
+          return;
+        }
+        setError(null);
+        setReport(parsed);
+        setPortToService({}); // unknown for an uploaded report unless it's embedded separately
+        setSelectedId(null);
+      } catch (err) {
+        setError("Couldn't parse that file as JSON: " + err.message);
+      }
+    };
+    reader.readAsText(file);
+  }, []);
+
+  const selected = graph.nodes.find(n => n.id === selectedId) || null;
+  const selectedEdges = selected
+    ? [...graph.edges, ...graph.trafficEdges].filter(e => e.from === selected.id || e.to === selected.id)
+    : [];
+
+  return (
+    <div className="app">
+      <div className="topbar">
+        <div className="brand">PREDICT-SHIELD <span>/ Asset Graph</span></div>
+        <div className="tiles">
+          <StatTile num={graph.nodes.length} label="Assets" />
+          <StatTile num={depCount} label="Declared links" />
+          <StatTile num={riskCount} label="Undeclared, active" risk={riskCount > 0} />
+          <StatTile num={totalPackets} label="Packets observed" />
+        </div>
+        <span className={"pill" + (report.live_sdn_evidence ? " ok" : "")}>
+          <span className="dot" /> {report.live_sdn_evidence ? "Live switch evidence" : "No live evidence"}
+        </span>
+        <button className="loadbtn" onClick={() => fileInputRef.current.click()}>
+          Load a report (.json)
+        </button>
+        <input ref={fileInputRef} type="file" accept=".json,application/json" className="file-input" onChange={handleFile} />
+      </div>
+
+      {error && <div className="error-banner">{error}</div>}
+
+      <div className="main">
+        <div className="scene-wrap-outer" style={{ position: "relative", flex: 1, minWidth: 0 }}>
+          <Scene graph={graph} onSelectNode={setSelectedId} selectedId={selectedId} />
+          <div className="legend">
+            <div className="row"><span className="swatch" style={{ background: "#43c6d7" }} /> declared dependency, evidence-backed</div>
+            <div className="row"><span className="swatch" style={{ background: "#e3a336" }} /> real traffic, no declared owner</div>
+          </div>
+          <div className="scene-caption">
+            Drag to orbit &middot; scroll to zoom &middot; click an asset &middot; <b>{report.bridge}</b>
+          </div>
+        </div>
+
+        <div className="sidebar">
+          <section>
+            <h2>Selected asset</h2>
+            {!selected && (
+              <div className="empty-hint">Click a node in the graph.</div>
+            )}
+            {selected && (
+              <div className="node-card">
+                <div className={"name" + (selected.kind === "risk" ? " risk" : "")}>
+                  {selected.kind === "risk" ? "⚠ " : ""}{selected.label}
+                </div>
+                {selected.kind === "risk" ? (
+                  <>
+                    <div className="kv"><span className="k">OpenFlow port</span><span className="v">{selected.ofport}</span></div>
+                    <div className="kv"><span className="k">Interface</span><span className="v">{selected.interface || "unresolved"}</span></div>
+                    <div className="kv"><span className="k">Max packets / flow</span><span className="v">{selected.maxPacketsObserved}</span></div>
+                    <div className="kv"><span className="k">Flow entries</span><span className="v">{selected.flowCount}</span></div>
+                    <div className="kv"><span className="k">Status</span><span className="v">undeclared</span></div>
+                  </>
+                ) : (
+                  <div className="kv"><span className="k">Role</span><span className="v">declared service</span></div>
+                )}
+              </div>
+            )}
+          </section>
+
+          <section>
+            <h2>Connections</h2>
+            {selected && selectedEdges.length === 0 && <div className="empty-hint">No traffic on this asset.</div>}
+            {!selected && <div className="empty-hint">Select an asset.</div>}
+            {selected && selectedEdges.length > 0 && (
+              <div className="edge-list">
+                {selectedEdges.map((e, i) => (
+                  <div key={i} className={"item" + (e.kind === "unattributed" ? " risk" : "")}>
+                    <div className="route">{e.from} &rarr; {e.to}</div>
+                    {e.kind === "declared"
+                      ? <div className="evidence">{e.evidenceId}</div>
+                      : <div className="evidence">{e.packets} packet(s) &middot; no declared owner</div>}
+                  </div>
+                ))}
+              </div>
+            )}
+          </section>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+</body>
+</html>
