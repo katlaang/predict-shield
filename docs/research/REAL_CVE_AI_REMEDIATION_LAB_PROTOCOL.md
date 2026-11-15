@@ -9,7 +9,7 @@ A single laboratory demonstration cannot establish AI decision superiority, a 99
 ## Actual package and independent source
 
 - **CVE:** CVE-2020-8203, prototype pollution in lodash deep-path helpers including `zipObjectDeep`.
-- Independent public references: [GitHub Reviewed Advisory GHSA-p6mc-m468-83gw](https://github.com/advisories/GHSA-p6mc-m468-83gw) and [NVD CVE-2020-8203](https://nvd.nist.gov/vuln/detail/CVE-2020-8203). These sources differ slightly on the earliest fixed patch version. Both recognize `lodash@4.17.17` as affected and `lodash@4.17.21` as fixed for this CVE, which are the **only** versions used in this experiment.
+- Independent public references: [GitHub Reviewed Advisory GHSA-p6mc-m468-83gw](https://github.com/advisories/GHSA-p6mc-m468-83gw) and [NVD CVE-2020-8203](https://nvd.nist.gov/vuln/detail/CVE-2020-8203). These sources differ slightly on the earliest fixed patch version. Both recognize `lodash@4.17.11` as affected and `lodash@4.17.21` as fixed for this CVE, which are the **only** versions used in this experiment.
 - A genuine dependency is installed from the public npm registry into a **temporary local directory**. `npm install` uses `--ignore-scripts` to avoid executing package install scripts.
 - `independent_probe.js` uses a **fresh Node.js process** to inspect installed package source and JSON, computes their SHA-256 digests, and performs a marker-only `zipObjectDeep` prototype test. It never sends a network request, accesses a real target or executes arbitrary shell commands. A benign normal-path `zipObjectDeep` call checks functionality.
 - The pre-action oracle must observe actual prototype pollution in the affected version, not just see a CVE in an SBOM.
@@ -29,3 +29,7 @@ The real Node lab only measures software prototype pollution behavior and a beni
 **Future external evidence:** independent assessor verifies the starting vulnerable configuration, pre-registers permitted changes and service budgets, supervises the operator-authorized run, signs pre/post observations, independently compares rule and AI action choices on held-out sites or fault classes, and records separately measured security and continuity outcomes.
 
 Replay the workflow `.github/workflows/real-cve-ai-remediation-lab.yml` on GitHub Actions with Node 22, Python 3.12, local Ollama and publicly available npm registry. No production assets, credentials or public network probes are used.
+
+## Failed first preflight and corrective protocol revision
+
+The first actual GitHub Actions attempt used `lodash@4.17.17`, which is inside some published affected-version ranges, but the separate benign `zipObjectDeep` probe observed **no prototype pollution** on the runner. **The study failed closed before invoking AI or changing any package.** That is a negative precondition result, not a measured remediation or AI failure. The exact legacy `zipObjectDeep` issue has variant/fix-version differences among published advisories, so the next preregistered input is the older `lodash@4.17.11`, whose prototype-pollution behavior is separately documented in vulnerability reports. The patched target `4.17.21`, action menu, separate oracle and strong-rule comparator remain unchanged. Independent preflight JSON is now archived whether it passes or fails. Do not discard the 4.17.17 failed attempt.
