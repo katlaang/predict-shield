@@ -76,14 +76,19 @@ def run(p=None, callbacks=None, observations=None, **kw):
     c,_=responses()
     if callbacks is not None:
         c=callbacks
-    return execute_bound_lab_case(
-        p or plan(),project="psunified",
-        model_bundle={"training_fingerprint":"trained-bundle-fingerprint"},
-        pre_action={"run_id":"test-case","oracle_features_excluded":True,
-                    "experiment_type":"real_kafka_multijvm_lab"},
-        control_token=CONTROL,oracle_token=ORACLE,remaining_lab_budget=30,
-        applicability_observations=(evidence(),) if observations is None else observations,
-        now=NOW,**c,**kw)
+    params={
+        "project":"psunified",
+        "model_bundle":{"training_fingerprint":"trained-bundle-fingerprint"},
+        "pre_action":{"run_id":"test-case","oracle_features_excluded":True,
+                      "experiment_type":"real_kafka_multijvm_lab"},
+        "control_token":CONTROL,"oracle_token":ORACLE,
+        "remaining_lab_budget":30,
+        "applicability_observations":(evidence(),) if observations is None else observations,
+        "now":NOW,
+        **c,
+    }
+    params.update(kw)
+    return execute_bound_lab_case(p or plan(),**params)
 
 
 class UnifiedBridgeTests(unittest.TestCase):
