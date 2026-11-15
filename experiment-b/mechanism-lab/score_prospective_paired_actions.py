@@ -126,7 +126,7 @@ def bootstrap_groups(by_group:dict[str,dict],baseline:str)->dict:
         ai=sum(y for _,y in selected)/24
         delta=base-ai
         absolute.append(delta)
-        relative.append(delta/base if base>1e-12 else -math.inf)
+        relative.append(delta/base if base>1e-12 else -1.0)
     meanbase=sum(x for x,_ in pairs)/24
     meanai=sum(y for _,y in pairs)/24
     lower_abs=_quantile(absolute,FAMILYWISE_ALPHA)
