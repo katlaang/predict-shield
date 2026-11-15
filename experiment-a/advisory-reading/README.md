@@ -38,9 +38,9 @@ The rules fail for two reasons. In 44 of the 80 answerable advisories the text n
 
 ## Model readers
 
-### Comparison run (preregistered 2026-11-15, result pending)
+### Comparison run (preregistered 2026-11-15, measured)
 
-This section is written before the run's numbers are known, so the comparison can't be read backward into a predetermined conclusion.
+This section was written before the run's numbers were known, so the comparison can't be read backward into a predetermined conclusion.
 
 **Research question.** Does a security-domain-tuned model read advisory prose more accurately than a small general model, and does either stay within the wrong-answer ceiling the artifact-name rule already set? This is not a test of AI against a human analyst, and a single run on one corpus does not establish which model is better in general, only on these 120 advisories.
 
@@ -57,7 +57,7 @@ This section is written before the run's numbers are known, so the comparison ca
 - One CPU-only `ollama/ollama:latest` container, one model loaded at a time (`OLLAMA_MAX_LOADED_MODELS=1`, `OLLAMA_NUM_PARALLEL=1`), `OLLAMA_CONTEXT_LENGTH=4096`, container memory capped at 7 GiB with an equal swap cap.
 - Harness: `predict_shield.advisory_eval`, same corpus (`corpus.json`, 120 advisories, 80 answerable / 40 not answerable) and same scoring table as the rule baseline above, so all three readers' numbers are directly comparable.
 - Every prompt and reply is recorded to `experiment-a/advisory-reading/recordings/` and archived as a run artifact, so the result can be replayed later with `--model recorded:<file>` without the model, a key, or a provider present.
-- Run record: run ID `43704195578` on branch `feat/advisory-reading`, commit `a0d34b4`. [Run log](https://github.com/katlaang/predict-shield/actions/runs/43704195578).
+- Run record: run ID `43704208571`, commit `a0d34b4` (merged to master as `0f69ae2`, PR #102). [Run log](https://github.com/katlaang/predict-shield/actions/runs/43704208571); report artifact `advisory-reading-120-model-comparison` (ID `14159051663`). A separate run, `43704195578`, was triggered by the same PR's own check re-run at nearly the same moment and sat queued for hours before being superseded and cancelled once this run's result was confirmed; it is not the source of the numbers below.
 
 **Primary measure, fixed in advance.** Correct answers on the 80 answerable advisories, subject to no more total wrong answers (across all 120) than the artifact-name rule's 7 (4 on answerable + 3 on not-answerable). A model that answers more wrong than that does not get credit for extra correct answers; a wrong answer is the costly outcome the pipeline would act on, so it is the binding constraint, not the correct count.
 
@@ -67,7 +67,19 @@ This section is written before the run's numbers are known, so the comparison ca
 - *Ties or loses:* at or below the rule's correct count, or exceeds the wrong-answer ceiling. Given the pattern already seen elsewhere in this repo on other advisory/action tasks (models roughly tying or losing to a strong deterministic baseline in most settings measured so far), this is the outcome treated as unsurprising, not the one being hoped for.
 - *No answer from either model on most items:* reported as-is; an abstention-heavy result is not re-run with a different prompt to chase a better number.
 
-**Result:** pending. This section will be replaced with the measured numbers once run `43704195578` completes, linking the archived `model-results.json` and recordings, not edited to match them after the fact.
+**Result:** ties or loses, for both models, against the preregistered criteria above.
+
+| Reader | Answerable (80): correct | wrong | Not answerable (40): wrong | Total wrong |
+| --- | --- | --- | --- | --- |
+| Artifact name rule (baseline) | 7 | 4 | 3 | 7 |
+| qwen3:0.6b (general) | 8 | 11 | 0 | 11 |
+| Foundation-Sec-8B (security-tuned) | 0 | 0 | 0 | 0 |
+
+- **qwen3:0.6b** answered one more advisory correctly than the rule (8 vs. 7), but its 11 wrong answers on the answerable set alone already exceed the 7-wrong ceiling the rule set. Per the primary measure fixed in advance, it does not get credit for the extra correct answer: this is a loss.
+- **Foundation-Sec-8B**, the security-domain-tuned model, scored 0 correct and 0 wrong on all 120 advisories, meaning it gave no answer at all, on every single one, including the 80 it should have been able to answer from the text. This is not a close loss; it is a model that abstained universally under this harness's exact prompt and parsing. Per preregistration, an abstention-heavy result is reported as-is, not re-run with a different prompt to chase a better number, so no attempt was made here to tune around it. Whether that is a property of the model, the quantization used, or the prompt format is an open question for a separate run, not answered by this one.
+- Neither model wins. This matches the pattern already seen elsewhere in this repository on other advisory and action-selection tasks: automation has value as a shortlist generator even where it is not yet beating a well-built fixed rule, and no claim of AI superiority is made here.
+
+Full output: `model-results.json` and `recordings/`, archived as the run's `advisory-reading-120-model-comparison` artifact (not committed to the repository; see the run log above to retrieve it).
 
 ### How to reproduce or extend this run
 
