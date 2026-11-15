@@ -22,6 +22,7 @@ from __future__ import annotations
 import json
 import subprocess
 import sys
+import time
 from pathlib import Path
 
 from mininet.net import Containernet
@@ -42,22 +43,37 @@ def main() -> None:
     link_shadow = net.addLink(shadow, switch)
     net.start()
     try:
+        time.sleep(2)  # let OVS and the container interfaces fully settle
         # Real traffic: web<->db a few times (declared pair), shadow pings
         # web once too (undeclared port, but it still shows up on the wire).
-        web.cmd("ping -c 4 -W 2 10.0.0.2")
-        shadow.cmd("ping -c 2 -W 2 10.0.0.1")
+        print("=== web -> db ping ===")
+        print(web.cmd("ping -c 4 -W 2 10.0.0.2"))
+        print("=== shadow -> web ping ===")
+        print(shadow.cmd("ping -c 2 -W 2 10.0.0.1"))
 
         web_switch_port = link_web.intf2.name
         db_switch_port = link_db.intf2.name
         shadow_switch_port = link_shadow.intf2.name
+        print("=== ovs-vsctl show ===")
+        print(subprocess.run(["ovs-vsctl", "show"], capture_output=True, text=True).stdout)
+        print("=== ovs-ofctl dump-flows s1 (raw) ===")
+        print(subprocess.run(["ovs-ofctl", "dump-flows", "s1"], capture_output=True, text=True).stdout)
+
         name_to_ofport = {name: ofport for ofport, name in
                           resolve_ofports([web_switch_port, db_switch_port, shadow_switch_port],
                                          runner=subprocess.run).items()}
+        print("=== resolved ofports ===", name_to_ofport)
+        for required in (web_switch_port, db_switch_port):
+            if required not in name_to_ofport:
+                raise RuntimeError(f"OVS never resolved an ofport for {required} -- "
+                                   "the link likely never attached to the bridge")
         port_to_service = {name_to_ofport[web_switch_port]: "web",
                            name_to_ofport[db_switch_port]: "db"}
         # shadow is deliberately left out of the declaration.
 
         report = build_topology_report("s1", port_to_service, runner=subprocess.run)
+        print("=== full parsed report ===")
+        print(json.dumps(report, indent=2))
 
         declared_pairs = {(link["service"], link["depends_on"])
                           for link in report["service_dependencies"]}
