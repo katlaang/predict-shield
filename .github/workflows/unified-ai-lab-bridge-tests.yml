@@ -1,0 +1,25 @@
+name: Unified AI case to existing lab executor binding
+on:
+  pull_request:
+    paths:
+      - 'engine/predict_shield/pipeline.py'
+      - 'experiment-b/mechanism-lab/unified_lab_case_adapter.py'
+      - 'experiment-b/mechanism-lab/test_unified_lab_case_adapter.py'
+      - '.github/workflows/unified-ai-lab-bridge-tests.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  safety-contracts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: All evidence and policy engine contracts
+        run: PYTHONPATH=engine python -m unittest discover -s engine/tests -v
+      - name: Lab bridge replay, image binding, policy recomputation and negative oracle contracts
+        working-directory: experiment-b/mechanism-lab
+        run: PYTHONPATH=../../engine python -m unittest test_unified_lab_case_adapter -v
