@@ -36,9 +36,42 @@ Full output: `baseline-results.json`. The engine tests reproduce these numbers f
 
 The rules fail for two reasons. In 44 of the 80 answerable advisories the text never uses the artifact name, and in 25 more it lists several fixed release lines, which the pattern rule treats as ambiguous.
 
-## Model readers (not yet measured)
+## Model readers
 
-No model result is recorded here yet. To produce one, either serve an open-weight model locally with [Ollama](https://ollama.com), or use a hosted API that serves the same open weights ([Featherless](https://featherless.ai), [Together](https://together.ai)). A hosted run sends the 120 advisories' text and the inventory's package list to that provider; export its key first (`FEATHERLESS_API_KEY` or `TOGETHER_API_KEY`), never on the command line, where it would land in shell history.
+### Comparison run (preregistered 2026-11-15, result pending)
+
+This section is written before the run's numbers are known, so the comparison can't be read backward into a predetermined conclusion.
+
+**Research question.** Does a security-domain-tuned model read advisory prose more accurately than a small general model, and does either stay within the wrong-answer ceiling the artifact-name rule already set? This is not a test of AI against a human analyst, and a single run on one corpus does not establish which model is better in general, only on these 120 advisories.
+
+**Models compared.**
+
+| Role | Model | Source |
+| --- | --- | --- |
+| General, no security tuning | `qwen3:0.6b` | Ollama library |
+| Security-domain-tuned | `hf.co/fdtn-ai/Foundation-Sec-8B-Reasoning-Q4_K_M-GGUF:Q4_K_M` | Ollama, pulled from Hugging Face |
+
+**Execution environment (fixed before the run, not tuned after seeing a result).**
+
+- Workflow: [`.github/workflows/advisory-reading-model-comparison.yml`](../../.github/workflows/advisory-reading-model-comparison.yml), job `advisory-reading-comparison`, GitHub-hosted `ubuntu-latest` runner.
+- One CPU-only `ollama/ollama:latest` container, one model loaded at a time (`OLLAMA_MAX_LOADED_MODELS=1`, `OLLAMA_NUM_PARALLEL=1`), `OLLAMA_CONTEXT_LENGTH=4096`, container memory capped at 7 GiB with an equal swap cap.
+- Harness: `predict_shield.advisory_eval`, same corpus (`corpus.json`, 120 advisories, 80 answerable / 40 not answerable) and same scoring table as the rule baseline above, so all three readers' numbers are directly comparable.
+- Every prompt and reply is recorded to `experiment-a/advisory-reading/recordings/` and archived as a run artifact, so the result can be replayed later with `--model recorded:<file>` without the model, a key, or a provider present.
+- Run record: run ID `43704195578` on branch `feat/advisory-reading`, commit `a0d34b4`. [Run log](https://github.com/katlaang/predict-shield/actions/runs/43704195578).
+
+**Primary measure, fixed in advance.** Correct answers on the 80 answerable advisories, subject to no more total wrong answers (across all 120) than the artifact-name rule's 7 (4 on answerable + 3 on not-answerable). A model that answers more wrong than that does not get credit for extra correct answers; a wrong answer is the costly outcome the pipeline would act on, so it is the binding constraint, not the correct count.
+
+**What would count as each outcome:**
+
+- *Security-tuned model wins:* more correct on the 80 answerable advisories than both qwen3:0.6b and the artifact-name rule, at or under the 7-wrong ceiling.
+- *Ties or loses:* at or below the rule's correct count, or exceeds the wrong-answer ceiling. Given the pattern already seen elsewhere in this repo on other advisory/action tasks (models roughly tying or losing to a strong deterministic baseline in most settings measured so far), this is the outcome treated as unsurprising, not the one being hoped for.
+- *No answer from either model on most items:* reported as-is; an abstention-heavy result is not re-run with a different prompt to chase a better number.
+
+**Result:** pending. This section will be replaced with the measured numbers once run `43704195578` completes, linking the archived `model-results.json` and recordings, not edited to match them after the fact.
+
+### How to reproduce or extend this run
+
+To add another model or run it yourself, either serve an open-weight model locally with [Ollama](https://ollama.com), or use a hosted API that serves the same open weights ([Featherless](https://featherless.ai), [Together](https://together.ai)). A hosted run sends the 120 advisories' text and the inventory's package list to that provider; export its key first (`FEATHERLESS_API_KEY` or `TOGETHER_API_KEY`), never on the command line, where it would land in shell history.
 
 ```bash
 # local
@@ -56,7 +89,7 @@ PYTHONPATH=engine python -m predict_shield.advisory_eval \
 
 `--record-dir` saves every prompt and reply, never the API key. Commit the recordings with the results so the run can be replayed with `--model recorded:<file>` and audited without the model, the key, or the provider present.
 
-Before running, fix in writing which models and versions will be compared and what counts as a better result. Suggested primary measure: correct answers on the 80 answerable advisories, subject to no more wrong answers than the artifact-name rule on all 120.
+Before running, fix in writing which models and versions will be compared and what counts as a better result, the same way the run above does.
 
 ## Limits
 
