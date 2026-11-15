@@ -1,0 +1,26 @@
+name: Unified AI vulnerability pipeline and local model contracts
+on:
+  pull_request:
+    paths:
+      - 'engine/predict_shield/dependency_graph.py'
+      - 'engine/predict_shield/local_ai.py'
+      - 'engine/predict_shield/pipeline.py'
+      - 'engine/predict_shield/run_ai_case.py'
+      - 'engine/tests/test_unified_pipeline.py'
+      - 'engine/tests/test_local_ai.py'
+      - 'engine/tests/test_run_ai_case.py'
+      - '.github/workflows/unified-ai-pipeline-tests.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  python-contracts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Full Python engine unit suite with offline recorded model output
+        run: PYTHONPATH=engine python -m unittest discover -s engine/tests -v
