@@ -49,7 +49,7 @@ The **absolute paired regret improvement versus fixed-monitor was 0.0165445150**
 
 ### Why no 99.9% or general field claim
 
-These are 24 different software-lab operating configurations within the **same four-JVM Kafka deployment**, not independent U.S. critical-infrastructure organizations. Two physical action replays per condition are not two independent operator incidents. A cost-weighted decision regret is not the same quantity as 99.9% incident detection accuracy, 99.9% policy correctness, or customer service availability.
+These are 24 different software-lab operating configurations within the **same four-JVM Kafka deployment**, not independent U.S. critical-infrastructure organizations. Two repetitions per configuration, each containing four measured action replays, are not two independent operator incidents. A cost-weighted decision regret is not the same quantity as 99.9% incident detection accuracy, 99.9% policy correctness, or customer service availability.
 
 The comparison was **offline**: real action outcomes were independently measured in the testbed for all four candidate choices, then the **previously frozen** AI scored the observable pre-action context and was evaluated against those saved outcomes. This was **not** online AI-driven autonomous production dispatch or independent operator-field remediation.
 
