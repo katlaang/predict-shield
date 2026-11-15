@@ -23,7 +23,7 @@ jobs:
       - name: Install Open vSwitch and Mininet
         run: |
           sudo apt-get update -qq
-          sudo apt-get install -y --no-install-recommends openvswitch-switch mininet
+          sudo apt-get install -y --no-install-recommends openvswitch-switch openvswitch-testcontroller mininet telnet
           sudo service openvswitch-switch start
           sudo ovs-vsctl show
       - name: Install Containernet (and its dependencies, e.g. the docker SDK) on top of the system Mininet/OVS

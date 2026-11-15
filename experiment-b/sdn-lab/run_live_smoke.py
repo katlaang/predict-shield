@@ -26,7 +26,7 @@ import time
 from pathlib import Path
 
 from mininet.net import Containernet
-from mininet.node import Controller, OVSSwitch
+from mininet.node import OVSController, OVSSwitch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "engine"))
 from predict_shield.sdn_topology_discovery import build_topology_report, resolve_ofports  # noqa: E402
@@ -39,7 +39,16 @@ def main() -> None:
     # first live run against this script found. A controller-programmed
     # switch is also the realistic target case -- ONOS/Ryu/OpenDaylight all
     # install explicit per-flow rules the same way.
-    net = Containernet(controller=Controller, switch=OVSSwitch)
+    #
+    # Mininet's generic Controller class shells out to a binary literally
+    # named "controller", which the apt mininet package does not ship on
+    # this runner (confirmed by a live run: "Cannot find required
+    # executable controller"). OVSController instead looks for
+    # ovs-controller/test-controller/ovs-testcontroller, which come from
+    # Open vSwitch itself (the openvswitch-testcontroller apt package), so
+    # it needs no separate controller binary beyond what the workflow
+    # already installs.
+    net = Containernet(controller=OVSController, switch=OVSSwitch)
     net.addController("c0")
     switch = net.addSwitch("s1")
     web = net.addDocker("web", ip="10.0.0.1/24", dimage="nicolaka/netshoot:latest")
