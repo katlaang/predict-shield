@@ -21,4 +21,4 @@ The physical GitHub Actions workflow `.github/workflows/persistent-five-fault-he
 
 A prospective learned-model follow-up may be justified if the independent group results show **multiple distinct optimal actions** and sufficient measurable headroom against strong fixed and telemetry-based rules. We will not rerun only favorable groups or alter the utility weights after seeing the results.
 
-Passing lab tests, genuine fault diversity and even a positive later held-out model result do not establish real U.S. critical-infrastructure field outcomes, commercial adoption or EB-2 NIW approval.
+Passing lab tests, genuine fault diversity and even a positive later held-out model result do not establish real U.S. critical-infrastructure field outcomes or commercial adoption.

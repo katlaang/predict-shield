@@ -2,7 +2,7 @@
 
 **Status: prepared for operator engagement; no independent field pilot has been completed or verified.**
 
-The PREDICT-SHIELD endeavor concerns strengthening U.S. critical infrastructure. Real Kafka/JVM experiments show mechanisms and operational constraints, but that does **not** prove that an American infrastructure operator experiences lower cyber-risk, fewer interruptions or greater resilience. Infrastructure effectiveness must be studied with organizations operating real relevant services, not inferred from GitHub traffic or hypothetical market size.
+PREDICT-SHIELD is concerned with strengthening U.S. critical infrastructure. Real Kafka/JVM experiments show mechanisms and operational constraints, but that does **not** prove that an American infrastructure operator experiences lower cyber-risk, fewer interruptions or greater resilience. Infrastructure effectiveness must be studied with organizations operating real relevant services, not inferred from GitHub traffic or hypothetical market size.
 
 ## Operator-facing study outline
 
@@ -45,4 +45,4 @@ Do not commit raw operator data or evidence letters with signatures, emails or p
 
 Supported by the GitHub research record: implemented physical Kafka service tests, independently collected lab oracle state, real HTTP exposure/disruption measurements, and a falsifiable AI decision-value comparison protocol.
 
-**Not supported as of this document:** a prospectively held-out AI action-value superiority result from the complete physical campaign; independent third-party infrastructure field validation; quantified national economic benefit; actual technology adoption at US critical-infrastructure sites; or EB-2 NIW petition approval. Those remain evidence milestones, not completed accomplishments.
+**Not supported as of this document:** a prospectively held-out AI action-value superiority result from the complete physical campaign; independent third-party infrastructure field validation; quantified national economic benefit; or actual technology adoption at US critical-infrastructure sites. Those remain evidence milestones, not completed accomplishments.
