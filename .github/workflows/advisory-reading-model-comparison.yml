@@ -8,6 +8,10 @@ on:
       - 'engine/predict_shield/language_model.py'
       - '.github/workflows/advisory-reading-model-comparison.yml'
   workflow_dispatch:
+    inputs:
+      limit:
+        description: 'Optional: evaluate only the first N advisories (omit for the full 120). For a quick exploratory signal, not a replacement for the preregistered full-120 run.'
+        required: false
 permissions:
   contents: read
 jobs:
@@ -53,27 +57,39 @@ jobs:
             docker logs ps-advisory-comparison
             exit 1
           }
-      - name: Evaluate both installed models on all 120 committed advisories
+      - name: Evaluate both installed models on the committed advisories (optionally a subset)
         env:
           PYTHONPATH: engine
+          LIMIT: ${{ github.event.inputs.limit }}
         run: |
           mkdir -p experiment-a/advisory-reading/recordings
+          ARGS=()
+          if [ -n "$LIMIT" ]; then
+            ARGS+=(--limit "$LIMIT")
+            echo "::notice::Running a $LIMIT-advisory subset, not the full 120. This is an exploratory signal, not the preregistered primary result."
+          fi
           python -m predict_shield.advisory_eval \
             --model ollama:qwen3:0.6b \
             --model ollama:hf.co/fdtn-ai/Foundation-Sec-8B-Reasoning-Q4_K_M-GGUF:Q4_K_M \
             --record-dir experiment-a/advisory-reading/recordings \
-            --output experiment-a/advisory-reading/model-results.json
+            --output experiment-a/advisory-reading/model-results.json \
+            "${ARGS[@]}"
           python - <<'PY'
           import json
+          import os
           from pathlib import Path
           report = json.loads(Path("experiment-a/advisory-reading/model-results.json").read_text())
-          assert report["advisories"] == 120
+          limit = os.environ.get("LIMIT")
+          expected_total = min(int(limit), 120) if limit else 120
+          assert report["advisories"] == expected_total, (report["advisories"], expected_total)
           for name, result in report["readers"].items():
               summary = result["summary"]["all"]
-              assert summary["correct"] + summary["wrong"] + summary["no_answer"] == 120
-              print(name, "answerable correct:", result["summary"]["answerable"]["correct"],
-                    "/ 80, wrong:", result["summary"]["answerable"]["wrong"],
-                    "| not-answerable wrong:", result["summary"]["not_answerable"]["wrong"], "/ 40")
+              assert summary["correct"] + summary["wrong"] + summary["no_answer"] == expected_total
+              a, n = result["summary"]["answerable"], result["summary"]["not_answerable"]
+              print(name, "answerable correct:", a["correct"], f"/ {a['advisories']}, wrong:", a["wrong"],
+                    f"| not-answerable wrong:", n["wrong"], f"/ {n['advisories']}")
+          if limit:
+              print(f"Subset run ({expected_total} of 120 advisories): exploratory signal only.")
           print("No model result is cherry-picked here; both models' full summaries are in the report.")
           PY
       - name: Archive the full report and every model exchange for replay and audit
