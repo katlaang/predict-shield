@@ -1,0 +1,3143 @@
+{
+ "schema": "predict-shield/advisory-reading-results/1",
+ "corpus_source_commit": "36c906d5ff54ef0a2d203d17cca6645be6f57bad",
+ "advisories": 120,
+ "inventory_packages": 236,
+ "shortlist_contains_every_affected_package": 114,
+ "readers": {
+  "rule:coordinate": {
+   "summary": {
+    "answerable": {
+     "advisories": 80,
+     "correct": 1,
+     "wrong": 0,
+     "no_answer": 79,
+     "refused_by_check": 0,
+     "precision_when_answering": 1.0
+    },
+    "not_answerable": {
+     "advisories": 40,
+     "correct": 0,
+     "wrong": 1,
+     "no_answer": 39,
+     "refused_by_check": 0,
+     "precision_when_answering": 0.0
+    },
+    "all": {
+     "advisories": 120,
+     "correct": 1,
+     "wrong": 1,
+     "no_answer": 118,
+     "refused_by_check": 0,
+     "precision_when_answering": 0.5
+    }
+   },
+   "items": [
+    {
+     "id": "GHSA-287c-fxr7-3w6c",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-2j95-gqxf-v3vg",
+     "answerable": false,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-2w2h-gwwj-fh3q",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-35xx-9xrg-gwhf",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-386j-6m86-78f9",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-4jrw-64vr-7g8m",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-5476-xc4j-rqcv",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-5568-6qcg-g7fx",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-5fvg-qwcp-r325",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-5hh8-q8hv-fr38",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-5jh9-2h63-pw4q",
+     "answerable": false,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-5pq9-5mpr-jj85",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-5rc6-9qfp-8vwg",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-5rqc-86vf-g8r2",
+     "answerable": true,
+     "status": "ACCEPTED",
+     "outcome": "correct",
+     "packages_right": true,
+     "missed": [],
+     "extra": [],
+     "reasons": []
+    },
+    {
+     "id": "GHSA-694g-j8pj-cjj5",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-695c-x5gc-94gj",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no single fixed version stated"
+     ]
+    },
+    {
+     "id": "GHSA-69cc-cv78-qc8g",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-69r9-qgr7-g2wj",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-6g26-7cx5-mrrg",
+     "answerable": false,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-6qw3-4796-5984",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-6v25-8wq6-xq4j",
+     "answerable": false,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-6w48-2g9j-v9q5",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-7259-vf48-52q3",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-74cf-pgh9-m5q2",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-74xj-wh4w-vqxc",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-7mqr-33rv-p3mp",
+     "answerable": false,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-7pwc-h2j2-rjgj",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-7v55-q9x3-83cj",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-7xf9-4jfc-wgm4",
+     "answerable": false,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-8263-qv4g-vfxr",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-8364-hfqj-pwm6",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-83r6-96m8-r52p",
+     "answerable": false,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-83x9-vc3c-hghc",
+     "answerable": false,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-85g9-8j9g-p486",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-962x-ccwf-8x6p",
+     "answerable": false,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-97jf-46m3-8953",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-9jjc-fw8x-fmwx",
+     "answerable": false,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no single fixed version stated"
+     ]
+    },
+    {
+     "id": "GHSA-9wm7-8qf3-9v98",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-c399-q49h-qwc8",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-c3f3-cc42-xr9v",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-c5w7-m8wf-xc77",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-c825-6ph3-4h84",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-c9q6-g3hr-8gww",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-cmwh-w62w-r2mf",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-cpm7-cfpx-3hvp",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-crxp-chh4-9ghp",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-cwq5-8pvq-j65j",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-f2wh-grmh-r6jm",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-f4gc-mwrg-q36r",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-f7g3-2cg6-f5hj",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-fc3h-c6h7-r83j",
+     "answerable": false,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-fhrq-3gmx-p879",
+     "answerable": false,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-fq3f-m5qm-99f5",
+     "answerable": false,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-g5v7-jchf-7jrr",
+     "answerable": false,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-g628-r368-6vh7",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-g7c6-wxjf-8564",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-g8r3-5hwf-qp96",
+     "answerable": false,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-gc95-3vw8-vg43",
+     "answerable": false,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-gf47-qgg5-9g9q",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-gjx9-j8f8-7j74",
+     "answerable": false,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-gxp5-mv27-vjcj",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-h2xq-h7f9-vh6c",
+     "answerable": false,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-h6w7-qmcm-q6xr",
+     "answerable": false,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-hjg2-f45w-c566",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-hrmj-8fm9-cg8x",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-j2q8-xx3q-8fqh",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-j548-68g5-9j7x",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-j769-9gv9-65gr",
+     "answerable": false,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-j8mx-j73w-9mxw",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no single fixed version stated"
+     ]
+    },
+    {
+     "id": "GHSA-j92g-9f8w-j867",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-jh4v-gfqj-7rhx",
+     "answerable": false,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-jm7w-5684-pvh8",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-jmqq-x5g9-9p2w",
+     "answerable": false,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-m4w9-hjfw-vwj4",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-m9c2-85gv-8xr5",
+     "answerable": false,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-mhm7-754m-9p8w",
+     "answerable": false,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-mhp6-f224-j2c3",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-p2gw-f3rv-82mw",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-p462-xxwx-pqf4",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-p68j-q7hf-3qcp",
+     "answerable": false,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-pg32-686q-qh6x",
+     "answerable": false,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-pj6p-9p8x-5mfc",
+     "answerable": false,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-pmhh-3w7g-xqp8",
+     "answerable": false,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-q4xh-88c3-wmh7",
+     "answerable": false,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-qc4j-qjqx-vr58",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-qffm-gf3j-6mvg",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-qjp4-4jvr-xqg3",
+     "answerable": false,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-qp49-qgx5-5m26",
+     "answerable": false,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-qpm9-h556-mwxm",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no single fixed version stated"
+     ]
+    },
+    {
+     "id": "GHSA-qqw8-7c2r-jxch",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no single fixed version stated"
+     ]
+    },
+    {
+     "id": "GHSA-qx7j-jv8m-fppr",
+     "answerable": false,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-r8fj-rff6-f7h5",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-r989-cjhx-3v49",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-r9pv-5rpp-vm8g",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-rcqc-6cw3-h962",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-rcvm-6r79-cf4r",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-rxpj-7qvf-xv32",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-v3f7-2p4r-mwfw",
+     "answerable": false,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-v45h-mqf4-6939",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-v73p-f52r-fmmr",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-vf5j-865m-mq7c",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-vvwm-3j43-7pfm",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-vxgg-mqx2-3w59",
+     "answerable": false,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-w3w2-mpp5-92gm",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-w4p5-rfh6-cwrv",
+     "answerable": false,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-w56x-9778-rppx",
+     "answerable": false,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-w5r6-mcgq-7pq4",
+     "answerable": false,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-w7x5-g22v-xqhr",
+     "answerable": false,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-wf6j-gr27-g7ch",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-wg5r-wc3x-39vc",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-wmmv-vvg5-993q",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-wrhr-54p6-q97f",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-wv7f-c794-82v6",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-x3j7-7pgj-h87r",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-x5hg-x4gv-j98m",
+     "answerable": false,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-xm28-xvqc-gxxg",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-xq73-fvmr-jvmm",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-xr72-g735-4vwp",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-xvr9-35cr-46v9",
+     "answerable": false,
+     "status": "ACCEPTED",
+     "outcome": "wrong",
+     "packages_right": true,
+     "missed": [
+      [
+       "org.mariadb.jdbc:mariadb-java-client",
+       "3.0.0"
+      ],
+      [
+       "org.mariadb.jdbc:mariadb-java-client",
+       "3.3.4"
+      ],
+      [
+       "org.mariadb.jdbc:mariadb-java-client",
+       "3.4.0"
+      ],
+      [
+       "org.mariadb.jdbc:mariadb-java-client",
+       "3.4.2"
+      ],
+      [
+       "org.mariadb.jdbc:mariadb-java-client",
+       "3.5.0"
+      ],
+      [
+       "org.mariadb.jdbc:mariadb-java-client",
+       "3.5.8"
+      ]
+     ],
+     "extra": [],
+     "reasons": []
+    },
+    {
+     "id": "GHSA-xw7x-h9fj-p2c7",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    }
+   ]
+  },
+  "rule:artifact-name": {
+   "summary": {
+    "answerable": {
+     "advisories": 80,
+     "correct": 7,
+     "wrong": 4,
+     "no_answer": 69,
+     "refused_by_check": 0,
+     "precision_when_answering": 0.636
+    },
+    "not_answerable": {
+     "advisories": 40,
+     "correct": 1,
+     "wrong": 3,
+     "no_answer": 36,
+     "refused_by_check": 0,
+     "precision_when_answering": 0.25
+    },
+    "all": {
+     "advisories": 120,
+     "correct": 8,
+     "wrong": 7,
+     "no_answer": 105,
+     "refused_by_check": 0,
+     "precision_when_answering": 0.533
+    }
+   },
+   "items": [
+    {
+     "id": "GHSA-287c-fxr7-3w6c",
+     "answerable": true,
+     "status": "ACCEPTED",
+     "outcome": "correct",
+     "packages_right": true,
+     "missed": [],
+     "extra": [],
+     "reasons": []
+    },
+    {
+     "id": "GHSA-2j95-gqxf-v3vg",
+     "answerable": false,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no single fixed version stated"
+     ]
+    },
+    {
+     "id": "GHSA-2w2h-gwwj-fh3q",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-35xx-9xrg-gwhf",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-386j-6m86-78f9",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-4jrw-64vr-7g8m",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no single fixed version stated"
+     ]
+    },
+    {
+     "id": "GHSA-5476-xc4j-rqcv",
+     "answerable": true,
+     "status": "ACCEPTED",
+     "outcome": "correct",
+     "packages_right": true,
+     "missed": [],
+     "extra": [],
+     "reasons": []
+    },
+    {
+     "id": "GHSA-5568-6qcg-g7fx",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-5fvg-qwcp-r325",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-5hh8-q8hv-fr38",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no single fixed version stated"
+     ]
+    },
+    {
+     "id": "GHSA-5jh9-2h63-pw4q",
+     "answerable": false,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no single fixed version stated"
+     ]
+    },
+    {
+     "id": "GHSA-5pq9-5mpr-jj85",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no single fixed version stated"
+     ]
+    },
+    {
+     "id": "GHSA-5rc6-9qfp-8vwg",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no single fixed version stated"
+     ]
+    },
+    {
+     "id": "GHSA-5rqc-86vf-g8r2",
+     "answerable": true,
+     "status": "ACCEPTED",
+     "outcome": "correct",
+     "packages_right": true,
+     "missed": [],
+     "extra": [],
+     "reasons": []
+    },
+    {
+     "id": "GHSA-694g-j8pj-cjj5",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-695c-x5gc-94gj",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no single fixed version stated"
+     ]
+    },
+    {
+     "id": "GHSA-69cc-cv78-qc8g",
+     "answerable": true,
+     "status": "ACCEPTED",
+     "outcome": "wrong",
+     "packages_right": false,
+     "missed": [
+      [
+       "org.apache.tomcat.embed:tomcat-embed-core",
+       "10.1.51"
+      ],
+      [
+       "org.apache.tomcat.embed:tomcat-embed-core",
+       "10.1.52"
+      ],
+      [
+       "org.apache.tomcat.embed:tomcat-embed-core",
+       "11.0.16"
+      ],
+      [
+       "org.apache.tomcat.embed:tomcat-embed-core",
+       "11.0.19"
+      ],
+      [
+       "org.apache.tomcat.embed:tomcat-embed-core",
+       "9.0.114"
+      ],
+      [
+       "org.apache.tomcat.embed:tomcat-embed-core",
+       "9.0.115"
+      ],
+      [
+       "org.apache.tomcat:tomcat-coyote",
+       "10.1.51"
+      ],
+      [
+       "org.apache.tomcat:tomcat-coyote",
+       "10.1.52"
+      ],
+      [
+       "org.apache.tomcat:tomcat-coyote",
+       "11.0.16"
+      ],
+      [
+       "org.apache.tomcat:tomcat-coyote",
+       "11.0.19"
+      ],
+      [
+       "org.apache.tomcat:tomcat-coyote",
+       "9.0.114"
+      ],
+      [
+       "org.apache.tomcat:tomcat-coyote",
+       "9.0.115"
+      ]
+     ],
+     "extra": [
+      [
+       "org.apache.tomcat:tomcat",
+       "10.1.50"
+      ],
+      [
+       "org.apache.tomcat:tomcat",
+       "10.1.53"
+      ],
+      [
+       "org.apache.tomcat:tomcat",
+       "10.1.54"
+      ],
+      [
+       "org.apache.tomcat:tomcat",
+       "11.0.15"
+      ],
+      [
+       "org.apache.tomcat:tomcat",
+       "9.0.113"
+      ],
+      [
+       "org.apache.tomcat:tomcat",
+       "9.0.116"
+      ],
+      [
+       "org.apache.tomcat:tomcat",
+       "9.0.117"
+      ]
+     ],
+     "reasons": []
+    },
+    {
+     "id": "GHSA-69r9-qgr7-g2wj",
+     "answerable": true,
+     "status": "ACCEPTED",
+     "outcome": "wrong",
+     "packages_right": false,
+     "missed": [
+      [
+       "org.apache.tomcat:tomcat-tribes",
+       "10.1.53"
+      ],
+      [
+       "org.apache.tomcat:tomcat-tribes",
+       "11.0.20"
+      ],
+      [
+       "org.apache.tomcat:tomcat-tribes",
+       "9.0.116"
+      ]
+     ],
+     "extra": [
+      [
+       "org.apache.tomcat:tomcat",
+       "10.1.50"
+      ],
+      [
+       "org.apache.tomcat:tomcat",
+       "10.1.51"
+      ],
+      [
+       "org.apache.tomcat:tomcat",
+       "10.1.52"
+      ],
+      [
+       "org.apache.tomcat:tomcat",
+       "10.1.54"
+      ],
+      [
+       "org.apache.tomcat:tomcat",
+       "11.0.15"
+      ],
+      [
+       "org.apache.tomcat:tomcat",
+       "11.0.16"
+      ],
+      [
+       "org.apache.tomcat:tomcat",
+       "11.0.19"
+      ],
+      [
+       "org.apache.tomcat:tomcat",
+       "9.0.113"
+      ],
+      [
+       "org.apache.tomcat:tomcat",
+       "9.0.114"
+      ],
+      [
+       "org.apache.tomcat:tomcat",
+       "9.0.115"
+      ],
+      [
+       "org.apache.tomcat:tomcat",
+       "9.0.117"
+      ]
+     ],
+     "reasons": []
+    },
+    {
+     "id": "GHSA-6g26-7cx5-mrrg",
+     "answerable": false,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-6qw3-4796-5984",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no single fixed version stated"
+     ]
+    },
+    {
+     "id": "GHSA-6v25-8wq6-xq4j",
+     "answerable": false,
+     "status": "ACCEPTED",
+     "outcome": "correct",
+     "packages_right": true,
+     "missed": [],
+     "extra": [],
+     "reasons": []
+    },
+    {
+     "id": "GHSA-6w48-2g9j-v9q5",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-7259-vf48-52q3",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-74cf-pgh9-m5q2",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-74xj-wh4w-vqxc",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no single fixed version stated"
+     ]
+    },
+    {
+     "id": "GHSA-7mqr-33rv-p3mp",
+     "answerable": false,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-7pwc-h2j2-rjgj",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-7v55-q9x3-83cj",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no single fixed version stated"
+     ]
+    },
+    {
+     "id": "GHSA-7xf9-4jfc-wgm4",
+     "answerable": false,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-8263-qv4g-vfxr",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-8364-hfqj-pwm6",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no single fixed version stated"
+     ]
+    },
+    {
+     "id": "GHSA-83r6-96m8-r52p",
+     "answerable": false,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-83x9-vc3c-hghc",
+     "answerable": false,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-85g9-8j9g-p486",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-962x-ccwf-8x6p",
+     "answerable": false,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no single fixed version stated"
+     ]
+    },
+    {
+     "id": "GHSA-97jf-46m3-8953",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-9jjc-fw8x-fmwx",
+     "answerable": false,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no single fixed version stated"
+     ]
+    },
+    {
+     "id": "GHSA-9wm7-8qf3-9v98",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no single fixed version stated"
+     ]
+    },
+    {
+     "id": "GHSA-c399-q49h-qwc8",
+     "answerable": true,
+     "status": "ACCEPTED",
+     "outcome": "correct",
+     "packages_right": true,
+     "missed": [],
+     "extra": [],
+     "reasons": []
+    },
+    {
+     "id": "GHSA-c3f3-cc42-xr9v",
+     "answerable": true,
+     "status": "ACCEPTED",
+     "outcome": "correct",
+     "packages_right": true,
+     "missed": [],
+     "extra": [],
+     "reasons": []
+    },
+    {
+     "id": "GHSA-c5w7-m8wf-xc77",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-c825-6ph3-4h84",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-c9q6-g3hr-8gww",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no single fixed version stated"
+     ]
+    },
+    {
+     "id": "GHSA-cmwh-w62w-r2mf",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no single fixed version stated"
+     ]
+    },
+    {
+     "id": "GHSA-cpm7-cfpx-3hvp",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no single fixed version stated"
+     ]
+    },
+    {
+     "id": "GHSA-crxp-chh4-9ghp",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no single fixed version stated"
+     ]
+    },
+    {
+     "id": "GHSA-cwq5-8pvq-j65j",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-f2wh-grmh-r6jm",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-f4gc-mwrg-q36r",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-f7g3-2cg6-f5hj",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no single fixed version stated"
+     ]
+    },
+    {
+     "id": "GHSA-fc3h-c6h7-r83j",
+     "answerable": false,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-fhrq-3gmx-p879",
+     "answerable": false,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-fq3f-m5qm-99f5",
+     "answerable": false,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-g5v7-jchf-7jrr",
+     "answerable": false,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-g628-r368-6vh7",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-g7c6-wxjf-8564",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-g8r3-5hwf-qp96",
+     "answerable": false,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no single fixed version stated"
+     ]
+    },
+    {
+     "id": "GHSA-gc95-3vw8-vg43",
+     "answerable": false,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no single fixed version stated"
+     ]
+    },
+    {
+     "id": "GHSA-gf47-qgg5-9g9q",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-gjx9-j8f8-7j74",
+     "answerable": false,
+     "status": "ACCEPTED",
+     "outcome": "wrong",
+     "packages_right": false,
+     "missed": [],
+     "extra": [
+      [
+       "com.hubspot.jinjava:jinjava",
+       "2.7.6"
+      ]
+     ],
+     "reasons": []
+    },
+    {
+     "id": "GHSA-gxp5-mv27-vjcj",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no single fixed version stated"
+     ]
+    },
+    {
+     "id": "GHSA-h2xq-h7f9-vh6c",
+     "answerable": false,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no single fixed version stated"
+     ]
+    },
+    {
+     "id": "GHSA-h6w7-qmcm-q6xr",
+     "answerable": false,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no single fixed version stated"
+     ]
+    },
+    {
+     "id": "GHSA-hjg2-f45w-c566",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no single fixed version stated"
+     ]
+    },
+    {
+     "id": "GHSA-hrmj-8fm9-cg8x",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-j2q8-xx3q-8fqh",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-j548-68g5-9j7x",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-j769-9gv9-65gr",
+     "answerable": false,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-j8mx-j73w-9mxw",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no single fixed version stated"
+     ]
+    },
+    {
+     "id": "GHSA-j92g-9f8w-j867",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no single fixed version stated"
+     ]
+    },
+    {
+     "id": "GHSA-jh4v-gfqj-7rhx",
+     "answerable": false,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-jm7w-5684-pvh8",
+     "answerable": true,
+     "status": "ACCEPTED",
+     "outcome": "correct",
+     "packages_right": true,
+     "missed": [],
+     "extra": [],
+     "reasons": []
+    },
+    {
+     "id": "GHSA-jmqq-x5g9-9p2w",
+     "answerable": false,
+     "status": "ACCEPTED",
+     "outcome": "wrong",
+     "packages_right": false,
+     "missed": [
+      [
+       "org.asynchttpclient:async-http-client",
+       "2.0.0"
+      ],
+      [
+       "org.asynchttpclient:async-http-client",
+       "2.16.0"
+      ],
+      [
+       "org.asynchttpclient:async-http-client",
+       "3.0.0"
+      ],
+      [
+       "org.asynchttpclient:async-http-client",
+       "3.0.12"
+      ]
+     ],
+     "extra": [],
+     "reasons": []
+    },
+    {
+     "id": "GHSA-m4w9-hjfw-vwj4",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-m9c2-85gv-8xr5",
+     "answerable": false,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-mhm7-754m-9p8w",
+     "answerable": false,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no single fixed version stated"
+     ]
+    },
+    {
+     "id": "GHSA-mhp6-f224-j2c3",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-p2gw-f3rv-82mw",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-p462-xxwx-pqf4",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-p68j-q7hf-3qcp",
+     "answerable": false,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-pg32-686q-qh6x",
+     "answerable": false,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-pj6p-9p8x-5mfc",
+     "answerable": false,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-pmhh-3w7g-xqp8",
+     "answerable": false,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no single fixed version stated"
+     ]
+    },
+    {
+     "id": "GHSA-q4xh-88c3-wmh7",
+     "answerable": false,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no single fixed version stated"
+     ]
+    },
+    {
+     "id": "GHSA-qc4j-qjqx-vr58",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-qffm-gf3j-6mvg",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-qjp4-4jvr-xqg3",
+     "answerable": false,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-qp49-qgx5-5m26",
+     "answerable": false,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no single fixed version stated"
+     ]
+    },
+    {
+     "id": "GHSA-qpm9-h556-mwxm",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no single fixed version stated"
+     ]
+    },
+    {
+     "id": "GHSA-qqw8-7c2r-jxch",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no single fixed version stated"
+     ]
+    },
+    {
+     "id": "GHSA-qx7j-jv8m-fppr",
+     "answerable": false,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-r8fj-rff6-f7h5",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-r989-cjhx-3v49",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-r9pv-5rpp-vm8g",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-rcqc-6cw3-h962",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no single fixed version stated"
+     ]
+    },
+    {
+     "id": "GHSA-rcvm-6r79-cf4r",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no single fixed version stated"
+     ]
+    },
+    {
+     "id": "GHSA-rxpj-7qvf-xv32",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-v3f7-2p4r-mwfw",
+     "answerable": false,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-v45h-mqf4-6939",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-v73p-f52r-fmmr",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-vf5j-865m-mq7c",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-vvwm-3j43-7pfm",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no single fixed version stated"
+     ]
+    },
+    {
+     "id": "GHSA-vxgg-mqx2-3w59",
+     "answerable": false,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-w3w2-mpp5-92gm",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-w4p5-rfh6-cwrv",
+     "answerable": false,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-w56x-9778-rppx",
+     "answerable": false,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no single fixed version stated"
+     ]
+    },
+    {
+     "id": "GHSA-w5r6-mcgq-7pq4",
+     "answerable": false,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no single fixed version stated"
+     ]
+    },
+    {
+     "id": "GHSA-w7x5-g22v-xqhr",
+     "answerable": false,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-wf6j-gr27-g7ch",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no single fixed version stated"
+     ]
+    },
+    {
+     "id": "GHSA-wg5r-wc3x-39vc",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-wmmv-vvg5-993q",
+     "answerable": true,
+     "status": "ACCEPTED",
+     "outcome": "wrong",
+     "packages_right": false,
+     "missed": [
+      [
+       "com.amazon.redshift:redshift-jdbc42",
+       "2.2.1"
+      ]
+     ],
+     "extra": [
+      [
+       "org.jenkins-ci.plugins:database",
+       "1.7"
+      ]
+     ],
+     "reasons": []
+    },
+    {
+     "id": "GHSA-wrhr-54p6-q97f",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-wv7f-c794-82v6",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-x3j7-7pgj-h87r",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-x5hg-x4gv-j98m",
+     "answerable": false,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-xm28-xvqc-gxxg",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-xq73-fvmr-jvmm",
+     "answerable": true,
+     "status": "ABSTAINED",
+     "outcome": "no_answer",
+     "packages_right": false,
+     "missed": [],
+     "extra": [],
+     "reasons": [
+      "no inventory package named in the text"
+     ]
+    },
+    {
+     "id": "GHSA-xr72-g735-4vwp",
+     "answerable": true,
+     "status": "ACCEPTED",
+     "outcome": "correct",
+     "packages_right": true,
+     "missed": [],
+     "extra": [],
+     "reasons": []
+    },
+    {
+     "id": "GHSA-xvr9-35cr-46v9",
+     "answerable": false,
+     "status": "ACCEPTED",
+     "outcome": "wrong",
+     "packages_right": true,
+     "missed": [
+      [
+       "org.mariadb.jdbc:mariadb-java-client",
+       "3.0.0"
+      ],
+      [
+       "org.mariadb.jdbc:mariadb-java-client",
+       "3.3.4"
+      ],
+      [
+       "org.mariadb.jdbc:mariadb-java-client",
+       "3.4.0"
+      ],
+      [
+       "org.mariadb.jdbc:mariadb-java-client",
+       "3.4.2"
+      ],
+      [
+       "org.mariadb.jdbc:mariadb-java-client",
+       "3.5.0"
+      ],
+      [
+       "org.mariadb.jdbc:mariadb-java-client",
+       "3.5.8"
+      ]
+     ],
+     "extra": [],
+     "reasons": []
+    },
+    {
+     "id": "GHSA-xw7x-h9fj-p2c7",
+     "answerable": true,
+     "status": "ACCEPTED",
+     "outcome": "wrong",
+     "packages_right": false,
+     "missed": [
+      [
+       "io.opentelemetry.javaagent:opentelemetry-javaagent",
+       "2.26.0"
+      ]
+     ],
+     "extra": [
+      [
+       "org.datadog.jenkins.plugins:datadog",
+       "0.6.2"
+      ]
+     ],
+     "reasons": []
+    }
+   ]
+  }
+ }
+}
