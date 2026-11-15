@@ -26,15 +26,22 @@ import time
 from pathlib import Path
 
 from mininet.net import Containernet
-from mininet.node import OVSSwitch
+from mininet.node import Controller, OVSSwitch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "engine"))
 from predict_shield.sdn_topology_discovery import build_topology_report, resolve_ofports  # noqa: E402
 
 
 def main() -> None:
-    net = Containernet(controller=None, switch=OVSSwitch)
-    switch = net.addSwitch("s1", failMode="standalone")
+    # A real controller, not OVS's own standalone/NORMAL bridging: standalone
+    # mode has no per-port OpenFlow entries to read (one generic priority=0
+    # actions=NORMAL catch-all covers everything), which is exactly what the
+    # first live run against this script found. A controller-programmed
+    # switch is also the realistic target case -- ONOS/Ryu/OpenDaylight all
+    # install explicit per-flow rules the same way.
+    net = Containernet(controller=Controller, switch=OVSSwitch)
+    net.addController("c0")
+    switch = net.addSwitch("s1")
     web = net.addDocker("web", ip="10.0.0.1/24", dimage="nicolaka/netshoot:latest")
     db = net.addDocker("db", ip="10.0.0.2/24", dimage="nicolaka/netshoot:latest")
     shadow = net.addDocker("shadow", ip="10.0.0.3/24", dimage="nicolaka/netshoot:latest")
@@ -43,7 +50,7 @@ def main() -> None:
     link_shadow = net.addLink(shadow, switch)
     net.start()
     try:
-        time.sleep(2)  # let OVS and the container interfaces fully settle
+        time.sleep(3)  # let OVS, the controller handshake, and the container interfaces settle
         # Real traffic: web<->db a few times (declared pair), shadow pings
         # web once too (undeclared port, but it still shows up on the wire).
         print("=== web -> db ping ===")
