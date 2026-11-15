@@ -28,8 +28,8 @@ jobs:
           sudo ovs-vsctl show
       - name: Install Containernet (and its dependencies, e.g. the docker SDK) on top of the system Mininet/OVS
         run: sudo python3 -m pip install --break-system-packages git+https://github.com/containernet/containernet.git
-      - name: Pull the disposable Alpine image used as lab host containers
-        run: docker pull alpine:latest
+      - name: Pull the disposable lab host image (needs bash + ping, not just Alpine's default shell)
+        run: docker pull nicolaka/netshoot:latest
       - name: Run the live three-host Containernet/OVS smoke test
         run: sudo PYTHONPATH=engine python3 experiment-b/sdn-lab/run_live_smoke.py
       - name: Retain the real discovery report

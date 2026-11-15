@@ -10,8 +10,8 @@ proves two things for real, not against a fake runner:
     2. The third host ("shadow"), deliberately left out of the operator's
        declaration, still generates real traffic and is reported in
        active_unnamed_ports with its real interface name resolved -- the
-       exact risk-flagging behavior PREDICT-SHIELD/0007-0107 added in
-       response to the question "shouldn't we call out ports with no name?".
+       exact risk-flagging behavior added in PR #107, in response to the
+       question "shouldn't we call out ports with no name?".
 
 Must run as root (Containernet/Mininet requirement). Not meant to run
 outside CI or a disposable VM: it creates real network namespaces, veth
@@ -34,9 +34,9 @@ from predict_shield.sdn_topology_discovery import build_topology_report, resolve
 def main() -> None:
     net = Containernet(controller=None, switch=OVSSwitch)
     switch = net.addSwitch("s1", failMode="standalone")
-    web = net.addDocker("web", ip="10.0.0.1/24", dimage="alpine:latest")
-    db = net.addDocker("db", ip="10.0.0.2/24", dimage="alpine:latest")
-    shadow = net.addDocker("shadow", ip="10.0.0.3/24", dimage="alpine:latest")
+    web = net.addDocker("web", ip="10.0.0.1/24", dimage="nicolaka/netshoot:latest")
+    db = net.addDocker("db", ip="10.0.0.2/24", dimage="nicolaka/netshoot:latest")
+    shadow = net.addDocker("shadow", ip="10.0.0.3/24", dimage="nicolaka/netshoot:latest")
     link_web = net.addLink(web, switch)
     link_db = net.addLink(db, switch)
     link_shadow = net.addLink(shadow, switch)
