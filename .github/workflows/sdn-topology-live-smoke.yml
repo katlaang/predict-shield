@@ -26,8 +26,8 @@ jobs:
           sudo apt-get install -y --no-install-recommends openvswitch-switch mininet
           sudo service openvswitch-switch start
           sudo ovs-vsctl show
-      - name: Install Containernet on top of the system Mininet/OVS
-        run: sudo python3 -m pip install --no-deps git+https://github.com/containernet/containernet.git
+      - name: Install Containernet (and its dependencies, e.g. the docker SDK) on top of the system Mininet/OVS
+        run: sudo python3 -m pip install --break-system-packages git+https://github.com/containernet/containernet.git
       - name: Pull the disposable Alpine image used as lab host containers
         run: docker pull alpine:latest
       - name: Run the live three-host Containernet/OVS smoke test
