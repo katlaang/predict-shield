@@ -63,6 +63,7 @@ def execute_bound_lab_case(plan: dict, *, project: str, source_discovery: dict,
             or pre_action.get("oracle_features_excluded") is not True
             or pre_action.get("experiment_type") != "real_kafka_multijvm_lab"):
         raise ValueError("Model input and case scope mismatch")
+    injected_clock = now is not None
     now = now or datetime.now(timezone.utc)
     if now.tzinfo is None:
         raise ValueError("Timestamp must include timezone")
@@ -107,11 +108,12 @@ def execute_bound_lab_case(plan: dict, *, project: str, source_discovery: dict,
 
     snapshot, scope, inventory = scope_collector(
         project=project, token=control_token, case_id=plan["case_id"])
+    scope_checked_at = now if injected_clock else datetime.now(timezone.utc)
     if (not isinstance(snapshot, EvidenceSnapshot) or
             not snapshot.trusted or not snapshot.scope_complete or
             snapshot.case_id != plan["case_id"] or
             snapshot.snapshot_id != plan.get("scope_snapshot_id") or
-            not 0 <= (now - snapshot.captured_at).total_seconds() <= 300 or
+            not 0 <= (scope_checked_at - snapshot.captured_at).total_seconds() <= 300 or
             scope.get("status") != "LAB_SCOPE_SUPPORTED" or
             scope.get("production_scope_attested") is not False):
         raise ValueError("Current independently observed lab scope does not match the case")
