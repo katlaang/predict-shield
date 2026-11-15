@@ -1,0 +1,75 @@
+name: Advisory-reading model comparison (120 real advisories)
+on:
+  pull_request:
+    paths:
+      - 'experiment-a/advisory-reading/**'
+      - 'engine/predict_shield/advisory_reader.py'
+      - 'engine/predict_shield/advisory_eval.py'
+      - 'engine/predict_shield/language_model.py'
+      - '.github/workflows/advisory-reading-model-comparison.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  advisory-reading-comparison:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Verify the harness and the rule baseline against the committed corpus
+        run: PYTHONPATH=engine:engine/tests python -m unittest tests.test_versions tests.test_language_model tests.test_advisory_reader tests.test_advisory_eval -v
+      - name: Start CPU-only local Ollama with one loaded model at a time
+        run: |
+          docker run --rm -d --name ps-advisory-comparison \
+            --memory=7g --memory-swap=7g \
+            -e OLLAMA_NUM_PARALLEL=1 -e OLLAMA_MAX_LOADED_MODELS=1 \
+            -e OLLAMA_CONTEXT_LENGTH=4096 \
+            -p 127.0.0.1:11434:11434 ollama/ollama:latest
+          for attempt in $(seq 1 60); do
+            if curl -fsS http://127.0.0.1:11434/api/version >/dev/null; then exit 0; fi
+            if [ "$attempt" = 60 ]; then docker logs ps-advisory-comparison; exit 1; fi
+            sleep 2
+          done
+      - name: Pull the baseline and the security-focused model, same digests as the other comparisons
+        run: |
+          docker exec ps-advisory-comparison ollama pull qwen3:0.6b
+          docker exec ps-advisory-comparison ollama pull hf.co/fdtn-ai/Foundation-Sec-8B-Reasoning-Q4_K_M-GGUF:Q4_K_M
+      - name: Evaluate both installed models on all 120 committed advisories
+        env:
+          PYTHONPATH: engine
+        run: |
+          mkdir -p experiment-a/advisory-reading/recordings
+          python -m predict_shield.advisory_eval \
+            --model ollama:qwen3:0.6b \
+            --model ollama:hf.co/fdtn-ai/Foundation-Sec-8B-Reasoning-Q4_K_M-GGUF:Q4_K_M \
+            --record-dir experiment-a/advisory-reading/recordings \
+            --output experiment-a/advisory-reading/model-results.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          report = json.loads(Path("experiment-a/advisory-reading/model-results.json").read_text())
+          assert report["advisories"] == 120
+          for name, result in report["readers"].items():
+              summary = result["summary"]["all"]
+              assert summary["correct"] + summary["wrong"] + summary["no_answer"] == 120
+              print(name, "answerable correct:", result["summary"]["answerable"]["correct"],
+                    "/ 80, wrong:", result["summary"]["answerable"]["wrong"],
+                    "| not-answerable wrong:", result["summary"]["not_answerable"]["wrong"], "/ 40")
+          print("No model result is cherry-picked here; both models' full summaries are in the report.")
+          PY
+      - name: Archive the full report and every model exchange for replay and audit
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: advisory-reading-120-model-comparison
+          path: |
+            experiment-a/advisory-reading/model-results.json
+            experiment-a/advisory-reading/recordings/
+          retention-days: 30
+      - name: Dispose of the model container
+        if: always()
+        run: |
+          docker rm -f ps-advisory-comparison 2>/dev/null || true
