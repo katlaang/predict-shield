@@ -1,99 +1,102 @@
 # PREDICT-SHIELD
 
-**AI-centered, verification-grounded cybersecurity research framework**
+**An AI-driven security assessment pipeline for network operators.**
 
-PREDICT-SHIELD is experimental research software for investigating whether learned cyber-defense decisions can improve security outcomes without unnecessarily disrupting dependent services. The framework combines predictive threat intelligence, contextual risk assessment, policy-constrained defensive actions, and independently assessed outcomes.
+PREDICT-SHIELD finds what is running on a network, checks it against known vulnerabilities, uses a language model to read the advisories and propose fixes, screens every proposal through a deterministic policy gate, and independently verifies whether a fix actually worked. It is built for operators who need continuous, evidence-backed security assessment — including small ISPs who do not have a dedicated security team to do this by hand.
 
-> **Research status:** Pre-alpha prototype (November 2026). The repository contains executable laboratory components and an AI training/evaluation prototype, **not** a validated production cybersecurity platform. No claim of superior AI performance or real-world effectiveness is made.
+> **Status: working research prototype, not a finished product.** The pipeline below runs end-to-end today against a lab network. Running it against a real ISP's live infrastructure — with a dashboard, real asset discovery, and safe automated remediation — is the next phase of work, not something already deployed. Nothing here claims that the AI outperforms a well-built fixed rule; that is a separate, still-open research question (see [Current research](#current-research) below), and it does not block using the pipeline as an automation tool.
 
-## Research approach
+## How it works
 
-1. **Assess:** Collect security observations and determine which controls are at risk.
-2. **Predict:** Estimate candidate-action effectiveness and disruption using a learned model, retaining explicit uncertainty and deterministic baselines.
-3. **Constrain:** Apply an independent policy and service-continuity gate before any authorized action.
-4. **Act:** Execute controlled laboratory changes; do not interpret action acknowledgments as evidence of success.
-5. **Verify:** Probe the resulting security state separately from the action runner, record coverage and ambiguity, and retain observed service-health effects.
-6. **Evaluate:** Compare model predictions with measured outcomes and an experimental oracle, without leaking the oracle into model inputs.
+1. **Discover.** Scan the network and build an inventory of running assets, services, and the dependencies between them, with every discovery record hashed so it can't be silently altered later.
+2. **Evaluate.** Match the inventory against known vulnerability advisories and build a risk picture: which assets are exposed, to what, and how confidently.
+3. **AI analyzes the findings.** A language model reads the advisory text and the risk picture and proposes candidate fixes. It never writes free text into the record — every proposal is checked against the real package inventory and the real advisory text, and anything it can't verify is rejected rather than guessed at.
+4. **Recommend.** The model's proposal only narrows the list of things worth considering. A deterministic policy gate — not the model — makes the actual call: it checks the action against service-continuity budgets, calibrated risk/impact estimates, and policy limits before anything is approved.
+5. **Apply approved defenses.** Today this step runs against an isolated lab network (Docker/Kafka/Java), not live ISP infrastructure. The gate can approve an action for consideration, but nothing in this repository dispatches a change to a real production system — that boundary is intentional while the approach is still being proven out.
+6. **Verify outcomes.** A separate, independent verifier — not the model, and not the thing that applied the fix — re-checks the target afterward and reports one of VERIFIED, NOT VERIFIED, INDETERMINATE, or NOT APPLICABLE. An action's own "success" acknowledgment is never treated as proof it worked.
 
-The verifier distinguishes **VERIFIED**, **NOT VERIFIED**, **INDETERMINATE**, and **NOT APPLICABLE**. The experimental oracle, verifier conclusion, pre-action prediction, and operational measurements are separate records.
+Each step produces a signed, hashed record, so a finding, a recommendation, an applied action, and a verification result can always be traced back to the evidence behind them.
 
-## Implemented components
+## What's built vs. what's planned
 
-| Location | Current scope |
-| --- | --- |
-| `engine/predict_shield/` | Python evidence assessment, typed AI prediction records, and fail-closed action screening |
-| `engine/tests/` | Evidence-assessment and policy-gate unit tests |
-| `experiment-b/java-lab/` | Java 25 / Spring Boot localhost-only authorization-drift laboratory |
-| `experiment-b/run.py` | Initial two-instance deny probe, opt-in lab correction, and independent HTTP re-check |
-| `experiment-b/generate_manifest.py` | Reproducible plan for 100 configurations × 4 candidate actions × 3 repeats |
-| `experiment-b/collect_training_data.py` | Explicitly authorized action replays and separate experimental record collection |
-| `experiment-b/train_action_model.py` | Supervised model-training and held-out evaluation code, with calibration and lookup baseline |
-| `.github/workflows/` | Python unit tests and Java/Docker integration checks |
+| Capability | Built today | Still needed for a full ISP product |
+| --- | --- | --- |
+| Asset & dependency discovery | Docker/container-based discovery, hashed inventory, dependency graph | Discovery against a real ISP network (routers, CPE, non-containerized hosts) |
+| Vulnerability matching | Advisory ingestion from GitHub Advisory Database, coordinate and artifact-name matching rules | Broader source coverage (CISA KEV, vendor feeds) |
+| AI-read advisories & proposals | Local/hosted language model reads advisory text, proposes only cataloged actions and checks, grounded against the real inventory | Measured accuracy at scale (see below) before recommending unsupervised use |
+| Policy-gated action selection | Deterministic gate: service-continuity budgets, calibrated risk predictions, policy tiers | Calibration against real operator traffic, not just lab traffic |
+| Applying fixes | Executes in an isolated lab (Docker/Kafka/Java) only | A safe, reversible actuator for real ISP infrastructure, with the same gate in front of it |
+| Independent verification | Separate verifier distinguishes VERIFIED/NOT VERIFIED/INDETERMINATE/NOT APPLICABLE | Live, authenticated probes against a real network |
+| Dashboard | Read-only research demo displaying recorded lab trial data (`demo/index.html`) | A live dashboard showing real findings, recommendations, and verification status for an operator's own network |
 
-**What remains:** full execution and evaluation of the 1,200-run plan; learned-model integration into the decision path; independently reconciled target inventory; a separately administered oracle; realistic policy propagation faults; operational impact calibration; broader threat intelligence and external validation.
-
-The training manifest contains **planned runs only**. It does not constitute training data until each trial is executed and its outcomes measured.
+The one gap that matters most for an ISP pitch is the row on asset discovery and the dashboard: the pipeline is real and wired together end to end, but it has only been run against lab/test infrastructure, not a live customer network, and there's no live-data UI yet — today everything the pipeline produces is a JSON record, not a screen an operator would look at.
 
 ## Quick start
 
 Requirements: Python 3.12, Docker with Docker Compose, and a Docker environment able to build Java 25 images.
 
-From the repository root, run the Python evidence-engine tests:
+Run the Python evidence-engine tests:
 
 ```bash
 PYTHONPATH=engine python -m unittest discover -s engine/tests -v
 ```
 
-From the `experiment-b` directory, initialize a disposable, **localhost-only** laboratory with separate action and oracle tokens:
+Run the unified AI case pipeline against a local model (see [the unified pipeline doc](docs/development/UNIFIED_LOCAL_AI_VULNERABILITY_PIPELINE.md) for the full walkthrough):
 
 ```bash
+ollama serve
+# in a separate shell, after pulling a model revision:
+PYTHONPATH=engine python -m predict_shield.run_ai_case \
+  --case-id local-case-0001 \
+  --discovery /private/asset-discovery-with-sbom.json \
+  --advisories /private/sourced-advisories.json \
+  --catalog /private/registered-actions.json \
+  --model qwen3:8b \
+  --model-fingerprint sha256:recorded-model-digest \
+  --output /private/unified-ai-case-0001.json
+```
+
+Measure a language model's advisory-reading accuracy against real public advisories and against fixed-rule baselines:
+
+```bash
+PYTHONPATH=engine python -m predict_shield.advisory_eval \
+  --corpus experiment-a/advisory-reading/corpus.json \
+  --model ollama:qwen3:0.6b \
+  --output results.json
+```
+
+Bring up the isolated, localhost-only mechanism lab to see fixes actually applied and verified:
+
+```bash
+cd experiment-b
 export LAB_TOKEN="$(python -c 'import secrets;print(secrets.token_urlsafe(32))')"
 export LAB_ORACLE_TOKEN="$(python -c 'import secrets;print(secrets.token_urlsafe(32))')"
-
 docker compose up --build -d
 python integration_smoke.py
-python generate_manifest.py --out generated --seed 20261110
-python collect_training_data.py --execute-lab --manifest generated --out results --limit 4
 docker compose down
 ```
 
-The first data-collection invocation runs **four candidate actions**, not the whole experimental campaign. The optional ML training dependencies are in `experiment-b/requirements-ml.txt`. Training requires a complete, consistent measured dataset and refuses incomplete records.
+Read [the Experiment B guide](experiment-b/README.md) for full setup and limitations.
 
-Read [the Experiment B guide](experiment-b/README.md) for precise setup, restrictions, data provenance, and study limitations.
+## Current research
 
-## Unified local AI vulnerability assessment
+Alongside the product pipeline, this repository tracks a separate, harder question: **does the AI's recommendation actually beat a strong fixed rule**, not just automate the process a person would otherwise do by hand? That question is still open. Measured results so far on advisory-reading and action-selection tasks show the model roughly tying or losing to the strongest deterministic baseline in most settings tested, and one promising early result did not replicate in a second independent study. None of this stops the pipeline from being useful as automation — a model that reads advisory text and proposes a shortlist still saves real analyst time even if it isn't yet beating a hand-tuned rule — but it means no claim of AI superiority is made here without a measured, held-out comparison behind it.
 
-The new [unified AI case pipeline](docs/development/UNIFIED_LOCAL_AI_VULNERABILITY_PIPELINE.md) reuses existing Docker/SBOM discovery and the current policy-constrained action selector. A loopback-only Ollama-compatible language model reads **untrusted advisory text** and proposes only cataloged actions and verification check IDs. The evidence-dependency graph preserves gateway/source uncertainty and explicitly declared service relationships.
-
-This path currently supports **read-only AI-assisted investigation and offline independently checked action planning**. A separate authenticated scope snapshot, independently verified CVE applicability, and calibrated learned action-impact predictions are required before a candidate can pass the existing selector. The CLI does not dispatch actions or claim verified remediation; the pre-existing Java/Kafka mechanism lab remains the only lab actuator.
-
-```bash
-PYTHONPATH=engine python -m unittest discover -s engine/tests -v
-# See docs/development/UNIFIED_LOCAL_AI_VULNERABILITY_PIPELINE.md for a local model run.
-```
-
-The model has not yet demonstrated superiority over strong conventional baselines. Unit-test fixtures cannot establish model quality or real infrastructure protection.
-
-## Research demo and repeated physical pilot evidence
-
-A first [read-only research dashboard](demo/README.md) is now available in `demo/index.html`. It displays **actual recorded Java/Kafka/Docker physical trial measurements**, not simulated AI recommendation results, and allows viewing exposure-duration intervals, authorized-user disruption and source provenance.
-
-The [November 14 repeated authority-outage research record](docs/research/PHYSICAL_OUTAGE_REPEATED_PILOT_2026_11_14.md) records **eight physically executed action replays in two repeat batches** of one configuration, with GitHub Actions run ID, separately hashed evidence, per-arm outcomes and explicit scientific limitations. The corresponding [GitHub Actions workflow](.github/workflows/repeated-outage-pilots.yml) is manually rerunnable for further bounded exploratory batches and publishes a standalone dashboard artifact alongside the measured report.
-
-The dashboard demonstrates experimental measurements **only**. It has no production remediation controls. No AI decision-value superiority or independently validated U.S. critical-infrastructure impact has yet been established.
+See [the research index](docs/research/README.md) for the full set of studies, and [the roadmap](docs/development/ROADMAP.md) for a capability-by-capability account of what's verified versus still outstanding.
 
 ## Documentation
 
 - [Architecture notes](docs/architecture/README.md)
-- [v2.2 implementation specification](docs/research/PREDICT_SHIELD_v2_2_IMPLEMENTATION_SPEC.md)
+- [Unified AI vulnerability-to-defense pipeline](docs/development/UNIFIED_LOCAL_AI_VULNERABILITY_PIPELINE.md)
+- [Advisory-reading corpus and model comparison](experiment-a/advisory-reading/README.md)
+- [Research index](docs/research/README.md)
 - [Engineering roadmap](docs/development/ROADMAP.md)
 - [Development history](docs/development/CHANGELOG.md)
-- [Initial v0.3.0 test review](docs/research/v0.3.0-validation-note.md)
 
 ## Safety and reproducibility
 
-The lab intentionally reproduces incorrect authorization decisions. **Do not deploy it to the internet, production infrastructure, or operational systems.** Keep credentials and raw oracle observations out of source control. Record commit SHA, configuration seed, measured outcomes, and experiment limitations. A passing unit test or a simulated observation does not establish effectiveness outside the tested conditions.
+The mechanism lab intentionally reproduces incorrect authorization decisions for research purposes. **Do not deploy it to the internet, production infrastructure, or operational systems.** Keep credentials and raw oracle observations out of source control. Record commit SHA, configuration seed, measured outcomes, and known limitations with every result. A passing unit test or a simulated observation does not establish effectiveness outside the tested conditions, and nothing in this repository authorizes unattended action against a real network.
 
 ## Project maturity
 
-This repository is research software under development. Interfaces, experiments, assumptions, and evaluation methods may change following reproducible testing. No distribution license is currently declared in this repository.
+This repository is under active development. Interfaces, experiments, and evaluation methods may change following reproducible testing. Licensed under Apache License 2.0 — see [LICENSE](LICENSE).
