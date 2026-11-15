@@ -9,6 +9,14 @@ ports that are actually passing traffic to each other, and only ever reports
 an edge between two ports an operator has explicitly named as belonging to a
 known service.
 
+An unnamed port is not treated as harmless. A port nobody declared but that
+flow evidence shows is actually carrying traffic is exactly what a rogue or
+forgotten interface looks like, so `build_topology_report` surfaces every
+such port in `active_unnamed_ports`, with the flow evidence behind it. It
+never silently drops to an edge instead -- it can't, because an edge
+requires a declared service on both ends -- but it is reported as a finding,
+not left out of the report.
+
 What this does NOT do:
 
     * It does not guess which port belongs to which service. A port with no
@@ -37,6 +45,8 @@ from datetime import datetime, timezone
 from typing import Callable
 
 _BRIDGE_NAME = re.compile(r"^[A-Za-z0-9_.-]{1,64}$")
+_INTERFACE_NAME = re.compile(r"^[A-Za-z0-9_.-]{1,64}$")
+_OFPORT = re.compile(r"^\d+$")
 _FLOW_FIELD = re.compile(r"(\w+)=([^, ]+)")
 
 
@@ -45,12 +55,38 @@ def utc_now() -> str:
 
 
 def list_ports(bridge: str, *, runner: Callable = subprocess.run) -> list[str]:
-    """The bridge's own port list, read-only (`ovs-vsctl list-ports`)."""
+    """The bridge's own port list, read-only (`ovs-vsctl list-ports`).
+
+    Returns interface *names* (e.g. `veth-web`), not the numeric OpenFlow
+    port IDs that `dump_flows` reports. The two are different namespaces in
+    OVS; `resolve_ofports` is what bridges them.
+    """
     if not _BRIDGE_NAME.fullmatch(bridge):
         raise ValueError("Bridge name must be a plain OVS identifier")
     completed = runner(["ovs-vsctl", "list-ports", bridge], capture_output=True,
                        text=True, check=True, timeout=15)
     return sorted({line.strip() for line in completed.stdout.splitlines() if line.strip()})
+
+
+def resolve_ofports(ports: list[str], *, runner: Callable = subprocess.run) -> dict[str, str]:
+    """Map each interface name to the numeric OpenFlow port ID flow entries use
+    (`ovs-vsctl get Interface <name> ofport`), read-only, one query per port.
+
+    An interface that OVS cannot resolve to a concrete port (not yet attached,
+    or reporting -1/`[]`) is left out rather than guessed at: a missing
+    mapping means "we don't know this port's OpenFlow number", never "this
+    port doesn't exist".
+    """
+    resolved = {}
+    for port in ports:
+        if not _INTERFACE_NAME.fullmatch(port):
+            raise ValueError("Interface name must be a plain OVS identifier")
+        completed = runner(["ovs-vsctl", "get", "Interface", port, "ofport"],
+                           capture_output=True, text=True, check=True, timeout=15)
+        value = completed.stdout.strip()
+        if _OFPORT.fullmatch(value) and value != "0":
+            resolved[value] = port
+    return resolved
 
 
 def dump_flows(bridge: str, *, runner: Callable = subprocess.run) -> list[dict]:
@@ -121,22 +157,56 @@ def observed_service_links(bridge: str, port_to_service: dict[str, str],
     return sorted(links, key=lambda link: (link["service"], link["depends_on"]))
 
 
+def active_unnamed_ports(port_to_service: dict[str, str], flow_entries: list[dict],
+                         ofport_to_name: dict[str, str] | None = None, *,
+                         min_packets: int = 1) -> list[dict]:
+    """Ports that are actually carrying traffic but have no declared owner.
+
+    This is the risk list, distinct from a merely idle unnamed port: a named
+    port we have no traffic on is unremarkable, but an *unnamed* port moving
+    real packets is exactly what an unlabeled rogue interface, a forgotten
+    test link, or a service nobody got around to declaring would look like.
+    Each entry carries the flow evidence it was found in, so the finding is
+    checkable, not just asserted.
+    """
+    ofport_to_name = ofport_to_name or {}
+    by_port: dict[str, dict] = {}
+    for entry in flow_entries:
+        if entry["n_packets"] < min_packets:
+            continue
+        candidates = (entry["in_port"],) + entry["out_ports"]
+        for port in candidates:
+            if port in port_to_service:
+                continue
+            record = by_port.setdefault(port, {"ofport": port,
+                                               "interface": ofport_to_name.get(port),
+                                               "max_packets_observed": 0, "flow_count": 0})
+            record["max_packets_observed"] = max(record["max_packets_observed"], entry["n_packets"])
+            record["flow_count"] += 1
+    return sorted(by_port.values(), key=lambda r: r["ofport"])
+
+
 def build_topology_report(bridge: str, port_to_service: dict[str, str], *,
                           runner: Callable = subprocess.run, min_packets: int = 1) -> dict:
-    """One hashed, read-only snapshot: ports, raw flow entries, and the
-    service-level links they support under the operator's own port naming."""
+    """One hashed, read-only snapshot: ports, raw flow entries, the
+    service-level links they support under the operator's own port naming,
+    and the unnamed ports actually seen carrying traffic (the risk list)."""
     ports = list_ports(bridge, runner=runner)
+    ofport_to_name = resolve_ofports(ports, runner=runner)
     flows = dump_flows(bridge, runner=runner)
-    unnamed_ports = sorted(p for p in ports if p not in port_to_service)
+    unresolved_ports = sorted(p for p in ports if p not in ofport_to_name.values())
+    risk = active_unnamed_ports(port_to_service, flows, ofport_to_name, min_packets=min_packets)
     report = {
-        "schema": "predict-shield/sdn-topology-report/1",
+        "schema": "predict-shield/sdn-topology-report/2",
         "bridge": bridge,
         "collected_at": utc_now(),
         "ports": ports,
-        "unnamed_ports": unnamed_ports,
+        "ofport_to_interface": ofport_to_name,
+        "unresolved_ports": unresolved_ports,
         "flow_entries": flows,
         "service_dependencies": observed_service_links(
             bridge, port_to_service, flows, min_packets=min_packets),
+        "active_unnamed_ports": risk,
         "live_sdn_evidence": True,
         "complete_topology_verified": False,
     }
