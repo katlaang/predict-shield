@@ -61,6 +61,19 @@ The first data-collection invocation runs **four candidate actions**, not the wh
 
 Read [the Experiment B guide](experiment-b/README.md) for precise setup, restrictions, data provenance, and study limitations.
 
+## Unified local AI vulnerability assessment
+
+The new [unified AI case pipeline](docs/development/UNIFIED_LOCAL_AI_VULNERABILITY_PIPELINE.md) reuses existing Docker/SBOM discovery and the current policy-constrained action selector. A loopback-only Ollama-compatible language model reads **untrusted advisory text** and proposes only cataloged actions and verification check IDs. The evidence-dependency graph preserves gateway/source uncertainty and explicitly declared service relationships.
+
+This path currently supports **read-only AI-assisted investigation and offline independently checked action planning**. A separate authenticated scope snapshot, independently verified CVE applicability, and calibrated learned action-impact predictions are required before a candidate can pass the existing selector. The CLI does not dispatch actions or claim verified remediation; the pre-existing Java/Kafka mechanism lab remains the only lab actuator.
+
+```bash
+PYTHONPATH=engine python -m unittest discover -s engine/tests -v
+# See docs/development/UNIFIED_LOCAL_AI_VULNERABILITY_PIPELINE.md for a local model run.
+```
+
+The model has not yet demonstrated superiority over strong conventional baselines. Unit-test fixtures cannot establish model quality or real infrastructure protection.
+
 ## Research demo and repeated physical pilot evidence
 
 A first [read-only research dashboard](demo/README.md) is now available in `demo/index.html`. It displays **actual recorded Java/Kafka/Docker physical trial measurements**, not simulated AI recommendation results, and allows viewing exposure-duration intervals, authorized-user disruption and source provenance.
