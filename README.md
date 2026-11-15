@@ -2,34 +2,36 @@
 
 **An AI-driven security assessment pipeline for network operators.**
 
-PREDICT-SHIELD finds what is running on a network, checks it against known vulnerabilities, uses a language model to read the advisories and propose fixes, screens every proposal through a deterministic policy gate, and independently verifies whether a fix actually worked. It is built for operators who need continuous, evidence-backed security assessment — including small ISPs who do not have a dedicated security team to do this by hand.
+PREDICT-SHIELD finds what is running on a network or a public-facing website, checks it against known vulnerabilities, uses a language model to read the advisories and propose fixes, screens every proposal through a deterministic policy gate, and independently verifies whether a fix actually worked. It is built for operators who need continuous, evidence-backed security assessment and don't have a dedicated security team to do it by hand — ISPs, telecom carriers, and SMEs running a public website.
 
-> **Status: working research prototype, not a finished product.** The pipeline below runs end-to-end today against a lab network. Running it against a real ISP's live infrastructure — with a dashboard, real asset discovery, and safe automated remediation — is the next phase of work, not something already deployed. Nothing here claims that the AI outperforms a well-built fixed rule; that is a separate, still-open research question (see [Current research](#current-research) below), and it does not block using the pipeline as an automation tool.
+> **Status: working research prototype, not a finished product.** The pipeline below runs end-to-end today against a lab network. Running it against a real operator's live infrastructure — with a dashboard, real asset discovery, and safe automated remediation — is the next phase of work, not something already deployed. Nothing here claims that the AI outperforms a well-built fixed rule; that is a separate, still-open research question (see [Current research](#current-research) below), and it does not block using the pipeline as an automation tool.
 
 ## How it works
 
 1. **Discover.** Scan the network and build an inventory of running assets, services, and the dependencies between them, with every discovery record hashed so it can't be silently altered later.
 2. **Evaluate.** Match the inventory against known vulnerability advisories and build a risk picture: which assets are exposed, to what, and how confidently.
-3. **AI analyzes the findings.** A language model reads the advisory text and the risk picture and proposes candidate fixes. It never writes free text into the record — every proposal is checked against the real package inventory and the real advisory text, and anything it can't verify is rejected rather than guessed at.
-4. **Recommend.** The model's proposal only narrows the list of things worth considering. A deterministic policy gate — not the model — makes the actual call: it checks the action against service-continuity budgets, calibrated risk/impact estimates, and policy limits before anything is approved.
-5. **Apply approved defenses.** Today this step runs against an isolated lab network (Docker/Kafka/Java), not live ISP infrastructure. The gate can approve an action for consideration, but nothing in this repository dispatches a change to a real production system — that boundary is intentional while the approach is still being proven out.
-6. **Verify outcomes.** A separate, independent verifier — not the model, and not the thing that applied the fix — re-checks the target afterward and reports one of VERIFIED, NOT VERIFIED, INDETERMINATE, or NOT APPLICABLE. An action's own "success" acknowledgment is never treated as proof it worked.
+3. **AI analyzes the findings.** A language model reads the advisory text and the risk picture and proposes candidate fixes. It never writes free text into the record — every proposal is checked against the real package inventory and the real advisory text, and anything it can't verify is rejected rather than guessed at. Advisory text is treated as untrusted input throughout: it is screened for known instruction-injection patterns before it ever reaches the model, independently of the grounding check.
+4. **Validate in isolation, where applicable.** A text match in an advisory is not proof a weakness is actually present. For web-facing targets, a reviewed, CVE-specific, read-only probe — never one derived from the advisory text or the model's own reply — can run against a host the operator has explicitly authorized, and its result is treated as one more piece of independent evidence, not a verdict on its own.
+5. **Recommend.** The model's proposal only narrows the list of things worth considering. A deterministic policy gate — not the model — makes the actual call: it checks the action against service-continuity budgets, calibrated risk/impact estimates, and policy limits before anything is approved.
+6. **Apply approved defenses.** Today this step runs against an isolated lab network (Docker/Kafka/Java), not live operator infrastructure. The gate can approve an action for consideration, but nothing in this repository dispatches a change to a real production system — that boundary is intentional while the approach is still being proven out.
+7. **Verify outcomes.** A separate, independent verifier — not the model, and not the thing that applied the fix — re-checks the target afterward and reports one of VERIFIED, NOT VERIFIED, INDETERMINATE, or NOT APPLICABLE. An action's own "success" acknowledgment is never treated as proof it worked.
 
 Each step produces a signed, hashed record, so a finding, a recommendation, an applied action, and a verification result can always be traced back to the evidence behind them.
 
 ## What's built vs. what's planned
 
-| Capability | Built today | Still needed for a full ISP product |
+| Capability | Built today | Still needed for a full operator product |
 | --- | --- | --- |
-| Asset & dependency discovery | Docker/container-based discovery, hashed inventory, dependency graph | Discovery against a real ISP network (routers, CPE, non-containerized hosts) |
+| Asset & dependency discovery | Docker/container-based discovery, hashed inventory, dependency graph | Discovery against a real ISP/telecom network (routers, CPE, non-containerized hosts) |
 | Vulnerability matching | Advisory ingestion from GitHub Advisory Database, coordinate and artifact-name matching rules | Broader source coverage (CISA KEV, vendor feeds) |
-| AI-read advisories & proposals | Local/hosted language model reads advisory text, proposes only cataloged actions and checks, grounded against the real inventory | Measured accuracy at scale (see below) before recommending unsupervised use |
+| AI-read advisories & proposals | Local/hosted language model reads advisory text, proposes only cataloged actions and checks, grounded against the real inventory; advisory text is screened for instruction-injection patterns before it reaches the model | Measured accuracy at scale (see below) before recommending unsupervised use; the injection screen is pattern-based and should keep growing from real examples, not a trained classifier yet |
+| Confirming a finding is real | Text-grounding check (does the package and version really appear in the advisory); a bounded, read-only, catalog-registered HTTP signature check for web-facing targets | Broader confirmation checks per vulnerability class; today's web check only covers CVEs with a reviewed, registered signature |
 | Policy-gated action selection | Deterministic gate: service-continuity budgets, calibrated risk predictions, policy tiers | Calibration against real operator traffic, not just lab traffic |
-| Applying fixes | Executes in an isolated lab (Docker/Kafka/Java) only | A safe, reversible actuator for real ISP infrastructure, with the same gate in front of it |
+| Applying fixes | Executes in an isolated lab (Docker/Kafka/Java) only | A safe, reversible actuator for real operator infrastructure, with the same gate in front of it |
 | Independent verification | Separate verifier distinguishes VERIFIED/NOT VERIFIED/INDETERMINATE/NOT APPLICABLE | Live, authenticated probes against a real network |
 | Dashboard | Read-only research demo displaying recorded lab trial data (`demo/index.html`) | A live dashboard showing real findings, recommendations, and verification status for an operator's own network |
 
-The one gap that matters most for an ISP pitch is the row on asset discovery and the dashboard: the pipeline is real and wired together end to end, but it has only been run against lab/test infrastructure, not a live customer network, and there's no live-data UI yet — today everything the pipeline produces is a JSON record, not a screen an operator would look at.
+The one gap that matters most for an ISP/telecom pitch is the row on asset discovery and the dashboard: the pipeline is real and wired together end to end, but it has only been run against lab/test infrastructure, not a live customer network, and there's no live-data UI yet — today everything the pipeline produces is a JSON record, not a screen an operator would look at.
 
 ## Quick start
 

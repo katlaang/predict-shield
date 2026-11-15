@@ -11,6 +11,8 @@ import urllib.error
 import urllib.request
 from dataclasses import dataclass
 
+from .injection_guard import scan as scan_for_injection
+
 MODEL_ID=re.compile(r"^[A-Za-z0-9_.:/-]{1,128}$")
 MAX_RESPONSE=65536
 
@@ -133,11 +135,23 @@ def prepare_request(context: dict, advisories: list[dict],
                             "advisory_text_untrusted":text[:4000]})
     if len(entries)>64:
         raise ValueError("Too many candidate findings in one model request")
+    # Independent of the enum-constrained model output below (which already
+    # bounds what a model reply can select), flag any candidate whose raw
+    # advisory text matches a known instruction-injection pattern. This is a
+    # review signal for the operator, not a block: the enum constraint is
+    # what actually keeps an injected instruction from being acted on.
+    injection_flags=[]
+    for entry in entries:
+        signal=scan_for_injection(entry["advisory_text_untrusted"])
+        if signal.suspected:
+            injection_flags.append({"asset_id":entry["asset_id"],"cve":entry["cve"],
+                                    "purl":entry["purl"],**signal.to_json()})
     return {"schema":"predict-shield/llm-advisory-request/1",
             "context_sha256":context.get("sha256"),
             "candidate_findings":entries,
             "allowed_action_ids":list(action_ids),
             "allowed_verification_check_ids":list(verification_check_ids),
+            "injection_flags":injection_flags,
             "uncertainty_note":"All CVE matches require independent applicability evidence"}
 
 
