@@ -31,4 +31,4 @@ Each shard prints its count after every 12 actual actions, so partial activity i
 
 ## Separate field evidence
 
-Even if the AI wins this physical research experiment, the National Interest Waiver claim of improving resilience in U.S. critical infrastructure requires separately documented independent real-operator evaluation. No artificial lab or Github Actions deployment can substitute for that.
+Even if the AI wins this physical research experiment, any claim of improving resilience in U.S. critical infrastructure requires separately documented independent real-operator evaluation. No artificial lab or Github Actions deployment can substitute for that.
