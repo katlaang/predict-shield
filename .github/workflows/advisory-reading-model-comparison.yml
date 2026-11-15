@@ -22,9 +22,16 @@ jobs:
       - name: Verify the harness and the rule baseline against the committed corpus
         run: PYTHONPATH=engine:engine/tests python -m unittest tests.test_versions tests.test_language_model tests.test_advisory_reader tests.test_advisory_eval -v
       - name: Start CPU-only local Ollama with one loaded model at a time
+        # The previous 7 GiB cap was too tight for the 4.9 GB Foundation-Sec-8B
+        # Q4_K_M weights plus Ollama's own runtime and inference buffers on this
+        # public-repo runner's 16 GiB total: the container's OOM killer took the
+        # Ollama process down partway through that model's evaluation, and every
+        # request after that failed with a flat connection refusal, not a model
+        # answer. 12 GiB still leaves headroom for the runner's own OS and the
+        # Python harness process outside the container.
         run: |
           docker run --rm -d --name ps-advisory-comparison \
-            --memory=7g --memory-swap=7g \
+            --memory=12g --memory-swap=12g \
             -e OLLAMA_NUM_PARALLEL=1 -e OLLAMA_MAX_LOADED_MODELS=1 \
             -e OLLAMA_CONTEXT_LENGTH=4096 \
             -p 127.0.0.1:11434:11434 ollama/ollama:latest
@@ -37,6 +44,15 @@ jobs:
         run: |
           docker exec ps-advisory-comparison ollama pull qwen3:0.6b
           docker exec ps-advisory-comparison ollama pull hf.co/fdtn-ai/Foundation-Sec-8B-Reasoning-Q4_K_M-GGUF:Q4_K_M
+          # A pull succeeding says nothing about whether the server is still up
+          # afterward; confirm it explicitly so a crashed container fails the
+          # job here, loudly, instead of silently turning into 120 identical
+          # "connection refused" abstentions in the comparison step below.
+          curl -fsS http://127.0.0.1:11434/api/version >/dev/null || {
+            echo "::error::Ollama server is not responding after pulling both models"
+            docker logs ps-advisory-comparison
+            exit 1
+          }
       - name: Evaluate both installed models on all 120 committed advisories
         env:
           PYTHONPATH: engine
