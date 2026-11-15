@@ -44,4 +44,4 @@ The earlier five-config v3 pilot was dominated by self-healing behavior. The new
 
 **Do not modify the scenario mixture to make a learned model look superior.** Keep the negative/inconclusive report in the research record. The next legitimate work is to implement the authority-outage outcome collector tracked in [issue #36](https://github.com/katlaang/predict-shield/issues/36), including separately witnessed policy state, full direct physical observations, conservative UNKNOWN semantics, and complete action eligibility and disruption metrics. Then independently predeclare a representative six-family feasibility sample and conduct power/precision planning before choosing whether to freeze and run the 150×4×2 final campaign.
 
-This report supports documented progress on experiment integrity and policy-governed defense but does not establish superior AI efficacy, independent real-world critical-infrastructure validation, or EB-2 NIW approval.
+This report supports documented progress on experiment integrity and policy-governed defense but does not establish superior AI efficacy or independent real-world critical-infrastructure validation.

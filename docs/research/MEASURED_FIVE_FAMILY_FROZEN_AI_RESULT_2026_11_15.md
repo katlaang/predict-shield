@@ -67,10 +67,10 @@ Therefore the favorable point benefit was **not stable across expanded configura
 
 **Official registered result** `lab_superiority_supported_under_all_predeclared_tests=false`.
 
-## Current research and NIW evidence boundaries
+## Current research evidence boundaries
 
 Demonstrated: genuine offline learned-defense research, real physical Kafka/JVM action replays, independent measured security and authorized-service outcomes, frozen model provenance, two separate post-training new physical configuration studies, complete negative and positive evidence history.
 
-**Not demonstrated**: policy-level statistical superiority over the strongest conventional rule, reliable hard service-continuity preservation, independent operators' critical infrastructure effectiveness, production-safe autonomous defense or 99.9% security decision accuracy. All testbeds reused the same four-JVM lab, not separate U.S. infrastructure sites. The user’s NIW proposed endeavor remains a research objective, not a validated field claim.
+**Not demonstrated**: policy-level statistical superiority over the strongest conventional rule, reliable hard service-continuity preservation, independent operators' critical infrastructure effectiveness, production-safe autonomous defense or 99.9% security decision accuracy. All testbeds reused the same four-JVM lab, not separate U.S. infrastructure sites. This remains a research objective, not a validated field claim.
 
 Next defensible technical milestone: **train-only safety-constrained action-value learning**, predicting/interval-calibrating actual legitimate-service failures as a separately enforced hard bound *before* considering action utility; fail closed under model uncertainty. Test on **completely fresh** physical scenarios, and independently evaluate a strong policy baseline with the *same* service constraints. Never tune and reclassify the currently examined 60 groups as held-out.
