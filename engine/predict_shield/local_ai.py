@@ -42,10 +42,44 @@ class LocalOllama:
                 "provided action IDs and check IDs. You cannot establish CVE "
                 "applicability, authorization, successful remediation, or execute "
                 "commands. If uncertain, return an empty proposals array.")
+        # Ollama supports JSON Schema constrained output. Allowed identifiers
+        # come only from the caller-owned catalog, never from advisory prose.
+        findings=request_data.get("candidate_findings",[])
+        if not isinstance(findings,list):
+            raise ValueError("Missing structured candidate findings")
+        asset_ids=sorted({x["asset_id"] for x in findings})
+        cves=sorted({x["cve"] for x in findings})
+        purls=sorted({x["purl"] for x in findings})
+        action_ids=request_data.get("allowed_action_ids",[])
+        check_ids=request_data.get("allowed_verification_check_ids",[])
+        if not asset_ids or not cves or not purls or not action_ids:
+            raise ValueError("Empty local-model proposal scope")
+        proposal_fields={
+            "asset_id":{"type":"string","enum":asset_ids},
+            "cve":{"type":"string","enum":cves},
+            "purl":{"type":"string","enum":purls},
+            "action_id":{"type":"string","enum":action_ids},
+            "verification_check_ids":{"type":"array","items":{"type":"string",
+                                                                "enum":check_ids},
+                                      "maxItems":8,"uniqueItems":True},
+            "rationale":{"type":"string","maxLength":500},
+        }
+        reply_schema={
+            "type":"object","additionalProperties":False,
+            "properties":{
+                "schema":{"type":"string","const":"predict-shield/llm-advisory-proposals/1"},
+                "proposals":{"type":"array","maxItems":64,
+                             "items":{"type":"object","additionalProperties":False,
+                                      "properties":proposal_fields,
+                                      "required":list(proposal_fields)}},
+            },
+            "required":["schema","proposals"],
+        }
         payload={"model":self.model_id,
                  "messages":[{"role":"system","content":system},
                              {"role":"user","content":json.dumps(request_data,sort_keys=True)}],
-                 "stream":False,"format":"json",
+                 "stream":False,"format":reply_schema,
+                 "think":False,
                  "options":{"temperature":0,"num_predict":768}}
         raw=json.dumps(payload,separators=(",",":")).encode()
         if len(raw)>160000:
