@@ -30,6 +30,7 @@ import re
 from dataclasses import dataclass
 from typing import Iterable, Mapping, Protocol
 
+from .injection_guard import scan as scan_for_injection
 from .language_model import LanguageModel, ModelUnavailable, parse_json_object
 from .versions import UnsupportedVersion, VersionRange, parse
 
@@ -245,6 +246,11 @@ class ModelAdvisoryReader:
 
     def read(self, text: str, packages: Iterable[str]) -> Reading:
         text = text[:MAX_TEXT_CHARS]
+        signal = scan_for_injection(text)
+        if signal.suspected:
+            reasons = tuple(f"suspected instruction injection ({label}): {matched!r}"
+                             for matched, label in signal.matches)
+            return Reading(REJECTED, (), self.name, reasons)
         candidates = shortlist(text, packages, self.shortlist_size)
         if not candidates:
             return Reading(ABSTAINED, (), self.name, ("no inventory package shares a word with the text",))
