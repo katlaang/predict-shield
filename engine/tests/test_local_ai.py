@@ -45,7 +45,9 @@ class LocalModelTests(unittest.TestCase):
         self.assertEqual(opener.target,"http://127.0.0.1:11434/api/chat")
         self.assertFalse(opener.payload["stream"])
         self.assertEqual(opener.payload["options"]["temperature"],0)
-        self.assertEqual(opener.payload["format"],"json")
+        self.assertEqual(opener.payload["format"]["type"],"object")
+        self.assertEqual(opener.payload["format"]["properties"]["proposals"]["items"]["properties"]["action_id"]["enum"],["resync_policy"])
+        self.assertFalse(opener.payload["think"])
         self.assertEqual(opener.payload["messages"][0]["role"],"system")
 
     def test_nonloopback_llm_endpoint_refused(self):
