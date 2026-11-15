@@ -146,7 +146,7 @@ class PipelineTests(unittest.TestCase):
                    predictions=(predicted(snapshot),),
                    remaining_error_budgets={"authorization":1})
         self.assertIsNone(result["selected_action"])
-        self.assertEqual(result["policy_screened"]["resync_policy"]["decision"],"REJECT")
+        self.assertEqual(result["policy_screened"]["resync_policy"]["decision"],"ESCALATE_FOR_EVIDENCE")
 
     def test_proposal_cannot_escape_allowed_action_catalog(self):
         with self.assertRaisesRegex(ValueError,"unauthorized action"):
