@@ -12,7 +12,7 @@
 
  Research pre-alpha. A merged implementation or passing CI proves only the documented local or CI behavior, not superior AI performance, commercial adoption or critical-infrastructure field validation.
 
-## Endeavor capability coverage
+## Capability coverage
 
 | Proposed capability | Verified development evidence | Outstanding proof |
 | --- | --- | --- |
