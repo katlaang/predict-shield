@@ -1,0 +1,48 @@
+name: Live Containernet/OVS SDN topology discovery smoke test
+on:
+  pull_request:
+    paths:
+      - 'engine/predict_shield/sdn_topology_discovery.py'
+      - 'engine/tests/test_sdn_topology_discovery.py'
+      - 'experiment-b/sdn-lab/**'
+      - '.github/workflows/sdn-topology-live-smoke.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  live-sdn-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      - name: Validate the discovery adapter against the fake OVS CLI first
+        run: PYTHONPATH=engine python -m unittest discover -s engine/tests -p "test_sdn_topology_discovery.py" -v
+      - name: Install Open vSwitch and Mininet
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends openvswitch-switch mininet
+          sudo service openvswitch-switch start
+          sudo ovs-vsctl show
+      - name: Install Containernet on top of the system Mininet/OVS
+        run: sudo python3 -m pip install --no-deps git+https://github.com/containernet/containernet.git
+      - name: Pull the disposable Alpine image used as lab host containers
+        run: docker pull alpine:latest
+      - name: Run the live three-host Containernet/OVS smoke test
+        run: sudo PYTHONPATH=engine python3 experiment-b/sdn-lab/run_live_smoke.py
+      - name: Retain the real discovery report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sdn-live-topology-report
+          path: /tmp/predict-shield-sdn-live-report.json
+          retention-days: 30
+          if-no-files-found: ignore
+      - name: Tear down any leftover lab containers and the OVS bridge
+        if: always()
+        run: |
+          docker rm -f web db shadow mn.web mn.db mn.shadow 2>/dev/null || true
+          sudo ovs-vsctl --if-exists del-br s1 || true
+          sudo mn -c || true
