@@ -1,0 +1,35 @@
+name: Real second remediation-registration target (minimist CVE-2021-44906)
+
+on:
+  pull_request:
+    paths:
+      - 'experiment-b/real-minimist-remediation/**'
+      - 'engine/predict_shield/remediation_target.py'
+      - '.github/workflows/real-minimist-remediation-lab.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  real-minimist-pilot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate unit contracts first
+        working-directory: experiment-b/real-minimist-remediation
+        env:
+          PYTHONPATH: ../../engine
+        run: python -m unittest test_verify_remediation_via_registration -v
+      - name: Pilot a second, independent real CVE fix through the generic registration mechanism
+        working-directory: experiment-b/real-minimist-remediation
+        env:
+          PYTHONPATH: ../../engine
+        run: python verify_remediation_via_registration.py

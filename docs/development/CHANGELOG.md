@@ -1,5 +1,12 @@
 # Development changelog
 
+## 2026-11-15 (3): Second independent target through the registration mechanism
+
+- Registered and piloted a genuinely different real CVE fix (minimist, CVE-2021-44906 / GHSA-xvch-5gv4-984h) through `remediation_target.py`, with its own `independent_probe.js` written from scratch, not reused from the lodash pilot.
+- The probe uses the exact proof-of-concept Snyk's advisory (SNYK-JS-MINIMIST-2429795) publishes (`--_.constructor.constructor.prototype.foo bar`, reaching `Function.prototype`), confirmed by hand against both the vulnerable (1.2.5) and fixed (1.2.6) installed versions before writing the pilot. An initial guess at the payload (`--__proto__.y`) was tried first, found to not actually pollute on 1.2.5, and replaced once the real PoC was confirmed via search -- a negative control catching exactly the mistake it exists to catch.
+- All four assertions reach VERIFIED for real: a real negative-control install (1.2.5, probed and confirmed vulnerable before any fix is credited), a real fixed install (1.2.6), a real `npm install --dry-run`, and a scan against two real OSV-confirmed advisories.
+- 2 new unit tests pass; added to its own CI workflow (`real-minimist-remediation-lab.yml`).
+
 ## 2026-11-15 (2): Generalize dependency-upgrade verification registration
 
 - `remediation_target.py` reads a declarative JSON schema (resolver command, test command, package/new-version/advisories) instead of requiring a new hand-written Python script per project, following up on `remediation_verification.py`'s two single-case pilots.
