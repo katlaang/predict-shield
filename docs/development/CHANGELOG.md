@@ -1,5 +1,11 @@
 # Development changelog
 
+## 2026-11-15 (4): Wire a SAST finding into the propose-then-gate pipeline
+
+- `plan_sast_case()` (`engine/predict_shield/pipeline.py`) is the SAST-finding counterpart to `plan_case`'s CVE/advisory flow: it independently re-confirms a finding via `sast_findings.confirm_before_fix`, maps the finding's `rule_id` to an operator-registered remediation action (deterministic registration, never a model's guess), and runs the existing `select_action` policy gate.
+- Deliberately scoped to stop at the same boundary `plan_case` already stops at: it returns an eligible plan and never calls `sast_findings.evaluate_fix` itself. Post-action verification stays a separate step -- true for the CVE path as well, which this work surfaced: no capability in this repository is actually chained end to end from proposal through an applied, verified fix yet.
+- 7 new unit tests pass; full engine suite (288 tests) still passes.
+
 ## 2026-11-15 (3): Second independent target through the registration mechanism
 
 - Registered and piloted a genuinely different real CVE fix (minimist, CVE-2021-44906 / GHSA-xvch-5gv4-984h) through `remediation_target.py`, with its own `independent_probe.js` written from scratch, not reused from the lodash pilot.
