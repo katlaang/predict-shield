@@ -1,5 +1,12 @@
 # Development changelog
 
+## 2026-11-15 (2): Generalize dependency-upgrade verification registration
+
+- `remediation_target.py` reads a declarative JSON schema (resolver command, test command, package/new-version/advisories) instead of requiring a new hand-written Python script per project, following up on `remediation_verification.py`'s two single-case pilots.
+- `experiment-b/real-cve-remediation/verify_remediation_via_registration.py` re-runs the real lodash/CVE-2020-8203 case through the generic path (same real `npm install`, same real independent probe, same real advisory rescan) and reaches the identical accepted/all-four-VERIFIED result as the original hand-written `verify_remediation.py`, confirming the generalization actually holds rather than only looking reusable on paper.
+- Deliberately not generalized: the `vulnerability_resolved` assertion still requires a human-supplied, separately reviewed, CVE-specific probe; this module does not invent or automate that probe for an arbitrary target.
+- 10 new unit tests pass; full engine suite (281 tests) still passes.
+
 ## 2026-11-15: Real SAST fix-verification pilot; commit-signing switch
 
 - Piloted `sast_findings.py`'s four-assertion composite against a real `semgrep` scan (pinned to a repo-local rule file, not the live registry), a real SQL-injection fixture and fix, and a real sqlite3 regression check; all four assertions reached VERIFIED. See `experiment-b/real-sast-pilot/` and its CI workflow.
