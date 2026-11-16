@@ -1,0 +1,57 @@
+name: Real SAST fix-verification pilot
+
+on:
+  pull_request:
+    paths:
+      - 'experiment-b/real-sast-pilot/**'
+      - 'engine/predict_shield/sast_findings.py'
+      - '.github/workflows/real-sast-pilot.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  real-sast-pilot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install semgrep
+        run: pip install semgrep
+      - name: Validate all unit contracts before running the real scanner
+        working-directory: experiment-b/real-sast-pilot
+        env:
+          PYTHONPATH: ../../engine
+        run: python -m unittest test_real_sast_pilot -v
+      - name: Run the real pilot (real semgrep scan, real sqlite3 regression check)
+        working-directory: experiment-b/real-sast-pilot
+        env:
+          PYTHONPATH: ../../engine
+          SEMGREP_ENABLE_VERSION_CHECK: '0'
+        run: |
+          python run_real_sast_pilot.py --output /tmp/ps-real-sast-pilot.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p = json.loads(Path("/tmp/ps-real-sast-pilot.json").read_text())
+          assert p["scan_is_deterministic"] is True
+          assert p["before_scan_raw"]["check_id"] == "python-sql-string-concat"
+          assert p["finding_still_present_after_fix"] is False
+          assert p["regression_check_returncode"] == 0
+          assert p["new_high_severity_findings_count"] == 0
+          assert p["accepted"] is True, p["blocking_reasons"]
+          assert p["external_scanner_integration_production_ready"] is False
+          print("PASS: real semgrep scan, real regression check, all four assertions VERIFIED")
+          PY
+      - name: Retain the real evidence report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: real-sast-pilot-evidence
+          path: /tmp/ps-real-sast-pilot.json
+          if-no-files-found: ignore
+          retention-days: 30

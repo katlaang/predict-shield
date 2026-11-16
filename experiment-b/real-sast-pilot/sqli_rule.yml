@@ -1,0 +1,15 @@
+rules:
+  - id: python-sql-string-concat
+    languages: [python]
+    severity: ERROR
+    message: >-
+      SQL query built via string concatenation with a function parameter;
+      an attacker-controlled value reaches the query text directly. Use a
+      parameterized query instead.
+    patterns:
+      - pattern: $CONN.execute("..." + $VAR + "...")
+    metadata:
+      category: security
+      cwe: "CWE-89: Improper Neutralization of Special Elements used in an SQL Command"
+      references:
+        - https://owasp.org/www-community/attacks/SQL_Injection
