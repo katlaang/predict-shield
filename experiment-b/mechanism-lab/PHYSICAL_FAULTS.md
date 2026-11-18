@@ -1,6 +1,6 @@
 # Physically injected external authority outage (experimental smoke)
 
-**Status:** opt-in mechanism check for proposed Experiment B v3.1, *not* a replacement for v3, not a completed v3.1 campaign, and not a simulated optimal-action label.
+**Status:** opt-in mechanism check for Experiment B v3.1, not a simulated optimal-action label.
 
 The existing mechanism CI already checks persistent consumer event loss. This additional experiment stops the **actual Docker Compose authority process** after the disposable lab is ready, observes that the authority's HTTP health endpoint becomes unavailable, tries an actual resync request (which must not publish), restarts **enforcer-b** locally, and observes that the authority remains unavailable. It then starts the authority in a `finally` cleanup and waits for full lab readiness. A stop/start failure fails CI.
 
@@ -32,4 +32,4 @@ The workflow calls this test before the v3 40-replay pilot after restoring the o
 
 The physically executed authority-outage CI now queries the separate oracle **while authority remains stopped**, after a local enforcer restart. It requires `authority_truth_available=false`, `inventory_complete=false`, and `all_revoked_access_denied=null`. It retains `direct_target_observations_complete` independently so observed HTTP evidence is not lost merely because desired policy is unknowable.
 
-This is a fail-closed distinction, **not** a six-family v3.1 scorer. A new collector must define a separately witnessed pre-outage policy, temporal bounds and conservative handling of unknown outcomes before comparing action regret under an outage. See issue #36.
+This is a fail-closed distinction. A new collector must define a separately witnessed pre-outage policy, temporal bounds and conservative handling of unknown outcomes before scoring actions under an outage. See issue #36.

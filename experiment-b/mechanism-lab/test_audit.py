@@ -105,7 +105,7 @@ class CampaignAuditTests(unittest.TestCase):
         self.assertEqual(inspect_trial(self.trial, self.output)[0], "complete")
 
     def test_extra_unknown_record_fails_readiness(self):
-        """The plan must account for every stored research run ID."""
+        """The plan must account for every stored run ID."""
         (self.output / "oracle").mkdir()
         (self.output / "oracle" / "unregistered.json").write_text("{}")
         result = audit_campaign(self.configs, self.trials, self.output)

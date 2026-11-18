@@ -1,4 +1,4 @@
-"""Tests for the AI research training pipeline.
+"""Tests for the AI training pipeline.
 
 Synthetic fixtures in these tests are not experimental results and are never
 included in PREDICT-SHIELD published evaluation outputs.
@@ -17,7 +17,7 @@ from train_action_model import (
 
 
 class ActionModelTrainingTests(unittest.TestCase):
-    """Test leakage boundaries, calibration and baseline evaluation mechanics."""
+    """Test leakage boundaries, calibration and held-out evaluation mechanics."""
 
     def make_example(self, group, split, action, fault, repeat):
         """Create one labeled unit-test fixture, never a live-lab measurement."""

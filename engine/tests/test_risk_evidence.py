@@ -1,4 +1,4 @@
-"""Synthetic discovery-to-policy integration: never test evidence of superiority."""
+"""Synthetic discovery-to-policy integration contracts."""
 import unittest
 from datetime import datetime, timezone, timedelta
 

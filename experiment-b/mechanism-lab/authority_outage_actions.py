@@ -1,7 +1,7 @@
 """Four distinct physical actions during external policy-authority unavailability.
 
 An exploratory *mechanism* comparison: observed HTTP behavior and uncertainty
-bounds only, NOT an audited v3.1 regret/utility or a successful AI decision.
+bounds only, NOT an audited utility or a successful AI decision.
 """
 from __future__ import annotations
 

@@ -12,7 +12,7 @@ from generate_manifest import (
 
 
 class ExperimentManifestTests(unittest.TestCase):
-    """Ensure the research design cannot silently leak data or invent outcomes."""
+    """Ensure the lab design cannot silently leak data or invent outcomes."""
 
     def test_exact_configuration_and_trial_counts(self):
         """The agreed 100 x 4 x 3 plan produces exactly 1,200 planned runs."""

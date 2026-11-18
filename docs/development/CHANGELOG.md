@@ -1,5 +1,12 @@
 # Development changelog
 
+## 2026-11-18 (4): Remove the AI-versus-rule comparison work and the research wording
+
+- Removed every model-versus-rule and model-versus-model comparison from the repository: the benchmark and backtest modules, the v3/v3.1 campaign scaffolding and protocol-freeze checks, the advisory-reading and vulnerability-benchmark comparisons, the ISP and telecom AI-versus-rule studies, the lodash strong-rule arm, the lookup and exposure baselines inside the learned models, and the eighteen workflows that ran them. Their documents and result records went with them. Git history keeps all of it.
+- Kept: the lab infrastructure, the learned action model and its held-out error and interval coverage, campaign collection and audit, link learning, graph risk scoring, the physical action measurements and every verification capability.
+- `docs/research` is now `docs/evidence`, with an index grouped by capability. The word "research" no longer appears in code, identifiers, workflows or documents; for example `ELIGIBLE_RESEARCH_LAB_PLAN` is now `ELIGIBLE_LAB_PLAN`.
+- Superiority disclaimer fields were removed from reports, since there is no comparison for them to describe.
+
 ## 2026-11-18 (3): Run the script proposer against a real model, and fix what it exposed
 
 - The script-integrity workflow gained a second job that serves a real model (`qwen3:0.6b`) through a local Ollama on loopback, the same setup the lodash pilot uses, and runs the containment proposer against it on every relevant push, recording the installed model digest. No API key is needed.
@@ -64,14 +71,15 @@
 - The pilot's own build surfaced and fixed two real bugs: a severity-vocabulary mismatch that made the no-new-high-severity check silently vacuous against Semgrep's real `ERROR`/`WARNING`/`INFO` scale, and a finding-fingerprint flaw caused by scanning the before/after fixture states as two separately named files rather than one shared path.
 - Commits made from an ephemeral development sandbox are now created through GitHub's Git Data API rather than a local signed `git commit`, so GitHub signs them server-side and they show Verified under the `katlaang` account, without any private signing key ever being placed on that sandbox's disk.
 
-## 2026-11-11: Mechanism-based Experiment B research hardening
+## 2026-11-11: Mechanism-based Experiment B hardening
 
 - Implemented real Kafka broker, separate Java enforcement instances, a separate oracle and a measured HTTP gateway; no synthetic-formula results are claimed.
 - Added source- and protocol-pinned measured-only campaign collection, independent group splits, separate oracle streams and offline model training.
 - Added synchronized trial-epoch invalidation and broker-carried trial identifiers so late events from an old experiment are not applied to the next experiment.
 - Corrected resync to retain persistent consumer loss, and made reordering use two distinct published revisions.
-- Added independent Compose-versus-gateway scope checks, distinct path/control/service outcomes, a declared (not verified remaining) laboratory SLO budget and offline decision-regret comparisons.
-- Experimental branch changes remain subject to their own tests and review; full 1,200-trial collection and scientific model superiority are not established.
+- Added independent Compose-versus-gateway scope checks, distinct path/control/service outcomes and a declared (not verified remaining) laboratory SLO budget.
+- Experimental branch changes remain subject to their own tests and review.
+
 ## 2026-11-10: AI-centered implementation foundation and laboratory extensions
 
 - Added typed pre-action prediction and measured-outcome contracts, with independent safety screening.
@@ -85,6 +93,6 @@
 
 - Added localhost-only Java/Spring Boot authorization-drift fixtures, Python deny probes, and opt-in lab-only correction.
 - Added independent post-action HTTP checking, mock-transport unit tests, and automated integration smoke tests.
-- Reviewed a separate experimental archive; results are documented in [the archived test review](../research/v0.3.0-validation-note.md), not attributed to the integrated codebase.
+- Reviewed a separate experimental archive; results are documented in [the archived test review](../evidence/v0.3.0-validation-note.md), not attributed to the integrated codebase.
 
 A commit, passing test or simulated laboratory result does not establish production security efficacy.

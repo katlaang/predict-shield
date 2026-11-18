@@ -64,7 +64,7 @@ class PlanScriptIntegrityCaseTests(unittest.TestCase):
         s = snap()
         result = run(scope_snapshot=s, predictions=(predicted(s),),
                     remaining_error_budgets={"example-sme.com": 5.0})
-        self.assertEqual(result["selection_status"], "ELIGIBLE_RESEARCH_LAB_PLAN")
+        self.assertEqual(result["selection_status"], "ELIGIBLE_LAB_PLAN")
         self.assertEqual(result["selected_action"], "block_via_csp")
         self.assertEqual(result["finding_confirmed"], "VERIFIED")
         self.assertEqual(result["finding_reason"], "hash_mismatch")
@@ -91,7 +91,7 @@ class PlanScriptIntegrityCaseTests(unittest.TestCase):
             remaining_error_budgets={"example-sme.com": 5.0},
         )
         self.assertEqual(result["finding_reason"], "unregistered_domain")
-        self.assertEqual(result["selection_status"], "ELIGIBLE_RESEARCH_LAB_PLAN")
+        self.assertEqual(result["selection_status"], "ELIGIBLE_LAB_PLAN")
 
     def test_a_proposal_for_an_unoffered_action_does_not_reach_eligible(self):
         s = snap()

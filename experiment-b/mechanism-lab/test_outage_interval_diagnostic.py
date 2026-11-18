@@ -73,7 +73,7 @@ class OutageIntervalTests(unittest.TestCase):
         self.assertNotIn("restart_enforcer", result["feasible_actions_for_offline_comparison"])
         self.assertNotIn("resync_policy", result["feasible_actions_for_offline_comparison"])
         self.assertEqual(len(result["action_intervals"]), 4)
-        self.assertTrue(result["fixed_resync_is_ineligible_comparator"])
+        self.assertTrue(result["fixed_resync_is_ineligible"])
 
     def test_unavailable_resync_is_never_eligible_when_authority_offline(self):
         result = evaluate(sample_report(), error_budget_requests=25,

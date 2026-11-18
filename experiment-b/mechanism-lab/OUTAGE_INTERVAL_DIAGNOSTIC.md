@@ -1,6 +1,6 @@
 # Authority-outage interval cost diagnostic (exploratory)
 
-This implementation operates on **actual four-arm timed physical observations**, independently observed direct target counts, authorized-user HTTP failures, and pre-outage policy witness commitments. It is not a new primary v3.1 utility, not learned action selection and **not** a justification for launching the 1,200-trial campaign.
+This implementation operates on **actual four-arm timed physical observations**, independently observed direct target counts, authorized-user HTTP failures, and pre-outage policy witness commitments. It is not learned action selection.
 
 ## Why intervals instead of a single cost?
 
@@ -33,10 +33,10 @@ python outage_interval_diagnostic.py \
 
 The GitHub Actions workflow generates the diagnostic report directly from physical observations and uploads only the derived non-sensitive summary. The request allowance is an explicit offline assumption here, **not** proof of the live remaining operational error budget.
 
-## Next research requirements
+## Next requirements
 
-The full v3.1 methodology still needs a locked contemporaneous-authority uncertainty policy, action-specific operational authority requirements, an independently registered six-family sample, multiple repeated configurations, sufficient partial-visibility decision diversity, and group-level power/precision justification. Neither this diagnostic nor the earlier five-group pilot satisfies those gates. Any future primary utility must be frozen prospectively and evaluated on new independent experiments, not retrofitted to observed action rankings.
+A locked contemporaneous-authority uncertainty policy, action-specific operational authority requirements, multiple repeated configurations and group-level precision are still required. Any future utility must be frozen before it is evaluated on new experiments, never retrofitted to observed action rankings.
 
-## Comparator selection in the stopped-authority stratum
+## Resync in the stopped-authority stratum
 
-Always-resync is not a defensible *eligible* fixed baseline when the external authority is physically known to be unavailable. Including it would artificially improve any model that simply avoids an impossible action. The policy comparison therefore excludes resync from the feasible choice set while retaining its observed physical transport failure. A new fixed baseline for this stratum, such as a predeclared monitor or gateway restriction policy with safety approval, must be prospectively registered and evaluated against the same eligibility constraints as AI. This is not permission for an agent to activate gateway restrictions automatically.
+Resync is excluded from the feasible choice set when the external authority is physically known to be unavailable, while its observed physical transport failure is retained. This is not permission for an agent to activate gateway restrictions automatically.

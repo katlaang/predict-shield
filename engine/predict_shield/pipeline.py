@@ -126,7 +126,7 @@ def plan_case(*, case_id: str, discovery: dict, advisories: list[dict],
     if screened.abstained or screened.selected is None:
         report["reason"]="Existing independent action gate abstained: "+screened.reason
         return report
-    report["selection_status"]="ELIGIBLE_RESEARCH_LAB_PLAN"
+    report["selection_status"]="ELIGIBLE_LAB_PLAN"
     report["scope_snapshot_id"]=scope_snapshot.snapshot_id
     report["selected_action_model_fingerprint"]=next(p.training_fingerprint for p in predictions if p.action_id==screened.selected.action_id)
     report["selected_action"]=screened.selected.action_id
@@ -235,7 +235,7 @@ def plan_sast_case(*, case_id: str, finding: ScanFinding,
     if screened.abstained or screened.selected is None:
         report["reason"] = "Existing independent action gate abstained: " + screened.reason
         return report
-    report["selection_status"] = "ELIGIBLE_RESEARCH_LAB_PLAN"
+    report["selection_status"] = "ELIGIBLE_LAB_PLAN"
     report["scope_snapshot_id"] = scope_snapshot.snapshot_id
     report["selected_action_model_fingerprint"] = next(
         (p.training_fingerprint for p in predictions if p.action_id == screened.selected.action_id), None)
@@ -393,7 +393,7 @@ def plan_script_integrity_case(
     if screened.abstained or screened.selected is None:
         report["reason"] = "Existing independent action gate abstained: " + screened.reason
         return report
-    report["selection_status"] = "ELIGIBLE_RESEARCH_LAB_PLAN"
+    report["selection_status"] = "ELIGIBLE_LAB_PLAN"
     report["scope_snapshot_id"] = scope_snapshot.snapshot_id
     report["selected_action_model_fingerprint"] = next(
         (p.training_fingerprint for p in predictions if p.action_id == screened.selected.action_id), None)
@@ -419,11 +419,11 @@ def record_independent_outcome(plan: dict, execution_receipt: dict,
     if now.tzinfo is None:
         raise ValueError("Observation timestamp must be timezone-aware")
     action=plan.get("selected_action")
-    if (not action or plan.get("selection_status")!="ELIGIBLE_RESEARCH_LAB_PLAN"
+    if (not action or plan.get("selection_status")!="ELIGIBLE_LAB_PLAN"
             or not isinstance(execution_receipt,dict)
             or execution_receipt.get("selected_action")!=action
             or execution_receipt.get("lab_only") is not True):
-        raise ValueError("Missing matching research-lab execution receipt")
+        raise ValueError("Missing matching lab execution receipt")
     output={
         "schema":"predict-shield/unified-ai-case-outcome/1",
         "case_id":plan["case_id"],"selected_action":action,

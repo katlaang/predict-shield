@@ -1,6 +1,6 @@
 """Controlled, resumable Experiment B collection on the real Kafka/JVM laboratory.
 
-A research campaign is a sequence of *measured* actions, not a JSON manifest.
+A campaign is a sequence of *measured* actions, not a JSON manifest.
 This runner never manufactures labels, replays a completed trial, skips a
 partial record, or silently changes a registered experiment. A maximum of
 twelve trials can be executed per explicit invocation. Complete four-stream

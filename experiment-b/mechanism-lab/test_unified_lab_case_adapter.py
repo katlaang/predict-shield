@@ -29,7 +29,7 @@ def plan():
         "schema":"predict-shield/unified-ai-case-plan/1",
         "case_id":"test-case",
         "created_at":NOW.isoformat(),
-        "selection_status":"ELIGIBLE_RESEARCH_LAB_PLAN",
+        "selection_status":"ELIGIBLE_LAB_PLAN",
         "selected_action":"resync_policy",
         "scope_snapshot_id":"lab-scope:lab-sha",
         "selected_action_model_fingerprint":"trained-bundle-fingerprint",
@@ -58,7 +58,7 @@ def responses(verdict=True, action="resync_policy", trusted=True, scope=True,
         return snapshot,{"status":"LAB_SCOPE_SUPPORTED",
                          "production_scope_attested":False},{"sha256":"lab-sha"}
     def selector(bundle,pre_action,snapshot,**kwargs):
-        return {"research_lab_only":True,"action_executed":False,
+        return {"lab_only":True,"action_executed":False,
                 "abstained":False,"selected_action":action,
                 "case_id":"test-case","snapshot_id":snapshot.snapshot_id,
                 "model_fingerprint":model,

@@ -5,7 +5,7 @@ on:
     paths:
       - 'engine/predict_shield/archive_acquire.py'
       - 'engine/predict_shield/threat_intel.py'
-      - 'docs/research/data/historical_sources_2026_10.json'
+      - 'docs/evidence/data/historical_sources_2026_10.json'
       - '.github/workflows/threat-archive-audit.yml'
 permissions:
   contents: read
@@ -18,13 +18,13 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Verify source commits predate research cutoff
+      - name: Verify source commits predate the as-of cutoff
         run: |
           python - <<'PY'
           import json
           from datetime import date
           from pathlib import Path
-          x=json.loads(Path("docs/research/data/historical_sources_2026_10.json").read_text())
+          x=json.loads(Path("docs/evidence/data/historical_sources_2026_10.json").read_text())
           assert x["as_of"]=="2026-10-02"
           assert all(date.fromisoformat(x[k]["commit_observed_date"])<=date.fromisoformat(x["as_of"])
                      for k in ("epss","kev_before"))
@@ -32,7 +32,7 @@ jobs:
       - name: Fetch actual pinned archive bytes and validate source dates
         run: |
           PYTHONPATH=engine python -m predict_shield.archive_acquire \
-            --manifest docs/research/data/historical_sources_2026_10.json \
+            --manifest docs/evidence/data/historical_sources_2026_10.json \
             --output-dir /tmp/predict-shield-archives
       - name: Verify acquired bytes and record non-sensitive SHA manifest only
         run: |

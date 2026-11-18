@@ -593,7 +593,7 @@ public final class EnforcementController {
      * Stops the laboratory scheduler when the Spring service is destroyed.
      *
      * <p>Delayed callbacks are discarded when the process terminates. The
-     * research lab does not persist a callback queue, so experimental
+     * lab does not persist a callback queue, so experimental
      * collectors must not treat container shutdown as delivery confirmation.</p>
      */
     @PreDestroy

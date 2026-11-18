@@ -195,7 +195,7 @@ def separate_records(config: dict, trial: dict, observed: dict) -> dict[str, dic
 def write_trial_records(output: Path, records: dict[str, dict]) -> None:
     """Write four non-overwriting files and use owner-only oracle permissions.
 
-    This is a research artifact boundary, not a transactional distributed
+    This is a lab artifact boundary, not a transactional distributed
     write. A crash after writing some records leaves an incomplete trial;
     downstream training must reject that incomplete trial rather than impute
     any missing labels. Existing run IDs are never silently overwritten.

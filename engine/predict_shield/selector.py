@@ -1,4 +1,4 @@
-"""Policy-constrained defensive action selector for the Experiment B research loop.
+"""Policy-constrained defensive action selector for the Experiment B lab loop.
 
 This component connects model predictions to the existing fail-closed action
 gate and ranks *eligible* actions by estimated residual risk and normalized

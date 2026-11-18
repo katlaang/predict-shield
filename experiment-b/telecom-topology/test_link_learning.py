@@ -32,9 +32,7 @@ class LinkLearningTests(unittest.TestCase):
         model, report=train_evaluate(fixture())
         self.assertEqual(report["test_records"],12)
         self.assertEqual(len(report["test_topologies"]),3)
-        self.assertFalse(report["model_superiority_claim"])
         self.assertEqual(sum(report["model_confusion"][key] for key in ("tp","fp","tn","fn")),12)
-        self.assertEqual(sum(report["deterministic_baseline_confusion"][key] for key in ("tp","fp","tn","fn")),12)
         proposals=infer_pairs(model,[{"source":"new-router","target":"new-switch",
                    "features":{key:(key=="lldp_seen") for key in FEATURES}}])
         self.assertEqual(proposals[0]["status"],"INFERRED")

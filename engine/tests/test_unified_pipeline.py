@@ -98,7 +98,7 @@ class PipelineTests(unittest.TestCase):
                    finding_evidence=(applicable(),),
                    predictions=(predicted(snapshot),),
                    remaining_error_budgets={"authorization":10})
-        self.assertEqual(result["selection_status"],"ELIGIBLE_RESEARCH_LAB_PLAN")
+        self.assertEqual(result["selection_status"],"ELIGIBLE_LAB_PLAN")
         self.assertEqual(result["selected_action"],"resync_policy")
         self.assertEqual(result["applicability"],"VERIFIED")
         self.assertEqual(result["policy_screened"]["resync_policy"]["decision"],

@@ -7,7 +7,7 @@ package org.predictshield.mechanism;
  * events and policy-cache refreshes carry that identifier. Enforcement
  * points reject policy events for any other trial, even when the late event
  * has a higher revision. Revision ordering applies only within one trial.
- * This is a research isolation mechanism, not a production authorization
+ * This is a lab isolation mechanism, not a production authorization
  * protocol or a substitute for broker transactional guarantees.</p>
  *
  * @param revision monotonic authority revision within the current trial

@@ -1,4 +1,4 @@
-"""End-to-end research smoke test: real SNMP assets -> graph -> trained risk score.
+"""End-to-end smoke test: real SNMP assets -> graph -> trained risk score.
 
 The training labels and service dependency are deliberately synthetic.
 No claim of calibrated telecom risk or production-ready defense is made.
@@ -74,7 +74,6 @@ def run(output:Path):
       "model_trained_on_synthetic_labels_only":True,
       "training_test_topologies":training_report["test_groups"],
       "risk_model_prediction":score,
-      "independent_ai_superiority_established":False,
       "telco_field_risk_calibration_established":False,
       "defense_action_executed":False}
     output.parent.mkdir(parents=True,exist_ok=True)

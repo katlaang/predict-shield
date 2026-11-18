@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
  * <p>Four actions are supported: resync_policy, restart_enforcer,
  * gateway_restrict, and monitor_only. Conditions and action effects are
  * deliberately simplified. This code is strictly for a disposable localhost
- * research lab, never for production or operational technology.</p>
+ * lab, never for production or operational technology.</p>
  *
  * <p>The oracle endpoint exposes internal logical truth only to the
  * separately credentialed evaluation collector. Since the oracle runs in

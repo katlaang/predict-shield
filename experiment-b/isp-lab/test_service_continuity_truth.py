@@ -2,7 +2,7 @@ import unittest
 from isp_defense import execute_and_verify
 
 TOKEN="test-"+"a"*40
-P={"research_lab_only":True,"selected_action":"isolate_access","policy_decision":"ELIGIBLE_LAB_ONLY",
+P={"lab_only":True,"selected_action":"isolate_access","policy_decision":"ELIGIBLE_LAB_ONLY",
    "scope_complete":True,"approved_lab_asset":"simulated-broadband-access"}
 
 class ServiceContinuityTruthTests(unittest.TestCase):

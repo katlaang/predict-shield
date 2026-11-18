@@ -2,7 +2,7 @@
 
 Unlike the conservative advisory context, this uses two LIVE lab inventories
 and independently observed gateway forwards. Trust is bounded to a disposable
-localhost research lab; it is not a production source attestation.
+localhost lab; it is not a production source attestation.
 """
 from __future__ import annotations
 

@@ -1,6 +1,6 @@
 """Bind an eligible AI vulnerability case to the EXISTING JVM/Kafka lab executor.
 
-This is a narrow research bridge, not a second actuator. It independently
+This is a narrow lab bridge, not a second actuator. It independently
 refreshes bounded lab scope and learned-action policy immediately before
 dispatch. The independent oracle verifies authorization policy only, NEVER
 a matched CVE's remediation. A lab result cannot establish production safety.
@@ -44,7 +44,7 @@ def execute_bound_lab_case(plan: dict, *, project: str, source_discovery: dict,
             or control_token == oracle_token):
         raise ValueError("Distinct disposable lab control and oracle tokens required")
     if (not isinstance(plan, dict) or plan.get("schema") != "predict-shield/unified-ai-case-plan/1"
-            or plan.get("selection_status") != "ELIGIBLE_RESEARCH_LAB_PLAN"
+            or plan.get("selection_status") != "ELIGIBLE_LAB_PLAN"
             or plan.get("dispatch_authorized") is not False
             or plan.get("independent_verification") != "NOT_EVALUATED"):
         raise ValueError("No unexecuted independently screened case plan")
@@ -144,7 +144,7 @@ def execute_bound_lab_case(plan: dict, *, project: str, source_discovery: dict,
                                   remaining_budget=remaining_lab_budget,
                                   restart_permitted=False)
     screened = recommendation.get("screened", {}).get(action, {})
-    if (recommendation.get("research_lab_only") is not True or
+    if (recommendation.get("lab_only") is not True or
             recommendation.get("action_executed") is not False or
             recommendation.get("abstained") is not False or
             recommendation.get("selected_action") != action or
@@ -201,5 +201,5 @@ def execute_bound_lab_case(plan: dict, *, project: str, source_discovery: dict,
         "independent_oracle_requeried": True,
         "unmeasured_service_continuity": "UNKNOWN",
         "external_critical_infrastructure_validated": False,
-        "research_lab_only": True,
+        "lab_only": True,
     }

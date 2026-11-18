@@ -1,4 +1,4 @@
-# Optional research-model training dependencies.
+# Optional model-training dependencies.
 # Not required for manifest generation or the Java/Docker laboratory.
 numpy>=2.0,<3.0
 scikit-learn>=1.5,<2.0

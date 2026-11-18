@@ -20,7 +20,7 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Install Net-SNMP tools and research model dependencies
+      - name: Install Net-SNMP tools and model dependencies
         run: |
           sudo apt-get update && sudo apt-get install -y snmp
           python -m pip install -r ../requirements-ml.txt

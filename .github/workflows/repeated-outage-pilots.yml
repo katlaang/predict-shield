@@ -53,7 +53,7 @@ jobs:
           assert data["independent_fault_configuration_count"] == 1
           assert data["ai_action_model_trained_or_tested"] is False
           assert data["critical_infrastructure_operator_pilot"] is False
-          assert data["research_conclusion"] == "EXPLORATORY_MECHANISM_REPEATS_ONLY"
+          assert data["conclusion"] == "EXPLORATORY_MECHANISM_REPEATS_ONLY"
           assert len(data["batch_records"]) == 2
           assert all(x["verification_status"] == "INDETERMINATE"
                      and x["policy_truth"] == "UNKNOWN"
@@ -79,11 +79,11 @@ jobs:
             experiment-b/mechanism-lab/reports/physical-batch-*.json
             experiment-b/mechanism-lab/reports/ci-evidence-sha256.txt
           if-no-files-found: warn
-      - name: Upload standalone research demo UI with actual pilot JSON
+      - name: Upload standalone lab demo UI with actual pilot JSON
         if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: predict-shield-research-demo
+          name: predict-shield-lab-demo
           path: demo/
       - name: Destroy disposable lab
         if: always()

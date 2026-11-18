@@ -33,11 +33,11 @@ Expected synthetic observation: `router-z` is reported as `observed_not_register
 - Asset IDs require deterministic mapping by the operator. Hostnames/IPs are not universally unique, and this first increment does **not** perform probabilistic entity resolution or learned topology inference.
 - Absence from a particular source cannot establish actual nonexistence.
 - SHA-256 detects accidental report modification, not tampering by a source administrator.
-- Do not claim this is deployed in a real ISP or validates AI superiority. All included tests use synthetic fixtures.
+- Do not claim this is deployed in a real ISP. All included tests use synthetic fixtures.
 
 ## Next milestones
 
 1. Connect authorized SNMPv3 / gNMI / NETCONF read-only adapters and passive LLDP export to real virtual network nodes (e.g. supported Containerlab router images).
 2. Add graph-aware reconciliation across multiple time-separated snapshots and explicit source freshness and confidence evidence.
-3. Create a preregistered hidden-asset and hidden-link benchmark with deterministic baselines, an optional separately trained ML ranking model and **held-out network topologies**.
+3. Evaluate hidden-asset and hidden-link ranking with a separately trained ML model on **held-out network topologies**.
 4. Link observed network/telecom dependencies to the AI risk predictor and independent policy gate, while retaining strict verification and service disruption limits.

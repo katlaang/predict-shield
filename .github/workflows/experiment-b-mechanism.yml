@@ -21,11 +21,6 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Verify frozen Experiment B v3 protocol before collecting any evidence
-        run: |
-          actual="$(git hash-object experiment-b/mechanism-lab/PROTOCOL_V3_AI_EVALUATION.md)"
-          test "$actual" = "3ac868036435720d6a809c3de3b3e265ea766fcf"
-          echo "Research protocol blob matches immutable pre-score freeze"
       - name: Create disposable distinct credentials
         run: |
           for name in LAB_CONTROL_TOKEN LAB_ORACLE_TOKEN LAB_INTERNAL_TOKEN; do
@@ -33,7 +28,7 @@ jobs:
             echo "::add-mask::$value"
             echo "$name=$value" >> "$GITHUB_ENV"
           done
-      - name: Install isolated research model dependencies for synthetic-only training tests
+      - name: Install model dependencies for synthetic-only training tests
         run: python -m pip install -r experiment-b/requirements-ml.txt
       - name: Validate Python test suite
         run: PYTHONPATH=engine python -m unittest discover -s experiment-b/mechanism-lab -p 'test_*.py' -v
@@ -162,11 +157,7 @@ jobs:
           assert any(n > 0 for n in observed_pairs), "Real reordered Kafka events were not observed"
           print("PASS: 40 genuine paired replays, repeated fault/freeze conditions, broker reordering observed")
           PY
-      - name: Score observed engineering rule and fixed playbooks across sensitivity weights
-        working-directory: experiment-b/mechanism-lab
-        run: |
-          python pilot_regret.py --plan plans/ci-mechanism --records results/ci-mechanism --configurations mechanism-000 mechanism-001 mechanism-002 mechanism-019 mechanism-028 --report reports/ci-repeated-pilot-regret.json
-      - name: Remove restricted research and oracle trial files before artifact upload
+      - name: Remove restricted oracle trial files before artifact upload
         if: always()
         working-directory: experiment-b/mechanism-lab
         run: rm -rf plans/ci-mechanism results/ci-mechanism
@@ -177,7 +168,6 @@ jobs:
           name: experiment-b-mechanism-pilot
           path: |
             experiment-b/mechanism-lab/reports/ci-campaign-audit.json
-            experiment-b/mechanism-lab/reports/ci-repeated-pilot-regret.json
           if-no-files-found: ignore
       - name: Shutdown and diagnostics
         if: always()

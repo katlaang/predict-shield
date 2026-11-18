@@ -31,7 +31,7 @@ def select_lab_defense(bundle, pre_action, snapshot, *, remaining_budget: float,
         postcondition="Revoked operation denied at all in-scope lab enforcers",
         reversible=name != "monitor_only",
     ) for name in ACTIONS)
-    # Retain experimental injection metadata only in offline research records;
+    # Retain experimental injection metadata only in offline lab records;
     # the model request receives a pre-action, operator-observable projection.
     # Oracle or post-action fields must fail in the predictor, never be stripped.
     inference_input = {k: v for k, v in pre_action.items() if k != "experimental_conditions"}
@@ -58,7 +58,7 @@ def select_lab_defense(bundle, pre_action, snapshot, *, remaining_budget: float,
         "budget_source": "explicitly-supplied-lab-experimental-limit-not-verified-production-budget",
         "action_executed": False,
         "independently_verified_post_action": False,
-        "research_lab_only": True,
+        "lab_only": True,
     }
 
 

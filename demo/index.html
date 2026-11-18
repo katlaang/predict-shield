@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>PREDICT-SHIELD | Research evidence console</title>
+  <title>PREDICT-SHIELD | Lab evidence console</title>
   <style>
     :root { color-scheme: dark; --base:#080e17; --panel:#101b29; --border:#2d3d50; --ink:#eff4fa; --muted:#aec0d2; --red:#f36565; --blue:#78b4ee; --warn:#edca80; }
     * {box-sizing:border-box} body{margin:0;background:var(--base);color:var(--ink);font:15px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
@@ -30,8 +30,8 @@
 </head>
 <body>
 <main class="shell">
-  <header class="top"><div class="brand"><span>PREDICT</span>-SHIELD <span style="font-weight:400;color:#b9c8dc">/ LAB</span></div><span class="flag">EXPLORATORY RESEARCH ONLY</span></header>
-  <h1>Cyber-defense research console</h1>
+  <header class="top"><div class="brand"><span>PREDICT</span>-SHIELD <span style="font-weight:400;color:#b9c8dc">/ LAB</span></div><span class="flag">EXPLORATORY LAB ONLY</span></header>
+  <h1>Cyber-defense lab console</h1>
   <p class="lede">A read-only viewer of actual disposable Java/Kafka/Docker pilot measurements. The console never executes remediation actions, invents live results, or represents laboratory measurements as evidence of infrastructure effectiveness.</p>
   <div class="controls">
     <label for="report">Open a measured pilot JSON report:</label>
@@ -42,9 +42,9 @@
   <div id="warning" class="notice" role="note">No data loaded. Generate a real repeated-outage pilot report in GitHub Actions or a disposable local Docker lab. This dashboard intentionally does not include simulated success figures.</div>
 
   <section aria-label="Pilot overview" class="layout space">
-    <div class="card"><div class="overline">Physical action replays</div><div id="replays" class="metric">—</div><p class="muted small">Real measured actions, not planned trials</p></div>
-    <div class="card"><div class="overline">Four-arm repeat batches</div><div id="batches" class="metric">—</div><p class="muted small">These are not independent configurations</p></div>
-    <div class="card"><div class="overline">Authority verification</div><div id="verification" class="metric" style="font-size:22px;color:#efc77d">—</div><p class="muted small">Live authority deliberately unavailable</p></div>
+    <div class="card"><div class="overline">Physical action replays</div><div id="replays" class="metric">-</div><p class="muted small">Real measured actions, not planned trials</p></div>
+    <div class="card"><div class="overline">Four-arm repeat batches</div><div id="batches" class="metric">-</div><p class="muted small">These are not independent configurations</p></div>
+    <div class="card"><div class="overline">Authority verification</div><div id="verification" class="metric" style="font-size:22px;color:#efc77d">-</div><p class="muted small">Live authority deliberately unavailable</p></div>
   </section>
 
   <section class="card space">
@@ -60,10 +60,10 @@
   </section>
 
   <div class="columns space">
-    <section class="card"><h2>Research evidence</h2><div id="metadata" class="muted">Load a report to inspect source revision, recorded batches, and limitations.</div></section>
+    <section class="card"><h2>Lab evidence</h2><div id="metadata" class="muted">Load a report to inspect source revision, recorded batches, and limitations.</div></section>
     <section class="card"><h2>What this demo does not prove</h2>
       <p class="muted">These outage studies do not demonstrate that an AI model chose better defenses. The registered action-effectiveness training study has not yielded a complete held-out result. No operator pilot establishes improved U.S. critical-infrastructure resilience.</p>
-      <p class="status">No production action control. No AI superiority or field-impact claim.</p>
+      <p class="status">No production action control. No field-impact claim.</p>
       <a href="https://github.com/katlaang/predict-shield" target="_blank" rel="noopener noreferrer">View source repository</a>
     </section>
   </div>
@@ -75,7 +75,7 @@ const actions={resync_policy:"Resynchronize policy",restart_enforcer:"Restart en
 const fmt=n=>Number(n).toFixed(2);
 const show=(id,value)=>$(id).textContent=value;
 function clear(){
-  ["replays","batches","verification"].forEach(id=>show(id,"—"));
+  ["replays","batches","verification"].forEach(id=>show(id,"-"));
   $("actions").replaceChildren();
   const cell=document.createElement("tr"),td=document.createElement("td");td.colSpan=5;td.className="muted";td.textContent="No physical records loaded";cell.append(td);$("actions").append(cell);
   $("metadata").textContent="Load a report to inspect source revision, recorded batches, and limitations.";
@@ -86,7 +86,7 @@ function assert(x,msg){if(!x)throw Error(msg);}
 function load(data){
   assert(data && data.schema==="predict-shield/repeated-physical-outage-pilot/1","Unsupported pilot report schema");
   assert(data.record_type==="MEASURED_DISPOSABLE_DOCKER_PHYSICAL_REPLAYS","Not an executed Docker measurement");
-  assert(data.ai_action_model_trained_or_tested===false && data.v31_feasibility_evaluated===false && data.critical_infrastructure_operator_pilot===false,"Misclassified research evidence");
+  assert(data.ai_action_model_trained_or_tested===false && data.v31_feasibility_evaluated===false && data.critical_infrastructure_operator_pilot===false,"Misclassified lab evidence");
   assert(Number.isInteger(data.physical_four_action_batches) && data.physical_four_action_batches>0 && data.physical_four_action_batches<=5,"Invalid repeat batch count");
   assert(data.physical_action_replays===4*data.physical_four_action_batches && data.batch_records.length===data.physical_four_action_batches,"Incomplete physical pilot");
   assert(data.independent_fault_configuration_count===1,"Unverified multi-configuration claim");
@@ -128,7 +128,7 @@ function load(data){
     ["Source commit",data.source_commit_sha],
     ["Declared fault",data.fault_family],
     ["Independent configurations",String(data.independent_fault_configuration_count)],
-    ["Research status",data.research_conclusion],
+    ["Lab status",data.conclusion],
     ["AI decision test","NOT RUN"],
     ["Critical-infrastructure pilot","NOT RUN"],
   ];

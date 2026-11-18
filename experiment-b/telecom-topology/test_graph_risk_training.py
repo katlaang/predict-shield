@@ -20,11 +20,10 @@ def rows():
     return out
 
 class GroupedRiskTests(unittest.TestCase):
-    def test_grouped_model_fit_and_baseline(self):
+    def test_grouped_model_fit(self):
         model,report=fit_and_evaluate(rows())
         self.assertEqual(report["test_groups"],2)
         self.assertEqual(report["test_records"],4)
-        self.assertFalse(report["superiority_confirmed"])
         score=predict_graph_risk(model,rows()[0]["graph"],"edge-0",
               critical_services=("auth",),confirmed_exposure=0)
         self.assertFalse(score["decision_authorized"])

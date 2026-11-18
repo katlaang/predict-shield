@@ -1,4 +1,4 @@
-"""Research-only learned ranking of candidate telecom topology edges.
+"""Lab-only learned ranking of candidate telecom topology edges.
 
 Training labels are independently verified links. Model inputs are only
 pre-verification evidence indicators. Group isolation prevents a topology
@@ -63,12 +63,6 @@ def vector(row: dict) -> list[int]:
     return [int(row["features"][k]) for k in FEATURES]
 
 
-def rule_baseline(row: dict) -> float:
-    """Strong discovery baseline: LLDP, routing adjacency or observed bidirectional flow."""
-    f = row["features"]
-    return float(f["lldp_seen"] or f["routing_adjacency_seen"] or f["bidirectional_flow_seen"])
-
-
 def confusion(y: list[bool], predictions: list[float], threshold: float = 0.5) -> dict:
     if len(y) != len(predictions):
         raise ValueError("Mismatched evaluation arrays")
@@ -98,7 +92,6 @@ def train_evaluate(rows: list[dict]) -> tuple[dict,dict]:
     estimator.fit([vector(r) for r in train],[int(r["verified_link"]) for r in train])
     probs = [float(p[1]) for p in estimator.predict_proba([vector(r) for r in test])]
     labels = [r["verified_link"] for r in test]
-    baseline = [rule_baseline(r) for r in test]
     fitted = {
         "schema":"predict-shield/telecom-link-logistic/1",
         "features":list(FEATURES),
@@ -109,24 +102,22 @@ def train_evaluate(rows: list[dict]) -> tuple[dict,dict]:
         "training_row_sha256":hashlib.sha256(
             json.dumps(train,sort_keys=True,separators=(",",":")).encode()).hexdigest(),
     }
-    comparison = {
+    evaluation = {
         "schema":"predict-shield/topology-link-heldout/1",
         "split_integrity":summary,
         "model":"LogisticRegression",
         "model_confusion":confusion(labels,probs),
-        "deterministic_baseline_confusion":confusion(labels,baseline),
         "threshold":0.5,
         "test_topologies":sorted({r["topology_id"] for r in test}),
         "test_records":len(test),
-        "paired_test_predictions":[{"topology_id":r["topology_id"],"source":r["source"],
+        "test_predictions":[{"topology_id":r["topology_id"],"source":r["source"],
             "target":r["target"],"verified_link":r["verified_link"],
-            "truth_evidence_id":r.get("truth_evidence_id"),"model_score":p,
-            "baseline_score":b} for r,p,b in zip(test,probs,baseline)],
+            "truth_evidence_id":r.get("truth_evidence_id"),"model_score":p}
+            for r,p in zip(test,probs)],
         "synthetic_or_external_provenance_must_be_reported":True,
-        "model_superiority_claim":False,
         "production_topology_verified":False,
     }
-    return fitted, comparison
+    return fitted, evaluation
 
 
 def infer_pairs(bundle: dict, candidates: list[dict]) -> list[dict]:
@@ -159,19 +150,19 @@ def infer_pairs(bundle: dict, candidates: list[dict]) -> list[dict]:
 
 
 def main():
-    p=argparse.ArgumentParser(description="Research-only grouped topology inference")
+    p=argparse.ArgumentParser(description="Lab-only grouped topology inference")
     p.add_argument("--training-data",required=True,type=Path)
     p.add_argument("--model-output",required=True,type=Path)
     p.add_argument("--report-output",required=True,type=Path)
     args=p.parse_args()
     if args.model_output.exists() or args.report_output.exists():
-        p.error("Refuse to overwrite research artifacts")
+        p.error("Refuse to overwrite lab artifacts")
     rows=json.loads(args.training_data.read_text())
     bundle,report=train_evaluate(rows)
     for path,value in ((args.model_output,bundle),(args.report_output,report)):
         path.parent.mkdir(parents=True,exist_ok=True)
         path.write_text(json.dumps(value,indent=2,sort_keys=True)+"\n")
-    print("Evaluated learned topology link ranking and deterministic baseline:",report["test_records"],"held-out examples")
+    print("Evaluated learned topology link ranking:",report["test_records"],"held-out examples")
 
 
 if __name__=="__main__":

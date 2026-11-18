@@ -13,4 +13,4 @@ python ../../experiment-a/partial_remediation.py \
   --execute-lab --output reports/experiment-a-partial.json
 ```
 
-The result is limited to an authorization-drift laboratory mechanism and lacks a calibrated AI strategy. The next research task is to compare independent verification with self-reported action success under multiple registered partial-remediation mechanisms, record exact source commits and report false-VERIFIED and indeterminate rates.
+The result is limited to an authorization-drift laboratory mechanism and lacks a calibrated AI strategy. The next task is to compare independent verification with self-reported action success under multiple registered partial-remediation mechanisms, record exact source commits and report false-VERIFIED and indeterminate rates.

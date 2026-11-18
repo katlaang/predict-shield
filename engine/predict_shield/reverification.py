@@ -1,6 +1,6 @@
 """Deterministic re-verification scheduling baselines.
 
-Offline research component. It schedules *requests* for independent probes and
+Offline component. It schedules *requests* for independent probes and
 never executes probes, labels an action VERIFIED, or accesses the private oracle.
 """
 from __future__ import annotations
@@ -47,8 +47,8 @@ def schedule(subjects: list[Subject], *, now: int, budget: int,
     'change': due if changed since last verification
     'adaptive': due if changed, interval elapsed, or high-risk shortened window
 
-    Fixed and change policies are required non-AI comparators; 'adaptive' is
-    an explicitly heuristic comparator, not a learned regression predictor.
+    Fixed and change policies are deterministic schedules; 'adaptive' is an
+    explicitly heuristic schedule, not a learned regression predictor.
     """
     if now < 0 or budget < 0 or interval < 1 or high_risk_after < 1:
         raise ValueError("invalid time, budget or intervals")

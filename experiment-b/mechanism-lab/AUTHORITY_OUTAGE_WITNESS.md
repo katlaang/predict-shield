@@ -14,7 +14,7 @@ The test restores the authority in `finally` and checks readiness. It retains on
 
 ## Scope and remaining blockers
 
-This is **not** the six-family, four-action, two-repeat v3.1 feasibility pilot. It does not yet measure action-specific service disruption and time-integrated exposure under an outage, guarantee atomic independently attested desired-policy persistence, verify authorized-user behavior for every node or produce a validated utility outcome for ranking. Those requirements remain in issue #36. No positive AI selection or critical-infrastructure field effectiveness claim is justified.
+It does not yet measure action-specific service disruption and time-integrated exposure under an outage, guarantee atomic independently attested desired-policy persistence, verify authorized-user behavior for every node or produce a validated utility outcome for ranking. Those requirements remain in issue #36. No positive AI selection or critical-infrastructure field effectiveness claim is justified.
 
 Run from the disposable lab only:
 

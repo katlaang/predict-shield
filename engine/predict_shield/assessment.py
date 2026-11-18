@@ -1,6 +1,6 @@
 """Conservative, scope-aware evidence assessment.
 
-Pre-alpha research implementation. No external systems are modified.
+Pre-alpha implementation. No external systems are modified.
 A trusted, current, complete independent check is required for VERIFIED.
 """
 from dataclasses import dataclass

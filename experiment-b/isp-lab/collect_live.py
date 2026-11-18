@@ -37,8 +37,7 @@ def run(output: Path):
        "declared_minus_observed":drift["registered_not_observed"],
        "graph_digest":graph["sha256"],
        "physical_topology_verified":False,
-       "real_isp_validated":False,
-       "ai_superiority_established":False}
+       "real_isp_validated":False}
     if output.exists():
         raise FileExistsError("Evidence file exists")
     output.parent.mkdir(parents=True,exist_ok=True)

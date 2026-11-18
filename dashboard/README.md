@@ -1,6 +1,6 @@
 # PREDICT-SHIELD asset dashboard (prototype)
 
-This is a first prototype of the live operator dashboard called out as a gap in the main [README](../README.md)'s built-vs-planned table. It is a different thing from [`demo/`](../demo/README.md): that directory is a zero-dependency, evidence-grade research console for the Java/Kafka mechanism lab's measured pilot results. This directory is a customer-facing product UI prototype, and it is built differently on purpose: React and Three.js, loaded from CDN, rendering an interactive 3D graph of a network's assets and the data flowing between them.
+This is a first prototype of the live operator dashboard called out as a gap in the main [README](../README.md)'s built-vs-planned table. It is a different thing from [`demo/`](../demo/README.md): that directory is a zero-dependency, evidence-grade lab console for the Java/Kafka mechanism lab's measured pilot results. This directory is a customer-facing product UI prototype, and it is built differently on purpose: React and Three.js, loaded from CDN, rendering an interactive 3D graph of a network's assets and the data flowing between them.
 
 ## What it shows
 

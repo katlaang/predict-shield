@@ -14,7 +14,7 @@ unreviewed accept/reject decision on its own, and not to replace the grounding
 check above.
 
 What it is not: a jailbreak classifier trained on attack data (that is a
-larger, separate research effort). This is the fast, auditable first layer the
+larger, separate effort). This is the fast, auditable first layer the
 rapid-response literature calls for: recognizing a *class* of attack from a
 handful of concrete patterns, so a batch of advisories can be triaged before
 any of them reach a model prompt.

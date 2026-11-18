@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
  * Mutating a desired revision queues an event, not a claim of successful
  * enforcement. A policy resynchronization republishes the existing revision
  * so an enforcement point can recover from missed or reordered updates.
- * This research fixture persists revisions only in memory and must never
+ * This lab fixture persists revisions only in memory and must never
  * serve real identity or production authorization controls.</p>
  *
  * <p>Both control and private read paths require disposable credentials.

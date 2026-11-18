@@ -89,7 +89,7 @@ def read_kev(path: str | Path, snapshot_date: str, as_of: str) -> tuple[dict, di
 def prioritize(assets: list[dict], epss: dict, kev: dict, as_of: str) -> list[dict]:
     """Rank asset-vulnerability pairs, retaining missing EPSS as unknown.
 
-    Composite is a transparent, uncalibrated research heuristic. It is not
+    Composite is a transparent, uncalibrated heuristic. It is not
     exploit probability, monetary loss, CVSS, or a model prediction.
     """
     _date(as_of)

@@ -7,10 +7,10 @@ Verification outcomes are inspected for matching metadata but never supplied
 as model features. Configurations, not individual repeated trials, are split
 60/20/20 for train, calibration and held-out test.
 
-A fitted random forest is compared to train-only action means and train-only
-action-by-fault and action-by-fault-by-target lookup baselines. The 90% nominal
-grouped split-conformal radius is evaluated on held-out configuration groups, and does
-not justify safety-critical automatic execution under distribution shift.
+A random forest is fitted on training groups. Its held-out prediction error
+and the 90% nominal grouped split-conformal interval coverage are reported on
+held-out configuration groups; neither justifies safety-critical automatic
+execution under distribution shift.
 
 This experiment intentionally produces an evaluation report only, not an
 implicitly deployable model. Serving a calibrated model is a separate
@@ -24,7 +24,6 @@ import json
 import math
 import os
 from collections import Counter
-from decision_eval import evaluate_sensitivity, tune_rule_on_training_groups
 from pathlib import Path
 
 FAULTS = ("loss", "delay", "duplicate", "reorder")
@@ -35,8 +34,7 @@ SPLITS = {"train": 60, "calibration": 20, "test": 20}
 EXPECTED_TRIALS = 1200
 
 # The trained model must not see laboratory-injected fault labels or timing.
-# Those variables remain available only for post-hoc stratification and an
-# explicitly *privileged* diagnostic lookup baseline.
+# Those variables remain available only for post-hoc stratification.
 OPERATOR_FEATURES = (
     "operator_observed_count", "operator_missing_count",
     "operator_revision_spread", "operator_max_cache_age_ms",
@@ -288,11 +286,11 @@ def grouped_conformal_radius(
 
 def train_evaluate(rows: list[dict], seed: int = 20261110,
                    *, export_path: Path | None = None) -> dict:
-    """Fit models on training groups and compare once on held-out groups.
+    """Fit models on training groups, calibrate on calibration groups, and
+    report prediction error and interval coverage once on held-out groups.
 
-    Uses an operational action-only lookup baseline and an explicitly privileged
-    diagnostic fault/target lookup that is not considered a fair operational competitor. No test-set results are used to select features,
-    hyperparameters, interval radii, or baselines.
+    No test-set results are used to select features, hyperparameters or
+    interval radii.
     """
     groups = {name: [r for r in rows if r["partition"] == name]
               for name in SPLITS}
@@ -346,38 +344,8 @@ def train_evaluate(rows: list[dict], seed: int = 20261110,
         calibration_radii[label] = radius
         low = np.clip(pred_test - radius, 0, upper)
         high = np.clip(pred_test + radius, 0, upper)
-        lookup = {}
-        for r in train:
-            for key in (
-                (r["action"], r["fault"], r["target"]),
-                (r["action"], r["fault"]),
-                (r["action"],),
-            ):
-                lookup.setdefault(key, []).append(r[label])
-        averages = {k: float(np.mean(v)) for k, v in lookup.items()}
-        def baseline(r):
-            for key in (
-                (r["action"], r["fault"], r["target"]),
-                (r["action"], r["fault"]),
-                (r["action"],),
-            ):
-                if key in averages:
-                    return averages[key]
-            raise ValueError("Action not seen in training")
-        baseline_test = np.asarray([baseline(r) for r in test])
-        # Comparable deployment baseline: action averages only, without the
-        # laboratory's hidden fault label or injected target identity.
-        action_means = {action: float(np.mean([
-            item[label] for item in train if item["action"] == action]))
-            for action in ACTIONS}
-        action_baseline = np.asarray([action_means[item["action"]] for item in test])
         report["metrics"][label] = {
-            "action_only_lookup_heldout_mae": float(mean_absolute_error(
-                y["test"], action_baseline)),
-            "privileged_fault_lookup_is_not_operational_baseline": True,
             "model_heldout_mae": float(mean_absolute_error(y["test"], pred_test)),
-            "privileged_fault_lookup_heldout_mae": float(mean_absolute_error(
-                y["test"], baseline_test)),
             "marginal_interval_coverage": float(np.mean(
                 (y["test"] >= low) & (y["test"] <= high))),
             "heldout_configuration_group_coverage": float(np.mean([
@@ -391,53 +359,6 @@ def train_evaluate(rows: list[dict], seed: int = 20261110,
             "heldout_test_count": len(test),
             "caveat": "Only measured laboratory behavior; not conditional service safety",
         }
-    # Evaluate the complete *decision*, not only per-target regression MAE.
-    # The hidden test outcomes are read exclusively by evaluate_regret as a
-    # hindsight scoring oracle, never as model features or action preferences.
-    test_rows = groups["test"]
-    offline_predictions = {}
-    for i, row in enumerate(test_rows):
-        key = (row["group"], row["repeat"], row["action"])
-        if key in offline_predictions:
-            raise ValueError("Duplicate held-out decision candidate")
-        offline_predictions[key] = {
-            label: max(0.0, float(model.predict(
-                matrices["test"][i:i+1]
-            )[0]))
-            for label, model in fitted_models.items()
-        }
-    # Fit the strongest declared deterministic comparator exclusively on
-    # 60 training configurations; apply it unchanged to all test strata and
-    # all three objective sensitivity weights.
-    tuned_rule = tune_rule_on_training_groups(groups["train"])
-    report["train_only_tuned_rule"] = tuned_rule
-    report["offline_decision_sensitivity"] = evaluate_sensitivity(
-        test_rows, offline_predictions, tuned_rule["parameters"]
-    )
-    # A model beating the mean-action baseline in regression MAE is NOT the
-    # same as selecting better interventions. The following paired decision
-    # audit selects its strongest deterministic comparator on calibration
-    # configurations only, then tests the AI on never-used held-out groups.
-    # Even a positive lab result explicitly does not imply field efficacy.
-    from decision_superiority_audit import evaluate as audit_decision_superiority
-    report["heldout_decision_superiority_audit"] = audit_decision_superiority(
-        rows, offline_predictions, tuned_rule["parameters"]
-    )
-    # Prospective crossover: describe results at every declared difficulty
-    # level without filtering for strata where AI happens to outperform a rule.
-    report["complexity_crossover"] = {}
-    for level in ("SIMPLE", "INTERACTION", "PARTIAL_VISIBILITY"):
-        selected = [r for r in test_rows if r["complexity_stratum"] == level]
-        if selected:
-            keys = {(r["group"], r["repeat"], r["action"]) for r in selected}
-            report["complexity_crossover"][level] = evaluate_sensitivity(
-                selected, {k: p for k, p in offline_predictions.items() if k in keys},
-                tuned_rule["parameters"]
-            )
-        else:
-            report["complexity_crossover"][level] = {
-                "not_evaluable": "No registered held-out groups in this stratum"
-            }
     if export_path is not None:
         # Only load model artifacts created in a trusted local environment.
         # The scikit-learn serialization is pickle-based and unsafe to load

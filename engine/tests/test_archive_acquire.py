@@ -53,7 +53,7 @@ class PinnedSourceTests(unittest.TestCase):
 
     def test_feature_commit_cannot_be_later_than_cutoff(self):
         self.manifest["kev_before"]["commit_observed_date"] = "2026-10-03"
-        with self.assertRaisesRegex(ValueError, "after research as_of"):
+        with self.assertRaisesRegex(ValueError, "after the as_of date"):
             acquire(self.manifest, self.root / "data", fetcher=self.by_url.__getitem__)
 
     def test_unpinned_refs_and_foreign_sources_rejected(self):

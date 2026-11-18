@@ -59,7 +59,7 @@ class PlanSastCaseTests(unittest.TestCase):
         s = snap()
         result = run(scope_snapshot=s, predictions=(predicted(s),),
                      remaining_error_budgets={"web-app": 5.0})
-        self.assertEqual(result["selection_status"], "ELIGIBLE_RESEARCH_LAB_PLAN")
+        self.assertEqual(result["selection_status"], "ELIGIBLE_LAB_PLAN")
         self.assertEqual(result["selected_action"], "apply_parameterized_query_patch")
         self.assertEqual(result["confirmed_present"], "VERIFIED")
 

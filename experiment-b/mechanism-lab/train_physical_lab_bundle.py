@@ -1,8 +1,7 @@
 """Fit a local action-risk/disruption model from five original audited physical shards.
 
-All 100 groups are already historically examined: evaluation is exploratory,
-not new independent superiority evidence. Train only on original 60 train
-groups; calibrate only on original 20 calibration groups.
+Train only on the original 60 train groups; calibrate only on the original
+20 calibration groups.
 """
 from __future__ import annotations
 
@@ -13,7 +12,7 @@ import zipfile
 from collections import Counter, defaultdict
 from pathlib import Path
 
-from train_group_stability import training_rows, SHARD_SCHEMA, ACTIONS
+from physical_shards import training_rows, SHARD_SCHEMA, ACTIONS
 from train import train_evaluate
 
 
@@ -70,7 +69,6 @@ def train_physical(archives: list[Path], model_path: Path) -> dict:
     report["original_calibration_groups"]=20
     report["previously_examined_test_groups"]=20
     report["new_independent_test_groups"]=0
-    report["independent_superiority_claim"]=False
     report["model_sha256"]=hashlib.sha256(model_path.read_bytes()).hexdigest()
     return report
 

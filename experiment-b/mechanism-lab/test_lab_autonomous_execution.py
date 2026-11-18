@@ -4,7 +4,7 @@ from lab_autonomous_execution import execute_lab_recommendation
 
 
 def recommendation(action="resync_policy", eligible=True):
-    return {"research_lab_only":True, "abstained":False, "action_executed":False,
+    return {"lab_only":True, "abstained":False, "action_executed":False,
             "selected_action":action,
             "screened":{action:{"decision":"ELIGIBLE_AUTOMATIC" if eligible else "REJECT"}}}
 

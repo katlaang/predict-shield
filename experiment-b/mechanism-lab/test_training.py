@@ -1,4 +1,4 @@
-"""No-network validation of measured-only model training and lookup baselines.
+"""No-network validation of measured-only model training.
 
 Any in-memory synthetic examples here are unit-test fixtures, not collected
 Experiment B measurements or publishable machine-learning results.
@@ -40,7 +40,7 @@ class MeasuredModelTrainingTests(unittest.TestCase):
         self.assertEqual(to_features(row), baseline)
 
     def test_synthetic_training_calibration_export_and_checksum(self):
-        """Exercise model fitting on toy fixtures without implying research results."""
+        """Exercise model fitting on toy fixtures without implying lab results."""
         examples = []
         for group in range(12):
             partition = ("train" if group < 8 else

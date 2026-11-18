@@ -31,12 +31,12 @@ python -m unittest discover -s experiment-b -p "test_*.py" -v
 ```
 Tests are mock-transport unit tests and do not prove the Java lab compiles or runs. Integration test evidence must be recorded separately.
 
-## Research controls and limitations
+## Controls and limitations
 - Define both services' expected denial behavior before running tests. See `fixtures/expected-policy.json`.
 - Keep the disposable lab token private. The token gates the **lab mutation endpoint**, not an enterprise authorization control.
 - All services bind to the loopback interface; do not expose this intentionally flawed testbed.
 - Reports include observations, action attempts, and post-action observations. They are *not* cryptographically authenticated.
-- The next checkpoint must add real fault injection, explicit policy evaluation, baseline comparisons, audit persistence, repeated test runs, and service-disruption measurements.
+- The next checkpoint must add real fault injection, explicit policy evaluation, audit persistence, repeated test runs, and service-disruption measurements.
 
 
 ## v2.2 reproducible AI training-data extension
@@ -108,8 +108,8 @@ python train_action_model.py --data results --out reports/model-evaluation.json
 
 Training will refuse missing records, duplicate run IDs, mismatched groups,
 or leaked train/calibration/test partitions. The prototype fits models for
-residual exposure and legitimate-traffic failures, compares a train-only
-action/fault-family lookup baseline and evaluates on held-out configurations.
+residual exposure and legitimate-traffic failures and evaluates on held-out
+configurations.
 Its intervals use split-conformal calibration, with marginal rather than
 per-service safety guarantees. These are **lab fixture outcomes**, not proof
 of model benefit in a real network.

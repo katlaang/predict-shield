@@ -11,7 +11,6 @@ Method:
   - 60 configuration groups for model training
   - 20 configuration groups for split-conformal calibration
   - 20 configuration groups for held-out evaluation
-  - paired comparison against train-only action / fault-family mean baselines
 
 The regression models predict:
   - residual exposed target fraction (oracle-labeled)
@@ -165,15 +164,6 @@ def conformal_radius(y_cal: np.ndarray, predictions_cal: np.ndarray,
     return float(residuals[index])
 
 
-def action_fault_means(train: list[dict], label: str) -> dict[tuple[str, str], float]:
-    """Compute a deliberately competitive action-and-fault lookup baseline."""
-    sums: dict[tuple[str, str], list[float]] = {}
-    for example in train:
-        key = (example["action_id"], example["fault_family"])
-        sums.setdefault(key, []).append(float(example[label]))
-    return {key: float(np.mean(values)) for key, values in sums.items()}
-
-
 def train_and_report(examples: list[dict], seed: int = 20261110) -> dict:
     """Fit two supervised regressors and evaluate once on held-out groups.
 
@@ -224,20 +214,8 @@ def train_and_report(examples: list[dict], seed: int = 20261110) -> dict:
         radius = conformal_radius(y["calibration"], predicted_cal)
         lower = np.clip(predicted_test - radius, 0, 1)
         upper = np.clip(predicted_test + radius, 0, 1)
-        lookup = action_fault_means(train, label)
-        global_action = {
-            action: float(np.mean([r[label] for r in train if r["action_id"] == action]))
-            for action in ACTIONS
-        }
-        baseline_predictions = np.array([
-            lookup.get((row["action_id"], row["fault_family"]),
-                       global_action[row["action_id"]])
-            for row in test
-        ])
         result["targets"][label] = {
             "held_out_model_mae": float(mean_absolute_error(y["test"], predicted_test)),
-            "held_out_action_fault_lookup_mae": float(mean_absolute_error(
-                y["test"], baseline_predictions)),
             "held_out_interval_coverage": float(np.mean(
                 (y["test"] >= lower) & (y["test"] <= upper))),
             "nominal_marginal_coverage": 0.90,

@@ -1,6 +1,6 @@
 """Generate an explicit fictional asset/advisory case for local-model smoke tests.
 
-These are NOT real vulnerabilities, network inventories or research labels.
+These are NOT real vulnerabilities, network inventories or labels.
 """
 from __future__ import annotations
 
@@ -36,7 +36,7 @@ def generate_case(directory: Path) -> dict:
     advisories=[{"cve":cve,"purl":purl,"source":"fictional-test-advisory",
                 "text":"Fictional test only: an example package may require a vendor review. "
                        "No verified exploitation, remediation or customer impact exists."}]
-    actions={"schema":"predict-shield/research-action-catalog/1",
+    actions={"schema":"predict-shield/lab-action-catalog/1",
              "allowed_verification_checks":["review_version","reconcile_configuration"],
              "actions":[{"action_id":"request_security_review","tier":"APPROVAL",
                          "affected_services":["fictional-service"],

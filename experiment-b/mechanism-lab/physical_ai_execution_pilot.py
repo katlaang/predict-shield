@@ -1,6 +1,6 @@
 """One predeclared physical lab model->policy->action->oracle pilot.
 
-Train on original measured research data separately. This runner uses ONLY
+Train on original measured lab data separately. This runner uses ONLY
 new pre-action HTTP/operator telemetry and a local trusted model artifact.
 Never use private oracle labels as inference features.
 """
@@ -28,8 +28,7 @@ def run(*, project: str, model: Path, trusted_sha256: str, control_token: str,
         raise ValueError("Expected model SHA-256 required from trusted local manifest")
     bundle=load_local_bundle(model,trusted_sha256=trusted_sha256)
     wait_ready()
-    # One fixed configuration. This is a new physical execution, not a
-    # new independent fault family or confirmatory AI-superiority study.
+    # One fixed configuration: a new physical execution of a known fault family.
     setup_fault(control_token, ttl_ms=5000, delay_ms=125,
                 fault_target="enforcer-b", fault_mode="loss",
                 oracle_token=oracle_token, gateway_includes_hidden=True,
@@ -75,7 +74,6 @@ def run(*, project: str, model: Path, trusted_sha256: str, control_token: str,
         "execution":execution,
         "laboratory_only":True,
         "independent_new_fault_family":False,
-        "new_independent_superiority_evidence":False,
         "production_service_budget_verified":False,
     }
     report["sha256"]=hashlib.sha256(

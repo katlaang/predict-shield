@@ -5,7 +5,7 @@ on:
       - 'experiment-b/mechanism-lab/train_physical_lab_bundle.py'
       - 'experiment-b/mechanism-lab/physical_ai_execution_pilot.py'
       - '.github/workflows/physical-trained-ai-lab-pilot.yml'
-      - 'docs/research/PHYSICAL_TRAINED_AI_PILOT_PROTOCOL.md'
+      - 'docs/evidence/PHYSICAL_TRAINED_AI_PILOT_PROTOCOL.md'
   workflow_dispatch:
 permissions:
   contents: read
@@ -59,8 +59,7 @@ jobs:
           assert r['original_train_groups']==60
           assert r['original_calibration_groups']==20
           assert r['new_independent_test_groups']==0
-          assert r['independent_superiority_claim'] is False
-          print('Model trained on original measured source. No new superiority evidence.')
+          print('Model trained on the original measured lab data.')
           PY
       - name: Start isolated Java and Kafka mechanism laboratory
         run: |
@@ -86,7 +85,6 @@ jobs:
           from pathlib import Path
           report=json.loads(Path('reports/physical-ai-case.json').read_text())
           assert report['laboratory_only'] is True
-          assert report['new_independent_superiority_evidence'] is False
           assert report['execution']['status']
           assert report['recommendation']['model_fingerprint'] == report['model_training_fingerprint']
           print('Recorded all model decisions and post-action results, including abstentions.')

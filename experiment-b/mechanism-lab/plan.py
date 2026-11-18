@@ -81,7 +81,7 @@ def create_plan(seed: int = SEED) -> tuple[list[dict], list[dict]]:
             # select a prohibited restart.
             "restart_permitted": (i // 8) % 2 == 0,
             # Absolute failure allowance is held fixed as requested RPS
-            # varies. This is a research decision threshold, not a measured
+            # varies. This is a lab decision threshold, not a measured
             # remaining SLO budget or a production safety guarantee.
             "absolute_error_budget_requests": 25,
             # Each four-scenario block includes every fault family. Alternate

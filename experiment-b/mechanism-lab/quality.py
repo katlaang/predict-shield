@@ -30,7 +30,7 @@ def quality_summary(rows: list[dict]) -> dict:
     not synthetic placeholders or copied generator formulas.
 
     @param rows Complete joined measured trial rows from load_executed_dataset.
-    @return Auditable quality metadata and possible research limitations.
+    @return Auditable quality metadata and possible limitations.
     """
     grouped: dict[tuple[str, str], list[dict]] = defaultdict(list)
     by_fault = defaultdict(list)

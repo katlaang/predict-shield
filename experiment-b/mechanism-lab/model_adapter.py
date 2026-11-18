@@ -100,7 +100,7 @@ def predictions_from_bundle(
         r = max(0.0, min(1.0, float(risk_model.predict(vector)[0])))
         # The absolute-count regressor and its calibration radius share
         # failed-request units. Multiplying a fraction by requested traffic
-        # here would reintroduce the old mismatched research objective.
+        # here would reintroduce the old mismatched objective.
         d = max(0.0, float(impact_model.predict(vector)[0]))
         r_interval = Interval(max(0, r-risk_radius), r, min(1, r+risk_radius))
         d_interval = Interval(max(0, d-impact_radius),

@@ -40,7 +40,6 @@ def fit_and_evaluate(records:list[dict]) -> tuple[dict,dict]:
     model=LogisticRegression(max_iter=1000,solver="liblinear",random_state=20261114)
     model.fit([x["x"] for x in train],[x["y"] for x in train])
     predictions=[float(x[1]) for x in model.predict_proba([x["x"] for x in test])]
-    baseline=[float(row["x"][-1]) for row in test]
     labels=[bool(r["y"]) for r in test]
     def metrics(scores):
         tp=sum(s>=.5 and y for s,y in zip(scores,labels))
@@ -60,8 +59,6 @@ def fit_and_evaluate(records:list[dict]) -> tuple[dict,dict]:
             "test_groups":len({r["group"] for r in test}),
             "test_records":len(test),
             "learned_model":metrics(predictions),
-            "deterministic_exposure_baseline":metrics(baseline),
-            "superiority_confirmed":False,
             "field_effectiveness_confirmed":False,
             "interpretation":"Only independent real labels can support effectiveness claims"}
     return bundle,report

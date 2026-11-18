@@ -31,7 +31,7 @@ def _request(base, path, *, method="GET", token=None, opener=None):
 
 def execute_and_verify(*, base, token, proposal, baseline_observation=None, requester=None):
     """Explicit lab policy authorization, no ML score alone grants execution."""
-    if (proposal.get("research_lab_only") is not True
+    if (proposal.get("lab_only") is not True
        or proposal.get("selected_action")!="isolate_access"
        or proposal.get("policy_decision")!="ELIGIBLE_LAB_ONLY"
        or proposal.get("scope_complete") is not True

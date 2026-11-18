@@ -8,11 +8,11 @@ The authority is restored in `finally` before the next registered action. The pu
 
 ## Limitations
 
-- This is **four actual physical action replays under a single fault configuration**, not the complete registered six-family v3.1 feasibility study.
+- This is **four actual physical action replays under a single fault configuration**.
 - A resynchronization attempt must fail while the authority is stopped. A local JVM restart cannot restore the authority service. Gateway restriction has operational collateral effects visible in authorized test requests.
 - The historical policy witness can become stale if the authoritative state changes while the authority is unavailable. It is not a live truth oracle.
 - There is no normalized cross-action utility here. Do not assign artificial NOT VERIFIED labels or rank by cherry-picked status codes.
-- The next scientific milestone is independently registered multi-configuration outage trials with continuous probe timing, eligibility-safe action handling and measured costs under a predeclared conservative UNKNOWN policy. Do not start 1,200 trials until all six families meet the feasibility and precision gates.
+- The next milestone is multi-configuration outage trials with continuous probe timing, eligibility-safe action handling and measured costs under a predeclared conservative UNKNOWN policy.
 
 Run: `python authority_outage_actions.py --execute-lab --output reports/outage-actions.json` from the disposable Compose lab.
 

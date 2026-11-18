@@ -1,8 +1,8 @@
-"""Acquire pinned official EPSS and KEV archive blobs for a proxy backtest.
+"""Acquire pinned official EPSS and KEV archive blobs as dated inputs.
 
 No discovery of arbitrary URLs, branch refs, or credentials. Immutable Git SHAs
 and dated source metadata must come from a reviewed manifest. The files are
-local research inputs; downloading them is not a prediction experiment.
+local inputs; downloading them makes no prediction.
 """
 from __future__ import annotations
 
@@ -23,7 +23,7 @@ FIELDS = ("epss", "kev_before", "kev_after")
 
 def _download(url: str) -> bytes:
     request = urllib.request.Request(url, headers={
-        "User-Agent": "predict-shield-research-archive/1",
+        "User-Agent": "predict-shield-archive/1",
         "Accept": "application/octet-stream"})
     with urllib.request.urlopen(request, timeout=60) as response:
         raw = response.read(MAX_DOWNLOAD + 1)
@@ -78,7 +78,7 @@ def _acquire_to_empty_directory(manifest: dict, directory: Path, fetcher,
         date_value = date.fromisoformat(source["snapshot_date"])
         observed_commit = date.fromisoformat(source["commit_observed_date"])
         if (key != "kev_after" and (date_value > cutoff or observed_commit > cutoff)):
-            raise ValueError("Pre-action source or commit is after research as_of")
+            raise ValueError("Pre-action source or commit is after the as_of date")
         if key == "kev_after" and date_value < horizon_end:
             raise ValueError("Outcome snapshot predates declared horizon end")
         url = source_url(source)

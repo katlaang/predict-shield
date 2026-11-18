@@ -2,7 +2,7 @@ import unittest
 from isp_defense import execute_and_verify
 
 TOKEN="lab-token-"+"a"*32
-PROPOSAL={"research_lab_only":True,"selected_action":"isolate_access",
+PROPOSAL={"lab_only":True,"selected_action":"isolate_access",
           "policy_decision":"ELIGIBLE_LAB_ONLY","scope_complete":True,
           "approved_lab_asset":"simulated-broadband-access"}
 

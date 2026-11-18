@@ -22,7 +22,7 @@ def execute_lab_recommendation(recommendation: dict, *, scope_assessment: dict,
             scope_assessment.get("status") != "LAB_SCOPE_SUPPORTED" or
             scope_assessment.get("production_scope_attested") is not False):
         raise ValueError("No supported isolated lab scope")
-    if recommendation.get("research_lab_only") is not True:
+    if recommendation.get("lab_only") is not True:
         raise ValueError("No lab-only case boundary")
     if recommendation.get("abstained") is not False or recommendation.get("action_executed") is not False:
         raise ValueError("No fresh policy-eligible, unexecuted model selection")

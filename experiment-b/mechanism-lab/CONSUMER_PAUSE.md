@@ -1,6 +1,6 @@
 # Physical Kafka consumer-only pause
 
-This proposed v3.1 mechanism differs from the original `loss` callback fault. It calls Spring Kafka's actual listener-container `pause()`, waits for `isContainerPaused()`, and confirms the enforcer's HTTP health endpoint remains available. It publishes an actual authority resync event while paused and verifies the listener's handled-event counter does not advance until resume.
+This v3.1 mechanism differs from the original `loss` callback fault. It calls Spring Kafka's actual listener-container `pause()`, waits for `isContainerPaused()`, and confirms the enforcer's HTTP health endpoint remains available. It publishes an actual authority resync event while paused and verifies the listener's handled-event counter does not advance until resume.
 
 The mutation endpoint is restricted to disposable lab control credentials and supports only pause and resume. The listener resumes in `finally`, and the workflow runs a measured physical smoke before the existing v3 pilot.
 

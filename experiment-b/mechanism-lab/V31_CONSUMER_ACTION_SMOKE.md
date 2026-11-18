@@ -1,6 +1,6 @@
 # v3.1 first physical paired-action smoke: consumer-only pause
 
-This is a **single condition**, four-action exploratory mechanism smoke, not a configuration-group feasibility gate, a trained AI run, or the preregistered 1,200-action study. It extends the real Spring Kafka multi-JVM lab with a `consumer_paused` fault mode. Unlike the legacy callback-based `loss` fault, the real Kafka listener container is paused and its paused state is checked while the enforcer HTTP handler remains available.
+This is a **single condition**, four-action exploratory mechanism smoke, not a configuration-group measurement or a trained AI run. It extends the real Spring Kafka multi-JVM lab with a `consumer_paused` fault mode. Unlike the legacy callback-based `loss` fault, the real Kafka listener container is paused and its paused state is checked while the enforcer HTTP handler remains available.
 
 The runner executes `resync_policy`, `restart_enforcer`, `gateway_restrict`, and `monitor_only` through the existing measured `run_case` path. Each arm begins from a clean authority revision, physically pauses the target listener **before** broker publication, observes independent pre/post oracle snapshots, concurrent legitimate-traffic errors, time-integrated gateway exposure, and post-action scope verification. A restart or resynchronization is never scored using an acknowledgement alone.
 

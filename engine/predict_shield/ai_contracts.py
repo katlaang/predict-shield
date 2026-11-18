@@ -1,6 +1,6 @@
 """Typed prediction and outcome records for PREDICT-SHIELD v2.2.
 
-Research interfaces only. Predictions cannot authorize an action or establish
+Interfaces only. Predictions cannot authorize an action or establish
 verification. An oracle label is an experiment-only record, never model input.
 """
 from __future__ import annotations

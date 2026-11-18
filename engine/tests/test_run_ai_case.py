@@ -8,7 +8,7 @@ from predict_shield.run_ai_case import load_catalog
 
 class CliCatalogTests(unittest.TestCase):
     def test_catalog_has_concrete_nonexecuting_policy_action_options(self):
-        obj={"schema":"predict-shield/research-action-catalog/1",
+        obj={"schema":"predict-shield/lab-action-catalog/1",
              "actions":[{"action_id":"request_security_review",
                          "tier":"APPROVAL","affected_services":["authorization"],
                          "postcondition":"Analyst checks vulnerability applicability",
@@ -22,7 +22,7 @@ class CliCatalogTests(unittest.TestCase):
         self.assertEqual(actions[0].tier.value,"APPROVAL")
         self.assertEqual(checks,("recheck_package_version",))
     def test_duplicate_checks_fail_closed(self):
-        obj={"schema":"predict-shield/research-action-catalog/1",
+        obj={"schema":"predict-shield/lab-action-catalog/1",
              "actions":[{"action_id":"review",
                          "tier":"APPROVAL","affected_services":["auth"],
                          "postcondition":"Review","reversible":True}],

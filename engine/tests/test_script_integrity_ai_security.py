@@ -190,7 +190,7 @@ class CannotUseSeverityToBypassApprovalTests(unittest.TestCase):
         )
         self.assertEqual(result["ai_severity_advisory"], "low")
         self.assertEqual(result["policy_screened"]["disable_embed"]["decision"], "PROPOSE_FOR_APPROVAL")
-        self.assertNotEqual(result["selection_status"], "ELIGIBLE_RESEARCH_LAB_PLAN")
+        self.assertNotEqual(result["selection_status"], "ELIGIBLE_LAB_PLAN")
         self.assertFalse(result["dispatch_authorized"])
 
 
@@ -233,7 +233,7 @@ class CannotTriggerUnauthorizedExecutionTests(unittest.TestCase):
             actions=ACTION_CATALOG, scope_snapshot=s, predictions=(predicted("block_via_csp", s),),
             remaining_error_budgets={"example-sme.com": 5.0}, now=NOW,
         )
-        self.assertEqual(result["selection_status"], "ELIGIBLE_RESEARCH_LAB_PLAN")
+        self.assertEqual(result["selection_status"], "ELIGIBLE_LAB_PLAN")
         self.assertFalse(result["dispatch_authorized"])
         self.assertEqual(result["lab_execution_adapter"],
                          "existing mechanism-lab implementation; not invoked")

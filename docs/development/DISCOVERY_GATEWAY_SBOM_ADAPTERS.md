@@ -1,6 +1,6 @@
 # Gateway and image-SBOM discovery adapters
 
-This optional research collector queries a separately instrumented localhost gateway JSON exporter and can ask Syft to scan the exact immutable running Docker image ID.
+This optional lab collector queries a separately instrumented localhost gateway JSON exporter and can ask Syft to scan the exact immutable running Docker image ID.
 
 Example (from repository root, authorized disposable lab only):
 
@@ -17,4 +17,4 @@ For SBOM use, install Syft in the caller environment. This feature does not inst
 ## Known security limitations
 Local-only URLs are required and HTTP redirects are disabled. Gateway export itself is not authenticated, and source independence is **not established** by its self-reported source name. Do not expose an unauthenticated exporter on a public interface. The collector does not accept remote URLs, credentials in URLs, or perform remediation. Running with Docker socket access is sensitive.
 
-This is not yet integrated into AI threat assessment or real-time case closure. No production scope completeness, continuous discovery, SBOM source attestation, or experimentally demonstrated AI superiority is claimed. Image SBOMs contain software-package metadata but are not a vulnerability verdict.
+This is not yet integrated into AI threat assessment or real-time case closure. No production scope completeness, continuous discovery or SBOM source attestation is claimed. Image SBOMs contain software-package metadata but are not a vulnerability verdict.

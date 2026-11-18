@@ -17,7 +17,7 @@ from .pipeline import plan_case
 
 def load_catalog(path: Path) -> tuple[tuple[CandidateAction,...],tuple[str,...]]:
     payload=json.loads(path.read_text(encoding="utf-8"))
-    if payload.get("schema")!="predict-shield/research-action-catalog/1":
+    if payload.get("schema")!="predict-shield/lab-action-catalog/1":
         raise ValueError("Unsupported catalog schema")
     records=payload.get("actions")
     checks=payload.get("allowed_verification_checks")

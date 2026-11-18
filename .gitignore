@@ -9,7 +9,7 @@ target/
 build/
 node_modules/
 
-# Generated research manifests, raw action outcomes and restricted lab oracle labels
+# Generated lab manifests, raw action outcomes and restricted lab oracle labels
 experiment-b/generated/
 experiment-b/results/
 experiment-b/private_results/

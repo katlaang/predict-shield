@@ -119,12 +119,12 @@ def aggregate(batches: list[dict], source_sha: str) -> dict:
         "v31_feasibility_evaluated": False,
         "ai_action_model_trained_or_tested": False,
         "critical_infrastructure_operator_pilot": False,
-        "research_conclusion": "EXPLORATORY_MECHANISM_REPEATS_ONLY",
+        "conclusion": "EXPLORATORY_MECHANISM_REPEATS_ONLY",
         "limitations": [
             "Repeated batches reuse the same fault configuration; they are not independent configurations",
             "UNKNOWN live authority truth is not a verified policy outcome",
             "Exposure integrates sampled HTTP probe intervals with conservative bounds",
-            "Research weights are exploratory, not a prospectively frozen v3.1 primary utility",
+            "Lab weights are exploratory, not a prospectively frozen v3.1 primary utility",
             "No model action-selection performance or real operator benefit is evaluated",
         ],
     }
@@ -170,7 +170,7 @@ def main() -> None:
         json.dump(report, f, sort_keys=True, indent=2)
         f.write("\n")
     print(json.dumps({"schema": SCHEMA, "physical_action_replays": report["physical_action_replays"],
-                      "research_conclusion": report["research_conclusion"],
+                      "conclusion": report["conclusion"],
                       "ai_tested": False}))
 
 

@@ -108,7 +108,7 @@ class LiveModelRunnerTests(unittest.TestCase):
         report = self._run(lambda n: {"severity": "high", "action": "restrict_all_fetch_targets",
                                       "rationale": "contain"})
         self.assertTrue(report["passed"], report["violations"])
-        self.assertIn("ELIGIBLE_RESEARCH_LAB_PLAN", [c["selection_status"] for c in report["cases"]])
+        self.assertIn("ELIGIBLE_LAB_PLAN", [c["selection_status"] for c in report["cases"]])
 
 
 if __name__ == "__main__":

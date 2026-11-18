@@ -1,0 +1,33 @@
+{
+  "schema": "predict-shield/dated-threat-archive/1",
+  "purpose": "Historical KEV-catalog-addition proxy feasibility, NOT observed exploitation or real-asset risk",
+  "as_of": "2026-10-02",
+  "horizon_days": 30,
+  "epss": {
+    "repository": "empiricalsec/epss_scores",
+    "commit": "ed574837a582b41b77ae96ed04e027b668b27cb4",
+    "path": "2026/epss_scores-2026-10-01.csv.gz",
+    "snapshot_date": "2026-10-01",
+    "commit_observed_date": "2026-10-01"
+  },
+  "kev_before": {
+    "repository": "cisagov/kev-data",
+    "commit": "a25b61fbc5e3125030a15e09adba33f427cc0e25",
+    "path": "known_exploited_vulnerabilities.json",
+    "snapshot_date": "2026-10-01",
+    "commit_observed_date": "2026-10-01"
+  },
+  "kev_after": {
+    "repository": "cisagov/kev-data",
+    "commit": "6b8d7ba579672e4f84e2b1f255724aa97c8455b4",
+    "path": "known_exploited_vulnerabilities.json",
+    "snapshot_date": "2026-11-10",
+    "commit_observed_date": "2026-11-10"
+  },
+  "limitations": [
+    "Public snapshots do not represent asset vulnerability inventories.",
+    "A future KEV catalog addition is a proxy label, not confirmed exploitation.",
+    "Commit observed date is an annotation and must be checked against authoritative git history.",
+    "The after snapshot is later than horizon end; labels must filter addition dates to horizon."
+  ]
+}

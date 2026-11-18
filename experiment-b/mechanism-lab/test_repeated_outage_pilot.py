@@ -1,4 +1,4 @@
-"""Contract tests use obvious fake data; they are not physical research results."""
+"""Contract tests use obvious fake data; they are not physical lab results."""
 import copy
 import unittest
 
