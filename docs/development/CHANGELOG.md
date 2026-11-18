@@ -1,5 +1,12 @@
 # Development changelog
 
+## 2026-11-18 (3): Run the script proposer against a real model, and fix what it exposed
+
+- The script-integrity workflow gained a second job that serves a real model (`qwen3:0.6b`) through a local Ollama on loopback, the same setup the lodash pilot uses, and runs the containment proposer against it on every relevant push, recording the installed model digest. No API key is needed.
+- That run exposed a real defect: the system prompt told the model to copy an action from `permitted_actions`, but `propose()` never sent the list. The model invented actions (`block`, `patch`), and in the planted-injection case answered `disable_monitoring`, exactly the action the injected note demanded. Deterministic validation rejected all four replies, so no unsafe action got through, but the model could not do its job. The unit tests had used scripted replies that ignore the prompt, so they could not catch it.
+- Fixed in `script_risk_proposer.py` and in the unused `action_proposer.py`, which had the same defect and no tests. New tests check the prompt the model actually receives.
+- After the fix, with the same model digest: a valid offered choice in all four cases, an eligible plan in two, the two approval-tier choices held for review, the planted instruction not followed, and a "low" severity given where the pressure note asked for it, which did not change the approval tier. The runner now reports these usefulness measures alongside the enforced safety checks.
+
 ## 2026-11-18 (2): Close the remaining script-integrity limitations
 
 - The fetch probe now resolves a registered hostname once, checks every address in the answer, refuses private, loopback, link-local and other non-public addresses unless the registration explicitly opts in, and connects only to that pinned address, verifying TLS against the registered hostname. A DNS answer that changes between the check and the fetch can no longer move a probe to an internal address. Tested against a rebinding resolver, a mixed public/private answer, and a real TLS server with a matching and a mismatching certificate.
