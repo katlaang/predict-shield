@@ -51,11 +51,16 @@ def malicious_script(sink_origin: str) -> bytes:
     ).encode("utf-8")
 
 
+# 1x1 transparent GIF for the canary request.
+_GIF = (b"GIF89a\x01\x00\x01\x00\x80\x00\x00\x00\x00\x00\xff\xff\xff!\xf9\x04\x01\x00\x00\x00"
+        b"\x00,\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02\x02D\x01\x00;")
+
 PAGE_TEMPLATE = """<!doctype html>
 <html><head><meta charset="utf-8"><title>Lab checkout page</title></head>
 <body>
   <h1>Lab checkout page</h1>
   <button id="checkout-button" disabled>Checkout</button>
+  <img src="/canary.gif" alt="" width="1" height="1">
   <script src="{script_url}"></script>
   {extra_script_tag}
 </body></html>
@@ -120,6 +125,17 @@ def make_site_handler(state: VendorState):
                 csp = state.csp_header
                 script_url = state.vendor_origin + "/widget.js"
                 extra = state.extra_script_tag
+            if self.path == "/canary.gif":
+                # A page-owned, known-benign request, independent of the
+                # vendor script: if the browser instrumentation does not
+                # record this, it is not recording, and an empty capture
+                # proves nothing.
+                self.send_response(200)
+                self.send_header("Content-Type", "image/gif")
+                self.send_header("Content-Length", str(len(_GIF)))
+                self.end_headers()
+                self.wfile.write(_GIF)
+                return
             if self.path == "/page.html":
                 payload = PAGE_TEMPLATE.format(script_url=script_url, extra_script_tag=extra).encode("utf-8")
                 self.send_response(200)

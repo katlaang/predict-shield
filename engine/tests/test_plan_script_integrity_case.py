@@ -37,7 +37,7 @@ def predicted(snapshot):
 
 
 def proposer_choosing(action_id):
-    model = ScriptedModel([("vendor-widget", {"action": action_id, "rationale": "contain"})])
+    model = ScriptedModel([("vendor-widget", {"severity": "high", "action": action_id, "rationale": "contain"})])
     return ModelScriptRiskProposer(model)
 
 

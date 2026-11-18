@@ -4,16 +4,18 @@ import threading
 import unittest
 from datetime import datetime, timedelta, timezone
 
-from predict_shield.assessment import Outcome
+from predict_shield.assessment import Outcome, assess
 from predict_shield.script_integrity import (
     CSP_ENFORCED,
     HASH_MATCHES_TRUSTED,
     NO_PROHIBITED_NETWORK_BEHAVIOR,
     NO_UNREGISTERED_DOMAIN,
+    BrowserBehaviorCapture,
     FetchRejected,
     RegisteredScript,
     RegisteredSite,
     ScriptObservation,
+    confirm_controlled_sink_log,
     confirm_csp_enforced,
     confirm_hash_matches_trusted,
     confirm_no_prohibited_network_behavior,
@@ -138,9 +140,14 @@ class CspAssertionTests(unittest.TestCase):
         self.assertFalse(evidence.observed_pass)
 
 
+def capture(*, completed=("cdn.vendor.example",), blocked=(), canary=True, exercised=True):
+    return BrowserBehaviorCapture(sent_hosts=tuple(completed), blocked_hosts=tuple(blocked),
+                                  canary_observed=canary, exposure_exercised=exercised)
+
+
 class BehavioralAssertionTests(unittest.TestCase):
     def test_no_prohibited_destination_reached_passes(self):
-        evidence = confirm_no_prohibited_network_behavior(SITE, ("cdn.vendor.example",), NOW, now=NOW)
+        evidence = confirm_no_prohibited_network_behavior(SITE, capture(), NOW, now=NOW)
         self.assertTrue(evidence.observed_pass)
 
     def test_a_prohibited_destination_actually_reached_fails_even_with_a_clean_hash(self):
@@ -148,8 +155,48 @@ class BehavioralAssertionTests(unittest.TestCase):
         # still cause the browser to reach a prohibited sink. A hash
         # match (tested separately above) says nothing about this.
         evidence = confirm_no_prohibited_network_behavior(
-            SITE, ("cdn.vendor.example", "attacker.example"), NOW, now=NOW)
+            SITE, capture(completed=("cdn.vendor.example", "attacker.example")), NOW, now=NOW)
         self.assertFalse(evidence.observed_pass)
+
+    def test_an_attempt_the_browser_blocked_counts_as_contained(self):
+        evidence = confirm_no_prohibited_network_behavior(
+            SITE, capture(blocked=("attacker.example",)), NOW, now=NOW)
+        self.assertTrue(evidence.observed_pass)
+
+    def test_an_empty_capture_without_a_canary_is_not_a_pass(self):
+        # Instrumentation that recorded nothing must not look like containment.
+        evidence = confirm_no_prohibited_network_behavior(
+            SITE, capture(completed=(), canary=False), NOW, now=NOW)
+        self.assertIsNone(evidence.observed_pass)
+        self.assertFalse(evidence.integrity_ok)
+        result = assess(evidence.asset, evidence.assertion, [evidence], now=NOW)
+        self.assertEqual(result.outcome, Outcome.INDETERMINATE)
+
+    def test_a_trial_that_never_exercised_the_compromised_script_is_not_a_pass(self):
+        evidence = confirm_no_prohibited_network_behavior(SITE, capture(exercised=False), NOW, now=NOW)
+        result = assess(evidence.asset, evidence.assertion, [evidence], now=NOW)
+        self.assertEqual(result.outcome, Outcome.INDETERMINATE)
+
+    def test_sink_log_and_browser_capture_are_two_independent_sources(self):
+        browser = confirm_no_prohibited_network_behavior(SITE, capture(), NOW, now=NOW)
+        sink = confirm_controlled_sink_log(SITE, 0, NOW, now=NOW)
+        result = assess(SITE.site_id, NO_PROHIBITED_NETWORK_BEHAVIOR, [browser, sink],
+                        required_independent_checks=2, now=NOW)
+        self.assertEqual(result.outcome, Outcome.VERIFIED)
+
+    def test_a_sink_hit_the_browser_capture_missed_still_refutes_containment(self):
+        browser = confirm_no_prohibited_network_behavior(SITE, capture(), NOW, now=NOW)
+        sink = confirm_controlled_sink_log(SITE, 1, NOW, now=NOW)
+        result = assess(SITE.site_id, NO_PROHIBITED_NETWORK_BEHAVIOR, [browser, sink],
+                        required_independent_checks=2, now=NOW)
+        self.assertEqual(result.outcome, Outcome.NOT_VERIFIED)
+
+    def test_dead_instrumentation_leaves_only_one_source_so_two_required_is_indeterminate(self):
+        browser = confirm_no_prohibited_network_behavior(SITE, capture(canary=False), NOW, now=NOW)
+        sink = confirm_controlled_sink_log(SITE, 0, NOW, now=NOW)
+        result = assess(SITE.site_id, NO_PROHIBITED_NETWORK_BEHAVIOR, [browser, sink],
+                        required_independent_checks=2, now=NOW)
+        self.assertEqual(result.outcome, Outcome.INDETERMINATE)
 
 
 class CompositeEvaluateTests(unittest.TestCase):
@@ -163,7 +210,7 @@ class CompositeEvaluateTests(unittest.TestCase):
         header = "script-src 'self' cdn.vendor.example" if csp_pass else None
         csp_ev = confirm_csp_enforced(SITE, header, NOW, now=NOW)
         reached = ("cdn.vendor.example",) if behavior_pass else ("attacker.example",)
-        behavior_ev = confirm_no_prohibited_network_behavior(SITE, reached, NOW, now=NOW)
+        behavior_ev = confirm_no_prohibited_network_behavior(SITE, capture(completed=reached), NOW, now=NOW)
         scope = {
             HASH_MATCHES_TRUSTED: (hash_ev.asset, hash_ev.assertion),
             NO_UNREGISTERED_DOMAIN: (domain_ev.asset, domain_ev.assertion),

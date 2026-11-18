@@ -337,36 +337,119 @@ def confirm_csp_enforced(
     )
 
 
-def confirm_no_prohibited_network_behavior(
-    site: RegisteredSite, observed_requests: tuple[str, ...], observed_at: datetime, *,
-    now: datetime | None = None, max_age_seconds: float = 900.0,
-) -> Evidence:
-    """The behavioral check a hash comparison cannot replace: did a real,
-    instrumented browser load, after whatever containment action was
-    applied, still reach a registered-prohibited destination.
-    `observed_requests` must come from an actual page load with network
-    capture (the pilot's Playwright instrumentation, or a future live
-    adapter), never from re-deriving the question from the script's hash
-    or source text -- a script can be byte-identical to a known-bad
-    version and still be contained if the browser can no longer reach the
-    prohibited destination, and conversely a hash match alone says
-    nothing about what a differently-served response might still do."""
+@dataclass(frozen=True)
+class BrowserBehaviorCapture(object):
+    """What one real, instrumented browser trial observed.
+
+    `sent_hosts` are destinations a request actually left the browser
+    for, whether or not a usable response came back; `blocked_hosts` are
+    destinations the browser refused to send a request to at all (for
+    example a Content-Security-Policy block). The distinction matters: a
+    request that failed after it was sent (an aborted or opaque-response
+    failure) has still delivered whatever it carried, so it belongs in
+    `sent_hosts`, never in `blocked_hosts`. The pilot found exactly this
+    case -- an exfiltration request the browser reported as failed while
+    the destination server logged it as received.
+
+    The two liveness fields exist because an empty capture is not
+    evidence of anything:
+
+        * `canary_observed`: a page-owned, known-benign request was
+          captured during this same trial. Without it, "no prohibited
+          request was seen" could simply mean the instrumentation was not
+          recording.
+        * `exposure_exercised`: the script under test (for a containment
+          trial, the compromised version) was actually live at the
+          registered URL during this trial, confirmed independently of the
+          browser (for example by the fetch probe's own hash), and the
+          browser attempted to load it. Without it, "no prohibited request
+          was seen" could simply mean the malicious code was never present
+          to try. A load the browser attempted and the containment then
+          blocked still counts as exercised: that is the containment
+          working, not the test failing to run.
+
+    Either one missing makes the trial uninformative, not a pass.
+    """
+
+    sent_hosts: tuple[str, ...]
+    blocked_hosts: tuple[str, ...]
+    canary_observed: bool
+    exposure_exercised: bool
+
+
+def _check_age(observed_at: datetime, now: datetime | None, max_age_seconds: float, what: str) -> datetime:
     if now is None:
         now = datetime.now(timezone.utc)
     if now.tzinfo is None:
         raise ValueError("now must be timezone-aware")
-    site.validate()
     if observed_at.tzinfo is None:
         raise ValueError("observed_at must be timezone-aware")
     age = (now - observed_at).total_seconds()
     if age < 0 or age > max_age_seconds:
-        raise ValueError("behavioral observation is stale or from the future")
-    prohibited = set(site.prohibited_sinks)
-    reached = tuple(sorted(prohibited & set(observed_requests)))
+        raise ValueError(f"{what} is stale or from the future")
+    return now
+
+
+def confirm_no_prohibited_network_behavior(
+    site: RegisteredSite, capture: BrowserBehaviorCapture, observed_at: datetime, *,
+    now: datetime | None = None, max_age_seconds: float = 900.0,
+) -> Evidence:
+    """The behavioral check a hash comparison cannot replace: in a real,
+    instrumented browser trial, after whatever containment action was
+    applied, did the page still reach a registered-prohibited destination.
+
+    Three outcomes, never two:
+
+        * reached a prohibited destination -> observed_pass False;
+        * instrumentation not shown live (no canary) or the compromised
+          script never exercised -> no pass/fail at all
+          (`observed_pass=None`, `integrity_ok=False`), which
+          `assessment.assess()` can only ever report as INDETERMINATE;
+        * live instrumentation, exercised exposure, and no prohibited
+          destination reached (an attempt the browser blocked counts as
+          contained, not reached) -> observed_pass True.
+
+    `capture` must come from an actual page load with network capture
+    (the pilot's Playwright instrumentation, or a future live adapter),
+    never from re-deriving the answer from the script's hash or text."""
+    now = _check_age(observed_at, now, max_age_seconds, "behavioral observation")
+    site.validate()
+    uninformative = not capture.canary_observed or not capture.exposure_exercised
+    if uninformative:
+        return Evidence(
+            asset=site.site_id, assertion=NO_PROHIBITED_NETWORK_BEHAVIOR,
+            observed_pass=None, observed_at=observed_at,
+            source=SOURCE_PREFIX + "browser-behavior-probe", independent=True, integrity_ok=False,
+        )
+    reached = set(site.prohibited_sinks) & set(capture.sent_hosts)
     return Evidence(
         asset=site.site_id, assertion=NO_PROHIBITED_NETWORK_BEHAVIOR,
-        observed_pass=not reached,
-        observed_at=observed_at, source=SOURCE_PREFIX + "browser-behavior-probe", independent=True,
+        observed_pass=not reached, observed_at=observed_at,
+        source=SOURCE_PREFIX + "browser-behavior-probe", independent=True,
+    )
+
+
+def confirm_controlled_sink_log(
+    site: RegisteredSite, sink_hit_count: int, observed_at: datetime, *,
+    now: datetime | None = None, max_age_seconds: float = 900.0,
+) -> Evidence:
+    """A second, independent source for the same behavioral assertion,
+    available only in a controlled adversary simulation where the
+    prohibited destination is a server the operator runs: that server's
+    own record of whether anything reached it. It does not depend on the
+    browser's instrumentation at all, so it catches a capture that missed
+    a request, and the browser capture catches a sink log that was not
+    recording. In a live deployment the attacker's server is not
+    observable and this source does not exist; the browser capture
+    stands alone there."""
+    now = _check_age(observed_at, now, max_age_seconds, "sink log observation")
+    site.validate()
+    if sink_hit_count < 0:
+        raise ValueError("sink_hit_count cannot be negative")
+    return Evidence(
+        asset=site.site_id, assertion=NO_PROHIBITED_NETWORK_BEHAVIOR,
+        observed_pass=sink_hit_count == 0, observed_at=observed_at,
+        source=SOURCE_PREFIX + "controlled-sink-log", independent=True,
     )
 
 

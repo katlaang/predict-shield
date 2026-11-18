@@ -253,6 +253,8 @@ def plan_script_integrity_case(
     actions: tuple[CandidateAction, ...], predictions: tuple[ActionPrediction, ...] = (),
     scope_snapshot: EvidenceSnapshot | None = None,
     remaining_error_budgets: dict[str, float] | None = None,
+    asset_criticality: str | None = None,
+    detection_notes: tuple[str, ...] = (),
     now: datetime | None = None,
 ) -> dict:
     """Propose and policy-gate a containment action for a third-party
@@ -277,6 +279,15 @@ def plan_script_integrity_case(
     `confirm_no_unregistered_domain`, independently of any upstream
     claim, the same "don't trust the caller's claim, re-check it" rule
     `plan_case` and `plan_sast_case` both already apply.
+
+    The model also returns its own severity assessment, correlating the
+    evidence with `asset_criticality` and any registered
+    `detection_notes` (free text from a registered detection source,
+    screened for injection patterns before it reaches the model). That
+    severity is recorded in the plan as advisory only: the approval tier
+    comes from the registered action in the catalog, so a model that
+    rates a finding "low" cannot move an approval-tier action into
+    automatic eligibility.
 
     Like both of those, this stops at propose -> gate: it returns an
     eligible plan and never applies a containment action, and it does
@@ -306,6 +317,7 @@ def plan_script_integrity_case(
         "selected_action": None,
         "ai_proposal_status": None,
         "ai_proposal_rationale": None,
+        "ai_severity_advisory": None,
         "ai_injection_suspected": False,
         "policy_screened": {},
         "dispatch_authorized": False,
@@ -344,10 +356,13 @@ def plan_script_integrity_case(
         "trusted_sha384_count": len(script.trusted_sha384),
         "observed_domains": sorted(observed_domains),
         "allowed_domains": sorted(site.allowed_script_domains),
+        "asset_criticality": asset_criticality,
+        "detection_notes": list(detection_notes),
     }
     proposal = proposer.propose(context, offered)
     report["ai_proposal_status"] = proposal.status
     report["ai_proposal_rationale"] = proposal.rationale
+    report["ai_severity_advisory"] = proposal.severity
     report["ai_injection_suspected"] = proposal.injection_suspected
     if proposal.status != "ACCEPTED" or proposal.action_id not in offered:
         report["reason"] = "AI containment proposal did not yield a permitted action: " + \

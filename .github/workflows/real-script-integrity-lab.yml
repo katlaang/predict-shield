@@ -47,6 +47,15 @@ jobs:
               "behavioral check must observe the real browser reaching the sink, not only a hash change"
           assert s["false_positive_occurred"] is False
           assert s["unregistered_domain_caught_despite_clean_hash"] is True
+          c = s["containment_outcomes"]
+          # Containment against the live compromised script, two independent sources required.
+          assert c["F1_block_vendor_script"] == "VERIFIED", c
+          assert c["F2_restrict_connect_src"] == "VERIFIED", c
+          # The verifier must be able to fail a containment, not only pass one.
+          assert c["F3_ineffective_containment"] == "NOT VERIFIED", c
+          # An empty capture or an unexercised compromise is never a pass.
+          assert c["G_instrumentation_not_live"] == "INDETERMINATE", c
+          assert c["H_exposure_not_exercised"] == "INDETERMINATE", c
           print("PASS:", json.dumps(s, indent=1, sort_keys=True))
           PY
       - name: Retain the real evidence report
