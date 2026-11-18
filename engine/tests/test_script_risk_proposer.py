@@ -53,6 +53,14 @@ class ModelScriptRiskProposerTests(unittest.TestCase):
         self.assertEqual(proposal.action_id, "block_via_csp")
         self.assertFalse(proposal.injection_suspected)
 
+    def test_the_model_is_shown_exactly_the_offered_actions(self):
+        # The system prompt tells the model to copy an action from
+        # permitted_actions; that list must actually be in what it reads.
+        import json
+        model = ScriptedModel([("widget", {"severity": "high", "action": "block_via_csp", "rationale": "x"})])
+        ModelScriptRiskProposer(model).propose({"script_id": "widget"}, OFFERED)
+        self.assertEqual(json.loads(model.prompts[0])["permitted_actions"], OFFERED)
+
     def test_no_offered_actions_abstains_without_calling_the_model(self):
         model = ScriptedModel([])
         proposer = ModelScriptRiskProposer(model)

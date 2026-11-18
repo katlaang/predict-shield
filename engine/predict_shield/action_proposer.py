@@ -72,7 +72,10 @@ class ModelActionProposer:
         if not offered:
             return Proposal(ABSTAINED, None, reasons=("no action offered",))
         try:
-            reply = self.model.complete(SYSTEM_PROMPT, json.dumps(context, indent=1, sort_keys=True))
+            # The offered list goes in the prompt under the name the system
+            # prompt uses; the model cannot choose among actions it is not shown.
+            prompt = dict(context, permitted_actions=list(offered))
+            reply = self.model.complete(SYSTEM_PROMPT, json.dumps(prompt, indent=1, sort_keys=True))
         except ModelUnavailable as error:
             return Proposal(ABSTAINED, None, reasons=(f"model unavailable: {error}",))
         return validate_reply(reply, offered)
