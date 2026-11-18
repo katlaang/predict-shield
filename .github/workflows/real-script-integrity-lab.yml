@@ -1,6 +1,13 @@
 name: Real script-integrity pilot
 
 on:
+  push:
+    branches: [master]
+    paths:
+      - 'experiment-b/real-script-integrity-pilot/**'
+      - 'engine/predict_shield/script_integrity.py'
+      - 'engine/predict_shield/script_risk_proposer.py'
+      - '.github/workflows/real-script-integrity-lab.yml'
   pull_request:
     paths:
       - 'experiment-b/real-script-integrity-pilot/**'
@@ -15,7 +22,7 @@ permissions:
 jobs:
   real-script-integrity-pilot:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -47,15 +54,29 @@ jobs:
               "behavioral check must observe the real browser reaching the sink, not only a hash change"
           assert s["false_positive_occurred"] is False
           assert s["unregistered_domain_caught_despite_clean_hash"] is True
-          c = s["containment_outcomes"]
-          # Containment against the live compromised script, two independent sources required.
-          assert c["F1_block_vendor_script"] == "VERIFIED", c
-          assert c["F2_restrict_connect_src"] == "VERIFIED", c
-          # The verifier must be able to fail a containment, not only pass one.
-          assert c["F3_ineffective_containment"] == "NOT VERIFIED", c
+          V, N = "VERIFIED", "NOT VERIFIED"
+          expected = {
+              # channel: none, connect-src, all fetch directives, block script, SRI pin
+              "fetch":      [N, V, V, V, V],
+              "image":      [N, N, V, V, V],
+              "form":       [N, N, V, V, V],
+              "navigation": [N, N, N, V, V],
+          }
+          order = ["none_allow_vendor_only", "restrict_connect_src", "restrict_all_fetch_targets",
+                   "block_vendor_script", "sri_pin"]
+          m = s["containment_matrix_outcomes"]
+          for channel, outcomes in expected.items():
+              got = [m[channel][a] for a in order]
+              assert got == outcomes, (channel, got, outcomes)
           # An empty capture or an unexercised compromise is never a pass.
-          assert c["G_instrumentation_not_live"] == "INDETERMINATE", c
-          assert c["H_exposure_not_exercised"] == "INDETERMINATE", c
+          assert s["verifier_controls"] == {"G_instrumentation_not_live": "INDETERMINATE",
+                                            "H_exposure_not_exercised": "INDETERMINATE"}, s["verifier_controls"]
+          # SRI only works with vendor CORS, and blocks a benign update until the pin changes.
+          assert s["sri_operating_costs"] == {"S1_clean_script_vendor_sends_cors": True,
+                                              "S2_clean_script_vendor_without_cors": False,
+                                              "S3_benign_update_before_pin_changed": False}
+          d = s["scheduled_detection"]
+          assert d["all_detected"] and d["max_seconds"] <= d["bound_seconds"], d
           print("PASS:", json.dumps(s, indent=1, sort_keys=True))
           PY
       - name: Retain the real evidence report

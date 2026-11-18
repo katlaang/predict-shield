@@ -22,7 +22,13 @@ from predict_shield.script_integrity import (
     confirm_no_unregistered_domain,
     evaluate,
     fetch_script_observation,
+    SRI_PINNED,
+    confirm_sri_pinned,
+    sri_value,
 )
+import base64
+import hashlib
+import socket
 
 NOW = datetime(2026, 11, 17, 12, 0, tzinfo=timezone.utc)
 GOOD_SHA384 = "a" * 96
@@ -71,7 +77,7 @@ class FetchTargetTests(unittest.TestCase):
             host, port = server.server_address
             script = RegisteredScript(script_id="local", url=f"http://{host}:{port}/widget.js",
                                       trusted_sha384=(GOOD_SHA384,))
-            observation = fetch_script_observation(script, (host,), now=NOW)
+            observation = fetch_script_observation(script, (host,), now=NOW, allow_private_addresses=True)
             self.assertEqual(observation.status_code, 200)
             self.assertEqual(len(observation.sha384), 96)
         finally:
@@ -88,9 +94,161 @@ class FetchTargetTests(unittest.TestCase):
             script = RegisteredScript(script_id="local", url=f"http://{host}:{port}/widget.js",
                                       trusted_sha384=(GOOD_SHA384,))
             with self.assertRaises(FetchRejected):
+                fetch_script_observation(script, (host,), now=NOW, allow_private_addresses=True)
+        finally:
+            server.shutdown()
+
+
+def fake_resolver(*answers):
+    """A resolver that returns a different answer on every call, the
+    shape of a DNS-rebinding attack, and counts how often it is asked."""
+    calls = []
+
+    def resolve(host, port, type=None):
+        address = answers[min(len(calls), len(answers) - 1)]
+        calls.append(host)
+        return [(socket.AF_INET, socket.SOCK_STREAM, 6, "", (a, port)) for a in address]
+    resolve.calls = calls
+    return resolve
+
+
+class PinnedFetchTests(unittest.TestCase):
+    def test_a_private_address_is_refused_by_default(self):
+        server = _serve(_Handler)
+        try:
+            host, port = server.server_address
+            script = RegisteredScript(script_id="local", url=f"http://{host}:{port}/widget.js",
+                                      trusted_sha384=(GOOD_SHA384,))
+            with self.assertRaises(FetchRejected):
                 fetch_script_observation(script, (host,), now=NOW)
         finally:
             server.shutdown()
+
+    def test_a_public_name_that_resolves_to_an_internal_address_is_refused(self):
+        resolver = fake_resolver(["10.0.0.5"])
+        with self.assertRaises(FetchRejected):
+            fetch_script_observation(SCRIPT, ("cdn.vendor.example",), now=NOW, resolver=resolver)
+
+    def test_a_mixed_public_and_private_answer_is_refused_outright(self):
+        resolver = fake_resolver(["93.184.216.34", "127.0.0.1"])
+        with self.assertRaises(FetchRejected):
+            fetch_script_observation(SCRIPT, ("cdn.vendor.example",), now=NOW, resolver=resolver)
+
+    def test_the_name_is_resolved_once_and_the_connection_goes_to_that_address(self):
+        # A rebinding resolver answers with the real server first and an
+        # internal address on any later lookup. The fetch must resolve
+        # once and connect to the first answer; a second lookup at
+        # connect time would have been redirected.
+        server = _serve(_Handler)
+        try:
+            host, port = server.server_address
+            resolver = fake_resolver([host], ["10.0.0.5"])
+            script = RegisteredScript(script_id="local", url=f"http://lab.example:{port}/widget.js",
+                                      trusted_sha384=(GOOD_SHA384,))
+            observation = fetch_script_observation(script, ("lab.example",), now=NOW,
+                                                   allow_private_addresses=True, resolver=resolver)
+            self.assertEqual(observation.status_code, 200)
+            self.assertEqual(len(resolver.calls), 1)
+            self.assertEqual(observation.sha384, hashlib.sha384(_Handler.body).hexdigest())
+        finally:
+            server.shutdown()
+
+    def test_a_non_200_response_is_not_hashed_as_the_script(self):
+        class _NotFound(_Handler):
+            def do_GET(self):
+                self.send_response(404)
+                self.end_headers()
+        server = _serve(_NotFound)
+        try:
+            host, port = server.server_address
+            script = RegisteredScript(script_id="local", url=f"http://{host}:{port}/widget.js",
+                                      trusted_sha384=(GOOD_SHA384,))
+            with self.assertRaises(FetchRejected):
+                fetch_script_observation(script, (host,), now=NOW, allow_private_addresses=True)
+        finally:
+            server.shutdown()
+
+
+class PinnedHttpsTests(unittest.TestCase):
+    """The HTTPS path connects to the pinned address but must still verify
+    the server certificate against the registered hostname."""
+
+    @classmethod
+    def setUpClass(cls):
+        import shutil, subprocess, tempfile
+        if not shutil.which("openssl"):
+            raise unittest.SkipTest("openssl not available")
+        cls.tmp = tempfile.mkdtemp()
+        cls.cert, cls.key = f"{cls.tmp}/cert.pem", f"{cls.tmp}/key.pem"
+        subprocess.run(["openssl", "req", "-x509", "-newkey", "rsa:2048", "-nodes", "-days", "1",
+                        "-subj", "/CN=lab.example", "-addext", "subjectAltName=DNS:lab.example",
+                        "-keyout", cls.key, "-out", cls.cert], check=True, capture_output=True)
+
+    def _serve_tls(self):
+        import ssl
+        server = http.server.HTTPServer(("127.0.0.1", 0), _Handler)
+        context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
+        context.load_cert_chain(self.cert, self.key)
+        server.socket = context.wrap_socket(server.socket, server_side=True)
+        threading.Thread(target=server.serve_forever, daemon=True).start()
+        return server
+
+    def _client_context(self):
+        import ssl
+        context = ssl.create_default_context(cafile=self.cert)
+        return context
+
+    def test_the_certificate_is_verified_against_the_registered_hostname(self):
+        server = self._serve_tls()
+        try:
+            port = server.server_address[1]
+            script = RegisteredScript(script_id="tls", url=f"https://lab.example:{port}/widget.js",
+                                      trusted_sha384=(GOOD_SHA384,))
+            observation = fetch_script_observation(
+                script, ("lab.example",), now=NOW, allow_private_addresses=True,
+                resolver=fake_resolver(["127.0.0.1"]), ssl_context=self._client_context())
+            self.assertEqual(observation.status_code, 200)
+        finally:
+            server.shutdown()
+
+    def test_a_certificate_for_a_different_name_is_refused(self):
+        server = self._serve_tls()
+        try:
+            port = server.server_address[1]
+            script = RegisteredScript(script_id="tls", url=f"https://other.example:{port}/widget.js",
+                                      trusted_sha384=(GOOD_SHA384,))
+            with self.assertRaises(FetchRejected):
+                fetch_script_observation(
+                    script, ("other.example",), now=NOW, allow_private_addresses=True,
+                    resolver=fake_resolver(["127.0.0.1"]), ssl_context=self._client_context())
+        finally:
+            server.shutdown()
+
+
+class SriTests(unittest.TestCase):
+    def test_sri_value_matches_the_browser_format(self):
+        digest = hashlib.sha384(b"var x = 1;").digest()
+        self.assertEqual(sri_value(digest.hex()), "sha384-" + base64.b64encode(digest).decode())
+
+    def _page(self, attrs):
+        return f'<html><body><script src="{SCRIPT.url}" {attrs}></script></body></html>'
+
+    def test_a_trusted_pin_with_crossorigin_passes(self):
+        html = self._page(f'integrity="{sri_value(GOOD_SHA384)}" crossorigin="anonymous"')
+        evidence = confirm_sri_pinned(SCRIPT, html, NOW, now=NOW)
+        self.assertEqual(evidence.assertion, SRI_PINNED)
+        self.assertTrue(evidence.observed_pass)
+
+    def test_a_pin_without_crossorigin_does_not_pass(self):
+        html = self._page(f'integrity="{sri_value(GOOD_SHA384)}"')
+        self.assertFalse(confirm_sri_pinned(SCRIPT, html, NOW, now=NOW).observed_pass)
+
+    def test_a_pin_to_an_untrusted_hash_does_not_pass(self):
+        html = self._page(f'integrity="{sri_value(BAD_SHA384)}" crossorigin="anonymous"')
+        self.assertFalse(confirm_sri_pinned(SCRIPT, html, NOW, now=NOW).observed_pass)
+
+    def test_no_pin_at_all_does_not_pass(self):
+        self.assertFalse(confirm_sri_pinned(SCRIPT, self._page(""), NOW, now=NOW).observed_pass)
 
 
 class HashAssertionTests(unittest.TestCase):

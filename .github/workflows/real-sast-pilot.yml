@@ -1,6 +1,12 @@
 name: Real SAST fix-verification pilot
 
 on:
+  push:
+    branches: [master]
+    paths:
+      - 'experiment-b/real-sast-pilot/**'
+      - 'engine/predict_shield/sast_findings.py'
+      - '.github/workflows/real-sast-pilot.yml'
   pull_request:
     paths:
       - 'experiment-b/real-sast-pilot/**'

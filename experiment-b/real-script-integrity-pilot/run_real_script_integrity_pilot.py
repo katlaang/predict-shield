@@ -31,39 +31,61 @@ Detection scenarios:
        misses this; the browser's real network capture must not.
     E. CSP enforcement toggle: missing, wildcard and correctly scoped.
 
-Containment verification, every trial with the COMPROMISED script live
-at the vendor, each judged by two independent sources (the browser's
-own capture and the sink server's own log, both required) and each
-recording functional disruption:
+Containment verification. A compromised script is live at the vendor
+in every trial, and it sends page data to the sink through one of four
+exfiltration channels: a fetch() request, an image beacon, a form
+submission, or a top-level navigation. Each channel is tried against
+each containment, and each trial is judged by two independent sources,
+both required (the browser's own capture and the sink server's own
+log), with functional disruption recorded:
 
-    F1. Block the vendor script (CSP script-src 'self').
-    F2. Restrict where scripts may send data (CSP connect-src 'self'),
-        leaving the vendor script itself allowed to run.
-    F3. Ineffective containment (CSP allows the vendor and restricts
-        nothing else): the verifier must report NOT VERIFIED, proving it
-        can fail a containment rather than only ever passing one.
+    none_allow_vendor_only      CSP allows the vendor and restricts
+                                nothing else (the control: the verifier
+                                must report NOT VERIFIED, proving it can
+                                fail a containment, not only pass one)
+    restrict_connect_src        CSP connect-src 'self'
+    restrict_all_fetch_targets  CSP default-src 'self' plus form-action
+                                'self', the vendor still allowed to run
+    block_vendor_script         CSP script-src 'self'
+    sri_pin                     the page pins the vendor script to its
+                                trusted hash with Subresource Integrity
 
 Controls on the containment verifier itself, the two ways an absence of
 a prohibited request could mean nothing:
 
-    G. Instrumentation not live: the F2 trial again, but with the browser
-       capture deliberately not attached, so the page-owned canary is not
-       recorded. Must be INDETERMINATE, never VERIFIED.
-    H. Exposure not exercised: the F2 CSP again, but with the clean
-       script live at the vendor, so there is no compromise to contain.
-       Must be INDETERMINATE, never VERIFIED.
+    G. Instrumentation not live: a contained trial again, but with the
+       browser capture deliberately not attached, so the page-owned
+       canary is not recorded. Must be INDETERMINATE, never VERIFIED.
+    H. Exposure not exercised: the same CSP with the clean script live,
+       so there is no compromise to contain. Must be INDETERMINATE.
 
-The probe detection latency (scenario B) is the time from the tamper to
-the fetch probe flagging it when a probe runs immediately afterward. It
-deliberately excludes the re-verification scheduling interval, which
-dominates real-world detection time and depends on the scheduler's
-probe budget, not on this probe.
+SRI operating costs, measured with the clean or benign script:
+
+    S1. SRI pin with a vendor that sends CORS headers: script runs.
+    S2. The same pin with a vendor that does not: the browser refuses
+        the script even though it is clean.
+    S3. The same pin after a benign, reviewed vendor update: the browser
+        refuses the update until the pin is changed.
+
+Detection under a real re-check cadence:
+
+    I. The registered script is monitored by the existing
+       re-verification scheduler (`verification_cycle.select_probes`,
+       fixed-interval policy) on a real clock, with every selected probe
+       a real fetch. The script is tampered with at a random point
+       several times, and the time from each tamper to the first
+       NOT VERIFIED record is measured, scheduling wait included.
+
+Scenario B also reports probe detection latency: tamper to flag when a
+probe runs immediately afterward. Scenario I is the end-to-end figure,
+including the wait for the scheduler to select the next re-check.
 """
 from __future__ import annotations
 
 import argparse
 import hashlib
 import json
+import random
 import sys
 import time
 from dataclasses import dataclass
@@ -77,7 +99,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import lab_servers
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "engine"))
-from predict_shield.assessment import assess
+from predict_shield.assessment import Outcome, assess
 from predict_shield.script_integrity import (
     CSP_ENFORCED,
     HASH_MATCHES_TRUSTED,
@@ -92,11 +114,15 @@ from predict_shield.script_integrity import (
     confirm_no_prohibited_network_behavior,
     confirm_no_unregistered_domain,
     evaluate,
+    fetch_page,
     fetch_response_headers,
     fetch_script_observation,
+    confirm_sri_pinned,
+    sri_value,
 )
+from predict_shield.verification_cycle import TrackedControl, record_probe, select_probes
 
-SCHEMA = "predict-shield/real-script-integrity-pilot/2"
+SCHEMA = "predict-shield/real-script-integrity-pilot/3"
 
 
 def _sha384(body: bytes) -> str:
@@ -110,7 +136,8 @@ class PageTrial:
     blocked_hosts: set
     canary_observed: bool
     vendor_script_requested: bool
-    button_enabled: bool
+    button_enabled: bool | None   # None when the page navigated away
+    final_url: str
 
 
 def _load(playwright, url: str, vendor_script_url: str, *, instrument: bool = True,
@@ -151,13 +178,20 @@ def _load(playwright, url: str, vendor_script_url: str, *, instrument: bool = Tr
             page.on("request", on_request)
             page.on("requestfinished", on_finished)
             page.on("requestfailed", on_failed)
-        page.goto(url, timeout=timeout_ms)
-        page.wait_for_timeout(700)
-        try:
-            enabled = page.is_enabled("#checkout-button")
-        except Exception:
-            enabled = False
-        return PageTrial(requested, sent, blocked, flags["canary"], flags["vendor"], enabled)
+        # Wait only for the response to begin, then a fixed settle time:
+        # a channel that navigates the page away (form, navigation) never
+        # fires the original page's load event.
+        page.goto(url, timeout=timeout_ms, wait_until="commit")
+        page.wait_for_timeout(1500)
+        final_url = page.url
+        if urlparse(final_url).path != urlparse(url).path or urlparse(final_url).netloc != urlparse(url).netloc:
+            enabled = None
+        else:
+            try:
+                enabled = page.is_enabled("#checkout-button", timeout=1000)
+            except Exception:
+                enabled = False
+        return PageTrial(requested, sent, blocked, flags["canary"], flags["vendor"], enabled, final_url)
     finally:
         browser.close()
 
@@ -196,7 +230,8 @@ def run(output_path: Path) -> dict:
                           prohibited_sinks=(sink_host,))
     vendor_csp_source = f"{vendor_host}:{vendor_port}"
 
-    def set_state(*, body: bytes | None = None, csp: str | None | bool = False, extra: str | None = None):
+    def set_state(*, body: bytes | None = None, csp: str | None | bool = False, extra: str | None = None,
+                  attrs: str | None = None, cors: bool | None = None):
         with state.lock:
             if body is not None:
                 state.script_body = body
@@ -204,6 +239,18 @@ def run(output_path: Path) -> dict:
                 state.csp_header = csp
             if extra is not None:
                 state.extra_script_tag = extra
+            if attrs is not None:
+                state.script_attrs = attrs
+            if cors is not None:
+                state.vendor_cors = cors
+
+    # The lab's servers are on loopback addresses, which the fetch probe
+    # refuses unless a registration explicitly opts in; this pilot does.
+    def probe(reg, now):
+        return fetch_script_observation(reg, allowed_hosts, now=now, allow_private_addresses=True)
+
+    def headers_of(url):
+        return fetch_response_headers(url, allowed_hosts, allow_private_addresses=True)
 
     def sink_hits() -> int:
         with sink_state.lock:
@@ -213,12 +260,12 @@ def run(output_path: Path) -> dict:
                     "site_origin": state.site_origin, "vendor_origin": state.vendor_origin,
                     "sink_origin": state.sink_origin, "scenarios": {}, "containment": {}}
 
-    def containment_trial(label: str, action: str, csp: str, body: bytes, expected_hash: str,
-                          *, instrument: bool = True) -> dict:
-        set_state(body=body, csp=csp, extra="")
+    def containment_trial(action: str, csp: str, body: bytes, expected_hash: str,
+                          *, attrs: str = "", instrument: bool = True) -> dict:
+        set_state(body=body, csp=csp, extra="", attrs=attrs, cors=True)
         now = datetime.now(timezone.utc)
-        probe = fetch_script_observation(script, allowed_hosts, now=now)
-        compromise_live = probe.sha384 == expected_hash
+        observed = probe(script, now)
+        compromise_live = observed.sha384 == expected_hash
         hits_before = sink_hits()
         trial = _load(playwright, page_url, vendor_script_url, instrument=instrument)
         hits = sink_hits() - hits_before
@@ -233,7 +280,7 @@ def run(output_path: Path) -> dict:
         verdict = assess(site.site_id, NO_PROHIBITED_NETWORK_BEHAVIOR, [browser_ev, sink_ev],
                          required_independent_checks=2, now=now)
         return {
-            "containment_action": action, "csp_header": csp,
+            "containment_action": action, "csp_header": csp, "script_attrs": attrs,
             "compromised_script_live_at_vendor": compromise_live,
             "browser_attempted_vendor_script": trial.vendor_script_requested,
             "canary_observed": trial.canary_observed,
@@ -247,15 +294,17 @@ def run(output_path: Path) -> dict:
             "containment_outcome": verdict.outcome.value,
             "containment_reason": verdict.reason,
             "button_enabled": trial.button_enabled,
-            "functional_disruption_detected": not trial.button_enabled,
+            "page_navigated_away": trial.button_enabled is None,
+            "functional_disruption_detected": (None if trial.button_enabled is None
+                                               else not trial.button_enabled),
         }
 
     with sync_playwright() as playwright:
         # --- A. Negative control -------------------------------------------------
         set_state(body=lab_servers.GOOD_SCRIPT, csp=f"script-src 'self' {vendor_csp_source}")
         now_a = datetime.now(timezone.utc)
-        obs_a = fetch_script_observation(script, allowed_hosts, now=now_a)
-        headers_a = fetch_response_headers(page_url, allowed_hosts)
+        obs_a = probe(script, now_a)
+        headers_a = headers_of(page_url)
         hits_before = sink_hits()
         trial_a = _load(playwright, page_url, vendor_script_url)
         capture_a = BrowserBehaviorCapture(
@@ -287,7 +336,7 @@ def run(output_path: Path) -> dict:
         tamper_started = time.monotonic()
         set_state(body=malicious_body)
         now_b = datetime.now(timezone.utc)
-        obs_b = fetch_script_observation(script, allowed_hosts, now=now_b)
+        obs_b = probe(script, now_b)
         probe_latency = time.monotonic() - tamper_started
         hits_before = sink_hits()
         trial_b = _load(playwright, page_url, vendor_script_url)
@@ -307,7 +356,7 @@ def run(output_path: Path) -> dict:
                                     trusted_sha384=(good_hash, benign_update_hash))
         set_state(body=lab_servers.BENIGN_UPDATE_SCRIPT)
         now_c = datetime.now(timezone.utc)
-        obs_c = fetch_script_observation(script_c, allowed_hosts, now=now_c)
+        obs_c = probe(script_c, now_c)
         hash_ev_c = confirm_hash_matches_trusted(script_c, obs_c, now=now_c)
         trial_c = _load(playwright, page_url, vendor_script_url)
         domain_ev_c = confirm_no_unregistered_domain(site, tuple(_hosts(trial_c.requested_hosts)), now_c, now=now_c)
@@ -321,7 +370,7 @@ def run(output_path: Path) -> dict:
         set_state(body=lab_servers.GOOD_SCRIPT, extra=f'<script src="{state.sink_origin}/decoy.js"></script>',
                   csp=f"script-src 'self' {vendor_csp_source} {sink_host}:{sink_port}")
         now_d = datetime.now(timezone.utc)
-        obs_d = fetch_script_observation(script, allowed_hosts, now=now_d)
+        obs_d = probe(script, now_d)
         hash_ev_d = confirm_hash_matches_trusted(script, obs_d, now=now_d)
         trial_d = _load(playwright, page_url, vendor_script_url)
         domain_ev_d = confirm_no_unregistered_domain(site, tuple(_hosts(trial_d.requested_hosts)), now_d, now=now_d)
@@ -338,35 +387,64 @@ def run(output_path: Path) -> dict:
         for label, header in (("missing", None), ("wildcard", "script-src *"),
                               ("correctly_scoped", f"script-src 'self' {vendor_csp_source}")):
             set_state(csp=header)
-            headers_e = fetch_response_headers(page_url, allowed_hosts)
+            headers_e = headers_of(page_url)
             now_e = datetime.now(timezone.utc)
             csp_results[label] = confirm_csp_enforced(
                 site, headers_e.get("content-security-policy"), now_e, now=now_e).observed_pass
         report["scenarios"]["E_csp_enforcement_toggle"] = csp_results
 
-        # --- F. Containment verification, compromised script live -----------------
-        report["containment"]["F1_block_vendor_script"] = containment_trial(
-            "F1", "block_vendor_script", "script-src 'self'", malicious_body, malicious_hash)
-        report["containment"]["F2_restrict_connect_src"] = containment_trial(
-            "F2", "restrict_connect_src", f"script-src 'self' {vendor_csp_source}; connect-src 'self'",
-            malicious_body, malicious_hash)
-        report["containment"]["F3_ineffective_containment"] = containment_trial(
-            "F3", "ineffective_allow_vendor_only", f"script-src 'self' {vendor_csp_source}",
-            malicious_body, malicious_hash)
+        # --- F. Containment matrix: channel x containment ------------------------
+        V = vendor_csp_source
+        pin = f' integrity="{sri_value(good_hash)}" crossorigin="anonymous"'
+        containments = {
+            "none_allow_vendor_only": (f"script-src 'self' {V}", ""),
+            "restrict_connect_src": (f"script-src 'self' {V}; connect-src 'self'", ""),
+            "restrict_all_fetch_targets": (f"default-src 'self'; script-src 'self' {V}; form-action 'self'", ""),
+            "block_vendor_script": ("script-src 'self'", ""),
+            "sri_pin": (f"script-src 'self' {V}", pin),
+        }
+        matrix = {}
+        for channel in lab_servers.EXFIL_CHANNELS:
+            body = lab_servers.malicious_script(state.sink_origin, channel)
+            matrix[channel] = {}
+            for action, (csp, attrs) in containments.items():
+                matrix[channel][action] = containment_trial(action, csp, body, _sha384(body), attrs=attrs)
+        report["containment_matrix"] = matrix
 
         # --- G/H. Controls on the containment verifier itself ----------------------
+        fetch_body = lab_servers.malicious_script(state.sink_origin, "fetch")
+        contained_csp = f"script-src 'self' {V}; connect-src 'self'"
         report["containment"]["G_instrumentation_not_live"] = containment_trial(
-            "G", "restrict_connect_src", f"script-src 'self' {vendor_csp_source}; connect-src 'self'",
-            malicious_body, malicious_hash, instrument=False)
+            "restrict_connect_src", contained_csp, fetch_body, _sha384(fetch_body), instrument=False)
         report["containment"]["H_exposure_not_exercised"] = containment_trial(
-            "H", "restrict_connect_src", f"script-src 'self' {vendor_csp_source}; connect-src 'self'",
-            lab_servers.GOOD_SCRIPT, malicious_hash)
+            "restrict_connect_src", contained_csp, lab_servers.GOOD_SCRIPT, _sha384(fetch_body))
+
+        # --- S. SRI operating costs ------------------------------------------------
+        sri = {}
+        for label, body, cors in (("S1_clean_script_vendor_sends_cors", lab_servers.GOOD_SCRIPT, True),
+                                  ("S2_clean_script_vendor_without_cors", lab_servers.GOOD_SCRIPT, False),
+                                  ("S3_benign_update_before_pin_changed", lab_servers.BENIGN_UPDATE_SCRIPT, True)):
+            set_state(body=body, csp=f"script-src 'self' {V}", extra="", attrs=pin, cors=cors)
+            now_s = datetime.now(timezone.utc)
+            _, html = fetch_page(page_url, allowed_hosts, allow_private_addresses=True)
+            pinned = confirm_sri_pinned(script, html, now_s, now=now_s).observed_pass
+            trial_s = _load(playwright, page_url, vendor_script_url)
+            sri[label] = {"page_carries_trusted_pin": pinned,
+                          "script_ran": bool(trial_s.button_enabled),
+                          "functional_disruption_detected": not trial_s.button_enabled}
+        set_state(attrs="", cors=True)
+        report["sri_operating_costs"] = sri
+
+        # --- I. Detection under a real re-check cadence ----------------------------
+        report["scheduled_detection"] = _scheduled_detection(
+            set_state, probe, script, lambda: lab_servers.malicious_script(state.sink_origin, "fetch"))
 
     vendor_server.shutdown()
     site_server.shutdown()
     sink_server.shutdown()
     c = report["containment"]
     report["finished_at"] = datetime.now(timezone.utc).isoformat()
+    matrix = report["containment_matrix"]
     report["summary"] = {
         "negative_control_accepted": report["scenarios"]["A_negative_control"]["accepted"],
         "malicious_tamper_caught_by_hash": not report["scenarios"]["B_malicious_tamper"]["hash_matches_trusted"],
@@ -374,15 +452,68 @@ def run(output_path: Path) -> dict:
             report["scenarios"]["B_malicious_tamper"]["real_browser_reached_sink"]
             and report["scenarios"]["B_malicious_tamper"]["sink_server_hits"] > 0,
         "probe_detection_latency_seconds": report["scenarios"]["B_malicious_tamper"]["probe_detection_latency_seconds"],
+        "scheduled_detection": {k: v for k, v in report["scheduled_detection"].items() if k != "trials"},
         "false_positive_occurred": report["scenarios"]["C_benign_vendor_update"]["false_positive_occurred"],
         "unregistered_domain_caught_despite_clean_hash":
             report["scenarios"]["D_unregistered_domain_injection"]["caught_by_domain_check_despite_clean_hash"],
-        "containment_outcomes": {k: v["containment_outcome"] for k, v in c.items()},
-        "containment_functional_disruption": {k: v["functional_disruption_detected"]
-                                              for k, v in c.items() if k.startswith("F")},
+        "containment_matrix_outcomes": {ch: {a: t["containment_outcome"] for a, t in row.items()}
+                                        for ch, row in matrix.items()},
+        "containment_matrix_disruption": {ch: {a: t["functional_disruption_detected"] for a, t in row.items()}
+                                          for ch, row in matrix.items()},
+        "verifier_controls": {k: v["containment_outcome"] for k, v in c.items()},
+        "sri_operating_costs": {k: v["script_ran"] for k, v in report["sri_operating_costs"].items()},
     }
     output_path.write_text(json.dumps(report, indent=1, sort_keys=True) + "\n", encoding="utf-8")
     return report
+
+
+def _scheduled_detection(set_state, probe, script, malicious_body_fn, *, interval: int = 2,
+                         trials: int = 5, seed: int = 20261118) -> dict:
+    """Monitor the registered script with the existing fixed-interval
+    re-verification scheduler on a real clock, every selected probe a real
+    fetch, and measure tamper-to-detection including the scheduling wait.
+    The scheduler's timestamps are whole seconds, so the worst case is
+    about one interval plus one second."""
+    rng = random.Random(seed)
+    results = []
+    for _ in range(trials):
+        set_state(body=lab_servers.GOOD_SCRIPT)
+        start = int(time.time())
+        control = TrackedControl(subject_id=script.script_id, asset=script.script_id,
+                                 assertion=HASH_MATCHES_TRUSTED, last_verified_at=start - interval, risk=0.5)
+        tamper_at = time.monotonic() + rng.uniform(0.0, 2.0 * interval)
+        tampered, detected_after, probes_run = False, None, 0
+        deadline = time.monotonic() + 10 * interval + 10
+        while time.monotonic() < deadline:
+            if not tampered and time.monotonic() >= tamper_at:
+                set_state(body=malicious_body_fn())
+                tampered, tamper_clock = True, time.monotonic()
+            now = int(time.time())
+            requests = select_probes([control], now=now, budget=1, policy="fixed", interval=interval)
+            if requests:
+                observed = datetime.fromtimestamp(now, tz=timezone.utc)
+                evidence = confirm_hash_matches_trusted(script, probe(script, observed), now=observed)
+                control, record = record_probe(control, requests[0], [evidence],
+                                               observed_at=now, requested_at=now)
+                probes_run += 1
+                if record.outcome is Outcome.NOT_VERIFIED:
+                    if tampered:
+                        detected_after = time.monotonic() - tamper_clock
+                        break
+                    raise RuntimeError("clean script reported NOT VERIFIED")
+            time.sleep(0.05)
+        results.append({"detected": detected_after is not None,
+                        "seconds_from_tamper_to_detection": None if detected_after is None
+                        else round(detected_after, 3),
+                        "probes_run": probes_run})
+    times = [r["seconds_from_tamper_to_detection"] for r in results if r["detected"]]
+    return {
+        "scheduler_policy": "fixed", "interval_seconds": interval, "trials": results,
+        "all_detected": len(times) == trials,
+        "mean_seconds": round(sum(times) / len(times), 3) if times else None,
+        "max_seconds": max(times) if times else None,
+        "bound_seconds": interval + 1,
+    }
 
 
 def main() -> None:

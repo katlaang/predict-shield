@@ -47,11 +47,17 @@ Fail-closed rules carried over from every other check in this pipeline:
     * A script or site is only ever evaluated once registered by the
       operator ahead of time, pinned to an explicit host allowlist. An
       unregistered host is rejected before any fetch is attempted --
-      see `_validate_fetch_target` below, which is this module's SSRF
-      defense: the fetch target's scheme and hostname must exactly
-      match a registered entry, and a redirect response is treated as a
-      hard failure rather than followed, so an unregistered host can
-      never be reached by having the registered one redirect to it.
+      see `_validate_fetch_target` and `_pinned_get` below, which are
+      this module's SSRF defense: the fetch target's scheme and
+      hostname must exactly match a registered entry; the hostname is
+      resolved exactly once, every resolved address is checked, and the
+      connection is made to that pinned address, so a DNS answer that
+      changes between the check and the fetch (DNS rebinding) cannot
+      move the request somewhere else; private, loopback, link-local and
+      other non-public addresses are refused unless the registration
+      explicitly opts in; and a redirect response is a hard failure
+      rather than followed, so an unregistered host can never be reached
+      by having the registered one redirect to it.
     * A stale observation (older than `max_age_seconds`) is rejected:
       a past-tense clean hash is not evidence the script is clean now.
     * `evaluate()` adds no new trust and runs no checks itself. It asks
@@ -61,15 +67,13 @@ Fail-closed rules carried over from every other check in this pipeline:
 
 What this module does NOT yet do, honestly:
 
-    * Resolve-then-pin protection against DNS rebinding between the
-      hostname check and the actual fetch is not implemented; only the
-      host-allowlist and no-redirect checks are. A fully hardened fetcher
-      would also pin the resolved IP for the lifetime of the connection.
-    * SRI pinning and CSP generation/rollout are not implemented here;
-      this module only checks whether a CSP already in place restricts
-      script-src, and whether a registered script's trusted hash still
-      matches. Applying a new CSP header or SRI attribute to a real site
-      is a containment action gated and applied elsewhere, not this module.
+    * Applying a CSP header or an SRI attribute to a real site is a
+      containment action gated and applied elsewhere, not by this
+      module. This module computes the SRI value for a trusted hash
+      (`sri_value`) and checks whether a page actually carries it
+      (`confirm_sri_pinned`), and checks whether a CSP already in place
+      restricts script-src; the pilot verifies in a real browser what
+      each containment does and does not stop.
     * Nothing here crawls a live production site to discover what it
       embeds. `RegisteredSite`/`RegisteredScript` are what the operator
       declares ahead of time, the same registration discipline
@@ -78,12 +82,14 @@ What this module does NOT yet do, honestly:
 """
 from __future__ import annotations
 
+import base64
 import hashlib
+import http.client
 import ipaddress
 import socket
-import urllib.error
-import urllib.request
-from dataclasses import dataclass, field
+import ssl
+from dataclasses import dataclass
+from html.parser import HTMLParser
 from datetime import datetime, timezone
 from urllib.parse import urlparse
 
@@ -95,6 +101,11 @@ HASH_MATCHES_TRUSTED = "hash_matches_trusted"
 NO_UNREGISTERED_DOMAIN = "no_unregistered_domain"
 CSP_ENFORCED = "csp_enforced"
 NO_PROHIBITED_NETWORK_BEHAVIOR = "no_prohibited_network_behavior"
+# Optional, not part of REQUIRED_ASSERTIONS: SRI is only viable for a
+# script that is stable enough to pin and served with CORS (a browser
+# refuses a cross-origin SRI check without it), so it is a containment
+# option the operator chooses, not a condition every script must meet.
+SRI_PINNED = "sri_pinned"
 
 # Every registered third-party script this module evaluates must clear all
 # four of these assertions. The fourth is a real, instrumented-browser
@@ -169,14 +180,14 @@ class ScriptObservation(object):
     fetched_at: datetime
 
 
+MAX_FETCH_BYTES = 10 * 1024 * 1024
+
+
 def _validate_fetch_target(url: str, allowed_hosts: tuple[str, ...]) -> None:
-    """The SSRF defense this module relies on: the fetch target's scheme
-    and hostname must exactly match a registration the operator supplied
-    ahead of time. This does not vet the resolved IP (see the module
-    docstring's stated limitation on DNS-rebinding protection); it only
-    ensures the fetch can never be pointed at a host the operator never
-    registered, including by way of a redirect (`fetch_script_observation`
-    disables redirect following and treats one as a hard failure)."""
+    """First half of the SSRF defense: the fetch target's scheme and
+    hostname must exactly match a registration the operator supplied
+    ahead of time. The second half, in `_pinned_get`, vets the resolved
+    address and connects only to it."""
     parsed = urlparse(url)
     if parsed.scheme not in ("http", "https"):
         raise FetchRejected(f"refusing to fetch non-http(s) scheme: {parsed.scheme!r}")
@@ -184,47 +195,136 @@ def _validate_fetch_target(url: str, allowed_hosts: tuple[str, ...]) -> None:
         raise FetchRejected(f"refusing to fetch unregistered host: {parsed.hostname!r}")
 
 
-class _NoRedirect(urllib.request.HTTPRedirectHandler):
-    def redirect_request(self, req, fp, code, msg, headers, newurl):
-        raise FetchRejected(f"refusing to follow redirect to unregistered host: {newurl!r}")
+def _address_is_public(address: str) -> bool:
+    ip = ipaddress.ip_address(address)
+    return not (ip.is_private or ip.is_loopback or ip.is_link_local or ip.is_multicast
+                or ip.is_reserved or ip.is_unspecified)
 
 
-_NO_REDIRECT_OPENER = urllib.request.build_opener(_NoRedirect)
+def _resolve_once(hostname: str, port: int, *, allow_private_addresses: bool, resolver) -> str:
+    """Resolve the hostname exactly once and return the single address the
+    fetch will connect to. Every address in the answer is checked, not
+    only the first: an answer that mixes a public and a private address
+    is refused outright rather than trusted to pick the public one."""
+    try:
+        answers = resolver(hostname, port, type=socket.SOCK_STREAM)
+    except OSError as error:
+        raise FetchRejected(f"could not resolve {hostname!r}: {error}") from error
+    addresses = [info[4][0] for info in answers]
+    if not addresses:
+        raise FetchRejected(f"no address for {hostname!r}")
+    if not allow_private_addresses:
+        refused = [a for a in addresses if not _address_is_public(a)]
+        if refused:
+            raise FetchRejected(f"refusing non-public address for {hostname!r}: {refused}")
+    return addresses[0]
+
+
+class _PinnedHTTPConnection(http.client.HTTPConnection):
+    def __init__(self, host, pinned_address, port, timeout):
+        super().__init__(host, port, timeout=timeout)
+        self._pinned_address = pinned_address
+
+    def connect(self):
+        self.sock = socket.create_connection((self._pinned_address, self.port), self.timeout)
+
+
+class _PinnedHTTPSConnection(http.client.HTTPSConnection):
+    """Connects to the pinned address but still verifies the certificate
+    against the registered hostname (SNI and hostname check use `host`)."""
+
+    def __init__(self, host, pinned_address, port, timeout, context):
+        super().__init__(host, port, timeout=timeout, context=context)
+        self._pinned_address = pinned_address
+        self._pinned_context = context
+
+    def connect(self):
+        raw = socket.create_connection((self._pinned_address, self.port), self.timeout)
+        self.sock = self._pinned_context.wrap_socket(raw, server_hostname=self.host)
+
+
+def _pinned_get(url: str, allowed_hosts: tuple[str, ...], *, timeout: float,
+                allow_private_addresses: bool, resolver=socket.getaddrinfo,
+                ssl_context: ssl.SSLContext | None = None) -> tuple[int, dict[str, str], bytes]:
+    _validate_fetch_target(url, allowed_hosts)
+    parsed = urlparse(url)
+    port = parsed.port or (443 if parsed.scheme == "https" else 80)
+    address = _resolve_once(parsed.hostname, port, allow_private_addresses=allow_private_addresses,
+                            resolver=resolver)
+    path = parsed.path or "/"
+    if parsed.query:
+        path += "?" + parsed.query
+    if parsed.scheme == "https":
+        connection = _PinnedHTTPSConnection(parsed.hostname, address, port, timeout,
+                                            ssl_context or ssl.create_default_context())
+    else:
+        connection = _PinnedHTTPConnection(parsed.hostname, address, port, timeout)
+    try:
+        connection.request("GET", path, headers={"User-Agent": "predict-shield-script-integrity/1"})
+        response = connection.getresponse()
+        if 300 <= response.status < 400:
+            raise FetchRejected(
+                f"refusing to follow redirect ({response.status}) to {response.getheader('Location')!r}")
+        body = response.read(MAX_FETCH_BYTES + 1)
+        if len(body) > MAX_FETCH_BYTES:
+            raise FetchRejected("response exceeds the maximum fetch size")
+        headers = {k.lower(): v for k, v in response.getheaders()}
+        return response.status, headers, body
+    except (OSError, http.client.HTTPException) as error:
+        raise FetchRejected(f"fetch failed: {error}") from error
+    finally:
+        connection.close()
 
 
 def fetch_script_observation(
     script: RegisteredScript, allowed_hosts: tuple[str, ...], *,
-    opener=_NO_REDIRECT_OPENER, timeout: float = 10.0, now: datetime | None = None,
+    timeout: float = 10.0, now: datetime | None = None,
+    allow_private_addresses: bool = False, resolver=socket.getaddrinfo,
+    ssl_context: ssl.SSLContext | None = None,
 ) -> ScriptObservation:
     """Fetch the registered script for real and hash what was actually
     served. This is the same unauthenticated request a visiting browser
-    already makes; no vendor access or credential is used or required."""
+    already makes; no vendor access or credential is used or required.
+
+    `allow_private_addresses` must be set explicitly to fetch a script
+    hosted on a private or loopback address, as the pilot's own lab
+    servers are; it is off by default so a public registration that
+    starts resolving to an internal address is refused, not fetched."""
     if now is None:
         now = datetime.now(timezone.utc)
     script.validate()
-    _validate_fetch_target(script.url, allowed_hosts)
-    try:
-        with opener.open(script.url, timeout=timeout) as response:
-            body = response.read()
-            status = getattr(response, "status", 200) or 200
-    except (urllib.error.URLError, OSError, TimeoutError) as error:
-        raise FetchRejected(f"script fetch failed: {error}") from error
+    status, _, body = _pinned_get(script.url, allowed_hosts, timeout=timeout,
+                                  allow_private_addresses=allow_private_addresses, resolver=resolver,
+                                  ssl_context=ssl_context)
+    if status != 200:
+        raise FetchRejected(f"script fetch returned HTTP {status}")
     digest = hashlib.sha384(body).hexdigest()
     return ScriptObservation(script_id=script.script_id, sha384=digest, status_code=status, fetched_at=now)
 
 
 def fetch_response_headers(
-    url: str, allowed_hosts: tuple[str, ...], *,
-    opener=_NO_REDIRECT_OPENER, timeout: float = 10.0,
+    url: str, allowed_hosts: tuple[str, ...], *, timeout: float = 10.0,
+    allow_private_addresses: bool = False, resolver=socket.getaddrinfo,
 ) -> dict[str, str]:
     """Fetch a page's own response headers for real, for the CSP check.
     Same SSRF defense as `fetch_script_observation`."""
-    _validate_fetch_target(url, allowed_hosts)
-    try:
-        with opener.open(url, timeout=timeout) as response:
-            return {k.lower(): v for k, v in response.headers.items()}
-    except (urllib.error.URLError, OSError, TimeoutError) as error:
-        raise FetchRejected(f"page fetch failed: {error}") from error
+    status, headers, _ = _pinned_get(url, allowed_hosts, timeout=timeout,
+                                     allow_private_addresses=allow_private_addresses, resolver=resolver)
+    if status != 200:
+        raise FetchRejected(f"page fetch returned HTTP {status}")
+    return headers
+
+
+def fetch_page(
+    url: str, allowed_hosts: tuple[str, ...], *, timeout: float = 10.0,
+    allow_private_addresses: bool = False, resolver=socket.getaddrinfo,
+) -> tuple[dict[str, str], str]:
+    """Fetch a page's headers and HTML for real, for the CSP and SRI checks."""
+    status, headers, body = _pinned_get(url, allowed_hosts, timeout=timeout,
+                                        allow_private_addresses=allow_private_addresses, resolver=resolver)
+    if status != 200:
+        raise FetchRejected(f"page fetch returned HTTP {status}")
+    return headers, body.decode("utf-8", errors="replace")
 
 
 def _csp_restricts_script_src(header_value: str | None, allowed_domains: tuple[str, ...]) -> bool:
@@ -334,6 +434,57 @@ def confirm_csp_enforced(
         asset=site.site_id, assertion=CSP_ENFORCED,
         observed_pass=_csp_restricts_script_src(header_value, site.allowed_script_domains),
         observed_at=observed_at, source=SOURCE_PREFIX + "header-probe", independent=True,
+    )
+
+
+def sri_value(trusted_sha384_hex: str) -> str:
+    """The Subresource Integrity attribute value for a trusted SHA-384
+    digest, in the form a browser checks: "sha384-" plus the base64 of
+    the raw digest."""
+    raw = bytes.fromhex(trusted_sha384_hex)
+    if len(raw) != 48:
+        raise ValueError("not a sha384 digest")
+    return "sha384-" + base64.b64encode(raw).decode("ascii")
+
+
+class _ScriptTagParser(HTMLParser):
+    def __init__(self):
+        super().__init__()
+        self.tags: list[dict] = []
+
+    def handle_starttag(self, tag, attrs):
+        if tag.lower() == "script":
+            self.tags.append({k.lower(): (v or "") for k, v in attrs})
+
+
+def confirm_sri_pinned(
+    script: RegisteredScript, page_html: str, observed_at: datetime, *,
+    now: datetime | None = None, max_age_seconds: float = 900.0,
+) -> Evidence:
+    """Whether the operator's own page actually embeds the registered
+    script with an `integrity` attribute naming a trusted hash, and with
+    `crossorigin` set, without which a browser does not perform the
+    check for a cross-origin script. A tag missing either attribute, or
+    pinned only to a hash outside the trusted set, does not pass. This
+    checks that the pin is present; whether the browser then refuses a
+    tampered script is a separate, behavioral question the pilot answers
+    in a real browser."""
+    now = _check_age(observed_at, now, max_age_seconds, "page observation")
+    script.validate()
+    parser = _ScriptTagParser()
+    parser.feed(page_html)
+    trusted = {sri_value(h.lower()) for h in script.trusted_sha384}
+    pinned = False
+    for tag in parser.tags:
+        if tag.get("src") != script.url:
+            continue
+        values = set(tag.get("integrity", "").split())
+        pinned = bool(values) and values <= trusted and "crossorigin" in tag
+        if not pinned:
+            break
+    return Evidence(
+        asset=script.script_id, assertion=SRI_PINNED, observed_pass=pinned,
+        observed_at=observed_at, source=SOURCE_PREFIX + "page-markup-probe", independent=True,
     )
 
 

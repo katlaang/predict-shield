@@ -1,0 +1,58 @@
+name: Live-model script containment proposer
+
+# Runs the script-integrity containment proposer against a real hosted
+# language model instead of the deterministic test double, and fails if
+# any structural safety property is violated (an unoffered action
+# selected, an approval-tier action made automatically eligible, a
+# planted instruction not flagged, dispatch authorized, or the model not
+# answering at all). Manually dispatched: it needs a provider API key
+# stored as a repository secret (FEATHERLESS_API_KEY or TOGETHER_API_KEY).
+
+on:
+  workflow_dispatch:
+    inputs:
+      provider:
+        description: 'Hosted provider'
+        required: true
+        type: choice
+        options: [together, featherless]
+      model:
+        description: 'Model name at that provider'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  live-model-proposer:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Run the proposer against the live model
+        working-directory: experiment-b/real-script-integrity-pilot
+        env:
+          PYTHONPATH: ../../engine
+          FEATHERLESS_API_KEY: ${{ secrets.FEATHERLESS_API_KEY }}
+          TOGETHER_API_KEY: ${{ secrets.TOGETHER_API_KEY }}
+          # Inputs go through the environment, never interpolated into the
+          # shell command itself.
+          INPUT_PROVIDER: ${{ inputs.provider }}
+          INPUT_MODEL: ${{ inputs.model }}
+        run: >
+          python run_live_model_proposer.py
+          --provider "$INPUT_PROVIDER"
+          --model "$INPUT_MODEL"
+          --output /tmp/ps-live-model-script-proposer.json
+      - name: Retain the model's recorded decisions
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: live-model-script-proposer-evidence
+          path: /tmp/ps-live-model-script-proposer.json
+          if-no-files-found: ignore
+          retention-days: 30

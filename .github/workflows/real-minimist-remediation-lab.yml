@@ -1,6 +1,12 @@
 name: Real second remediation-registration target (minimist CVE-2021-44906)
 
 on:
+  push:
+    branches: [master]
+    paths:
+      - 'experiment-b/real-minimist-remediation/**'
+      - 'engine/predict_shield/remediation_target.py'
+      - '.github/workflows/real-minimist-remediation-lab.yml'
   pull_request:
     paths:
       - 'experiment-b/real-minimist-remediation/**'
