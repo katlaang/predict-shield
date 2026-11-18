@@ -1,0 +1,59 @@
+name: Real script-integrity pilot
+
+on:
+  pull_request:
+    paths:
+      - 'experiment-b/real-script-integrity-pilot/**'
+      - 'engine/predict_shield/script_integrity.py'
+      - 'engine/predict_shield/script_risk_proposer.py'
+      - '.github/workflows/real-script-integrity-lab.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  real-script-integrity-pilot:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install Playwright and its Chromium browser
+        run: |
+          pip install playwright
+          playwright install --with-deps chromium
+      - name: Validate lab-server and fetch-probe contracts before the real run
+        working-directory: experiment-b/real-script-integrity-pilot
+        env:
+          PYTHONPATH: ../../engine
+        run: python -m unittest test_real_script_integrity_pilot -v
+      - name: Run the real pilot (real HTTP servers, real Chromium, real network capture)
+        working-directory: experiment-b/real-script-integrity-pilot
+        env:
+          PYTHONPATH: ../../engine
+        run: |
+          python run_real_script_integrity_pilot.py --output /tmp/ps-real-script-integrity-pilot.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p = json.loads(Path("/tmp/ps-real-script-integrity-pilot.json").read_text())
+          s = p["summary"]
+          assert s["negative_control_accepted"] is True
+          assert s["malicious_tamper_caught_by_hash"] is True
+          assert s["malicious_tamper_real_network_reach_confirmed"] is True, \
+              "behavioral check must observe the real browser reaching the sink, not only a hash change"
+          assert s["false_positive_occurred"] is False
+          assert s["unregistered_domain_caught_despite_clean_hash"] is True
+          print("PASS:", json.dumps(s, indent=1, sort_keys=True))
+          PY
+      - name: Retain the real evidence report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: real-script-integrity-pilot-evidence
+          path: /tmp/ps-real-script-integrity-pilot.json
+          if-no-files-found: ignore
+          retention-days: 30

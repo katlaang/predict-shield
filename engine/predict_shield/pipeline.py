@@ -20,6 +20,14 @@ from .dependency_graph import build_dependency_graph, reachable_service_dependen
 from .local_ai import prepare_request, validate_proposals
 from .risk_evidence import assess_risk_evidence, verify_digest
 from .sast_findings import RegisteredScanner, ScanFinding, confirm_before_fix
+from .script_integrity import (
+    RegisteredScript,
+    RegisteredSite,
+    ScriptObservation,
+    confirm_hash_matches_trusted,
+    confirm_no_unregistered_domain,
+)
+from .script_risk_proposer import ScriptRiskProposer
 from .selector import select_action
 
 
@@ -234,6 +242,149 @@ def plan_sast_case(*, case_id: str, finding: ScanFinding,
     report["selected_action"] = screened.selected.action_id
     report["selection_score"] = screened.selected.score
     report["reason"] = "Confirmed finding matched a registered remediation action and policy gate"
+    # No execution token and no authority is included in a planning record.
+    return report
+
+
+def plan_script_integrity_case(
+    *, case_id: str, script: RegisteredScript, site: RegisteredSite,
+    observation: ScriptObservation, observed_domains: tuple[str, ...], observed_at: datetime,
+    proposer: ScriptRiskProposer, permitted_actions_by_reason: dict[str, tuple[str, ...]],
+    actions: tuple[CandidateAction, ...], predictions: tuple[ActionPrediction, ...] = (),
+    scope_snapshot: EvidenceSnapshot | None = None,
+    remaining_error_budgets: dict[str, float] | None = None,
+    now: datetime | None = None,
+) -> dict:
+    """Propose and policy-gate a containment action for a third-party
+    script integrity finding -- the script-integrity counterpart to
+    `plan_sast_case`'s source-code-finding flow.
+
+    Unlike `plan_sast_case`, the mapping from a confirmed finding to a
+    containment action is not a single deterministic lookup: more than
+    one registered containment action (block via CSP, revoke an SRI
+    pin, disable the embed) can be appropriate depending on the kind of
+    violation and the asset's context, which is exactly the judgment
+    call Chapter 2's AI proposal step exists for elsewhere in this
+    pipeline. `proposer` (an instance of `ScriptRiskProposer`) chooses
+    among `permitted_actions_by_reason[reason]` -- an operator-registered
+    set, never an open-ended catalog the model could expand -- and its
+    reply is re-validated against that exact set before the deterministic
+    gate runs, the same order of control `action_proposer.py` already
+    uses for the CVE path.
+
+    Whether the finding is genuinely present is re-derived here via
+    `script_integrity.confirm_hash_matches_trusted` and
+    `confirm_no_unregistered_domain`, independently of any upstream
+    claim, the same "don't trust the caller's claim, re-check it" rule
+    `plan_case` and `plan_sast_case` both already apply.
+
+    Like both of those, this stops at propose -> gate: it returns an
+    eligible plan and never applies a containment action, and it does
+    not call `script_integrity.evaluate()` -- that stays a separate,
+    independent, post-action verification step that also requires the
+    real behavioral browser check (`confirm_no_prohibited_network_behavior`),
+    which this planning stage has no evidence for yet (there is nothing
+    to verify post-action before an action has been taken).
+    """
+    if not case_id or not actions or len({a.action_id for a in actions}) != len(actions):
+        raise ValueError("Case and distinct approved action catalog required")
+    if now is None:
+        now = datetime.now(timezone.utc)
+    if now.tzinfo is None:
+        raise ValueError("Current timestamp must be timezone-aware")
+    report: dict = {
+        "schema": "predict-shield/script-integrity-case-plan/1",
+        "case_id": case_id,
+        "created_at": now.isoformat(),
+        "script_id": script.script_id,
+        "site_id": site.site_id,
+        "scope_snapshot_id": None,
+        "selected_action_model_fingerprint": None,
+        "finding_confirmed": "NOT_EVALUATED",
+        "finding_reason": None,
+        "selection_status": "ESCALATE_FOR_EVIDENCE",
+        "selected_action": None,
+        "ai_proposal_status": None,
+        "ai_proposal_rationale": None,
+        "ai_injection_suspected": False,
+        "policy_screened": {},
+        "dispatch_authorized": False,
+        "reason": "No confirmed finding or independently bound scope",
+        "lab_execution_adapter": "existing mechanism-lab implementation; not invoked",
+    }
+
+    # Independently re-derive whether a finding exists; never trust a
+    # caller's claim about it.
+    hash_evidence = confirm_hash_matches_trusted(script, observation, now=now)
+    domain_evidence = confirm_no_unregistered_domain(site, observed_domains, observed_at, now=now)
+    hash_ok = assess(hash_evidence.asset, hash_evidence.assertion, [hash_evidence], now=now)
+    domain_ok = assess(domain_evidence.asset, domain_evidence.assertion, [domain_evidence], now=now)
+
+    reason = None
+    if hash_ok.outcome is not Outcome.VERIFIED:
+        reason = "hash_mismatch"
+    elif domain_ok.outcome is not Outcome.VERIFIED:
+        reason = "unregistered_domain"
+    report["finding_confirmed"] = "VERIFIED" if reason else "NOT_VERIFIED"
+    report["finding_reason"] = reason
+    if reason is None:
+        report["reason"] = "No independently confirmed script-integrity finding"
+        return report
+
+    offered = list(permitted_actions_by_reason.get(reason, ()))
+    if not offered:
+        report["reason"] = f"No registered containment action set for finding reason {reason!r}"
+        return report
+
+    context = {
+        "case_id": case_id,
+        "finding_reason": reason,
+        "script_id": script.script_id,
+        "observed_sha384": observation.sha384,
+        "trusted_sha384_count": len(script.trusted_sha384),
+        "observed_domains": sorted(observed_domains),
+        "allowed_domains": sorted(site.allowed_script_domains),
+    }
+    proposal = proposer.propose(context, offered)
+    report["ai_proposal_status"] = proposal.status
+    report["ai_proposal_rationale"] = proposal.rationale
+    report["ai_injection_suspected"] = proposal.injection_suspected
+    if proposal.status != "ACCEPTED" or proposal.action_id not in offered:
+        report["reason"] = "AI containment proposal did not yield a permitted action: " + \
+                           "; ".join(proposal.reasons)
+        return report
+
+    selected_action = next((a for a in actions if a.action_id == proposal.action_id), None)
+    if selected_action is None:
+        report["reason"] = f"Proposed action {proposal.action_id!r} is not in the approved catalog"
+        return report
+
+    if not isinstance(scope_snapshot, EvidenceSnapshot) or scope_snapshot.case_id != case_id:
+        report["reason"] = "No case-bound independent scope snapshot"
+        return report
+    if not scope_snapshot.trusted or not scope_snapshot.scope_complete:
+        report["reason"] = "Independent scope evidence is incomplete or untrusted"
+        return report
+    if scope_snapshot.captured_at > now:
+        report["reason"] = "Scope observation is from the future"
+        return report
+    if "script-integrity:" + script.script_id not in scope_snapshot.source_ids:
+        report["reason"] = "Scope snapshot is not bound to this exact script"
+        return report
+
+    screened = select_action(scope_snapshot, (selected_action,), predictions,
+                             dict(remaining_error_budgets or {}))
+    report["policy_screened"] = _serialize_screened(screened.screened)
+    if screened.abstained or screened.selected is None:
+        report["reason"] = "Existing independent action gate abstained: " + screened.reason
+        return report
+    report["selection_status"] = "ELIGIBLE_RESEARCH_LAB_PLAN"
+    report["scope_snapshot_id"] = scope_snapshot.snapshot_id
+    report["selected_action_model_fingerprint"] = next(
+        (p.training_fingerprint for p in predictions if p.action_id == screened.selected.action_id), None)
+    report["selected_action"] = screened.selected.action_id
+    report["selection_score"] = screened.selected.score
+    report["reason"] = "Confirmed finding matched an AI-proposed, policy-gated containment action"
     # No execution token and no authority is included in a planning record.
     return report
 

@@ -1,0 +1,400 @@
+"""Verifying the integrity of a third-party script a site embeds, and
+whether a containment action actually stops it from doing something
+prohibited -- not verifying the vendor's source code, which this
+pipeline never has access to.
+
+A browser visiting a site downloads whatever the vendor serves at the
+registered script URL. That fetch is public by construction: no
+credential or access to the vendor's repository is needed to observe
+it, only the same unauthenticated HTTP request the visitor's own
+browser already makes. This module's checks follow from that fact and
+nothing more:
+
+    * fetch the script the operator's own page actually loads, hash it,
+      and compare the hash to what was registered as trusted
+      (HASH_MATCHES_TRUSTED);
+    * compare the set of network destinations a real page load actually
+      contacts against a registered allowlist, catching scripts that
+      load further script from an undeclared origin or exfiltrate data
+      through a request rather than a `<script src>` tag
+      (NO_UNREGISTERED_DOMAIN);
+    * check whether the site's own Content-Security-Policy response
+      header actually restricts script-src, not merely whether one is
+      configured somewhere (CSP_ENFORCED);
+    * and, the assertion a hash comparison cannot stand in for: whether
+      a real browser load, after a containment action is applied, can
+      still be made to contact a registered-prohibited destination
+      (NO_PROHIBITED_NETWORK_BEHAVIOR). An allowlisted vendor domain can
+      itself serve malicious code, and a CSP permitting that domain does
+      not by itself stop the script executing with the page's own
+      privileges (the browser gives any loaded script the embedding
+      page's own origin privileges unless CSP or SRI narrows that). A
+      hash returning to a previously-seen value is not evidence the
+      prohibited behavior cannot still occur through another path; only
+      a real, independently instrumented browser load is.
+
+This module does not perform the network capture or page load itself.
+Exactly as `sdn_topology_discovery.py` reads an existing Open vSwitch
+report rather than running Mininet, and `regression_check.py` runs a
+registered command rather than embedding a test runner, the real
+browser instrumentation (Playwright) lives in the pilot
+(`experiment-b/real-script-integrity-pilot/`) and in a future live
+adapter; this module only defines the evidence shape a real network
+capture must have and the checks run against it.
+
+Fail-closed rules carried over from every other check in this pipeline:
+
+    * A script or site is only ever evaluated once registered by the
+      operator ahead of time, pinned to an explicit host allowlist. An
+      unregistered host is rejected before any fetch is attempted --
+      see `_validate_fetch_target` below, which is this module's SSRF
+      defense: the fetch target's scheme and hostname must exactly
+      match a registered entry, and a redirect response is treated as a
+      hard failure rather than followed, so an unregistered host can
+      never be reached by having the registered one redirect to it.
+    * A stale observation (older than `max_age_seconds`) is rejected:
+      a past-tense clean hash is not evidence the script is clean now.
+    * `evaluate()` adds no new trust and runs no checks itself. It asks
+      the existing `assessment.assess()` gate the four required
+      questions and combines them with the same all-four-or-nothing
+      rule used everywhere else in this pipeline.
+
+What this module does NOT yet do, honestly:
+
+    * Resolve-then-pin protection against DNS rebinding between the
+      hostname check and the actual fetch is not implemented; only the
+      host-allowlist and no-redirect checks are. A fully hardened fetcher
+      would also pin the resolved IP for the lifetime of the connection.
+    * SRI pinning and CSP generation/rollout are not implemented here;
+      this module only checks whether a CSP already in place restricts
+      script-src, and whether a registered script's trusted hash still
+      matches. Applying a new CSP header or SRI attribute to a real site
+      is a containment action gated and applied elsewhere, not this module.
+    * Nothing here crawls a live production site to discover what it
+      embeds. `RegisteredSite`/`RegisteredScript` are what the operator
+      declares ahead of time, the same registration discipline
+      `detection_intake.py` and `sast_findings.py` already require of
+      their own sources.
+"""
+from __future__ import annotations
+
+import hashlib
+import ipaddress
+import socket
+import urllib.error
+import urllib.request
+from dataclasses import dataclass, field
+from datetime import datetime, timezone
+from urllib.parse import urlparse
+
+from .assessment import Evidence, Outcome, assess
+
+SOURCE_PREFIX = "script-integrity:"
+
+HASH_MATCHES_TRUSTED = "hash_matches_trusted"
+NO_UNREGISTERED_DOMAIN = "no_unregistered_domain"
+CSP_ENFORCED = "csp_enforced"
+NO_PROHIBITED_NETWORK_BEHAVIOR = "no_prohibited_network_behavior"
+
+# Every registered third-party script this module evaluates must clear all
+# four of these assertions. The fourth is a real, instrumented-browser
+# behavioral check, not a second hash comparison: see the module docstring
+# for why a hash match cannot stand in for it.
+REQUIRED_ASSERTIONS = (
+    HASH_MATCHES_TRUSTED,
+    NO_UNREGISTERED_DOMAIN,
+    CSP_ENFORCED,
+    NO_PROHIBITED_NETWORK_BEHAVIOR,
+)
+
+
+class FetchRejected(ValueError):
+    """Raised instead of performing a fetch outside the registered target."""
+
+
+@dataclass(frozen=True)
+class RegisteredScript(object):
+    """A third-party script URL an operator's own page embeds, registered
+    ahead of time. `trusted_sha384` is a tuple, not a single hash, so a
+    deliberate, reviewed vendor update can be rolled forward by adding a
+    new hash without first having to treat the rollover itself as an
+    incident; an unreviewed change is still anything not in this set."""
+
+    script_id: str
+    url: str
+    trusted_sha384: tuple[str, ...]
+    trusted: bool = True
+
+    def validate(self) -> None:
+        if not self.script_id or not self.url:
+            raise ValueError("script_id and url required")
+        parsed = urlparse(self.url)
+        if parsed.scheme not in ("http", "https") or not parsed.hostname:
+            raise ValueError("url must be an absolute http(s) URL")
+        if not self.trusted_sha384:
+            raise ValueError("trusted_sha384 required: an unpinned script is not reproducible evidence")
+        for digest in self.trusted_sha384:
+            if len(digest) != 96 or any(c not in "0123456789abcdef" for c in digest.lower()):
+                raise ValueError(f"not a sha384 hex digest: {digest!r}")
+
+
+@dataclass(frozen=True)
+class RegisteredSite(object):
+    """What an operator's own page is declared to embed and permit.
+    `allowed_script_domains` and `prohibited_sinks` are both hostnames,
+    never wildcards: an allowlist that accepts a wildcard subdomain is not
+    meaningfully different from accepting everything a compromised script
+    chooses to register."""
+
+    site_id: str
+    allowed_script_domains: tuple[str, ...]
+    prohibited_sinks: tuple[str, ...] = ()
+    trusted: bool = True
+
+    def validate(self) -> None:
+        if not self.site_id:
+            raise ValueError("site_id required")
+        for domain in self.allowed_script_domains:
+            if "*" in domain:
+                raise ValueError("allowed_script_domains must be exact hostnames, not wildcards")
+
+
+@dataclass(frozen=True)
+class ScriptObservation(object):
+    """One independent fetch of a registered script, at one point in time."""
+
+    script_id: str
+    sha384: str
+    status_code: int
+    fetched_at: datetime
+
+
+def _validate_fetch_target(url: str, allowed_hosts: tuple[str, ...]) -> None:
+    """The SSRF defense this module relies on: the fetch target's scheme
+    and hostname must exactly match a registration the operator supplied
+    ahead of time. This does not vet the resolved IP (see the module
+    docstring's stated limitation on DNS-rebinding protection); it only
+    ensures the fetch can never be pointed at a host the operator never
+    registered, including by way of a redirect (`fetch_script_observation`
+    disables redirect following and treats one as a hard failure)."""
+    parsed = urlparse(url)
+    if parsed.scheme not in ("http", "https"):
+        raise FetchRejected(f"refusing to fetch non-http(s) scheme: {parsed.scheme!r}")
+    if parsed.hostname not in allowed_hosts:
+        raise FetchRejected(f"refusing to fetch unregistered host: {parsed.hostname!r}")
+
+
+class _NoRedirect(urllib.request.HTTPRedirectHandler):
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        raise FetchRejected(f"refusing to follow redirect to unregistered host: {newurl!r}")
+
+
+_NO_REDIRECT_OPENER = urllib.request.build_opener(_NoRedirect)
+
+
+def fetch_script_observation(
+    script: RegisteredScript, allowed_hosts: tuple[str, ...], *,
+    opener=_NO_REDIRECT_OPENER, timeout: float = 10.0, now: datetime | None = None,
+) -> ScriptObservation:
+    """Fetch the registered script for real and hash what was actually
+    served. This is the same unauthenticated request a visiting browser
+    already makes; no vendor access or credential is used or required."""
+    if now is None:
+        now = datetime.now(timezone.utc)
+    script.validate()
+    _validate_fetch_target(script.url, allowed_hosts)
+    try:
+        with opener.open(script.url, timeout=timeout) as response:
+            body = response.read()
+            status = getattr(response, "status", 200) or 200
+    except (urllib.error.URLError, OSError, TimeoutError) as error:
+        raise FetchRejected(f"script fetch failed: {error}") from error
+    digest = hashlib.sha384(body).hexdigest()
+    return ScriptObservation(script_id=script.script_id, sha384=digest, status_code=status, fetched_at=now)
+
+
+def fetch_response_headers(
+    url: str, allowed_hosts: tuple[str, ...], *,
+    opener=_NO_REDIRECT_OPENER, timeout: float = 10.0,
+) -> dict[str, str]:
+    """Fetch a page's own response headers for real, for the CSP check.
+    Same SSRF defense as `fetch_script_observation`."""
+    _validate_fetch_target(url, allowed_hosts)
+    try:
+        with opener.open(url, timeout=timeout) as response:
+            return {k.lower(): v for k, v in response.headers.items()}
+    except (urllib.error.URLError, OSError, TimeoutError) as error:
+        raise FetchRejected(f"page fetch failed: {error}") from error
+
+
+def _csp_restricts_script_src(header_value: str | None, allowed_domains: tuple[str, ...]) -> bool:
+    """A CSP is only "enforced" here if it actually names a script-src (or
+    falls back to default-src) directive, contains no bare wildcard, and
+    every host it names is one the operator registered. A header that
+    merely exists but still allows '*' or an unregistered host is not
+    a pass: that would be checking for the header's presence, not its
+    effect."""
+    if not header_value:
+        return False
+    directives = {}
+    for part in header_value.split(";"):
+        tokens = part.strip().split()
+        if tokens:
+            directives[tokens[0].lower()] = tokens[1:]
+    script_src = directives.get("script-src", directives.get("default-src"))
+    if not script_src:
+        return False
+    for token in script_src:
+        token = token.strip("'\"")
+        if token in ("*", "unsafe-inline", "unsafe-eval", "data:"):
+            return False
+        if token == "self":
+            continue
+        # A CSP source may carry an explicit port (meaningful for a lab
+        # target running on a non-default port); registration is by
+        # hostname only, so match on the host part and require an exact
+        # hostname match, never a suffix or wildcard match.
+        host = token.rsplit(":", 1)[0] if token.count(":") == 1 else token
+        if host not in allowed_domains:
+            return False
+    return True
+
+
+def confirm_hash_matches_trusted(
+    script: RegisteredScript, observation: ScriptObservation, *,
+    now: datetime | None = None, max_age_seconds: float = 900.0,
+) -> Evidence:
+    if now is None:
+        now = datetime.now(timezone.utc)
+    if now.tzinfo is None:
+        raise ValueError("now must be timezone-aware")
+    script.validate()
+    if not script.trusted:
+        raise ValueError("script is not a registered, trusted source")
+    if observation.script_id != script.script_id:
+        raise ValueError("observation does not match the registered script")
+    if observation.fetched_at.tzinfo is None:
+        raise ValueError("observation timestamp must be timezone-aware")
+    age = (now - observation.fetched_at).total_seconds()
+    if age < 0 or age > max_age_seconds:
+        raise ValueError("observation is stale or from the future")
+    return Evidence(
+        asset=script.script_id, assertion=HASH_MATCHES_TRUSTED,
+        observed_pass=observation.sha384.lower() in {h.lower() for h in script.trusted_sha384},
+        observed_at=observation.fetched_at, source=SOURCE_PREFIX + "fetch-probe", independent=True,
+    )
+
+
+def confirm_no_unregistered_domain(
+    site: RegisteredSite, observed_domains: tuple[str, ...], observed_at: datetime, *,
+    now: datetime | None = None, max_age_seconds: float = 900.0,
+) -> Evidence:
+    """`observed_domains` is the set of network destinations a real,
+    instrumented browser load actually contacted while rendering the
+    site -- every request, fetch/XHR/sendBeacon call and dynamically
+    injected script included, not only the domains named in the page's
+    static `<script src>` tags, which a compromised script can trivially
+    bypass by loading or exfiltrating through a request instead."""
+    if now is None:
+        now = datetime.now(timezone.utc)
+    if now.tzinfo is None:
+        raise ValueError("now must be timezone-aware")
+    site.validate()
+    if not site.trusted:
+        raise ValueError("site is not a registered, trusted source")
+    if observed_at.tzinfo is None:
+        raise ValueError("observed_at must be timezone-aware")
+    age = (now - observed_at).total_seconds()
+    if age < 0 or age > max_age_seconds:
+        raise ValueError("domain observation is stale or from the future")
+    allowed = set(site.allowed_script_domains)
+    unregistered = tuple(sorted(set(observed_domains) - allowed))
+    return Evidence(
+        asset=site.site_id, assertion=NO_UNREGISTERED_DOMAIN,
+        observed_pass=not unregistered,
+        observed_at=observed_at, source=SOURCE_PREFIX + "network-capture", independent=True,
+    )
+
+
+def confirm_csp_enforced(
+    site: RegisteredSite, header_value: str | None, observed_at: datetime, *,
+    now: datetime | None = None, max_age_seconds: float = 900.0,
+) -> Evidence:
+    if now is None:
+        now = datetime.now(timezone.utc)
+    if now.tzinfo is None:
+        raise ValueError("now must be timezone-aware")
+    site.validate()
+    if observed_at.tzinfo is None:
+        raise ValueError("observed_at must be timezone-aware")
+    age = (now - observed_at).total_seconds()
+    if age < 0 or age > max_age_seconds:
+        raise ValueError("header observation is stale or from the future")
+    return Evidence(
+        asset=site.site_id, assertion=CSP_ENFORCED,
+        observed_pass=_csp_restricts_script_src(header_value, site.allowed_script_domains),
+        observed_at=observed_at, source=SOURCE_PREFIX + "header-probe", independent=True,
+    )
+
+
+def confirm_no_prohibited_network_behavior(
+    site: RegisteredSite, observed_requests: tuple[str, ...], observed_at: datetime, *,
+    now: datetime | None = None, max_age_seconds: float = 900.0,
+) -> Evidence:
+    """The behavioral check a hash comparison cannot replace: did a real,
+    instrumented browser load, after whatever containment action was
+    applied, still reach a registered-prohibited destination.
+    `observed_requests` must come from an actual page load with network
+    capture (the pilot's Playwright instrumentation, or a future live
+    adapter), never from re-deriving the question from the script's hash
+    or source text -- a script can be byte-identical to a known-bad
+    version and still be contained if the browser can no longer reach the
+    prohibited destination, and conversely a hash match alone says
+    nothing about what a differently-served response might still do."""
+    if now is None:
+        now = datetime.now(timezone.utc)
+    if now.tzinfo is None:
+        raise ValueError("now must be timezone-aware")
+    site.validate()
+    if observed_at.tzinfo is None:
+        raise ValueError("observed_at must be timezone-aware")
+    age = (now - observed_at).total_seconds()
+    if age < 0 or age > max_age_seconds:
+        raise ValueError("behavioral observation is stale or from the future")
+    prohibited = set(site.prohibited_sinks)
+    reached = tuple(sorted(prohibited & set(observed_requests)))
+    return Evidence(
+        asset=site.site_id, assertion=NO_PROHIBITED_NETWORK_BEHAVIOR,
+        observed_pass=not reached,
+        observed_at=observed_at, source=SOURCE_PREFIX + "browser-behavior-probe", independent=True,
+    )
+
+
+@dataclass(frozen=True)
+class ScriptIntegrityVerdict(object):
+    accepted: bool
+    assessments: dict
+
+    @property
+    def blocking_reasons(self) -> tuple[str, ...]:
+        return tuple(
+            f"{name}: {assessment.outcome.value} -- {assessment.reason}"
+            for name, assessment in self.assessments.items()
+            if assessment.outcome is not Outcome.VERIFIED
+        )
+
+
+def evaluate(scope: dict, evidence: list, **assess_kwargs) -> ScriptIntegrityVerdict:
+    """Evaluate all four required assertions for one third-party script
+    and report whether it is accepted as a whole, following the same
+    all-four-or-nothing rule `sast_findings.evaluate_fix()` and
+    `remediation_verification.evaluate()` use."""
+    missing = [name for name in REQUIRED_ASSERTIONS if name not in scope]
+    if missing:
+        raise ValueError("Missing required assertion scope for: " + ", ".join(missing))
+    assessments = {
+        name: assess(*scope[name], evidence, **assess_kwargs)
+        for name in REQUIRED_ASSERTIONS
+    }
+    accepted = all(a.outcome is Outcome.VERIFIED for a in assessments.values())
+    return ScriptIntegrityVerdict(accepted, assessments)
