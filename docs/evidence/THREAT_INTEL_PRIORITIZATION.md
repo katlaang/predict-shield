@@ -1,6 +1,6 @@
-# Threat intelligence / risk prioritization baseline (pre-alpha)
+# Threat intelligence and risk prioritization (pre-alpha)
 
-This module initiates the missing *predictive threat intelligence* and *automated risk prioritization* workstreams. It is a deterministic, transparent **baseline**, not a learned AI model, not a validated enterprise risk score, and not a production remediation controller.
+This module initiates the missing *predictive threat intelligence* and *automated risk prioritization* workstreams. It is deterministic and transparent, not a learned AI model, not a validated enterprise risk score, and not a production remediation controller.
 
 ## Inputs
 
@@ -24,7 +24,7 @@ PYTHONPATH=engine python -m predict_shield.threat_intel \
   --output /tmp/threat-ranking.json
 ```
 
-## Baseline formula and limitations
+## Formula and limitations
 
 For an asset/CVE with available EPSS score:
 

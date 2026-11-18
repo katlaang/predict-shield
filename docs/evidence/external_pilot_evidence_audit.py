@@ -81,45 +81,39 @@ def assess(manifest: dict) -> dict:
     for field in ("protocol_document_sha256", "operator_consent_sha256",
                   "independent_assessment_sha256", "measurement_artifact_sha256"):
         _sha256(manifest.get(field), field)
-    pairs = manifest.get("matched_conditions")
-    if not isinstance(pairs, list) or len(pairs) < 2:
-        raise ValueError("Two or more actual matched condition records required")
+    conditions = manifest.get("conditions")
+    if not isinstance(conditions, list) or len(conditions) < 2:
+        raise ValueError("Two or more actual condition records required")
     seen = set()
-    effects = []
-    for pair in pairs:
-        if not isinstance(pair, dict):
-            raise ValueError("Invalid paired physical condition")
-        ident = pair.get("condition_id")
+    measured = []
+    for condition in conditions:
+        if not isinstance(condition, dict):
+            raise ValueError("Invalid physical condition record")
+        ident = condition.get("condition_id")
         if not isinstance(ident, str) or not ident or ident in seen:
             raise ValueError("Duplicate or missing condition identity")
         seen.add(ident)
-        if (pair.get("comparable_load_and_scope_attested") is not True
-                or pair.get("independent_verification_scope_complete") is not True):
-            raise ValueError("No comparable independently verified scope")
-        baseline = _measure(pair.get("baseline"), "baseline")
-        framework = _measure(pair.get("framework"), "framework")
-        effects.append({
+        if condition.get("independent_verification_scope_complete") is not True:
+            raise ValueError("No independently verified scope")
+        framework = _measure(condition.get("framework"), "framework")
+        measured.append({
             "condition_id": ident,
-            "observed_exposure_seconds_difference":
-                framework["revoked_access_exposure_seconds"] -
-                baseline["revoked_access_exposure_seconds"],
-            "observed_authorized_failure_fraction_difference": (
-                framework["authorized_request_failures"]/
-                framework["authorized_request_total"] -
-                baseline["authorized_request_failures"]/
-                baseline["authorized_request_total"]),
-            "observed_critical_downtime_seconds_difference": (
-                framework["critical_service_downtime_seconds"] -
-                baseline["critical_service_downtime_seconds"]),
-            "observed_false_assurance_count_difference": (
-                framework["independent_false_assurance_events"] -
-                baseline["independent_false_assurance_events"]),
+            "revoked_access_exposure_seconds":
+                framework["revoked_access_exposure_seconds"],
+            "authorized_failure_fraction":
+                framework["authorized_request_failures"] /
+                framework["authorized_request_total"],
+            "critical_service_downtime_seconds":
+                framework["critical_service_downtime_seconds"],
+            "false_assurance_fraction":
+                framework["independent_false_assurance_events"] /
+                framework["independent_verification_events"],
             "causal_effect_estimated": False,
         })
     return {
-        "schema": "predict-shield/external-pilot-documentation-audit/1",
-        "matched_condition_records": len(effects),
-        "descriptive_paired_differences": effects,
+        "schema": "predict-shield/external-pilot-documentation-audit/2",
+        "condition_records": len(measured),
+        "descriptive_measurements": measured,
         "documentation_status": "STRUCTURALLY_COMPLETE_UNAUTHENTICATED",
         "external_independence_cryptographically_verified": False,
         "actual_operator_permission_authenticated": False,
@@ -129,7 +123,7 @@ def assess(manifest: dict) -> dict:
             "Authenticate the actual US operator, approval scope and dates",
             "Authenticate the independent assessor and direct observations",
             "Check hashes against original securely retained artifacts",
-            "Independently reproduce matching load, safe counterfactuals and inference",
+            "Independently reproduce the load, measurements and inference",
             "Assess selection effects, site variation and plausible harms",
         ],
     }

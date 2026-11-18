@@ -5,15 +5,7 @@ from external_pilot_evidence_audit import assess, SCHEMA
 
 
 def fixture():
-    baseline = {
-        "revoked_access_exposure_seconds": 20.0,
-        "authorized_request_failures": 6,
-        "authorized_request_total": 100,
-        "independent_false_assurance_events": 2,
-        "independent_verification_events": 20,
-        "critical_service_downtime_seconds": 4.0,
-    }
-    alternative = {
+    measurement = {
         "revoked_access_exposure_seconds": 10.0,
         "authorized_request_failures": 4,
         "authorized_request_total": 100,
@@ -35,12 +27,10 @@ def fixture():
         "operator_consent_sha256": "c"*64,
         "independent_assessment_sha256": "d"*64,
         "measurement_artifact_sha256": "e"*64,
-        "matched_conditions": [
+        "conditions": [
             {"condition_id": f"mock-{i}",
-             "comparable_load_and_scope_attested": True,
              "independent_verification_scope_complete": True,
-             "baseline": copy.deepcopy(baseline),
-             "framework": copy.deepcopy(alternative)} for i in range(2)
+             "framework": copy.deepcopy(measurement)} for i in range(2)
         ],
     }
 
@@ -53,9 +43,11 @@ class ExternalValidationEvidenceTests(unittest.TestCase):
         self.assertFalse(report["critical_infrastructure_effectiveness_established"])
         self.assertFalse(report["external_independence_cryptographically_verified"])
         self.assertFalse(report["actual_operator_permission_authenticated"])
-        self.assertEqual(report["matched_condition_records"], 2)
-        self.assertEqual(report["descriptive_paired_differences"][0][
-            "observed_exposure_seconds_difference"], -10)
+        self.assertEqual(report["condition_records"], 2)
+        first = report["descriptive_measurements"][0]
+        self.assertEqual(first["revoked_access_exposure_seconds"], 10)
+        self.assertAlmostEqual(first["authorized_failure_fraction"], 0.04)
+        self.assertAlmostEqual(first["false_assurance_fraction"], 0.05)
 
     def test_without_real_documented_operator_consent_fail_closed(self):
         f=fixture()
@@ -71,11 +63,11 @@ class ExternalValidationEvidenceTests(unittest.TestCase):
 
     def test_rejects_missing_or_mismatched_denominators(self):
         f=fixture()
-        f["matched_conditions"][0]["framework"]["authorized_request_failures"]=101
+        f["conditions"][0]["framework"]["authorized_request_failures"]=101
         with self.assertRaisesRegex(ValueError, "denominator"):
             assess(f)
         f=fixture()
-        f["matched_conditions"][0]["baseline"]["independent_verification_events"]=0
+        f["conditions"][0]["framework"]["independent_verification_events"]=0
         with self.assertRaisesRegex(ValueError, "denominator"):
             assess(f)
 
@@ -87,13 +79,13 @@ class ExternalValidationEvidenceTests(unittest.TestCase):
 
     def test_no_field_results_from_single_condition(self):
         f=fixture()
-        f["matched_conditions"].pop()
+        f["conditions"].pop()
         with self.assertRaisesRegex(ValueError, "Two or more"):
             assess(f)
 
     def test_cloned_conditions_not_distinct(self):
         f=fixture()
-        f["matched_conditions"][1]["condition_id"]="mock-0"
+        f["conditions"][1]["condition_id"]="mock-0"
         with self.assertRaisesRegex(ValueError, "Duplicate"):
             assess(f)
 

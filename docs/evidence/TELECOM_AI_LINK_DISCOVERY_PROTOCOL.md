@@ -11,7 +11,7 @@ The input JSON is a **list of independently labeled candidate pairs**. Each row 
 - `interface_type_compatible`
 - `inventory_edge_declared`
 
-**Important:** obtaining the ground-truth link label from these same input features is leakage. Labels must come from independent, authoritative physical/operational verification. Never use a link's post-inference oracle observation as a feature. All rows from the same topology are required to remain in one partition. Parameters are fitted only on the training portion, and the separately grouped test portion is used for one evaluation against the baseline `lldp_seen OR routing_adjacency_seen`.
+**Important:** obtaining the ground-truth link label from these same input features is leakage. Labels must come from independent, authoritative physical/operational verification. Never use a link's post-inference oracle observation as a feature. All rows from the same topology are required to remain in one partition. Parameters are fitted only on the training portion, and the separately grouped test portion is used for one held-out evaluation.
 
 From `experiment-b/telecom-topology` run:
 

@@ -27,7 +27,7 @@ Dated results, lab protocols and design notes behind the capabilities in the mai
 
 ## Threat intelligence and continuous assurance
 
-- [Threat-intelligence prioritization](THREAT_INTEL_BASELINE.md).
+- [Threat-intelligence prioritization](THREAT_INTEL_PRIORITIZATION.md).
 - [Pinned historical threat-data acquisition](PINNED_HISTORICAL_SOURCES.md) and its [source manifest](data/historical_sources_2026_10.json).
 - [Re-verification scheduler](REVERIFICATION_SCHEDULER.md).
 - [Verification feedback cycle](VERIFICATION_FEEDBACK_CYCLE.md).

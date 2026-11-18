@@ -1,5 +1,11 @@
 # Development changelog
 
+## 2026-11-18 (5): Remove the remaining comparison logic from code
+
+- The external pilot audit no longer takes a baseline arm or computes framework-minus-baseline differences. Each condition record now carries the framework's own independently verified measurements, and the audit reports exposure, authorized-failure fraction, downtime and false-assurance fraction per condition (schema `/2`).
+- Dropped the offline-baseline flag from the outage interval diagnostic, and the remaining "baseline" naming from the re-verification scheduler and threat prioritization modules (`threat-prioritization-v1`; the document is now `THREAT_INTEL_PRIORITIZATION.md`).
+- Removed the last comparison sentences from the development notes and roadmap.
+
 ## 2026-11-18 (4): Remove the AI-versus-rule comparison work and the research wording
 
 - Removed every model-versus-rule and model-versus-model comparison from the repository: the benchmark and backtest modules, the v3/v3.1 campaign scaffolding and protocol-freeze checks, the advisory-reading and vulnerability-benchmark comparisons, the ISP and telecom AI-versus-rule studies, the lodash strong-rule arm, the lookup and exposure baselines inside the learned models, and the eighteen workflows that ran them. Their documents and result records went with them. Git history keeps all of it.

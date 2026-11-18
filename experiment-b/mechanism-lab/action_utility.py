@@ -17,7 +17,7 @@ def observed_utility(row: dict, weights: dict[str, float] = METRIC_WEIGHTS) -> f
     Values must be nonnegative and exposure fractions no greater than one.
     The laboratory failure allowance is a fixed positive *count* per window,
     which keeps a costly restart expensive when absolute request failures
-    rise with traffic. This is a research utility, not a safety permission.
+    rise with traffic. This is a lab utility, not a safety permission.
     """
     if set(weights) != set(METRIC_WEIGHTS) or abs(sum(weights.values()) - 1) > 1e-8:
         raise ValueError("Unregistered objective weight components")

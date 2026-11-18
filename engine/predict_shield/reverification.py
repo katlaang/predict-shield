@@ -1,4 +1,4 @@
-"""Deterministic re-verification scheduling baselines.
+"""Deterministic re-verification scheduling policies.
 
 Offline component. It schedules *requests* for independent probes and
 never executes probes, labels an action VERIFIED, or accesses the private oracle.

@@ -1,4 +1,4 @@
-"""Dated threat-context ingestion and transparent prioritization baseline.
+"""Dated threat-context ingestion and transparent deterministic prioritization.
 
 This is NOT a trained predictive model or a calibrated probability of loss.
 Do not substitute today's EPSS/KEV feeds for historical as-of snapshots.
@@ -134,7 +134,7 @@ def build_report(epss_path: str, epss_date: str, kev_path: str,
     assets = json.loads(raw)
     if not isinstance(assets, list):
         raise ValueError("assets must be a JSON list")
-    return {"schema_version": "threat-baseline-v1", "as_of": as_of,
+    return {"schema_version": "threat-prioritization-v1", "as_of": as_of,
             "source_provenance": [ep_meta, kv_meta,
                                   {"source": "asset_fixture", "sha256": _hash(raw)}],
             "scoring_method": "uncalibrated_transparent_heuristic",

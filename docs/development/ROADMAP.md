@@ -4,7 +4,7 @@
 
 ## Infrastructure validation checkpoint
 
-- **External U.S. infrastructure validation is prepared but not conducted (PR #52).** The sector-independent operator-study protocol and fail-closed evidence manifest check demand real operator permission, independent assessor evidence, matched service baselines, and actual exposure, downtime, legitimate-request failure and false-assurance counts. Structural completeness cannot authenticate a real operator or prove impact.
+- **External U.S. infrastructure validation is prepared but not conducted (PR #52).** The sector-independent operator-study protocol and fail-closed evidence manifest check demand real operator permission, independent assessor evidence, and actual exposure, downtime, legitimate-request failure and false-assurance counts. Structural completeness cannot authenticate a real operator or prove impact.
 - **Authority-outage action inference remains limited.** PRs #43–#50 established physical outage witnesses, four action interventions, real timed observations and conservative UNKNOWN intervals. No field critical-infrastructure resilience improvement has been quantified.
 - **Evidence levels stay separate.** Software CI success, completed laboratory actions, and independent operator field impact are different evidence levels. Neither GitHub traffic nor self-reported records can bridge those levels.
 
@@ -14,7 +14,7 @@
 
 | Capability | Verified development evidence | Outstanding proof |
 | --- | --- | --- |
-| Predictive threat intelligence | Dated EPSS/KEV ingestion and official archive integrity; pinned historical sources and chronological CVE-level baseline | Validation against real production data |
+| Predictive threat intelligence | Dated EPSS/KEV ingestion and official archive integrity; pinned historical sources | Validation against real production data |
 | Automated cybersecurity risk assessment | Transparent asset/CVE heuristic, explicit missingness and recorded source hashes | Calibrated contextual multi-risk ranking with operational dependencies and real asset evidence |
 | Policy-governed adaptive defense | Fail-closed policy selection, error allowances, restart permission, four actual actions, real Kafka/JVM lab and physical fault mechanism smoke | Complete authority-outage action collector; a safe actuator for real infrastructure behind the existing policy gate |
 | Identify, prioritize, remediate | Authorization drift identified and lab actions replayed; synthetic asset/CVE queue ranked | Integrated cross-risk prioritization with safety gate and authorization under real operational constraints |

@@ -1,4 +1,4 @@
-"""Tests for offline temporally constrained threat-context baseline."""
+"""Tests for offline temporally constrained threat-context prioritization."""
 import json
 import tempfile
 import unittest

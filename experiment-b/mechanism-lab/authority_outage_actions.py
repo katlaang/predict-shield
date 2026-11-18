@@ -1,6 +1,6 @@
 """Four distinct physical actions during external policy-authority unavailability.
 
-An exploratory *mechanism* comparison: observed HTTP behavior and uncertainty
+An exploratory *mechanism* measurement: observed HTTP behavior and uncertainty
 bounds only, NOT an audited utility or a successful AI decision.
 """
 from __future__ import annotations
