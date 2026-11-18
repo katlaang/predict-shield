@@ -2,23 +2,20 @@
 
 **As of November 14, 2026.**
 
-## AI decision value and infrastructure effectiveness: evidence checkpoint
+## Infrastructure validation checkpoint
 
-The framework design scopes its one core AI-versus-deterministic question narrowly, to the continuous-assurance re-verification scheduler (a learned drift model versus the transparent priority function, under an equal probe budget); that specific comparison has not been run yet. The action-effectiveness item below is a separate, exploratory engineering study, not a precondition of the framework's value: the deterministic policy gate and verifier make every real decision regardless of how that exploratory model performs. CVE threat-ranking and advisory-reading model comparisons are deferred pending a study against real production data, and are not tracked in this roadmap for now.
-
-- **Action-effectiveness AI comparison code is now implemented (PR #51), not empirically demonstrated.** A physical-data trainer requires a complete 1,200-action four-stream lab dataset. Once data exist, its evaluation selects the strongest eligible non-AI comparator on calibration configurations, tests a random-forest selector on 20 separate held-out configuration groups, and requires group-paired bootstrap evidence of at least 10% regret improvement against all seven predeclared deterministic comparators under a Bonferroni safeguard. Current synthetic tests confirm the code contract, not superiority.
 - **External U.S. infrastructure validation is prepared but not conducted (PR #52).** The sector-independent operator-study protocol and fail-closed evidence manifest check demand real operator permission, independent assessor evidence, matched service baselines, and actual exposure, downtime, legitimate-request failure and false-assurance counts. Structural completeness cannot authenticate a real operator or prove impact.
 - **Authority-outage action inference remains limited.** PRs #43–#50 established physical outage witnesses, four action interventions, real timed observations, conservative UNKNOWN intervals, draft six-family feasibility registration and sample-size caution. The complete six-family physical study is not authorized/frozen; no field critical-infrastructure resilience improvement has been quantified.
-- **Research claims must remain separated.** Software CI success, completed exploratory laboratory actions, a positive held-out laboratory comparator result (if eventually observed), and independent operator field impact are four different evidence levels. Neither GitHub traffic nor self-reported records can bridge those levels.
+- **Evidence levels stay separate.** Software CI success, completed laboratory actions, and independent operator field impact are different evidence levels. Neither GitHub traffic nor self-reported records can bridge those levels.
 
- Research pre-alpha. A merged implementation or passing CI proves only the documented local or CI behavior, not superior AI performance, commercial adoption or critical-infrastructure field validation.
+ Research pre-alpha. A merged implementation or passing CI proves only the documented local or CI behavior, not commercial adoption or critical-infrastructure field validation.
 
 ## Capability coverage
 
 | Proposed capability | Verified development evidence | Outstanding proof |
 | --- | --- | --- |
-| Predictive threat intelligence | Dated EPSS/KEV ingestion and official archive integrity; pinned historical sources and chronological CVE-level baseline | A learned-model comparison against real production data, deferred for now |
-| Automated cybersecurity risk assessment | Transparent asset/CVE heuristic, explicit missingness and recorded source hashes | Calibrated contextual multi-risk ranking with operational dependencies and real asset evidence; learned model must exceed strong comparator |
+| Predictive threat intelligence | Dated EPSS/KEV ingestion and official archive integrity; pinned historical sources and chronological CVE-level baseline | Validation against real production data |
+| Automated cybersecurity risk assessment | Transparent asset/CVE heuristic, explicit missingness and recorded source hashes | Calibrated contextual multi-risk ranking with operational dependencies and real asset evidence |
 | Policy-governed adaptive defense | Fail-closed policy selection, error allowances, restart permission, four actual actions, real Kafka/JVM lab and physical fault mechanism smoke | Five-group v3.1 exploratory pilot completed but **final feasibility inconclusive**; complete authority-outage action collector and independent six-family feasibility before any full campaign |
 | Identify, prioritize, remediate | Authorization drift identified and lab actions replayed; synthetic asset/CVE queue ranked | Integrated cross-risk prioritization with safety gate and authorization under real operational constraints |
 | Independently verify outcomes | Separate oracle, scope reconciliation, actual probes, VERIFIED/NOT VERIFIED/INDETERMINATE/NOT APPLICABLE, regression tests | Independent external reproducibility, authentic observation-source attestations and full real-scope validation |
@@ -47,7 +44,7 @@ The framework design scopes its one core AI-versus-deterministic question narrow
 
 ## Scientific reporting rules
 
-Use precise denominators and versioned sources, distinguish physical observation from plan generation, and do not treat passing unit tests as outcome validation. Preserve negative results and report calibrated uncertainty, temporal leakage checks, action eligibility, and independent verification boundaries. A positive AI decision-value claim requires the preregistered comparator, relative threshold, and confidence interval on independent configuration groups. Do not start the 1,200-trial campaign until the revised protocol and mechanical pilot are formally frozen.
+Use precise denominators and versioned sources, distinguish physical observation from plan generation, and do not treat passing unit tests as outcome validation. Preserve negative results and report calibrated uncertainty, temporal leakage checks, action eligibility, and independent verification boundaries. Do not start the 1,200-trial campaign until the revised protocol and mechanical pilot are formally frozen.
 
 ## Evidence trail
 

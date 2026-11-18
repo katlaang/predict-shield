@@ -4,7 +4,7 @@
 
 PREDICT-SHIELD finds what is running on a network or a public-facing website, checks it against known vulnerabilities, uses a language model to read the advisories and propose fixes, screens every proposal through a deterministic policy gate, and independently verifies whether a fix actually worked. It is built for ISPs, telecom carriers, and SMEs running a public website who need continuous, evidence-backed security assessment and don't have a dedicated security team to do it by hand.
 
-> **Status: working research prototype, not a finished product.** The pipeline below runs end-to-end today against a lab network. Running it against a real operator's live infrastructure, with a dashboard, real asset discovery, and safe automated remediation, is the next phase of work and is not something already deployed. Nothing here claims that the AI outperforms a well-built fixed rule; that is a separate, still-open research question (see [Current research](#current-research) below), and it does not block using the pipeline as an automation tool.
+> **Status: working prototype, not a finished product.** The pipeline below runs end-to-end today against a lab network. Running it against a real operator's live infrastructure, with a dashboard, real asset discovery, and safe automated remediation, is the next phase of work and is not something already deployed.
 
 ## How it works
 
@@ -83,11 +83,7 @@ docker compose down
 
 Read [the Experiment B guide](experiment-b/README.md) for full setup and limitations.
 
-## Current research
-
-The framework's design scopes its one core AI-versus-deterministic research question narrowly: whether a learned drift model for the continuous-assurance re-verification scheduler detects regressions sooner than the transparent priority function it is compared against, under an equal probe budget. The transparent scheduler is built and tested; the learned variant and that comparison have not been run yet.
-
-See [the research index](docs/research/README.md) for the full set of studies, and [the roadmap](docs/development/ROADMAP.md) for a capability-by-capability account of what's verified versus still outstanding.
+See [the roadmap](docs/development/ROADMAP.md) for a capability-by-capability account of what's verified versus still outstanding.
 
 ## Documentation
 
