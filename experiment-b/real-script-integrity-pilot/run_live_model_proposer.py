@@ -20,9 +20,13 @@ It also records, per case, the action and severity the model chose and
 its rationale, so the model's judgment can be reviewed rather than only
 its compliance.
 
-Requires a provider API key in the environment (see
-`engine/predict_shield/language_model.py`, HOSTED_PROVIDERS). Run by the
-manually dispatched workflow `live-model-script-proposer.yml`.
+Two ways to run it. `--provider ollama` uses a real model served by a
+local Ollama on loopback, the same setup the lodash pilot already uses
+in CI; the `real-script-integrity-lab.yml` workflow runs it that way on
+every relevant push. A hosted provider (see
+`engine/predict_shield/language_model.py`, HOSTED_PROVIDERS) needs an API
+key in the environment and is run by the manually dispatched workflow
+`live-model-script-proposer.yml`.
 """
 from __future__ import annotations
 
@@ -34,7 +38,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / "engine"))
 from predict_shield.ai_contracts import ActionPrediction, ActionTier, CandidateAction, EvidenceSnapshot, Interval
-from predict_shield.language_model import HostedChatModel
+from predict_shield.language_model import HostedChatModel, OllamaModel
 from predict_shield.pipeline import plan_script_integrity_case
 from predict_shield.script_integrity import RegisteredScript, RegisteredSite, ScriptObservation
 from predict_shield.script_risk_proposer import ModelScriptRiskProposer
@@ -69,9 +73,10 @@ CASES = [
 ]
 
 
-def run(provider: str, model: str, output: Path) -> dict:
+def run(provider: str, model: str, output: Path, *, model_digest: str | None = None) -> dict:
     now = datetime.now(timezone.utc)
-    proposer = ModelScriptRiskProposer(HostedChatModel(provider, model))
+    language_model = OllamaModel(model) if provider == "ollama" else HostedChatModel(provider, model)
+    proposer = ModelScriptRiskProposer(language_model)
     snapshot = EvidenceSnapshot(snapshot_id="live-model-scope", case_id="live-model-case", captured_at=now,
                                 source_ids=("script-integrity:checkout-widget",), trusted=True, scope_complete=True)
     tiers = {a.action_id: a.tier for a in CATALOG}
@@ -116,6 +121,7 @@ def run(provider: str, model: str, output: Path) -> dict:
                         "selection_status": plan["selection_status"], "selected_action": selected,
                         "reason": plan["reason"], "checks": checks})
     report = {"schema": "predict-shield/live-model-script-proposer/1", "model": f"{provider}:{model}",
+              "model_digest": model_digest,
               "run_at": now.isoformat(), "cases": results, "violations": violations,
               "passed": not violations}
     output.write_text(json.dumps(report, indent=1, sort_keys=True) + "\n", encoding="utf-8")
@@ -127,8 +133,9 @@ def main() -> None:
     parser.add_argument("--provider", required=True)
     parser.add_argument("--model", required=True)
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--model-digest", default=None, help="installed model digest, recorded in the report")
     args = parser.parse_args()
-    report = run(args.provider, args.model, args.output)
+    report = run(args.provider, args.model, args.output, model_digest=args.model_digest)
     print(json.dumps(report, indent=1, sort_keys=True))
     if not report["passed"]:
         raise SystemExit("structural safety property violated: " + "; ".join(report["violations"]))

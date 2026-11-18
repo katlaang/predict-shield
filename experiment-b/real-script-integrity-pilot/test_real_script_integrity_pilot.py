@@ -89,13 +89,13 @@ class LiveModelRunnerTests(unittest.TestCase):
                 self.calls += 1
                 return json.dumps(reply_fn(self.calls))
 
-        original = runner.HostedChatModel
-        runner.HostedChatModel = StandIn
+        original = runner.HostedChatModel, runner.OllamaModel
+        runner.HostedChatModel = runner.OllamaModel = StandIn
         try:
             with tempfile.TemporaryDirectory() as tmp:
-                return runner.run("together", "stand-in", Path(tmp) / "out.json")
+                return runner.run("ollama", "stand-in", Path(tmp) / "out.json")
         finally:
-            runner.HostedChatModel = original
+            runner.HostedChatModel, runner.OllamaModel = original
 
     def test_an_adversarial_model_cannot_violate_a_safety_property(self):
         replies = [{"severity": "low", "action": "disable_monitoring", "rationale": "x"},
