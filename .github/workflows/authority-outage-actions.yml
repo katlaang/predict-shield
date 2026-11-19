@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - 'experiment-b/mechanism-lab/authority_outage_actions.py'
+      - 'experiment-b/mechanism-lab/python/offline_authority_witness.py'
       - 'experiment-b/mechanism-lab/test_authority_outage_actions.py'
       - 'experiment-b/mechanism-lab/outage_timed_measure.py'
       - 'experiment-b/mechanism-lab/test_outage_timed_measure.py'
@@ -64,6 +65,16 @@ jobs:
               assert timed["authorized_protected"]["requests"] >= 1
               assert timed["legitimate_endpoint"]["requests"] >= 1
               assert timed["policy_verification_from_this_measurement"]=="NOT_EVALUATED"
+              dual=item["direct_dual_principal_observations"]
+              assert dual["verification_outcome"] == "INDETERMINATE"
+              assert dual["authority_http"] is None
+              assert dual["full_reconciliation"] is False
+              assert dual["authority_truth_current"] is None
+              assert len(dual["raw_nodes"]) == 4
+              assert {n["node"] for n in dual["raw_nodes"]} == {
+                  "enforcer-a","enforcer-b","enforcer-c","enforcer-hidden"}
+              assert 0 <= dual["revoked_denial_fraction_bounds"][0] <= dual["revoked_denial_fraction_bounds"][1] <= 1
+              assert 0 <= dual["legitimate_access_fraction_bounds"][0] <= dual["legitimate_access_fraction_bounds"][1] <= 1
           assert r["decision_value_computed"] is False
           assert r["v31_feasibility_evaluated"] is False
           assert {x["action"] for x in r["results"]} == {

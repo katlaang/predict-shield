@@ -15,7 +15,8 @@ from urllib.parse import urlsplit
 from authority_outage_witness import capture_witness, observe_offline
 from outage_timed_measure import observe_during_action
 from physical_faults import compose_command, wait_authority_unavailable
-from pilot import request, setup_fault, wait_for_target, wait_ready
+from pilot import ENFORCERS, request, setup_fault, wait_for_target, wait_ready
+from python.offline_authority_witness import freeze_witness, offline_bounds
 
 ACTIONS = ("resync_policy", "restart_enforcer", "gateway_restrict", "monitor_only")
 TARGET = "enforcer-b"
@@ -65,6 +66,32 @@ def sample_gateway(*, count: int = 8) -> dict:
             "probe_count_each_principal": count}
 
 
+def collect_dual_principal_probes(request_fn, *, witness: dict,
+                                  authority_http: int | None,
+                                  observed_at: str) -> dict:
+    """Take fresh direct HTTP measurements from all four enforcement processes.
+
+    The revoked and legitimate test principals are synthetic identities in the
+    disposable lab. The caller must separately confirm the authority outage.
+    This does not supply private policy truth to an AI selector.
+    """
+    observations = []
+    for node in ENFORCERS:
+        revoked_http, _, _ = request_fn(node, "/protected", timeout=2)
+        authorized_http, _, _ = request_fn(
+            node, "/protected", timeout=2, authorized_lab_user=True
+        )
+        observations.append({
+            "node": node,
+            "revoked_probe_http": revoked_http,
+            "legitimate_probe_http": authorized_http,
+        })
+    return offline_bounds(
+        witness, authority_http=authority_http,
+        observed_at=observed_at, nodes=observations,
+    )
+
+
 def execute(control: str, oracle: str, compose_dir: Path) -> dict:
     if min(len(control), len(oracle)) < 24 or control == oracle:
         raise ValueError("Distinct disposable control and oracle credentials required")
@@ -80,6 +107,12 @@ def execute(control: str, oracle: str, compose_dir: Path) -> dict:
         if code != 200:
             raise RuntimeError("Unable to collect authentic pre-outage witness")
         witness = capture_witness(snapshot, observed_at=datetime.now(timezone.utc))
+        # Capture distinct immutable-structure witness *while authority is up*.
+        # Hashes alone do not attest independent custody or policy correctness.
+        dual_witness = freeze_witness(
+            snapshot["authority"], authority_http=snapshot["authority_http"],
+            inventory=list(ENFORCERS), captured_at=witness.observed_at,
+        )
         target_rows = [t for t in snapshot["targets"]
                        if urlsplit(t["node"]).hostname == TARGET]
         if len(target_rows) != 1 or target_rows[0]["direct_probe_http"] != 200:
@@ -97,6 +130,15 @@ def execute(control: str, oracle: str, compose_dir: Path) -> dict:
             if code != 200:
                 raise RuntimeError("Independent observer unavailable during outage")
             bounds = observe_offline(post, witness)
+            # Directly probe both synthetic principal types on all four actual
+            # JVMs while authority is physically stopped.
+            dual_probe = collect_dual_principal_probes(
+                request, witness=dual_witness,
+                authority_http=post["authority_http"],
+                observed_at=datetime.now(timezone.utc).isoformat(),
+            )
+            if dual_probe["verification_outcome"] != "INDETERMINATE":
+                raise RuntimeError("Offline dual-principal data fabricated policy truth")
             if bounds["verification_status"] != "INDETERMINATE":
                 raise RuntimeError("Offline policy was incorrectly certified")
             results.append({
@@ -113,6 +155,7 @@ def execute(control: str, oracle: str, compose_dir: Path) -> dict:
                     "observed_allow_fraction_upper_bound"],
                 "timed_observations": timed,
                 "action_observation": action_result,
+                "direct_dual_principal_observations": dual_probe,
             })
         finally:
             if stopped:
