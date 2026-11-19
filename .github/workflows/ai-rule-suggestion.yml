@@ -38,7 +38,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Unit tests
-        run: PYTHONPATH=engine:engine/tests python -m unittest test_rule_suggestion test_endpoint_telemetry -v
+        run: PYTHONPATH=engine:engine/tests:experiment-b/public-sources/ai_rules python -m unittest test_rule_suggestion test_endpoint_telemetry test_partial_checkpoint -v
       - name: Start the local model on loopback and record its digest
         run: |
           docker run --rm -d --name ps-rules-ai -e OLLAMA_NUM_PARALLEL=1 -p 127.0.0.1:11434:11434 ollama/ollama:latest
