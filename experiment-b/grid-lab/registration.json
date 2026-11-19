@@ -1,0 +1,57 @@
+{
+  "schema": "predict-shield/grid-cyber-physical-lab/1",
+  "scenario_id": "distribution-ot-remote-access",
+  "model": {"power_case": "pandapower.case33bw", "load_scaling": 1.0},
+  "nodes": [
+    "untrusted-vpn", "remote-access-gateway", "engineering-station",
+    "control-center", "control-switch", "substation-a", "relay-a",
+    "substation-b", "relay-b", "telemetry-server"
+  ],
+  "links": [
+    ["untrusted-vpn", "remote-access-gateway"],
+    ["remote-access-gateway", "engineering-station"],
+    ["engineering-station", "substation-a"],
+    ["control-center", "control-switch"],
+    ["control-switch", "substation-a"],
+    ["control-switch", "substation-b"],
+    ["substation-a", "relay-a"],
+    ["substation-b", "relay-b"],
+    ["control-center", "telemetry-server"]
+  ],
+  "threat_path": ["untrusted-vpn", "relay-a"],
+  "required_paths": [
+    ["control-center", "relay-a"],
+    ["control-center", "relay-b"],
+    ["control-center", "telemetry-server"]
+  ],
+  "protected_links": [
+    ["control-center", "control-switch"],
+    ["control-switch", "substation-a"],
+    ["control-switch", "substation-b"],
+    ["substation-a", "relay-a"],
+    ["substation-b", "relay-b"]
+  ],
+  "actions": [
+    {
+      "action_id": "block_untrusted_remote_management",
+      "tier": "APPROVAL",
+      "affected_services": ["remote-management"],
+      "remove_links": [["untrusted-vpn", "remote-access-gateway"]],
+      "reversible": true
+    },
+    {
+      "action_id": "monitor_only",
+      "tier": "AUTOMATIC",
+      "affected_services": ["remote-management"],
+      "remove_links": [],
+      "reversible": true
+    },
+    {
+      "action_id": "disconnect_substation_a",
+      "tier": "PROHIBITED",
+      "affected_services": ["relay-control-a"],
+      "remove_links": [["control-switch", "substation-a"]],
+      "reversible": true
+    }
+  ]
+}
