@@ -46,6 +46,38 @@ def normalize(raw: dict) -> dict:
     return fields
 
 
+_EVENT_NS = "{http://schemas.microsoft.com/win/2004/08/events/event}"
+
+
+def parse_windows_event_xml(line: str) -> dict:
+    """One Windows event rendered as XML (as exported by Splunk's
+    XmlWinEventLog) to the flat shape `normalize()` reads. Untrusted input:
+    any DTD or entity declaration is refused before parsing."""
+    import xml.etree.ElementTree as ET
+
+    if "<!DOCTYPE" in line or "<!ENTITY" in line:
+        raise ValueError("event XML with a DTD or entity declaration is refused")
+    root = ET.fromstring(line)
+    system = root.find(_EVENT_NS + "System")
+    data = root.find(_EVENT_NS + "EventData")
+    if system is None:
+        raise ValueError("not a Windows event")
+    out = {
+        "Channel": (system.findtext(_EVENT_NS + "Channel") or "").strip(),
+        "EventID": (system.findtext(_EVENT_NS + "EventID") or "").strip(),
+        "Hostname": (system.findtext(_EVENT_NS + "Computer") or "").strip(),
+        "RecordNumber": (system.findtext(_EVENT_NS + "EventRecordID") or "").strip(),
+    }
+    created = system.find(_EVENT_NS + "TimeCreated")
+    if created is not None:
+        out["TimeCreated"] = created.get("SystemTime")
+    for item in (data if data is not None else []):
+        name = item.get("Name")
+        if name and name not in out:
+            out[name] = item.text or ""
+    return out
+
+
 def _lower(value) -> str:
     return str(value or "").lower()
 

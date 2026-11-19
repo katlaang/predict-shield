@@ -224,5 +224,428 @@
         "sha256": "3d887b38c6a92892f950029f40114fe4598a798ad20453671dbe3d111b9ce4a2"
       }
     ]
+  },
+  "splunk_attack_data": {
+    "repository": "https://github.com/splunk/attack_data",
+    "commit": "5879f5423e6c08df2b22b63f7b36e84866f9c51c",
+    "license_note": "Published by Splunk for detection testing; recorded in its Attack Range lab.",
+    "rules_evaluated": "RULES_V2, frozen in commit 98ffd13 before this selection was made",
+    "selection_protocol": [
+      "Covered: every recording under T1003.001 and T1112 whose metadata lists a Sysmon XML log.",
+      "Excluded: two files whose first lines were opened before the selection (T1003.001/atomic_red_team/windows-sysmon_creddump.log, T1112/disable_rdp/fdenytsconnection-reg.log).",
+      "Other techniques: the first Sysmon recording, by folder order, under each of T1059.001, T1053.005, T1547.001, T1218.011, T1021.002, T1047, T1070.001, T1105, T1087.002, T1136.001.",
+      "Files over 64 MB, missing files and LFS pointers are skipped and recorded.",
+      "Selected and pinned from metadata only; run once after this commit; RULES_V2 is not changed in response."
+    ],
+    "covered": [
+      {
+        "file": "datasets/attack_techniques/T1003.001/atomic_red_team/createdump_windows-sysmon.log",
+        "labels": [
+          "T1003.001"
+        ],
+        "metadata": "datasets/attack_techniques/T1003.001/atomic_red_team/atomic_red_team.yml",
+        "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1003.001/atomic_red_team/createdump_windows-sysmon.log",
+        "sha256": "b898327b2b446ba63c13934d50c899eb4b2ee2c722a7c6c4a1dae6c515720001",
+        "bytes": 10636
+      },
+      {
+        "file": "datasets/attack_techniques/T1003.001/atomic_red_team/windows-sysmon.log",
+        "labels": [
+          "T1003.001"
+        ],
+        "metadata": "datasets/attack_techniques/T1003.001/atomic_red_team/atomic_red_team.yml",
+        "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1003.001/atomic_red_team/windows-sysmon.log",
+        "sha256": "a1905850598f1e943708c3329190e29c6cb046389c1575cb2afd6369b5f269f1",
+        "bytes": 14235927
+      },
+      {
+        "file": "datasets/attack_techniques/T1003.001/snapattack/snapattack.log",
+        "labels": [
+          "T1003.001"
+        ],
+        "metadata": "datasets/attack_techniques/T1003.001/snapattack/snapattack.yml",
+        "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1003.001/snapattack/snapattack.log",
+        "sha256": "c22994ec5fa481609dfbb3403dc51d803cb1f0665d3aab29da8f5e8a9766f4af",
+        "bytes": 58587
+      },
+      {
+        "file": "datasets/attack_techniques/T1112/DisableRemoteDesktopAntiAlias/disable_remote_alias.log",
+        "labels": [
+          "T1112"
+        ],
+        "metadata": "datasets/attack_techniques/T1112/DisableRemoteDesktopAntiAlias/DisableRemoteDesktopAntiAlias_old.yml",
+        "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1112/DisableRemoteDesktopAntiAlias/disable_remote_alias.log",
+        "sha256": "ce56a4b9f2539d1748b65fb690287c4e5016cdf1abc8b64f066d4006b443c62a",
+        "bytes": 2199
+      },
+      {
+        "file": "datasets/attack_techniques/T1112/atomic_red_team/wdigest_windows-sysmon.log",
+        "labels": [
+          "T1112"
+        ],
+        "metadata": "datasets/attack_techniques/T1112/atomic_red_team/atomic_red_team.yml",
+        "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1112/atomic_red_team/wdigest_windows-sysmon.log",
+        "sha256": "f51bc14b916e66487c299ffa642b938a26b14a5d934933eb2c32bb136dc0d353",
+        "bytes": 1116
+      },
+      {
+        "file": "datasets/attack_techniques/T1112/atomic_red_team/safemode_windows-sysmon.log",
+        "labels": [
+          "T1112"
+        ],
+        "metadata": "datasets/attack_techniques/T1112/atomic_red_team/atomic_red_team.yml",
+        "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1112/atomic_red_team/safemode_windows-sysmon.log",
+        "sha256": "57a8a6765acd975012d2bd379ced973a9d007eb7cf94151ca2c6f892db0f6f07",
+        "bytes": 45549
+      },
+      {
+        "file": "datasets/attack_techniques/T1112/atomic_red_team/windows-sysmon-webview.log",
+        "labels": [
+          "T1112"
+        ],
+        "metadata": "datasets/attack_techniques/T1112/atomic_red_team/atomic_red_team.yml",
+        "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1112/atomic_red_team/windows-sysmon-webview.log",
+        "sha256": "891605a31b4cfe03c4f9883663794314dacde05ed07f32f2c87eb31bb6ecaec8",
+        "bytes": 42342
+      },
+      {
+        "file": "datasets/attack_techniques/T1112/atomic_red_team/windows-sysmon.log",
+        "labels": [
+          "T1112"
+        ],
+        "metadata": "datasets/attack_techniques/T1112/atomic_red_team/atomic_red_team.yml",
+        "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1112/atomic_red_team/windows-sysmon.log",
+        "sha256": "2a54ff252b3ca480f4c50bbc2708f63ceeaecfaaa3305bd53ff73b615fb23041",
+        "bytes": 11705774
+      },
+      {
+        "file": "datasets/attack_techniques/T1112/bitlocker_registry_setting/fve-reg.log",
+        "labels": [
+          "T1112"
+        ],
+        "metadata": "datasets/attack_techniques/T1112/bitlocker_registry_setting/bitlocker_registry_setting_old.yml",
+        "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1112/bitlocker_registry_setting/fve-reg.log",
+        "sha256": "2798be4b152c5ae2daf820ad783bed4dd48b59567bb4c7ddb6e41516c26fd288",
+        "bytes": 9732
+      },
+      {
+        "file": "datasets/attack_techniques/T1112/delete_runmru_reg/runmru_deletion.log",
+        "labels": [
+          "T1112"
+        ],
+        "metadata": "datasets/attack_techniques/T1112/delete_runmru_reg/delete_runmru_reg.yml",
+        "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1112/delete_runmru_reg/runmru_deletion.log",
+        "sha256": "32fb866c1e62fd57d01a78ecb6a2114f8327e6bfcbc06d132e980e046efe6e4d",
+        "bytes": 13237
+      },
+      {
+        "file": "datasets/attack_techniques/T1112/disable_notif_center/sysmon.log",
+        "labels": [
+          "T1112"
+        ],
+        "metadata": "datasets/attack_techniques/T1112/disable_notif_center/disable_notif_center.yml",
+        "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1112/disable_notif_center/sysmon.log",
+        "sha256": "129168aa1bad3ade79eed4261db3caba65274db6f7fab6764e9e794aa0225c2a",
+        "bytes": 2099396
+      },
+      {
+        "file": "datasets/attack_techniques/T1112/firewall_modify_delete/firewall-mod-delete.log",
+        "labels": [
+          "T1112"
+        ],
+        "metadata": "datasets/attack_techniques/T1112/firewall_modify_delete/firewall_modify_delete.yml",
+        "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1112/firewall_modify_delete/firewall-mod-delete.log",
+        "sha256": "ac2b4ab4628203e0fe7ee7a52d77bc9451f094c94e09f21e3add1e0cf406c7da",
+        "bytes": 2369
+      },
+      {
+        "file": "datasets/attack_techniques/T1112/firewall_modify_delete/firewall_mod_delete.log",
+        "labels": [
+          "T1112"
+        ],
+        "metadata": "datasets/attack_techniques/T1112/firewall_modify_delete/firewall_modify_delete.yml",
+        "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1112/firewall_modify_delete/firewall_mod_delete.log",
+        "sha256": "ac2b4ab4628203e0fe7ee7a52d77bc9451f094c94e09f21e3add1e0cf406c7da",
+        "bytes": 2369
+      },
+      {
+        "file": "datasets/attack_techniques/T1112/kingsoft_reg/kingsoft_reg.log",
+        "labels": [
+          "T1112"
+        ],
+        "metadata": "datasets/attack_techniques/T1112/kingsoft_reg/kingsoft_reg_old.yml",
+        "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1112/kingsoft_reg/kingsoft_reg.log",
+        "sha256": "8c6b3949ff722092b8478f5618afcd177430744e85cbce9372f280cb4e55a169",
+        "bytes": 13122
+      },
+      {
+        "file": "datasets/attack_techniques/T1112/minint_reg/sysmon.log",
+        "labels": [
+          "T1112"
+        ],
+        "metadata": "datasets/attack_techniques/T1112/minint_reg/minint_reg.yml",
+        "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1112/minint_reg/sysmon.log",
+        "sha256": "a70e5da8db34240a2bdfb3985ec8598cc9be5e2398c67cde38407b64bf98e0d5",
+        "bytes": 5721027
+      },
+      {
+        "file": "datasets/attack_techniques/T1112/njrat_md5_registry_entry/njrat_reg_binary.log",
+        "labels": [
+          "T1112"
+        ],
+        "metadata": "datasets/attack_techniques/T1112/njrat_md5_registry_entry/njrat_md5_registry_entry_old.yml",
+        "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1112/njrat_md5_registry_entry/njrat_reg_binary.log",
+        "sha256": "4ddbf311f3159886e51a718202b2d45616798833a08fc1ac99d342f839187112",
+        "bytes": 3463
+      },
+      {
+        "file": "datasets/attack_techniques/T1112/no_changing_wallpaper/NoChangingWallPaper.log",
+        "labels": [
+          "T1112"
+        ],
+        "metadata": "datasets/attack_techniques/T1112/no_changing_wallpaper/no_changing_wallpaper_old.yml",
+        "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1112/no_changing_wallpaper/NoChangingWallPaper.log",
+        "sha256": "2741e106fd85b907949e588eb3da7e06db615f54252a76e688329960a9bdf590",
+        "bytes": 2288
+      },
+      {
+        "file": "datasets/attack_techniques/T1112/proxy_enable/proxyenable.log",
+        "labels": [
+          "T1112"
+        ],
+        "metadata": "datasets/attack_techniques/T1112/proxy_enable/proxy_enable_old.yml",
+        "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1112/proxy_enable/proxyenable.log",
+        "sha256": "18c9218e3f1c382c414fdaf9ef218651bf5f672c17af742a8c009687625bd611",
+        "bytes": 12757
+      },
+      {
+        "file": "datasets/attack_techniques/T1112/proxy_server/ProxyServer_sys.log",
+        "labels": [
+          "T1112"
+        ],
+        "metadata": "datasets/attack_techniques/T1112/proxy_server/proxy_server_old.yml",
+        "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1112/proxy_server/ProxyServer_sys.log",
+        "sha256": "d867fff9c62b862fae5cdc707f716b6db5019e02308cbd17a66c5c2f456d8aa0",
+        "bytes": 11692
+      },
+      {
+        "file": "datasets/attack_techniques/T1112/pwn_reg/pwn_reg.log",
+        "labels": [
+          "T1112"
+        ],
+        "metadata": "datasets/attack_techniques/T1112/pwn_reg/pwn_reg_old.yml",
+        "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1112/pwn_reg/pwn_reg.log",
+        "sha256": "82748e7db3e7c2dc3a2f0160b255067a47d4e83550a17d3937dd278feedc0374",
+        "bytes": 8651
+      },
+      {
+        "file": "datasets/attack_techniques/T1112/ransomware_disable_reg/sysmon.log",
+        "labels": [
+          "T1112"
+        ],
+        "metadata": "datasets/attack_techniques/T1112/ransomware_disable_reg/ransomware_disable_reg.yml",
+        "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1112/ransomware_disable_reg/sysmon.log",
+        "sha256": "a0781f5804e422166b179ac889b4979d406055530077f71b66b4b7020772d5d4",
+        "bytes": 13140158
+      },
+      {
+        "file": "datasets/attack_techniques/T1112/reg_profiles_private2/reg_profiles_private2.log",
+        "labels": [
+          "T1112"
+        ],
+        "metadata": "datasets/attack_techniques/T1112/reg_profiles_private2/reg_profiles_private2.yml",
+        "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1112/reg_profiles_private2/reg_profiles_private2.log",
+        "sha256": "6556ab4d3665ac2ffa87f5db2347b95de9e118e610a0d873b9f530a0b36b41b9",
+        "bytes": 4542
+      },
+      {
+        "file": "datasets/attack_techniques/T1112/remote_access_reg/remote_access_reg.log",
+        "labels": [
+          "T1112"
+        ],
+        "metadata": "datasets/attack_techniques/T1112/remote_access_reg/remote_access_reg.yml",
+        "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1112/remote_access_reg/remote_access_reg.log",
+        "sha256": "6dcdb8e7f63ec337464ed69e3e2e197d9bda49339f33c903fc111189ac253d4f",
+        "bytes": 5484
+      },
+      {
+        "file": "datasets/attack_techniques/T1112/shimcache_flush/sysmon.log",
+        "labels": [
+          "T1112"
+        ],
+        "metadata": "datasets/attack_techniques/T1112/shimcache_flush/shimcache_flush.yml",
+        "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1112/shimcache_flush/sysmon.log",
+        "sha256": "b7b3fb63f16df67d6cfa82c9ecaf0b08a7ca09a91f822aa4fb30f349a4e0baf9",
+        "bytes": 5475825
+      },
+      {
+        "file": "datasets/attack_techniques/T1112/smart_card_group_policy/scforceoption-reg.log",
+        "labels": [
+          "T1112"
+        ],
+        "metadata": "datasets/attack_techniques/T1112/smart_card_group_policy/smart_card_group_policy_old.yml",
+        "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1112/smart_card_group_policy/scforceoption-reg.log",
+        "sha256": "d7e69fef0be565cc2a02de146b334645c562e8b872e7b70b07e9134cf3e6d482",
+        "bytes": 1108
+      },
+      {
+        "file": "datasets/attack_techniques/T1112/snapattack/snapattack.log",
+        "labels": [
+          "T1112"
+        ],
+        "metadata": "datasets/attack_techniques/T1112/snapattack/snapattack.yml",
+        "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1112/snapattack/snapattack.log",
+        "sha256": "bb559d2673d9ab1af7527c68105853305c35acf6bb4b23996a8fde71e07c51c3",
+        "bytes": 24894
+      },
+      {
+        "file": "datasets/attack_techniques/T1112/test_registry/test_reg.log",
+        "labels": [
+          "T1112"
+        ],
+        "metadata": "datasets/attack_techniques/T1112/test_registry/test_registry_old.yml",
+        "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1112/test_registry/test_reg.log",
+        "sha256": "b4c5fd2eb1533b0cbd2a793c767a858d3493877822701be7944103cd9922ee06",
+        "bytes": 2174
+      },
+      {
+        "file": "datasets/attack_techniques/T1112/valleyrat_c2_reg2/valleyrat_c2_reg2.log",
+        "labels": [
+          "T1112"
+        ],
+        "metadata": "datasets/attack_techniques/T1112/valleyrat_c2_reg2/valleyrat_c2_reg2_old.yml",
+        "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1112/valleyrat_c2_reg2/valleyrat_c2_reg2.log",
+        "sha256": "a0ef4c6d298121d75ceec84b949ec022c14c239f8c1f9a49d2076924771ee487",
+        "bytes": 3297
+      },
+      {
+        "file": "datasets/attack_techniques/T1112/vip_big_env_variable/vip_INTERNAL_DB_CACHE.log",
+        "labels": [
+          "T1112"
+        ],
+        "metadata": "datasets/attack_techniques/T1112/vip_big_env_variable/vip_big_env_variable.yml",
+        "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1112/vip_big_env_variable/vip_INTERNAL_DB_CACHE.log",
+        "sha256": "b7b7a92f504ec7af15951bb2de90ed91f35499909331de3f70a8bfd7ea6d12cf",
+        "bytes": 20948
+      },
+      {
+        "file": "datasets/attack_techniques/T1112/wer_dontshowui/dontshowui_sys.log",
+        "labels": [
+          "T1112"
+        ],
+        "metadata": "datasets/attack_techniques/T1112/wer_dontshowui/wer_dontshowui_old.yml",
+        "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1112/wer_dontshowui/dontshowui_sys.log",
+        "sha256": "e80d336729e1f1bdbb265d0250fc3a98f7b997950bddd66a7718fb1fdec08d76",
+        "bytes": 1139
+      }
+    ],
+    "other": [
+      {
+        "file": "datasets/attack_techniques/T1059.001/atomic_red_team/captcha_windows-sysmon.log",
+        "labels": [
+          "T1059.001"
+        ],
+        "metadata": "datasets/attack_techniques/T1059.001/atomic_red_team/atomic_red_team.yml",
+        "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1059.001/atomic_red_team/captcha_windows-sysmon.log",
+        "sha256": "2349326b9042ba212dc16a4764a2cd1fbfa318a792c5591594b77bbfd20ddc9e",
+        "bytes": 2153
+      },
+      {
+        "file": "datasets/attack_techniques/T1053.005/asyncrat_highest_priv_schtasks/sysmon.log",
+        "labels": [
+          "T1053.005"
+        ],
+        "metadata": "datasets/attack_techniques/T1053.005/asyncrat_highest_priv_schtasks/asyncrat_highest_priv_schtasks.yml",
+        "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1053.005/asyncrat_highest_priv_schtasks/sysmon.log",
+        "sha256": "068cba2851e13e3708d353247c37891e2cdc5b78bc94f5d7099ada494ae644d9",
+        "bytes": 16999744
+      },
+      {
+        "file": "datasets/attack_techniques/T1547.001/atomic_red_team/bootexecute-windows-sysmon.log",
+        "labels": [
+          "T1547.001"
+        ],
+        "metadata": "datasets/attack_techniques/T1547.001/atomic_red_team/atomic_red_team.yml",
+        "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1547.001/atomic_red_team/bootexecute-windows-sysmon.log",
+        "sha256": "250282b2b0ccfe81a2d40f2fd21ccdaeba15d1b17f46ba102f9fd67f61d6b284",
+        "bytes": 21929
+      },
+      {
+        "file": "datasets/attack_techniques/T1218.011/atomic_red_team/windows-sysmon.log",
+        "labels": [
+          "T1218.011"
+        ],
+        "metadata": "datasets/attack_techniques/T1218.011/atomic_red_team/atomic_red_team.yml",
+        "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1218.011/atomic_red_team/windows-sysmon.log",
+        "sha256": "0805f7d8a89371dee4f75c001ef11574c2d759d91626c1625bca7c9174cfe29f",
+        "bytes": 23784139
+      },
+      {
+        "file": "datasets/attack_techniques/T1021.002/atomic_red_team/smbexec_windows-sysmon.log",
+        "labels": [
+          "T1021.002"
+        ],
+        "metadata": "datasets/attack_techniques/T1021.002/atomic_red_team/atomic_red_team.yml",
+        "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1021.002/atomic_red_team/smbexec_windows-sysmon.log",
+        "sha256": "2d29d8d01bb1d328a65e39963bd8c1945be271d40d9a2ca0507b8fc20bfd98cd",
+        "bytes": 5577
+      },
+      {
+        "file": "datasets/attack_techniques/T1047/atomic_red_team/windows-sysmon.log",
+        "labels": [
+          "T1047"
+        ],
+        "metadata": "datasets/attack_techniques/T1047/atomic_red_team/atomic_red_team.yml",
+        "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1047/atomic_red_team/windows-sysmon.log",
+        "sha256": "64651720e10813aa57d0f25ce149005ab06039b1974dbc09818b1fb45fbbc196",
+        "bytes": 11815541
+      },
+      {
+        "file": "datasets/attack_techniques/T1070.001/atomic_red_team/windows-sysmon.log",
+        "labels": [
+          "T1070.001"
+        ],
+        "metadata": "datasets/attack_techniques/T1070.001/atomic_red_team/atomic_red_team.yml",
+        "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1070.001/atomic_red_team/windows-sysmon.log",
+        "sha256": "58a5e3465bdced284a1c0b625063c539be77beca8f9921e29238bbdc4d26de11",
+        "bytes": 11267266
+      },
+      {
+        "file": "datasets/attack_techniques/T1105/atomic_red_team/windows-sysmon_curl_upload.log",
+        "labels": [
+          "T1105"
+        ],
+        "metadata": "datasets/attack_techniques/T1105/atomic_red_team/atomic_red_team.yml",
+        "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1105/atomic_red_team/windows-sysmon_curl_upload.log",
+        "sha256": "af1602ccd961b0ae04cd5ca8c5c9dcbde01df6f86381bd9da67e6a3add5951ff",
+        "bytes": 475947
+      },
+      {
+        "file": "datasets/attack_techniques/T1087.002/AD_discovery/windows-sysmon.log",
+        "labels": [
+          "T1087.002"
+        ],
+        "metadata": "datasets/attack_techniques/T1087.002/AD_discovery/AD_discovery.yml",
+        "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1087.002/AD_discovery/windows-sysmon.log",
+        "sha256": "1b78f515120a7e5ac532444fd7fd322c8dc1abf8efebe0295abad3939972db0d",
+        "bytes": 10902926
+      },
+      {
+        "file": "datasets/attack_techniques/T1136.001/atomic_red_team/windows-sysmon-esxadmins.log",
+        "labels": [
+          "T1136.001"
+        ],
+        "metadata": "datasets/attack_techniques/T1136.001/atomic_red_team/atomic_red_team.yml",
+        "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1136.001/atomic_red_team/windows-sysmon-esxadmins.log",
+        "sha256": "04db89547e200b0ff007641941fc5290dbd880562c834f5e470594e532edee60",
+        "bytes": 7992
+      }
+    ],
+    "skipped": [
+      {
+        "file": "datasets/attack_techniques/T1112/reg_profiles_private/windows-sysmon.log",
+        "reason": "download failed: HTTP Error 404: Not Found"
+      }
+    ]
   }
 }

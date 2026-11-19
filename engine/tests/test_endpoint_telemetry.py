@@ -60,6 +60,28 @@ class RuleTests(unittest.TestCase):
         self.assertFalse(technique_matches_label("T1112", ["T1003"]))
 
 
+class XmlEventTests(unittest.TestCase):
+    LINE = ("<Event xmlns='http://schemas.microsoft.com/win/2004/08/events/event'><System>"
+            "<Provider Name='Microsoft-Windows-Sysmon'/><EventID>10</EventID>"
+            "<TimeCreated SystemTime='2022-01-12T16:25:27.967Z'/><EventRecordID>7</EventRecordID>"
+            "<Channel>Microsoft-Windows-Sysmon/Operational</Channel><Computer>dc1</Computer></System>"
+            "<EventData><Data Name='SourceImage'>C:\\Tools\\dumper.exe</Data>"
+            "<Data Name='TargetImage'>C:\\Windows\\system32\\lsass.exe</Data>"
+            "<Data Name='GrantedAccess'>0x1fffff</Data></EventData></Event>")
+
+    def test_xml_events_normalize_and_match(self):
+        from predict_shield.endpoint_telemetry import RULES_V2, parse_windows_event_xml
+        raw = parse_windows_event_xml(self.LINE)
+        e = normalize(raw)
+        self.assertEqual((e["_channel"], e["_event_id"], e["_host"]), (SYSMON, 10, "dc1"))
+        self.assertEqual([h.rule_id for h in detect([raw], RULES_V2)], ["ps2-lsass-memory-access"])
+
+    def test_dtd_and_entities_are_refused(self):
+        from predict_shield.endpoint_telemetry import parse_windows_event_xml
+        with self.assertRaises(ValueError):
+            parse_windows_event_xml('<!DOCTYPE x [<!ENTITY a "aaaa">]><Event/>')
+
+
 class RulesV2Tests(unittest.TestCase):
     def hit(self, event):
         from predict_shield.endpoint_telemetry import RULES_V2
