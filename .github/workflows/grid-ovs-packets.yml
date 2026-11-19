@@ -4,11 +4,17 @@ on:
   pull_request:
     paths:
       - 'experiment-b/grid-lab/ovs_packet_pilot.sh'
+      - 'experiment-b/grid-lab/gated_ovs_response.py'
+      - 'experiment-b/grid-lab/test_gated_ovs_response.py'
+      - 'experiment-b/grid-lab/registration.json'
       - '.github/workflows/grid-ovs-packets.yml'
   push:
     branches: [master]
     paths:
       - 'experiment-b/grid-lab/ovs_packet_pilot.sh'
+      - 'experiment-b/grid-lab/gated_ovs_response.py'
+      - 'experiment-b/grid-lab/test_gated_ovs_response.py'
+      - 'experiment-b/grid-lab/registration.json'
       - '.github/workflows/grid-ovs-packets.yml'
   workflow_dispatch:
 
@@ -27,10 +33,18 @@ jobs:
           sudo apt-get install -y -qq openvswitch-switch iproute2 iputils-ping
           sudo service openvswitch-switch start
           sudo ovs-vsctl show
+      - name: Validate registered action, explicit lab authorization and malicious proposals
+        run: |
+          PYTHONPATH=engine:experiment-b/grid-lab python -m unittest -v test_gated_ovs_response
+          PYTHONPATH=engine python experiment-b/grid-lab/gated_ovs_response.py propose \
+            --registration experiment-b/grid-lab/registration.json \
+            --plan /tmp/unused-ovs-plan.json --output /tmp/ps-grid-ovs-plan.json \
+            --trusted-lab-fixture
       - name: Validate lab only, independent packet probes and rollback
         run: |
-          sudo env PREDICT_SHIELD_ISOLATED_LAB=1 bash \
-            experiment-b/grid-lab/ovs_packet_pilot.sh /tmp/ps-grid-ovs-pilot.json
+          sudo env PREDICT_SHIELD_ISOLATED_LAB=1 PREDICT_SHIELD_LAB_APPROVAL=1 bash \
+            experiment-b/grid-lab/ovs_packet_pilot.sh /tmp/ps-grid-ovs-pilot.json \
+            /tmp/ps-grid-ovs-plan.json
       - name: Assert recorded evidence and scope restrictions
         run: |
           python - <<'PY'
@@ -42,6 +56,8 @@ jobs:
           assert p['attacker_to_relay_restored_after_rollback'] is True
           assert p['ovs_before_flow_table_sha256'] != p['ovs_after_flow_table_sha256']
           assert p['grid_power_flow_coupled'] is False
+          assert p['registered_grid_policy_checked'] is True
+          assert p['lab_approval_checked_before_packet_mutation'] is True
           assert p['model_selected_action'] is False
           assert p['operational_critical_infrastructure_resilience_established'] is False
           print(json.dumps(p, indent=2))
@@ -53,6 +69,8 @@ jobs:
           name: real-ovs-isolated-packet-evidence
           path: |
             /tmp/ps-grid-ovs-pilot.json
+            /tmp/ps-grid-ovs-plan.json
+            /tmp/ps-grid-ovs-authorization.json
             /tmp/ps-grid-*.txt
             /tmp/ps-grid-*.flows
           retention-days: 90
