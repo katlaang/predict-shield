@@ -19,4 +19,4 @@ jobs:
         with:
           python-version: '3.12'
       - name: Run complete asset and engine contracts
-        run: PYTHONPATH=engine python -m unittest discover -s engine/tests -v
+        run: pip install 'cryptography>=42' && PYTHONPATH=engine python -m unittest discover -s engine/tests -v

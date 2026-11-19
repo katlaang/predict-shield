@@ -49,6 +49,19 @@ log), with functional disruption recorded:
     block_vendor_script         CSP script-src 'self'
     sri_pin                     the page pins the vendor script to its
                                 trusted hash with Subresource Integrity
+    isolate_in_sandboxed_frame  the vendor script runs only inside a frame
+                                the operator serves, sandboxed with
+                                allow-scripts alone, under a CSP with no
+                                fetch, image or form destination, while
+                                the parent's frame-src 'self' stops the
+                                frame navigating itself elsewhere; the
+                                widget's one visible effect crosses back
+                                as a typed message the operator's host
+                                bridge accepts only from that frame
+
+Two further channels an attacker turns to once the page is locked down
+are tried against every containment as well: navigating the top-level
+window, and opening a new window.
 
 Controls on the containment verifier itself, the two ways an absence of
 a prohibited request could mean nothing:
@@ -122,7 +135,7 @@ from predict_shield.script_integrity import (
 )
 from predict_shield.verification_cycle import TrackedControl, record_probe, select_probes
 
-SCHEMA = "predict-shield/real-script-integrity-pilot/3"
+SCHEMA = "predict-shield/real-script-integrity-pilot/4"
 
 
 def _sha384(body: bytes) -> str:
@@ -151,7 +164,10 @@ def _load(playwright, url: str, vendor_script_url: str, *, instrument: bool = Tr
     flags = {"canary": False, "vendor": False}
     browser = playwright.chromium.launch()
     try:
-        page = browser.new_page()
+        # Capture at the browser-context level, so requests from frames and
+        # from any window the page opens are recorded too.
+        context = browser.new_context()
+        page = context.new_page()
         if instrument:
             def on_request(req):
                 requested.add(urlparse(req.url).hostname)
@@ -175,9 +191,9 @@ def _load(playwright, url: str, vendor_script_url: str, *, instrument: bool = Tr
                 else:
                     sent.add(host)
 
-            page.on("request", on_request)
-            page.on("requestfinished", on_finished)
-            page.on("requestfailed", on_failed)
+            context.on("request", on_request)
+            context.on("requestfinished", on_finished)
+            context.on("requestfailed", on_failed)
         # Wait only for the response to begin, then a fixed settle time:
         # a channel that navigates the page away (form, navigation) never
         # fires the original page's load event.
@@ -231,8 +247,10 @@ def run(output_path: Path) -> dict:
     vendor_csp_source = f"{vendor_host}:{vendor_port}"
 
     def set_state(*, body: bytes | None = None, csp: str | None | bool = False, extra: str | None = None,
-                  attrs: str | None = None, cors: bool | None = None):
+                  attrs: str | None = None, cors: bool | None = None, isolate: bool | None = None):
         with state.lock:
+            if isolate is not None:
+                state.isolate = isolate
             if body is not None:
                 state.script_body = body
             if csp is not False:
@@ -261,8 +279,8 @@ def run(output_path: Path) -> dict:
                     "sink_origin": state.sink_origin, "scenarios": {}, "containment": {}}
 
     def containment_trial(action: str, csp: str, body: bytes, expected_hash: str,
-                          *, attrs: str = "", instrument: bool = True) -> dict:
-        set_state(body=body, csp=csp, extra="", attrs=attrs, cors=True)
+                          *, attrs: str = "", instrument: bool = True, isolate: bool = False) -> dict:
+        set_state(body=body, csp=csp, extra="", attrs=attrs, cors=True, isolate=isolate)
         now = datetime.now(timezone.utc)
         observed = probe(script, now)
         compromise_live = observed.sha384 == expected_hash
@@ -402,14 +420,29 @@ def run(output_path: Path) -> dict:
             "restrict_all_fetch_targets": (f"default-src 'self'; script-src 'self' {V}; form-action 'self'", ""),
             "block_vendor_script": ("script-src 'self'", ""),
             "sri_pin": (f"script-src 'self' {V}", pin),
+            "isolate_in_sandboxed_frame": (f"script-src 'self' {V}", ""),
         }
         matrix = {}
-        for channel in lab_servers.EXFIL_CHANNELS:
+        for channel in lab_servers.EXFIL_CHANNELS + lab_servers.ADAPTIVE_CHANNELS:
             body = lab_servers.malicious_script(state.sink_origin, channel)
             matrix[channel] = {}
             for action, (csp, attrs) in containments.items():
-                matrix[channel][action] = containment_trial(action, csp, body, _sha384(body), attrs=attrs)
+                matrix[channel][action] = containment_trial(
+                    action, csp, body, _sha384(body), attrs=attrs,
+                    isolate=(action == "isolate_in_sandboxed_frame"))
+        set_state(isolate=False)
         report["containment_matrix"] = matrix
+
+        # Isolation with the clean script: the widget's one visible effect must
+        # still reach the operator's page through the host bridge.
+        set_state(body=lab_servers.GOOD_SCRIPT, csp=f"script-src 'self' {V}", extra="", attrs="", isolate=True)
+        trial_iso = _load(playwright, page_url, vendor_script_url)
+        set_state(isolate=False)
+        report["isolation_clean_script"] = {
+            "vendor_script_requested": trial_iso.vendor_script_requested,
+            "canary_observed": trial_iso.canary_observed,
+            "button_enabled_through_host_bridge": trial_iso.button_enabled,
+        }
 
         # --- G/H. Controls on the containment verifier itself ----------------------
         fetch_body = lab_servers.malicious_script(state.sink_origin, "fetch")
@@ -462,6 +495,7 @@ def run(output_path: Path) -> dict:
                                           for ch, row in matrix.items()},
         "verifier_controls": {k: v["containment_outcome"] for k, v in c.items()},
         "sri_operating_costs": {k: v["script_ran"] for k, v in report["sri_operating_costs"].items()},
+        "isolation_preserves_widget_function": report["isolation_clean_script"]["button_enabled_through_host_bridge"] is True,
     }
     output_path.write_text(json.dumps(report, indent=1, sort_keys=True) + "\n", encoding="utf-8")
     return report

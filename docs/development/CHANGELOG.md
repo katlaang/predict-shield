@@ -1,5 +1,13 @@
 # Development changelog
 
+## 2026-11-18 (6): End-to-end chain, safe apply, live data, source identity and navigation containment
+
+- **Source identity.** Every registered detection source carries an Ed25519 public key or a client-certificate fingerprint. `admit()` accepts only an `AuthenticatedDetection` from `authenticate_signed()` or `authenticate_mtls()`, so a detection that only names a source is refused. Signatures are checked against the named source's key, replays (nonce or detection ID) are refused, and a rotated-out credential stops admitting. `intake_server.py` serves both routes over TLS.
+- **Safe apply.** `change_execution.py`: signed, single-use, expiring approvals bound to the exact change; dry run by default; production targets never auto-apply; `nginx -t` validation of a generated CSP include, or a page limited to registered renderings; atomic write and reload; verification after activation; automatic rollback with the restored content checked; a hash-chained audit log.
+- **End-to-end chain.** `experiment-b/end-to-end-chain` runs unattended against real nginx, Chromium and Suricata: detect, plan, dry-run, apply, verify, keep or roll back. Five registered paths plus one real-model incident run in the new `end-to-end-chain.yml` workflow. Building it surfaced a real race: right after an nginx reload, a previous-generation worker can still answer, so a single matching read is no longer accepted as proof that a state is live.
+- **Live data.** `live_feed.py` and `demo/live.html` give a read-only live view that says NO LIVE DATA when the feed stops. A real Suricata on loopback is the first real detection feed: its alerts are mapped only by registered sink and referrer, signed and admitted over TLS, and an admitted alert makes the scheduler re-check at once.
+- **Navigation containment.** Sandboxed-frame isolation contains all six exfiltration channels in the real Chromium matrix (fetch, image, form, frame navigation, top-window navigation, popup) with the widget still working. The pilot schema is now `/4` and request capture is now per browser context, so popup traffic is captured too.
+
 ## 2026-11-18 (5): Remove the remaining comparison logic from code
 
 - The external pilot audit no longer takes a baseline arm or computes framework-minus-baseline differences. Each condition record now carries the framework's own independently verified measurements, and the audit reports exposure, authorized-failure fraction, downtime and false-assurance fraction per condition (schema `/2`).

@@ -41,6 +41,10 @@ python repeated_outage_pilot.py --execute-lab --batches 2 \
 
 The output is refused if it already exists. After each complete action batch, a separate `physical-batch-0X.json` is saved immediately so later failures do not erase previous complete measurements. **Do not commit these files or any raw oracle state to GitHub.** Only the reviewed sanitized CI artifact is published.
 
+## Live operations view
+
+`live.html` and `live.js` are a second, read-only view served by `engine/predict_shield/live_feed.py` while the end-to-end chain runs (`experiment-b/end-to-end-chain/run_chain.py`). They poll `/api/state` every two seconds and show incidents by stage, authenticated detections and the change audit log. The page shows NO LIVE DATA when the feed cannot be reached or its timestamp stops moving. CI opens it in Chromium, checks every completed incident is rendered from the feed, then stops the feed and checks the page stops claiming to be live.
+
 ## Status of a fuller demo
 
-This first UI demonstrates the measured **experiment results**, not the AI being invoked in real time. A later operational demo should provide an authenticated read-only observation API, candidate-action predictions with uncertainty, the separate policy gate result, and independent verification history. Those features must be wired to real services, with any mutation disabled by default; we should not pre-populate fictional model confidence or claim successful defensive automation.
+This UI demonstrates recorded results. The live view above covers the running chain. Still to add: authentication for a feed exposed beyond loopback, and candidate-action predictions with uncertainty shown alongside the gate result. Those features must be wired to real services, with any mutation disabled by default; we should not pre-populate fictional model confidence or claim successful defensive automation.

@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PREDICT-SHIELD | Live operations</title>
+  <style>
+    :root { color-scheme: dark; --base:#080e17; --panel:#101b29; --border:#2d3d50; --ink:#eff4fa; --muted:#aec0d2; --red:#f36565; --blue:#78b4ee; --warn:#edca80; --ok:#99ddb5; }
+    * { box-sizing: border-box }
+    body { margin: 0; background: var(--base); color: var(--ink); font: 15px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif }
+    .shell { max-width: 1250px; margin: auto; padding: 28px 20px 80px }
+    .top { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap }
+    .brand { font-size: 15px; letter-spacing: .13em; font-weight: 800 } .brand span { color: var(--red) }
+    .pill { border: 1px solid var(--border); border-radius: 30px; padding: 5px 12px; font-size: 12px; font-weight: 700 }
+    .pill.live { border-color: #3c7a58; color: var(--ok) } .pill.down { border-color: #7a3c3c; color: #ff9898 }
+    h1 { font-size: clamp(24px, 4vw, 36px); margin: 28px 0 6px } h2 { font-size: 18px; margin: 0 0 12px }
+    .lede { max-width: 880px; color: var(--muted) }
+    .grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin-top: 18px }
+    .card { background: var(--panel); border: 1px solid var(--border); border-radius: 14px; padding: 18px }
+    .metric { font-size: 28px; font-weight: 750; font-variant-numeric: tabular-nums }
+    .overline { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .075em }
+    .space { margin-top: 18px } .muted { color: var(--muted) } .small { font-size: 12px }
+    .table-wrap { overflow-x: auto } table { border-collapse: collapse; width: 100%; min-width: 820px }
+    th, td { text-align: left; padding: 10px; border-bottom: 1px solid var(--border); vertical-align: top }
+    th { color: var(--muted); font-size: 12px; font-weight: 600 }
+    .ok { color: var(--ok) } .bad { color: #ff9898 } .warn { color: var(--warn) }
+    .notice { border-left: 3px solid var(--red); background: #281b23; padding: 12px 16px; color: #f5c9c9; border-radius: 0 9px 9px 0; margin-top: 16px }
+    code { font-size: 12px; word-break: break-word }
+    @media (max-width: 780px) { .grid { grid-template-columns: 1fr 1fr } .shell { padding: 18px 16px 50px } }
+  </style>
+</head>
+<body>
+<main class="shell">
+  <header class="top">
+    <div class="brand"><span>PREDICT</span>-SHIELD <span style="font-weight:400;color:#b9c8dc">/ LIVE</span></div>
+    <span id="feed" class="pill down" role="status">NO LIVE DATA</span>
+  </header>
+  <h1>Live operations</h1>
+  <p class="lede">Read-only. Every value on this page is fetched from the running feed every two seconds. If a fetch fails, or the feed's own timestamp stops moving, the page says so rather than showing the last values as current.</p>
+  <div id="stale" class="notice">Waiting for the live feed.</div>
+
+  <section class="grid" aria-label="Current totals">
+    <div class="card"><div class="overline">Incidents</div><div id="m-incidents" class="metric">-</div></div>
+    <div class="card"><div class="overline">Changes kept (verified)</div><div id="m-kept" class="metric">-</div></div>
+    <div class="card"><div class="overline">Changes rolled back</div><div id="m-rolled" class="metric">-</div></div>
+    <div class="card"><div class="overline">Authenticated detections</div><div id="m-detections" class="metric">-</div></div>
+  </section>
+
+  <section class="card space">
+    <h2>Incidents</h2>
+    <div class="table-wrap"><table>
+      <thead><tr><th>Case</th><th>Stage</th><th>Channel</th><th>Detected after</th><th>Action</th><th>Authority</th><th>Verification</th><th>Widget</th><th>Outcome</th></tr></thead>
+      <tbody id="incidents"></tbody>
+    </table></div>
+  </section>
+
+  <section class="card space">
+    <h2>Detection intake</h2>
+    <p id="intake" class="muted small">-</p>
+    <div class="table-wrap"><table>
+      <thead><tr><th>At</th><th>Source</th><th>Authentication</th><th>Assertion</th></tr></thead>
+      <tbody id="detections"></tbody>
+    </table></div>
+  </section>
+
+  <section class="card space">
+    <h2>Change audit log</h2>
+    <p id="audit" class="muted small">-</p>
+    <div class="table-wrap"><table>
+      <thead><tr><th>#</th><th>Case</th><th>Status</th><th>Target</th><th>Record hash</th></tr></thead>
+      <tbody id="audit-rows"></tbody>
+    </table></div>
+  </section>
+  <p class="muted small space">Served at <span id="served-at">-</span>. Sequence <span id="sequence">-</span>.</p>
+</main>
+<script src="/live.js"></script>
+</body>
+</html>

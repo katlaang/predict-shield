@@ -19,7 +19,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: Validate local AI and policy pipeline with no model downloads
-        run: PYTHONPATH=engine python -m unittest discover -s engine/tests -v
+        run: pip install 'cryptography>=42' && PYTHONPATH=engine python -m unittest discover -s engine/tests -v
       - name: Start isolated CPU-only Ollama locally
         run: |
           docker run --rm -d --name ps-local-ollama -p 127.0.0.1:11434:11434 ollama/ollama:latest

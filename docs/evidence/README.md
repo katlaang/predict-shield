@@ -8,6 +8,10 @@ Dated results, lab protocols and design notes behind the capabilities in the mai
 - [Measured result of that pilot](MEASURED_REAL_CVE_AI_REMEDIATION_2026_11_15.md).
 - [Real local-model inference smoke test](ACTUAL_LOCAL_AI_INFERENCE_SMOKE.md).
 
+## End-to-end response
+
+- [Detect, plan, apply, verify, keep or roll back](END_TO_END_CHAIN.md): the unattended chain against real nginx, Chromium and Suricata, with signed approvals, signed or mTLS detection intake, sandboxed-frame isolation and the live view.
+
 ## Policy-governed actions in the mechanism lab
 
 - [Physical lab execution with a trained action model](PHYSICAL_TRAINED_AI_PILOT_PROTOCOL.md).

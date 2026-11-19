@@ -19,7 +19,7 @@ jobs:
         with:
           python-version: '3.12'
       - name: All evidence and policy engine contracts
-        run: PYTHONPATH=engine python -m unittest discover -s engine/tests -v
+        run: pip install 'cryptography>=42' && PYTHONPATH=engine python -m unittest discover -s engine/tests -v
       - name: Lab bridge replay, image binding, policy recomputation and negative oracle contracts
         working-directory: experiment-b/mechanism-lab
         run: PYTHONPATH=../../engine python -m unittest test_unified_lab_case_adapter -v

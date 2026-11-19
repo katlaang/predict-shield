@@ -20,4 +20,4 @@ jobs:
       - name: Run synthetic contract tests without Docker permissions
         run: PYTHONPATH=engine python -m unittest engine.tests.test_asset_discovery -v
       - name: Run all existing engine unit tests
-        run: PYTHONPATH=engine python -m unittest discover -s engine/tests -v
+        run: pip install 'cryptography>=42' && PYTHONPATH=engine python -m unittest discover -s engine/tests -v

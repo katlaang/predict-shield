@@ -55,19 +55,28 @@ jobs:
           assert s["false_positive_occurred"] is False
           assert s["unregistered_domain_caught_despite_clean_hash"] is True
           V, N = "VERIFIED", "NOT VERIFIED"
-          expected = {
-              # channel: none, connect-src, all fetch directives, block script, SRI pin
-              "fetch":      [N, V, V, V, V],
-              "image":      [N, N, V, V, V],
-              "form":       [N, N, V, V, V],
-              "navigation": [N, N, N, V, V],
-          }
           order = ["none_allow_vendor_only", "restrict_connect_src", "restrict_all_fetch_targets",
-                   "block_vendor_script", "sri_pin"]
+                   "block_vendor_script", "sri_pin", "isolate_in_sandboxed_frame"]
+          expected = {
+              # channel: none, connect-src, all fetch directives, block script, SRI pin, sandboxed frame
+              "fetch":          [N, V, V, V, V, V],
+              "image":          [N, N, V, V, V, V],
+              "form":           [N, N, V, V, V, V],
+              "navigation":     [N, N, N, V, V, V],
+              "top_navigation": [N, N, N, V, V, V],
+              "popup":          [N, N, N, V, V, V],
+          }
           m = s["containment_matrix_outcomes"]
           for channel, outcomes in expected.items():
               got = [m[channel][a] for a in order]
               assert got == outcomes, (channel, got, outcomes)
+          # Isolation contains every channel without disabling the widget;
+          # blocking or pinning the script contains them by disabling it.
+          d = s["containment_matrix_disruption"]
+          for channel in expected:
+              assert d[channel]["isolate_in_sandboxed_frame"] is False, (channel, d[channel])
+              assert d[channel]["block_vendor_script"] is True, (channel, d[channel])
+          assert s["isolation_preserves_widget_function"] is True
           # An empty capture or an unexercised compromise is never a pass.
           assert s["verifier_controls"] == {"G_instrumentation_not_live": "INDETERMINATE",
                                             "H_exposure_not_exercised": "INDETERMINATE"}, s["verifier_controls"]

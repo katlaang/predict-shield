@@ -1,0 +1,155 @@
+name: End-to-end chain lab
+
+# Detect, plan, apply, verify, and keep or roll back, unattended, against a
+# real nginx, real Chromium, a real Suricata on loopback, the signed TLS
+# detection intake and the live dashboard feed. One incident uses a real
+# local model as the proposer; the others use a fixed choice to drive each
+# path (keep, roll back, approval) on purpose.
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'experiment-b/end-to-end-chain/**'
+      - 'experiment-b/real-script-integrity-pilot/lab_servers.py'
+      - 'engine/predict_shield/change_execution.py'
+      - 'engine/predict_shield/detection_intake.py'
+      - 'engine/predict_shield/intake_server.py'
+      - 'engine/predict_shield/live_feed.py'
+      - 'engine/predict_shield/pipeline.py'
+      - 'demo/live.html'
+      - 'demo/live.js'
+      - '.github/workflows/end-to-end-chain.yml'
+  pull_request:
+    paths:
+      - 'experiment-b/end-to-end-chain/**'
+      - 'experiment-b/real-script-integrity-pilot/lab_servers.py'
+      - 'engine/predict_shield/change_execution.py'
+      - 'engine/predict_shield/detection_intake.py'
+      - 'engine/predict_shield/intake_server.py'
+      - 'engine/predict_shield/live_feed.py'
+      - 'engine/predict_shield/pipeline.py'
+      - 'demo/live.html'
+      - 'demo/live.js'
+      - '.github/workflows/end-to-end-chain.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  chain:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install nginx, Suricata, Chromium and the signature library
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y nginx suricata
+          pip install 'cryptography>=42' playwright
+          playwright install --with-deps chromium
+          nginx -v
+          suricata -V
+      - name: Unit tests for intake, execution, live feed and forwarding
+        run: |
+          PYTHONPATH=engine:engine/tests python -m unittest test_detection_intake test_intake_server test_change_execution test_live_feed -v
+          cd experiment-b/end-to-end-chain && python -m unittest test_chain_units -v
+      - name: Start a local model on loopback only
+        run: |
+          docker run --rm -d --name ps-chain-ai -e OLLAMA_NUM_PARALLEL=1 \
+            -p 127.0.0.1:11434:11434 ollama/ollama:latest
+          for attempt in $(seq 1 60); do
+            if curl -fsS http://127.0.0.1:11434/api/version >/dev/null; then break; fi
+            if [ "$attempt" = 60 ]; then docker logs ps-chain-ai; exit 1; fi
+            sleep 2
+          done
+          downloaded=false
+          for attempt in 1 2 3 4 5; do
+            if docker exec ps-chain-ai ollama pull qwen3:0.6b; then downloaded=true; break; fi
+            sleep 15
+          done
+          if [ "$downloaded" != "true" ]; then
+            echo "No model fetched. Do not claim the chain ran with a real model."
+            exit 1
+          fi
+          python - <<'PY'
+          import json, urllib.request
+          from pathlib import Path
+          tags = json.load(urllib.request.urlopen("http://127.0.0.1:11434/api/tags", timeout=10))
+          matched = [m for m in tags.get("models", []) if m.get("name") == "qwen3:0.6b"]
+          assert len(matched) == 1 and len(matched[0]["digest"]) == 64
+          Path("/tmp/ps-chain-model-digest.txt").write_text("sha256:" + matched[0]["digest"])
+          PY
+      - name: Run the chain (real nginx, Chromium, Suricata, intake, live feed, local model)
+        working-directory: experiment-b/end-to-end-chain
+        run: |
+          python run_chain.py --ids suricata --ids-sudo \
+            --model ollama:qwen3:0.6b --model-digest "$(cat /tmp/ps-chain-model-digest.txt)" \
+            --output /tmp/ps-chain-report.json
+      - name: Check what the chain actually did
+        run: |
+          python - <<'PY'
+          import json
+          r = json.load(open("/tmp/ps-chain-report.json"))
+          s = r["summary"]
+
+          def row(name):
+              return s[name]
+
+          # Kept only after independent verification, and live afterwards.
+          for name in ("A_fetch_contained_by_csp", "C_navigation_contained_by_isolation",
+                       "F_ids_triggered_isolation"):
+              x = row(name)
+              assert x["final_status"] == "APPLIED_VERIFIED", (name, x)
+              assert x["authority"] == "AUTOMATIC_POLICY", (name, x)
+              assert x["served_matches_change"] is True, (name, x)
+              assert x["dry_run_left_site_unchanged"] is True, (name, x)
+          # Isolation contains navigation without disabling the widget.
+          assert row("C_navigation_contained_by_isolation")["widget_working"] is True
+          assert row("F_ids_triggered_isolation")["widget_working"] is True
+          # A change that does not contain the channel is rolled back, and
+          # the served state is confirmed back at the snapshot.
+          b = row("B_navigation_not_contained_by_csp")
+          assert b["final_status"] == "ROLLED_BACK", b
+          assert b["served_matches_baseline"] is True and b["served_matches_change"] is False, b
+          # An approval-tier action is refused unsigned and applied signed.
+          d = r["incidents"]["D_popup_block_needs_approval"]
+          assert d["approval_steps"][0]["without_approval"] == "REFUSED", d["approval_steps"]
+          assert d["authority"] == "SIGNED_APPROVAL" and d["final_status"] == "APPLIED_VERIFIED", d
+          # The IDS path: a real Suricata alert, signed, admitted over TLS,
+          # made the scheduler re-check at once instead of after 300 s.
+          f = r["incidents"]["F_ids_triggered_isolation"]
+          assert f["detection"]["probe_due_to"] == "change_event", f["detection"]
+          assert f["detection"]["interval_seconds"] == 300
+          assert f["detection"]["seconds_from_tamper_to_detection"] < 60, f["detection"]
+          assert f["ids"]["admitted_total"] >= 1 and f["ids"]["intake_rejections"] == 0, f["ids"]
+          assert f["detection"]["detection_triggers"][0]["source"] == "detection:suricata-lab"
+          # The real model's incident may land anywhere the policy allows,
+          # but never applied-and-unverified, and never left half-changed.
+          e = r["incidents"]["E_real_model_fetch"]
+          assert e["proposer_is_real_model"] is True and e["model_digest"].startswith("sha256:")
+          assert e["final_status"] in {"APPLIED_VERIFIED", "ROLLED_BACK", "REFUSED", "PLAN_ESCALATED"}, e["final_status"]
+          if e["final_status"] == "APPLIED_VERIFIED":
+              assert e["verification"] == "VERIFIED" and e["served_after"]["matches_change"] is True
+          if e["final_status"] == "ROLLED_BACK":
+              assert e["served_after"]["matches_baseline"] is True
+          # Audit log intact; dashboard showed the live feed and went dark when it stopped.
+          assert r["audit_log_chain_intact"] is True
+          lv = r["live_view_check"]
+          assert lv["showed_live"] and lv["all_cases_rendered"] and lv["feed_timestamp_advanced"], lv
+          assert lv["reports_no_live_data_after_feed_stops"] is True, lv
+          print(json.dumps(s, indent=1, sort_keys=True))
+          print("real model incident:", e["final_status"], e.get("applied_action"), e["plan"]["ai_proposal_status"])
+          PY
+      - name: Retain the chain report and audit log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: end-to-end-chain-evidence
+          path: /tmp/ps-chain-report.json
+          if-no-files-found: warn
+          retention-days: 90
