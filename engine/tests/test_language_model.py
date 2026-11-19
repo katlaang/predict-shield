@@ -76,7 +76,9 @@ class OllamaTests(unittest.TestCase):
         server = HTTPServer(("127.0.0.1", 0), Handler)
         threading.Thread(target=server.handle_request, daemon=True).start()
         try:
-            model = OllamaModel("some-model", host=f"http://127.0.0.1:{server.server_port}", timeout=5)
+            schema = {"type": "object", "properties": {"affected": {"type": "array"}}}
+            model = OllamaModel("some-model", host=f"http://127.0.0.1:{server.server_port}", timeout=5,
+                                format_schema=schema)
             self.assertEqual(model.complete("sys", "user"), '{"affected": []}')
         finally:
             server.server_close()
@@ -84,6 +86,7 @@ class OllamaTests(unittest.TestCase):
         self.assertEqual(seen["body"]["model"], "some-model")
         self.assertIs(seen["body"]["stream"], False)
         self.assertEqual(seen["body"]["options"]["temperature"], 0)
+        self.assertEqual(seen["body"]["format"], schema)
         self.assertEqual([m["role"] for m in seen["body"]["messages"]], ["system", "user"])
 
     def test_unreachable_server_is_reported_as_unavailable(self):
