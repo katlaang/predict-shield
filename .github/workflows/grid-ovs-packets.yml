@@ -1,0 +1,59 @@
+name: Electric grid actual OVS packet laboratory
+
+on:
+  pull_request:
+    paths:
+      - 'experiment-b/grid-lab/ovs_packet_pilot.sh'
+      - '.github/workflows/grid-ovs-packets.yml'
+  push:
+    branches: [master]
+    paths:
+      - 'experiment-b/grid-lab/ovs_packet_pilot.sh'
+      - '.github/workflows/grid-ovs-packets.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  isolated-real-ovs-packets:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install real Open vSwitch and network namespace tools
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq openvswitch-switch iproute2 iputils-ping
+          sudo service openvswitch-switch start
+          sudo ovs-vsctl show
+      - name: Validate lab only, independent packet probes and rollback
+        run: |
+          sudo env PREDICT_SHIELD_ISOLATED_LAB=1 bash \
+            experiment-b/grid-lab/ovs_packet_pilot.sh /tmp/ps-grid-ovs-pilot.json
+      - name: Assert recorded evidence and scope restrictions
+        run: |
+          python - <<'PY'
+          import json
+          p = json.load(open('/tmp/ps-grid-ovs-pilot.json'))
+          assert p['outcome'] == 'VERIFIED_PACKET_LAB_ONLY', p
+          assert p['attacker_to_relay_blocked_after_rule'] is True
+          assert p['control_center_to_relay_reachable_after_rule'] is True
+          assert p['attacker_to_relay_restored_after_rollback'] is True
+          assert p['ovs_before_flow_table_sha256'] != p['ovs_after_flow_table_sha256']
+          assert p['grid_power_flow_coupled'] is False
+          assert p['model_selected_action'] is False
+          assert p['operational_critical_infrastructure_resilience_established'] is False
+          print(json.dumps(p, indent=2))
+          PY
+      - name: Retain complete test output, even on failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: real-ovs-isolated-packet-evidence
+          path: |
+            /tmp/ps-grid-ovs-pilot.json
+            /tmp/ps-grid-*.txt
+            /tmp/ps-grid-*.flows
+          retention-days: 90
+          if-no-files-found: warn
