@@ -100,8 +100,8 @@ class CTU13Tests(unittest.TestCase):
         # Neither training nor calibration data are changed.
         path = self.root / "scenario-unseen.binetflow"
         content = path.read_text(encoding="utf-8")
-        path.write_text(content.replace("From-Botnet-V42", "From-Normal-V42")
-                        .replace("From-Normal-V42", "From-Botnet-V42"), encoding="utf-8")
+        path.write_text(content.replace("From-Botnet-V42", "From-Normal-V42", 1),
+                        encoding="utf-8")
         self.entries[-1]["sha256"] = hashlib.sha256(path.read_bytes()).hexdigest()
         other, changed = self.evaluate()
         self.assertEqual(model["threshold"], other["threshold"])
