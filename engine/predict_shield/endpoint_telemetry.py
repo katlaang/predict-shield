@@ -78,6 +78,23 @@ def parse_windows_event_xml(line: str) -> dict:
     return out
 
 
+def iter_windows_events_xml(text: str):
+    """Split an export of concatenated <Event> elements on element
+    boundaries, not line breaks: field values such as command lines and
+    PowerShell script blocks can contain newlines. Yields (event, None) or
+    (None, error) for each element, so a caller can count what failed."""
+    import re
+
+    starts = [m.start() for m in re.finditer(r"<Event[\s>]", text)]
+    for index, start in enumerate(starts):
+        end = starts[index + 1] if index + 1 < len(starts) else len(text)
+        chunk = text[start:end].strip()
+        try:
+            yield parse_windows_event_xml(chunk), None
+        except Exception as exc:  # malformed element: reported, not dropped silently
+            yield None, f"{type(exc).__name__}: {str(exc)[:80]}"
+
+
 def _lower(value) -> str:
     return str(value or "").lower()
 

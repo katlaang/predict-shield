@@ -76,6 +76,13 @@ class XmlEventTests(unittest.TestCase):
         self.assertEqual((e["_channel"], e["_event_id"], e["_host"]), (SYSMON, 10, "dc1"))
         self.assertEqual([h.rule_id for h in detect([raw], RULES_V2)], ["ps2-lsass-memory-access"])
 
+    def test_events_with_newlines_inside_values_are_kept_whole(self):
+        from predict_shield.endpoint_telemetry import iter_windows_events_xml
+        multi = self.LINE.replace("dumper.exe", "dumper.exe\nsecond line")
+        out = list(iter_windows_events_xml(self.LINE + "\n" + multi + "\n"))
+        self.assertEqual([err for _, err in out], [None, None])
+        self.assertIn("second line", out[1][0]["SourceImage"])
+
     def test_dtd_and_entities_are_refused(self):
         from predict_shield.endpoint_telemetry import parse_windows_event_xml
         with self.assertRaises(ValueError):

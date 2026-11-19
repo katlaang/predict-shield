@@ -21,7 +21,7 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE.parents[1] / "engine"))
 
-from predict_shield.endpoint_telemetry import RULES_V2, detect, parse_windows_event_xml, technique_matches_label  # noqa: E402
+from predict_shield.endpoint_telemetry import RULES_V2, detect, iter_windows_events_xml, technique_matches_label  # noqa: E402
 
 LIMIT = 64 * 1024 * 1024
 
@@ -48,16 +48,14 @@ def fetch(entry: dict) -> bytes:
 
 def measure(entry: dict) -> dict:
     events, unparsed = [], 0
-    for line in fetch(entry).decode("utf-8", errors="replace").splitlines():
-        if not line.strip():
-            continue
-        try:
-            events.append(parse_windows_event_xml(line))
-        except Exception:
+    for event, error in iter_windows_events_xml(fetch(entry).decode("utf-8", errors="replace")):
+        if event is None:
             unparsed += 1
+        else:
+            events.append(event)
     hits = detect(events, RULES_V2)
     agreeing = [h for h in hits if technique_matches_label(h.technique, entry["labels"])]
-    return {"file": entry["file"], "labels": entry["labels"], "events": len(events), "unparsed_lines": unparsed,
+    return {"file": entry["file"], "labels": entry["labels"], "events": len(events), "unparsed_events": unparsed,
             "hits": len(hits), "hits_agreeing_with_label": len(agreeing), "detected": bool(agreeing),
             "hit_detail": [{"rule": h.rule_id, "technique": h.technique,
                             "agrees_with_label": technique_matches_label(h.technique, entry["labels"]),
@@ -86,7 +84,7 @@ def main() -> None:
         "covered_missed": [r["file"] for r in covered if not r["detected"]],
         "other_recordings": len(other), "other_with_any_alert": [r["file"] for r in other if r["hits"]],
         "events": sum(r["events"] for r in covered + other),
-        "unparsed_lines": sum(r["unparsed_lines"] for r in covered + other),
+        "unparsed_events": sum(r["unparsed_events"] for r in covered + other),
         "skipped": source["skipped"],
     }
     report = {"schema": "predict-shield/splunk-heldout/1", "commit": source["commit"],

@@ -1,0 +1,70 @@
+{
+ "by_technique": {
+  "T1003.001": {
+   "detected": 3,
+   "recordings": 3,
+   "wilson_95": [
+    0.439,
+    1.0
+   ]
+  },
+  "T1112": {
+   "detected": 2,
+   "recordings": 27,
+   "wilson_95": [
+    0.021,
+    0.234
+   ]
+  }
+ },
+ "covered_detected": 5,
+ "covered_missed": [
+  "datasets/attack_techniques/T1112/DisableRemoteDesktopAntiAlias/disable_remote_alias.log",
+  "datasets/attack_techniques/T1112/atomic_red_team/safemode_windows-sysmon.log",
+  "datasets/attack_techniques/T1112/atomic_red_team/windows-sysmon-webview.log",
+  "datasets/attack_techniques/T1112/atomic_red_team/windows-sysmon.log",
+  "datasets/attack_techniques/T1112/bitlocker_registry_setting/fve-reg.log",
+  "datasets/attack_techniques/T1112/delete_runmru_reg/runmru_deletion.log",
+  "datasets/attack_techniques/T1112/disable_notif_center/sysmon.log",
+  "datasets/attack_techniques/T1112/firewall_modify_delete/firewall-mod-delete.log",
+  "datasets/attack_techniques/T1112/firewall_modify_delete/firewall_mod_delete.log",
+  "datasets/attack_techniques/T1112/kingsoft_reg/kingsoft_reg.log",
+  "datasets/attack_techniques/T1112/minint_reg/sysmon.log",
+  "datasets/attack_techniques/T1112/njrat_md5_registry_entry/njrat_reg_binary.log",
+  "datasets/attack_techniques/T1112/no_changing_wallpaper/NoChangingWallPaper.log",
+  "datasets/attack_techniques/T1112/proxy_enable/proxyenable.log",
+  "datasets/attack_techniques/T1112/proxy_server/ProxyServer_sys.log",
+  "datasets/attack_techniques/T1112/pwn_reg/pwn_reg.log",
+  "datasets/attack_techniques/T1112/ransomware_disable_reg/sysmon.log",
+  "datasets/attack_techniques/T1112/reg_profiles_private2/reg_profiles_private2.log",
+  "datasets/attack_techniques/T1112/remote_access_reg/remote_access_reg.log",
+  "datasets/attack_techniques/T1112/shimcache_flush/sysmon.log",
+  "datasets/attack_techniques/T1112/smart_card_group_policy/scforceoption-reg.log",
+  "datasets/attack_techniques/T1112/test_registry/test_reg.log",
+  "datasets/attack_techniques/T1112/valleyrat_c2_reg2/valleyrat_c2_reg2.log",
+  "datasets/attack_techniques/T1112/vip_big_env_variable/vip_INTERNAL_DB_CACHE.log",
+  "datasets/attack_techniques/T1112/wer_dontshowui/dontshowui_sys.log"
+ ],
+ "covered_recordings": 30,
+ "covered_wilson_95": [
+  0.073,
+  0.336
+ ],
+ "events": 75145,
+ "note": "Run 1 of RULES_V2 on the pre-registered set, with the line-per-event parser that dropped events containing newlines (477 lines unparsed). Superseded by run 2 after the parser fix; rules unchanged.",
+ "other_recordings": 10,
+ "other_with_any_alert": [
+  "datasets/attack_techniques/T1053.005/asyncrat_highest_priv_schtasks/sysmon.log",
+  "datasets/attack_techniques/T1218.011/atomic_red_team/windows-sysmon.log",
+  "datasets/attack_techniques/T1047/atomic_red_team/windows-sysmon.log",
+  "datasets/attack_techniques/T1070.001/atomic_red_team/windows-sysmon.log"
+ ],
+ "rules": "RULES_V2",
+ "skipped": [
+  {
+   "file": "datasets/attack_techniques/T1112/reg_profiles_private/windows-sysmon.log",
+   "reason": "download failed: HTTP Error 404: Not Found"
+  }
+ ],
+ "unparsed_lines": 477
+}
