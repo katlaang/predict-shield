@@ -1,0 +1,34 @@
+name: CTU-13 labeled flow experiment safeguards
+
+on:
+  pull_request:
+    paths:
+      - 'experiment-b/ctu13-flow/**'
+      - '.github/workflows/ctu13-flow-tests.yml'
+  push:
+    branches: [master]
+    paths:
+      - 'experiment-b/ctu13-flow/**'
+      - '.github/workflows/ctu13-flow-tests.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test-parser-and-partitions:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install 'scikit-learn==1.7.2'
+      - name: Check labels, splits, frozen checksums and evaluation on synthetic fixtures
+        working-directory: experiment-b/ctu13-flow
+        run: python -m unittest -v test_fit_evaluate
+      - name: Confirm no operational efficacy is being claimed
+        run: |
+          grep -q '"field_effectiveness_established": False' experiment-b/ctu13-flow/fit_evaluate.py
+          grep -q '"sample_precision_is_operational_precision": False' experiment-b/ctu13-flow/fit_evaluate.py
