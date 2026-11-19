@@ -5,20 +5,224 @@
     "commit": "d9d40ef123d2c87d5d3df28c96bcab4f0faccc87",
     "license_note": "Published by OTRF for detection testing; recorded in a lab, contains no production data.",
     "datasets": [
-      {"id": "SDWIN-190518201922", "title": "Empire WDigest Downgrade", "labels": ["T1112"],
-       "url": "https://raw.githubusercontent.com/OTRF/Security-Datasets/d9d40ef123d2c87d5d3df28c96bcab4f0faccc87/datasets/atomic/windows/defense_evasion/host/empire_wdigest_downgrade.tar.gz",
-       "format": "tar.gz", "sha256": "7135251d3073a059d1a1e7a1dfbf8f1ead74ebe274fc7a07ac61fae11228e164"},
-      {"id": "SDWIN-190518202151", "title": "Empire Mimikatz LogonPasswords", "labels": ["T1003.001"],
-       "url": "https://raw.githubusercontent.com/OTRF/Security-Datasets/d9d40ef123d2c87d5d3df28c96bcab4f0faccc87/datasets/atomic/windows/credential_access/host/empire_mimikatz_logonpasswords.zip",
-       "format": "zip", "sha256": "bb4c057b62d781be5426e011872ba1a15070c07afbb24848a14458f4b22b06fb"},
-      {"id": "SDWIN-201018195009", "title": "Lsass Memory Dump via Comsvcs.dll", "labels": ["T1003.001"],
-       "url": "https://raw.githubusercontent.com/OTRF/Security-Datasets/d9d40ef123d2c87d5d3df28c96bcab4f0faccc87/datasets/atomic/windows/credential_access/host/psh_lsass_memory_dump_comsvcs.zip",
-       "format": "zip", "sha256": "0af9e920220d746432f0972be83ad057629695540aecd68c15869d190786e1ae"}
+      {
+        "id": "SDWIN-190518201922",
+        "title": "Empire WDigest Downgrade",
+        "labels": [
+          "T1112"
+        ],
+        "url": "https://raw.githubusercontent.com/OTRF/Security-Datasets/d9d40ef123d2c87d5d3df28c96bcab4f0faccc87/datasets/atomic/windows/defense_evasion/host/empire_wdigest_downgrade.tar.gz",
+        "format": "tar.gz",
+        "sha256": "7135251d3073a059d1a1e7a1dfbf8f1ead74ebe274fc7a07ac61fae11228e164"
+      },
+      {
+        "id": "SDWIN-190518202151",
+        "title": "Empire Mimikatz LogonPasswords",
+        "labels": [
+          "T1003.001"
+        ],
+        "url": "https://raw.githubusercontent.com/OTRF/Security-Datasets/d9d40ef123d2c87d5d3df28c96bcab4f0faccc87/datasets/atomic/windows/credential_access/host/empire_mimikatz_logonpasswords.zip",
+        "format": "zip",
+        "sha256": "bb4c057b62d781be5426e011872ba1a15070c07afbb24848a14458f4b22b06fb"
+      },
+      {
+        "id": "SDWIN-201018195009",
+        "title": "Lsass Memory Dump via Comsvcs.dll",
+        "labels": [
+          "T1003.001"
+        ],
+        "url": "https://raw.githubusercontent.com/OTRF/Security-Datasets/d9d40ef123d2c87d5d3df28c96bcab4f0faccc87/datasets/atomic/windows/credential_access/host/psh_lsass_memory_dump_comsvcs.zip",
+        "format": "zip",
+        "sha256": "0af9e920220d746432f0972be83ad057629695540aecd68c15869d190786e1ae"
+      }
     ],
     "host_to_asset": {
       "HR001.shire.com": "otrf-hr001",
       "WORKSTATION5.theshire.local": "otrf-workstation5",
       "WORKSTATION5": "otrf-workstation5"
-    }
+    },
+    "coverage_note": "Held-out datasets: the three rules were committed (6bf4b5f) before any of these were fetched, and are not changed in response to them. Five are labelled with a technique the rules cover; fifteen with techniques they do not.",
+    "coverage_datasets": [
+      {
+        "id": "SDWIN-200807103913",
+        "title": "Empire Mimikatz Lsadump LSA Patch",
+        "labels": [
+          "T1003.001"
+        ],
+        "url": "https://raw.githubusercontent.com/OTRF/Security-Datasets/d9d40ef123d2c87d5d3df28c96bcab4f0faccc87/datasets/atomic/windows/credential_access/host/empire_mimikatz_lsadump_patch.zip",
+        "sha256": "552d5c8a3a41b8aae3118a855781b7a23cb497ebdc4afaa2127b46240356c132"
+      },
+      {
+        "id": "SDWIN-201018225619",
+        "title": "Lsass Memory Dump via Syscalls",
+        "labels": [
+          "T1003.001"
+        ],
+        "url": "https://raw.githubusercontent.com/OTRF/Security-Datasets/d9d40ef123d2c87d5d3df28c96bcab4f0faccc87/datasets/atomic/windows/credential_access/host/cmd_lsass_memory_dumpert_syscalls.zip",
+        "sha256": "a28dbf708685a80edfb0b3d2a00c9bf196dd394fc1d61a933878841f4872a7ed"
+      },
+      {
+        "id": "SDWIN-191027055035",
+        "title": "RDP TaskManager LSASS Dump",
+        "labels": [
+          "T1003.001"
+        ],
+        "url": "https://raw.githubusercontent.com/OTRF/Security-Datasets/d9d40ef123d2c87d5d3df28c96bcab4f0faccc87/datasets/atomic/windows/credential_access/host/rdp_interactive_taskmanager_lsass_dump.zip",
+        "sha256": "a7761e64c891162e949afebf367084a6dddd2f3dac7b91bce870fcf9f6206fba"
+      },
+      {
+        "id": "SDWIN-190518203650",
+        "title": "Empire Enable RDP",
+        "labels": [
+          "T1112"
+        ],
+        "url": "https://raw.githubusercontent.com/OTRF/Security-Datasets/d9d40ef123d2c87d5d3df28c96bcab4f0faccc87/datasets/atomic/windows/defense_evasion/host/empire_enable_rdp.tar.gz",
+        "sha256": "b10345f3e97c28210757419326b09a3bbb02b4e9491070a4269c557d67c11398"
+      },
+      {
+        "id": "SDWIN-191225045202",
+        "title": "Empire Invoke InternalMonologue",
+        "labels": [
+          "T1112"
+        ],
+        "url": "https://raw.githubusercontent.com/OTRF/Security-Datasets/d9d40ef123d2c87d5d3df28c96bcab4f0faccc87/datasets/atomic/windows/defense_evasion/host/empire_monologue_netntlm_downgrade.zip",
+        "sha256": "27d88aaccf5dbe2b917684eebe35afdfcc88953c70b27ee949e46204a23cda21"
+      },
+      {
+        "id": "SDWIN-190319131123",
+        "title": "Empire Over-Pass-The-Hash",
+        "labels": [
+          "T1550.002"
+        ],
+        "url": "https://raw.githubusercontent.com/OTRF/Security-Datasets/d9d40ef123d2c87d5d3df28c96bcab4f0faccc87/datasets/atomic/windows/credential_access/host/empire_over_pth_patch_lsass.zip",
+        "sha256": "daee42bbd9f7c6265e5614ce468ec868a399ee03877456dd01ec34e3e06479e7"
+      },
+      {
+        "id": "SDWIN-190625103712",
+        "title": "Empire Mimikatz SAM Extract Hashes",
+        "labels": [
+          "T1003.002"
+        ],
+        "url": "https://raw.githubusercontent.com/OTRF/Security-Datasets/d9d40ef123d2c87d5d3df28c96bcab4f0faccc87/datasets/atomic/windows/credential_access/host/empire_mimikatz_sam_access.zip",
+        "sha256": "1ed87bd1286fa8f9e01489ff49e913065e4d1a1956174eb64687c1159648fcad"
+      },
+      {
+        "id": "SDWIN-190625133822",
+        "title": "Empire Reg Dump SAM Hive",
+        "labels": [
+          "T1003.002"
+        ],
+        "url": "https://raw.githubusercontent.com/OTRF/Security-Datasets/d9d40ef123d2c87d5d3df28c96bcab4f0faccc87/datasets/atomic/windows/credential_access/host/empire_shell_reg_dump_sam.zip",
+        "sha256": "5a8ee19860f35da6d4bcadf15178a085b469086c461d3d873d0f4adedba41f0a"
+      },
+      {
+        "id": "SDWIN-200921175806",
+        "title": "Empire Elevated Scheduled Tasks",
+        "labels": [
+          "T1053.005"
+        ],
+        "url": "https://raw.githubusercontent.com/OTRF/Security-Datasets/d9d40ef123d2c87d5d3df28c96bcab4f0faccc87/datasets/atomic/windows/persistence/host/empire_schtasks_creation_execution_elevated_user.zip",
+        "sha256": "74662dc5c52f4ac2fc9dcb336bae7fb4e101217169c65adf5784b03015501d3b"
+      },
+      {
+        "id": "SDWIN-190319024742",
+        "title": "Empire Userland Scheduled Tasks",
+        "labels": [
+          "T1053.005"
+        ],
+        "url": "https://raw.githubusercontent.com/OTRF/Security-Datasets/d9d40ef123d2c87d5d3df28c96bcab4f0faccc87/datasets/atomic/windows/persistence/host/empire_schtasks_creation_standard_user.zip",
+        "sha256": "b073a18420c90394cd2b6ad7589c78d90eba32dc155ed04b12ac824a8fc591b4"
+      },
+      {
+        "id": "SDWIN-200921001437",
+        "title": "Empire Invoke WMI",
+        "labels": [
+          "T1047"
+        ],
+        "url": "https://raw.githubusercontent.com/OTRF/Security-Datasets/d9d40ef123d2c87d5d3df28c96bcab4f0faccc87/datasets/atomic/windows/lateral_movement/host/empire_wmi_dcerpc_wmi_IWbemServices_ExecMethod.zip",
+        "sha256": "96f1dbd9c5b077c8951b6e1f43b7fe01a2620c649889262481f15139a1746d88"
+      },
+      {
+        "id": "SDWIN-200806035621",
+        "title": "Covenant SharpWMI Exec",
+        "labels": [
+          "T1047"
+        ],
+        "url": "https://raw.githubusercontent.com/OTRF/Security-Datasets/d9d40ef123d2c87d5d3df28c96bcab4f0faccc87/datasets/atomic/windows/lateral_movement/host/covenant_sharpwmi_create_dcerpc_wmi.zip",
+        "sha256": "6ff5d99660a2ce3691d198e63398ea50d8112472c469c756eeb82b83440ce626"
+      },
+      {
+        "id": "SDWIN-190518210125",
+        "title": "Empire Invoke SMBExec",
+        "labels": [
+          "T1021.002"
+        ],
+        "url": "https://raw.githubusercontent.com/OTRF/Security-Datasets/d9d40ef123d2c87d5d3df28c96bcab4f0faccc87/datasets/atomic/windows/lateral_movement/host/empire_smbexec_dcerpc_smb_svcctl.zip",
+        "sha256": "c0fc435c9ce0ecdc7cd57b4055977b949ac6b1cae9d7f4ce7aa0f0e5eae7d7f1"
+      },
+      {
+        "id": "SDWIN-200722001847",
+        "title": "Empire Elevated Registry Run Keys",
+        "labels": [
+          "T1547.001"
+        ],
+        "url": "https://raw.githubusercontent.com/OTRF/Security-Datasets/d9d40ef123d2c87d5d3df28c96bcab4f0faccc87/datasets/atomic/windows/persistence/host/empire_persistence_registry_modification_run_keys_elevated_user.zip",
+        "sha256": "2809354d679025859d723be3ceb1e2c9f9e5dde2ebec5bbea7c398e165a9b67d"
+      },
+      {
+        "id": "SDWIN-190319023812",
+        "title": "Empire Userland Registry Run Keys",
+        "labels": [
+          "T1547.001"
+        ],
+        "url": "https://raw.githubusercontent.com/OTRF/Security-Datasets/d9d40ef123d2c87d5d3df28c96bcab4f0faccc87/datasets/atomic/windows/persistence/host/empire_persistence_registry_modification_run_keys_standard_user.zip",
+        "sha256": "2965f791bcaf5e6ccfc4059985e81fd7e67ec87f17855b6c383edd1b03a19c36"
+      },
+      {
+        "id": "SDWIN-201022035214",
+        "title": "Mshta HTML Application (HTA) Execution",
+        "labels": [
+          "T1218.005"
+        ],
+        "url": "https://raw.githubusercontent.com/OTRF/Security-Datasets/d9d40ef123d2c87d5d3df28c96bcab4f0faccc87/datasets/atomic/windows/defense_evasion/host/psh_mshta_html_application_execution.zip",
+        "sha256": "f734cd8d2043da8f9f49d86bea7b5bf35a8c87445aa44975a107936a543ae840"
+      },
+      {
+        "id": "SDWIN-190518182022",
+        "title": "Empire VBS Execution",
+        "labels": [
+          "T1059.005"
+        ],
+        "url": "https://raw.githubusercontent.com/OTRF/Security-Datasets/d9d40ef123d2c87d5d3df28c96bcab4f0faccc87/datasets/atomic/windows/execution/host/empire_launcher_vbs.zip",
+        "sha256": "812da270cf8cda6f1948fb6275410f15dc1794d0bd6b623c9c25b2518285019c"
+      },
+      {
+        "id": "SDWIN-190319020729",
+        "title": "Empire Net Local Users",
+        "labels": [
+          "T1087.001"
+        ],
+        "url": "https://raw.githubusercontent.com/OTRF/Security-Datasets/d9d40ef123d2c87d5d3df28c96bcab4f0faccc87/datasets/atomic/windows/discovery/host/empire_shell_net_local_users.zip",
+        "sha256": "a2cf8016ad2a134f61aec5133bd0aa54f662aa4165f60b30f4204fd31787576c"
+      },
+      {
+        "id": "SDWIN-200904032946",
+        "title": "Invoke BypassUAC FodHelper",
+        "labels": [
+          "T1548.002"
+        ],
+        "url": "https://raw.githubusercontent.com/OTRF/Security-Datasets/d9d40ef123d2c87d5d3df28c96bcab4f0faccc87/datasets/atomic/windows/privilege_escalation/host/empire_uac_shellapi_fodhelper.zip",
+        "sha256": "b8cc7aae826f5e4aea3ea47b2b6db69b062c39201de8de9621d5081622d3c504"
+      },
+      {
+        "id": "SDWIN-201021001911",
+        "title": "Netsh Open FW Proxy Ports",
+        "labels": [
+          "T1562.004"
+        ],
+        "url": "https://raw.githubusercontent.com/OTRF/Security-Datasets/d9d40ef123d2c87d5d3df28c96bcab4f0faccc87/datasets/atomic/windows/defense_evasion/host/cmd_netsh_fw_mod_open_ports.zip",
+        "sha256": "3d887b38c6a92892f950029f40114fe4598a798ad20453671dbe3d111b9ce4a2"
+      }
+    ]
   }
 }

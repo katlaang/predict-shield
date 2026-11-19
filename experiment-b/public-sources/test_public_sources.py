@@ -14,7 +14,7 @@ HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE.parents[1] / "engine"))
 
 from cdn_scripts import CdnFile, attest, jsdelivr_published_sha256, register  # noqa: E402
-from otrf_replay import events_from_archive, fetch_pinned  # noqa: E402
+from otrf_replay import archive_format, events_from_archive, fetch_pinned  # noqa: E402
 
 LIB = b"/*! lab library */ window.labLib = {};"
 ENTRY = CdnFile("lab", "1.0.0", "lab.min.js", "lab", "/dist/lab.min.js", "labLib")
@@ -83,6 +83,12 @@ class OtrfArchiveTests(unittest.TestCase):
             fetch_pinned(url, "0" * 64, opener=opener)
         with self.assertRaisesRegex(ValueError, "commit-pinned raw GitHub"):
             fetch_pinned("https://example.com/x.zip", hashlib.sha256(data).hexdigest(), opener=opener)
+
+    def test_format_comes_from_the_bytes_not_the_name(self):
+        self.assertEqual(archive_format(b"PK\x03\x04rest"), "zip")
+        self.assertEqual(archive_format(b"\x1f\x8brest"), "tar.gz")
+        with self.assertRaises(ValueError):
+            archive_format(b"<html>not an archive")
 
     def test_zip_and_tar_members_are_read_in_memory(self):
         lines = b'{"EventID": 1}\n{"EventID": 2}\n'

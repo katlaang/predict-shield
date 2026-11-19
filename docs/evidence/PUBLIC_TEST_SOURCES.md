@@ -27,17 +27,41 @@ PREDICT-SHIELD's lab results so far came from servers, packages and fixtures the
 
 Run [44451381802](https://github.com/katlaang/predict-shield/actions/runs/44451381802), commit `6bf4b5f`. All three jobs passed.
 
-- **OTRF:** the same result as locally: 8,920 events, 6 hits all agreeing with their labels, all three techniques detected, 6 detections admitted, each host marked due by `change_event`, the re-sent envelope refused.
+- **OTRF:** the same result as locally: all 3 recorded attacks detected, with 6 detections that all agree with their labels and none among about 8,900 background events; all 6 admitted, each host marked due by `change_event`, the re-sent envelope refused. These are the datasets the rules were written from; see the held-out results below.
 - **CDN files:** jQuery 3.7.1, jQuery 3.7.0 and lodash 4.17.21 each matched both cdnjs's and jsDelivr's published hashes, and the two CDNs served identical bytes. The production probe reported VERIFIED for all three over the public internet, and NOT VERIFIED with the 3.7.0 hash registered for the 3.7.1 URL. Chromium ran both libraries with their published SRI values and refused jQuery 3.7.1 with 3.7.0's.
 - **OSV and dependency upgrades:** 4.17.15 rolled back; OSV listed five advisories covering it, among them GHSA-p6mc-m468-83gw, and the live probe still saw prototype pollution. **4.17.21 rolled back as well:** the live probe passed, but OSV listed two advisories covering 4.17.21, GHSA-r5fr-rjxr-66jc and GHSA-xxjr-mmjv-4gpg, and its version query agreed. 4.18.1 was kept with all four assertions VERIFIED and no covering advisory. The existing lodash CVE pilot accepted 4.17.21 against the two advisories registered at the time; OSV shows that is no longer a clean version.
 - **ET Open:** 53,559 enabled rules downloaded for the runner's Suricata (merged ruleset SHA-256 `1ca3bd88...0f648a`); Suricata loaded 53,560 rules including the lab rule. The public rule sid 2100498 fired on lab traffic and its alert was admitted through the signed intake in 0.51 seconds, as T1059.
 - **DVWA:** the same as locally. The incomplete fix cleared all four static assertions, with Semgrep reporting the finding resolved, failed the live check (half of the payloads still returned other users' rows on staging and on the target), and was rolled back to the original file. The prepared statement passed all five and was kept.
 
+## How good are the endpoint rules? Held-out results, 2026-11-18
+
+The three OTRF datasets above are the ones the rules were written from, so detecting all three says the pipeline works, not that the rules detect well. A dataset is one attack recorded with all the host's normal background activity around it; OTRF labels datasets, not individual events, so a per-event detection rate cannot be computed. Detection is therefore measured per recorded attack.
+
+Twenty more OTRF datasets were pinned and run only after the rules were committed (`6bf4b5f`), and the rules were not changed in response (`run_otrf_coverage.py`, `coverage_datasets` in sources.json). 170,434 events in all.
+
+| Set | Recorded attacks | Detected | Alerts elsewhere |
+| --- | --- | --- | --- |
+| Development (rules written from these) | 3, all covered by a rule | 3 of 3 | none in 8,914 background events |
+| Held out, technique covered by a rule | 5 | **2 of 5** | n/a |
+| Held out, other techniques | 15 | n/a | alerts in 2 of 15 datasets |
+
+**Detected:** Mimikatz LSA patch (PowerShell opening LSASS with `0x1438`) and the Outflank Dumpert syscall dump (`0x1fffff`).
+
+**Missed, and why:**
+- *RDP Task Manager LSASS dump.* Task Manager opened LSASS with full access (`0x1fffff`) and wrote `lsass.DMP`. The rule lists `taskmgr.exe` as a benign source process, so it skipped exactly the process the attack used. This is a defect in the rule.
+- *Empire Enable RDP* and *Empire Invoke InternalMonologue* (both T1112, registry modification). The T1112 rule only checks the WDigest key, so it does not cover registry modification in general.
+
+**Alerts on datasets labelled with other techniques:**
+- *Empire Over-Pass-The-Hash* (T1550.002): PowerShell opened LSASS with `0x1010`. Mimikatz patches LSASS for this attack, so the alert reflects real malicious activity; only the label differs.
+- *Empire Invoke SMBExec* (T1021.002): the Azure guest agent's log collector (`CollectGuestLogs.exe`) opened LSASS with `0x1410`. This is a false alarm on benign software.
+
+**Reading these numbers.** Three hand-written rules caught 2 of the 5 held-out attacks they target and raised one false alarm in about 170,000 events. That is a measurement of these three rules, not of the pipeline's intake, scheduler or verification, which behaved as designed throughout. Improving the rules (for example, keying on LSASS access with dump-file creation rather than trusting process names, and covering more registry paths) would need a fresh held-out set to measure, since these twenty have now been seen.
+
 ## Local run, 2026-11-18
 
 This machine can reach GitHub and npm but not the CDNs, OSV, the ET download or Docker Hub, so those parts ran only in CI.
 
-- OTRF: 8,920 events across three datasets; 6 rule hits, all agreeing with their published labels; all three techniques detected; 6 detections admitted; each host marked due by `change_event`; the re-sent envelope refused with HTTP 401.
+- OTRF: all 3 recorded attacks detected, 6 detections all agreeing with their published labels, no alert among the other 8,914 events; 6 detections admitted; each host marked due by `change_event`; the re-sent envelope refused with HTTP 401.
 - DVWA: the incomplete fix rolled back with static analysis reporting it resolved and the live check failing; the prepared statement kept with all five assertions VERIFIED.
 - Dependency chain with the two hand-registered advisories in place of OSV: 4.17.15 rolled back; 4.17.21 and 4.18.1 kept.
 - Suricata with only the public sid 2100498 rule (not the full ET download): the rule fired and the alert was admitted in about half a second.

@@ -62,6 +62,7 @@ class TelemetryRule:
     reads: tuple[str, ...]
     matches: Callable[[dict], bool]
     confidence: float
+    fields: tuple[str, ...] = ()
 
 
 # Sysmon event 13: registry value set.
@@ -96,11 +97,14 @@ def _comsvcs_minidump(e: dict) -> bool:
 
 RULES: tuple[TelemetryRule, ...] = (
     TelemetryRule("ps-wdigest-downgrade", "T1112", "WDigest set to store plaintext credentials",
-                  ("Sysmon 13", "TargetObject", "Details"), _wdigest_downgrade, 0.9),
+                  ("Sysmon 13", "TargetObject", "Details"), _wdigest_downgrade, 0.9,
+                  ("TargetObject", "Details", "Image")),
     TelemetryRule("ps-lsass-memory-access", "T1003.001", "LSASS opened with a memory-read access mask",
-                  ("Sysmon 10", "TargetImage", "GrantedAccess", "SourceImage"), _lsass_memory_access, 0.8),
+                  ("Sysmon 10", "TargetImage", "GrantedAccess", "SourceImage"), _lsass_memory_access, 0.8,
+                  ("SourceImage", "GrantedAccess", "TargetImage")),
     TelemetryRule("ps-comsvcs-minidump", "T1003.001", "comsvcs.dll MiniDump invoked",
-                  ("Sysmon 1 / Security 4688", "CommandLine"), _comsvcs_minidump, 0.9),
+                  ("Sysmon 1 / Security 4688", "CommandLine"), _comsvcs_minidump, 0.9,
+                  ("CommandLine",)),
 )
 
 
@@ -112,6 +116,7 @@ class RuleHit:
     record: object
     event_digest: str
     event_time: str | None
+    matched: tuple = ()
 
 
 def detect(events: Iterable[dict], rules: tuple[TelemetryRule, ...] = RULES) -> list[RuleHit]:
@@ -120,7 +125,10 @@ def detect(events: Iterable[dict], rules: tuple[TelemetryRule, ...] = RULES) -> 
         e = normalize(raw)
         for rule in rules:
             if rule.matches(e):
-                hits.append(RuleHit(rule.rule_id, rule.technique, e["_host"], e["_record"], e["_digest"], e["_time"]))
+                matched = tuple((f, str(e.get(f) or e.get("ProcessCommandLine") if f == "CommandLine" else e.get(f))[:300])
+                                for f in rule.fields)
+                hits.append(RuleHit(rule.rule_id, rule.technique, e["_host"], e["_record"], e["_digest"], e["_time"],
+                                    matched))
     return hits
 
 

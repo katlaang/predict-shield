@@ -1,5 +1,12 @@
 # Development changelog
 
+## 2026-11-18 (8): Held-out measurement of the endpoint rules
+
+- Twenty more OTRF datasets, pinned and run only after the rules were committed (`run_otrf_coverage.py`). The rules caught 2 of 5 held-out attacks of the techniques they target and alerted on 2 of 15 datasets of other techniques (one real LSASS access during pass-the-hash, one false alarm from an Azure agent), across 170,434 events.
+- Found: the LSASS rule lists `taskmgr.exe` as benign, which hides the Task Manager LSASS dump; the T1112 rule covers only the WDigest key. Not changed here, so the held-out result stays valid.
+- Reworded every summary that read "8,920 events, 6 detections", which looked like a per-event rate. Detection is per recorded attack: 3 of 3 on the development set, 2 of 5 held out.
+- Archive format is now read from the bytes, not the file name; each rule hit records the fields it matched.
+
 ## 2026-11-18 (7): Public test sources
 
 - OTRF Security-Datasets (pinned commit and archive hashes) replayed through `endpoint_telemetry.py` rules and the signed intake; every hit agreed with its dataset's published ATT&CK label.

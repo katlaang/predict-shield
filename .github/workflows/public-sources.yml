@@ -58,6 +58,9 @@ jobs:
       - name: Replay OTRF Security-Datasets through the signed intake
         working-directory: experiment-b/public-sources
         run: python run_otrf_replay.py --output /tmp/ps-otrf.json
+      - name: Measure the endpoint rules on held-out OTRF datasets
+        working-directory: experiment-b/public-sources
+        run: python run_otrf_coverage.py --output /tmp/ps-otrf-coverage.json
       - name: Attest, monitor and SRI-load real public CDN files
         working-directory: experiment-b/public-sources
         run: python run_cdn_scripts.py --output /tmp/ps-cdn.json
@@ -81,6 +84,14 @@ jobs:
           for d in o["datasets"]:
               assert d["archive_sha256_verified"] and d["admitted"] >= 1, d
               assert all(x["due_to"] == "change_event" for x in d["scheduler_due_after_admission"]), d
+
+          # The held-out datasets are pinned, so the result is deterministic. These
+          # are the recorded numbers (2026-11-18); a change means the rules or the
+          # data changed and the evidence page needs updating, not the assertion.
+          cov = json.load(open("/tmp/ps-otrf-coverage.json"))["held_out_set"]["summary"]
+          assert (cov["datasets"], cov["covered_datasets"], cov["covered_detected"]) == (20, 5, 2), cov
+          assert cov["uncovered_datasets_with_any_hit"] == ["Empire Over-Pass-The-Hash", "Empire Invoke SMBExec"], cov
+          assert (cov["events"], cov["hits_total"]) == (170434, 5), cov
 
           c = json.load(open("/tmp/ps-cdn.json"))
           assert c["summary"]["all_attested"] is True, c["attestations"]

@@ -57,8 +57,18 @@ def fetch_pinned(url: str, sha256: str, *, opener=urllib.request.urlopen) -> byt
     return data
 
 
-def events_from_archive(data: bytes, fmt: str):
+def archive_format(data: bytes) -> str:
+    """From the bytes themselves, never the file name."""
+    if data[:4] == b"PK\x03\x04":
+        return "zip"
+    if data[:2] == b"\x1f\x8b":
+        return "tar.gz"
+    raise ValueError("archive is neither zip nor gzip")
+
+
+def events_from_archive(data: bytes, fmt: str | None = None):
     """Yield JSON events from every .json member, read in memory only."""
+    fmt = archive_format(data) if fmt is None else fmt
     if fmt == "zip":
         archive = zipfile.ZipFile(io.BytesIO(data))
         members = [(i.filename, i.file_size) for i in archive.infolist() if i.filename.endswith(".json")]
