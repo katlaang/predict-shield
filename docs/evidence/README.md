@@ -12,6 +12,11 @@ Dated results, lab protocols and design notes behind the capabilities in the mai
 
 - [Detect, plan, apply, verify, keep or roll back](END_TO_END_CHAIN.md): the unattended chain against real nginx, Chromium and Suricata, with signed approvals, signed or mTLS detection intake, sandboxed-frame isolation and the live view.
 
+## Measured AI-generated attack detection
+
+- [Real qwen3:4b rule-generation negative result, November 19, 2026](REAL_AI_RULE_SUGGESTION_NEGATIVE_RESULT_2026_11_19.md): all five AI replies were truncated/malformed; zero rules accepted and **zero of 33** selected attack-labelled held-out recordings detected. The independent audit validated the reporting, **not** attack-detection quality. The exact model digest and GitHub Actions artifact are recorded.
+- A revised compact, schema-constrained prompt has been implemented, but later reuse of the same evaluated recordings must be marked exploratory. Fresh, independently evaluated attack and benign data are still required for detection-accuracy claims.
+
 ## Public test sources
 
 - [Public test sources](PUBLIC_TEST_SOURCES.md): OTRF attack telemetry, cdnjs and jsDelivr files, OSV.dev, Emerging Threats Open, DVWA and real lodash releases, each plugged into the pipeline for testing.

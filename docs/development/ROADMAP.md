@@ -1,6 +1,14 @@
 # PREDICT-SHIELD engineering roadmap
 
-**As of November 18, 2026.**
+**Updated November 19, 2026.**
+
+## AI detection scientific checkpoint (November 19, 2026)
+
+- The completed [real local-model evaluation](https://github.com/katlaang/predict-shield/actions/runs/44470495011) used `qwen3:4b` and reported **0 accepted AI-generated rules and 0/33 detections** across 130,176 selected attack-scenario telemetry events. All five model outputs were malformed JSON containing an echoed, truncated event summary. The CI audit passed **report consistency**, not detection accuracy.
+- The historical negative report is retained in [evidence](../evidence/REAL_AI_RULE_SUGGESTION_NEGATIVE_RESULT_2026_11_19.md). The rule-generation prompt has been compacted and constrained to Ollama's JSON-schema output, but a fresh performance claim requires a new, independently held-out population, properly labeled benign recordings, and real precision/recall and false-alert denominators.
+- For electric-grid OT, the simulated grid policy gate now protects the real isolated Open vSwitch ICMP test. Independently probed network containment is **not** a coupled electrical-resilience test. Actual AI action choice, authenticated utility authority, and coupled power/communications behavior remain pending.
+- For policy-authority outages, four physical-lab interventions and dual-principal direct HTTP probes now have conservative UNKNOWN bounds; they do not establish full current-policy verification or complete v3.1 decision utility. Issue #36 remains open.
+- Historical protocol tag issue #41 remains unresolved: the pinned commit and blob were verified, but GitHub rejected automatic tag creation because the connected GitHub App lacks workflow permission. Historical commits were not modified.
 
 ## Infrastructure validation checkpoint
 
