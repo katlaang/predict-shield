@@ -38,6 +38,63 @@ class OutageActionsTests(unittest.TestCase):
         self.assertEqual(report["revoked"], {"403": 1, "200": 1})
         self.assertEqual(report["authorized"], {"403": 1, "503": 1})
 
+    def test_real_dual_probe_contract_uses_all_four_nodes_and_both_principals(self):
+        from python.offline_authority_witness import freeze_witness
+        witness = freeze_witness(
+            {"trialId": "lab-case-1", "revoked": True},
+            authority_http=200, inventory=list(exp.ENFORCERS),
+            captured_at="2026-11-19T00:00:00Z",
+        )
+        calls = []
+        def observed(node, path, *, timeout, authorized_lab_user=False):
+            calls.append((node, path, authorized_lab_user))
+            return (200 if authorized_lab_user else 403, {}, 0.5)
+        result = exp.collect_dual_principal_probes(
+            observed, witness=witness, authority_http=None,
+            observed_at="2026-11-19T00:00:30Z",
+        )
+        self.assertEqual(len(calls), 8)
+        self.assertEqual({n for n, _, _ in calls}, set(exp.ENFORCERS))
+        self.assertTrue(all(path == "/protected" for _, path, _ in calls))
+        self.assertEqual(sum(a for _, _, a in calls), 4)
+        self.assertEqual(result["revoked_denial_fraction_bounds"], [1, 1])
+        self.assertEqual(result["legitimate_access_fraction_bounds"], [1, 1])
+        self.assertEqual(result["verification_outcome"], "INDETERMINATE")
+        self.assertIsNone(result["authority_truth_current"])
+
+    def test_unreachable_probes_remain_unknown_not_success(self):
+        from python.offline_authority_witness import freeze_witness
+        witness = freeze_witness(
+            {"trialId": "lab-case-1", "revoked": True},
+            authority_http=200, inventory=list(exp.ENFORCERS),
+            captured_at="2026-11-19T00:00:00Z",
+        )
+        def observed(node, path, *, timeout, authorized_lab_user=False):
+            if node == exp.ENFORCERS[0]:
+                return None, {"error": "unreachable"}, 20.0
+            return (200 if authorized_lab_user else 403, {}, 0.5)
+        result = exp.collect_dual_principal_probes(
+            observed, witness=witness, authority_http=None,
+            observed_at="2026-11-19T00:00:30Z",
+        )
+        self.assertEqual(result["revoked_denial_fraction_bounds"], [0.75, 1.0])
+        self.assertEqual(result["legitimate_access_fraction_bounds"], [0.75, 1.0])
+        self.assertEqual(result["verification_outcome"], "INDETERMINATE")
+
+    def test_live_authority_cannot_be_scored_as_offline(self):
+        from python.offline_authority_witness import freeze_witness
+        witness = freeze_witness(
+            {"trialId": "lab-case-1", "revoked": True},
+            authority_http=200, inventory=list(exp.ENFORCERS),
+            captured_at="2026-11-19T00:00:00Z",
+        )
+        with self.assertRaises(ValueError):
+            exp.collect_dual_principal_probes(
+                lambda *args, **kwargs: (403, {}, 0.5),
+                witness=witness, authority_http=200,
+                observed_at="2026-11-19T00:00:30Z",
+            )
+
     def test_no_same_credential_execution(self):
         with self.assertRaises(ValueError):
             exp.execute("x" * 32, "x" * 32, Path("."))
