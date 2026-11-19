@@ -1,0 +1,24 @@
+{
+  "schema": "predict-shield/public-test-sources/1",
+  "otrf_security_datasets": {
+    "repository": "https://github.com/OTRF/Security-Datasets",
+    "commit": "d9d40ef123d2c87d5d3df28c96bcab4f0faccc87",
+    "license_note": "Published by OTRF for detection testing; recorded in a lab, contains no production data.",
+    "datasets": [
+      {"id": "SDWIN-190518201922", "title": "Empire WDigest Downgrade", "labels": ["T1112"],
+       "url": "https://raw.githubusercontent.com/OTRF/Security-Datasets/d9d40ef123d2c87d5d3df28c96bcab4f0faccc87/datasets/atomic/windows/defense_evasion/host/empire_wdigest_downgrade.tar.gz",
+       "format": "tar.gz", "sha256": "7135251d3073a059d1a1e7a1dfbf8f1ead74ebe274fc7a07ac61fae11228e164"},
+      {"id": "SDWIN-190518202151", "title": "Empire Mimikatz LogonPasswords", "labels": ["T1003.001"],
+       "url": "https://raw.githubusercontent.com/OTRF/Security-Datasets/d9d40ef123d2c87d5d3df28c96bcab4f0faccc87/datasets/atomic/windows/credential_access/host/empire_mimikatz_logonpasswords.zip",
+       "format": "zip", "sha256": "bb4c057b62d781be5426e011872ba1a15070c07afbb24848a14458f4b22b06fb"},
+      {"id": "SDWIN-201018195009", "title": "Lsass Memory Dump via Comsvcs.dll", "labels": ["T1003.001"],
+       "url": "https://raw.githubusercontent.com/OTRF/Security-Datasets/d9d40ef123d2c87d5d3df28c96bcab4f0faccc87/datasets/atomic/windows/credential_access/host/psh_lsass_memory_dump_comsvcs.zip",
+       "format": "zip", "sha256": "0af9e920220d746432f0972be83ad057629695540aecd68c15869d190786e1ae"}
+    ],
+    "host_to_asset": {
+      "HR001.shire.com": "otrf-hr001",
+      "WORKSTATION5.theshire.local": "otrf-workstation5",
+      "WORKSTATION5": "otrf-workstation5"
+    }
+  }
+}

@@ -3,6 +3,7 @@ from datetime import datetime, timedelta, timezone
 
 from predict_shield.assessment import Evidence
 from predict_shield.sast_findings import (
+    VULNERABILITY_BEHAVIOR_ABSENT,
     FINDING_CONFIRMED_BEFORE_FIX,
     FINDING_RESOLVED,
     NO_NEW_HIGH_SEVERITY_FINDING,
@@ -185,6 +186,31 @@ class EvaluateFixTests(unittest.TestCase):
         verdict = evaluate_fix(self._scope(before, after), [before, after, no_regression, no_new_finding], now=NOW)
         self.assertFalse(verdict.accepted)
         self.assertIn(NO_NEW_HIGH_SEVERITY_FINDING, "".join(verdict.blocking_reasons))
+
+    def _four(self):
+        before = confirm_before_fix(finding(present=True), REGISTRY, now=NOW)
+        after = confirm_resolution(finding(present=False, observed_at=NOW - timedelta(seconds=5)), REGISTRY, now=NOW)
+        no_regression = Evidence(asset="billing-api", assertion="no_regression:billing-api",
+                                 observed_pass=True, observed_at=NOW, source="regression-check", independent=True)
+        no_new_finding = confirm_no_new_high_severity("billing-api", "semgrep-ci", REGISTRY, [], now=NOW)
+        return before, after, [before, after, no_regression, no_new_finding]
+
+    def test_dynamic_check_failing_blocks_a_fix_the_static_scan_passed(self):
+        # An incomplete fix (escaped but unquoted input) can clear the re-scan
+        # while live exploitation still works.
+        before, after, evidence = self._four()
+        dynamic = Evidence(asset="billing-api", assertion="behavior:billing-api", observed_pass=False,
+                           observed_at=NOW, source="live-probe", independent=True)
+        scope = dict(self._scope(before, after), **{VULNERABILITY_BEHAVIOR_ABSENT: ("billing-api", "behavior:billing-api")})
+        self.assertTrue(evaluate_fix(self._scope(before, after), evidence, now=NOW).accepted)
+        verdict = evaluate_fix(scope, evidence + [dynamic], require_dynamic=True, now=NOW)
+        self.assertFalse(verdict.accepted)
+        self.assertIn(VULNERABILITY_BEHAVIOR_ABSENT, "".join(verdict.blocking_reasons))
+
+    def test_required_dynamic_check_without_scope_is_a_caller_error(self):
+        before, after, evidence = self._four()
+        with self.assertRaises(ValueError):
+            evaluate_fix(self._scope(before, after), evidence, require_dynamic=True, now=NOW)
 
     def test_missing_scope_entry_is_a_caller_error(self):
         before = confirm_before_fix(finding(present=True), REGISTRY, now=NOW)

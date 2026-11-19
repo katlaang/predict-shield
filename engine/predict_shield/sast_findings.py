@@ -54,10 +54,10 @@ What this module does NOT yet do, honestly, consistent with the Section 7.1
 design sketch this implements:
 
     * The optional dynamic check for findings with a reachable, externally
-      triggerable path (the fifth, class-specific assertion described
-      alongside this one) is not implemented. Nothing here claims a static
-      re-scan is as strong as a live probe; it is simply what is built so
-      far.
+      triggerable path is an opt-in fifth assertion
+      (`VULNERABILITY_BEHAVIOR_ABSENT`, `evaluate_fix(require_dynamic=True)`).
+      The caller produces its evidence from live exploitation attempts
+      against the running target; this module does not run them.
     * Reachability-based prioritization using the existing dependency graph
       is not implemented. `severity` on a `ScanFinding` is carried through
       unchanged from the scanner's own rating; nothing here re-ranks it by
@@ -81,6 +81,11 @@ FINDING_CONFIRMED_BEFORE_FIX = "finding_confirmed_before_fix"
 FINDING_RESOLVED = "finding_resolved"
 NO_REGRESSION = "no_regression"
 NO_NEW_HIGH_SEVERITY_FINDING = "no_new_high_severity_finding"
+# Optional fifth assertion: live exploitation attempts against the running
+# target fail after the fix. A static re-scan can pass an incomplete fix
+# (escaping input while leaving it unquoted, for example), so a caller that
+# can reach a running target should require this one too.
+VULNERABILITY_BEHAVIOR_ABSENT = "vulnerability_behavior_absent"
 
 # Every source-code fix this module evaluates must clear all four of these
 # assertions. Adding the dynamic-check assertion later means adding its name
@@ -245,8 +250,8 @@ class SastFixVerdict:
         )
 
 
-def evaluate_fix(scope: dict[str, tuple[str, str]], evidence: list[Evidence],
-                 **assess_kwargs) -> SastFixVerdict:
+def evaluate_fix(scope: dict[str, tuple[str, str]], evidence: list[Evidence], *,
+                 require_dynamic: bool = False, **assess_kwargs) -> SastFixVerdict:
     """Evaluate all four required assertions for one source-code fix and
     report whether it is accepted as a whole, following the same
     all-four-or-nothing rule `remediation_verification.evaluate()` uses for
@@ -260,12 +265,13 @@ def evaluate_fix(scope: dict[str, tuple[str, str]], evidence: list[Evidence],
     error, not a verification outcome, so it raises rather than silently
     treating a required check as satisfied or skipped.
     """
-    missing = [name for name in REQUIRED_ASSERTIONS if name not in scope]
+    required = REQUIRED_ASSERTIONS + ((VULNERABILITY_BEHAVIOR_ABSENT,) if require_dynamic else ())
+    missing = [name for name in required if name not in scope]
     if missing:
         raise ValueError("Missing required assertion scope for: " + ", ".join(missing))
     assessments = {
         name: assess(*scope[name], evidence, **assess_kwargs)
-        for name in REQUIRED_ASSERTIONS
+        for name in required
     }
     accepted = all(a.outcome is Outcome.VERIFIED for a in assessments.values())
     return SastFixVerdict(accepted, assessments)

@@ -1,0 +1,27 @@
+rules:
+  - id: php-request-to-mysqli-query
+    languages: [php]
+    severity: ERROR
+    message: >-
+      A request parameter reaches the text of a mysqli query. Bind it as a
+      parameter of a prepared statement instead.
+    mode: taint
+    pattern-sources:
+      - pattern: $_REQUEST[...]
+      - pattern: $_GET[...]
+      - pattern: $_POST[...]
+    pattern-sanitizers:
+      - pattern: mysqli_real_escape_string(...)
+      - pattern: intval(...)
+      - pattern: (int) $X
+    pattern-sinks:
+      - patterns:
+          - pattern-inside: mysqli_query($CONN, $QUERY)
+          - pattern: $QUERY
+      - patterns:
+          - pattern-inside: $DB->query($QUERY)
+          - pattern: $QUERY
+    metadata:
+      cwe: "CWE-89: Improper Neutralization of Special Elements used in an SQL Command"
+      references:
+        - https://owasp.org/www-community/attacks/SQL_Injection

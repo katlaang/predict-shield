@@ -40,10 +40,16 @@ TECHNIQUE = "T1041"  # exfiltration over an existing channel
 
 @dataclass(frozen=True)
 class AlertMapping:
+    """`page_origin=None` drops the referrer requirement, for rules that
+    fire on traffic with no page behind it. `either_direction=True` lets
+    the registered host appear as source or destination, for rules that
+    fire on a server's response."""
     asset: str
-    page_origin: str
+    page_origin: str | None
     sink_hosts: tuple[str, ...]
     signature_ids: tuple[int, ...] = (9900001,)
+    either_direction: bool = False
+    technique: str = TECHNIQUE
 
 
 def _timestamp(value: str) -> datetime:
@@ -60,16 +66,19 @@ def alert_to_detection(alert: dict, mapping: AlertMapping, source_id: str) -> tu
     if sid not in mapping.signature_ids:
         return None, "signature not registered for forwarding"
     http_info = alert.get("http") or {}
-    if alert.get("dest_ip") not in mapping.sink_hosts and http_info.get("hostname") not in mapping.sink_hosts:
+    hosts = {alert.get("dest_ip"), http_info.get("hostname")}
+    if mapping.either_direction:
+        hosts.add(alert.get("src_ip"))
+    if not hosts & set(mapping.sink_hosts):
         return None, "destination is not a registered sink"
-    referrer = http_info.get("http_refer") or ""
-    parsed = urlparse(referrer)
-    if f"{parsed.scheme}://{parsed.netloc}" != mapping.page_origin:
-        return None, "referrer is not the registered page"
+    if mapping.page_origin is not None:
+        parsed = urlparse(http_info.get("http_refer") or "")
+        if f"{parsed.scheme}://{parsed.netloc}" != mapping.page_origin:
+            return None, "referrer is not the registered page"
     severity = (alert.get("alert") or {}).get("severity")
     return DetectionEvent(
         detection_id=f"suricata:{alert.get('flow_id')}:{alert.get('tx_id')}:{sid}",
-        asset=mapping.asset, source_id=source_id, technique=TECHNIQUE,
+        asset=mapping.asset, source_id=source_id, technique=mapping.technique,
         confidence=SEVERITY_CONFIDENCE.get(severity, 0.5),
         observed_at=_timestamp(alert["timestamp"]),
     ), "mapped"
@@ -150,23 +159,25 @@ class Suricata:
     """A real Suricata process capturing on loopback with the lab rule only."""
 
     def __init__(self, workdir: Path, interface: str = "lo", config: str = "/etc/suricata/suricata.yaml",
-                 command_prefix: list[str] | None = None):
+                 command_prefix: list[str] | None = None, extra_rules_file: Path | None = None):
         self.workdir = Path(workdir)
         self.logdir = self.workdir / "log"
         self.rules = self.workdir / "lab.rules"
         self.interface = interface
         self.config = config
         self.prefix = list(command_prefix or [])
+        self.extra_rules_file = Path(extra_rules_file) if extra_rules_file else None
         self.process: subprocess.Popen | None = None
 
     @property
     def eve(self) -> Path:
         return self.logdir / "eve.json"
 
-    def start(self, timeout: float = 90.0) -> str:
+    def start(self, timeout: float = 240.0) -> str:
         self.logdir.mkdir(parents=True, exist_ok=True)
         os.chmod(self.logdir, 0o777)
-        self.rules.write_text(LAB_RULES)
+        extra = self.extra_rules_file.read_text(errors="replace") if self.extra_rules_file else ""
+        self.rules.write_text(extra + ("\n" if extra and not extra.endswith("\n") else "") + LAB_RULES)
         cmd = self.prefix + ["suricata", "-c", self.config, f"--pcap={self.interface}", "-k", "none",
                              "-l", str(self.logdir), "-S", str(self.rules),
                              "--set", "unix-command.enabled=no"]

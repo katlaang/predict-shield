@@ -1,0 +1,218 @@
+name: Public test sources
+
+# Public data sources plugged into the pipeline for testing. Every source is
+# published for testing or released by its owner; no third-party site is
+# scanned. Runs weekly as well, because OSV advisories and the ET ruleset
+# change on their own.
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'experiment-b/public-sources/**'
+      - 'experiment-b/end-to-end-chain/ids_forwarder.py'
+      - 'engine/predict_shield/endpoint_telemetry.py'
+      - 'engine/predict_shield/osv_source.py'
+      - 'engine/predict_shield/change_execution.py'
+      - 'engine/predict_shield/sast_findings.py'
+      - 'engine/predict_shield/script_integrity.py'
+      - '.github/workflows/public-sources.yml'
+  pull_request:
+    paths:
+      - 'experiment-b/public-sources/**'
+      - 'experiment-b/end-to-end-chain/ids_forwarder.py'
+      - 'engine/predict_shield/endpoint_telemetry.py'
+      - 'engine/predict_shield/osv_source.py'
+      - 'engine/predict_shield/change_execution.py'
+      - 'engine/predict_shield/sast_findings.py'
+      - 'engine/predict_shield/script_integrity.py'
+      - '.github/workflows/public-sources.yml'
+  schedule:
+    - cron: '17 9 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  telemetry-advisories-cdn:
+    # OTRF attack telemetry, OSV.dev advisories (dependency chain), public CDN files.
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install the signature library and Chromium
+        run: |
+          pip install 'cryptography>=42' playwright
+          playwright install --with-deps chromium
+      - name: Offline unit tests
+        run: |
+          PYTHONPATH=engine:engine/tests python -m unittest test_endpoint_telemetry test_osv_source test_sast_findings test_change_execution -v
+          cd experiment-b/public-sources && python -m unittest test_public_sources -v
+      - name: Replay OTRF Security-Datasets through the signed intake
+        working-directory: experiment-b/public-sources
+        run: python run_otrf_replay.py --output /tmp/ps-otrf.json
+      - name: Attest, monitor and SRI-load real public CDN files
+        working-directory: experiment-b/public-sources
+        run: python run_cdn_scripts.py --output /tmp/ps-cdn.json
+      - name: Dependency upgrades through the chain, with OSV.dev as the advisory source
+        working-directory: experiment-b/public-sources/dependency
+        run: python run_dependency_chain.py --advisories osv --output /tmp/ps-dependency.json
+      - name: Check the results
+        run: |
+          python - <<'PY'
+          import json
+          from datetime import datetime, timezone
+          import sys
+          sys.path.insert(0, "engine")
+          from predict_shield.osv_source import scan_with_osv
+
+          o = json.load(open("/tmp/ps-otrf.json"))
+          s = o["summary"]
+          assert s["datasets"] == 3 and s["datasets_with_label_detected"] == 3, s
+          assert s["rule_hits"] == s["hits_agreeing_with_label"] == s["admitted"] > 0, s
+          assert o["resent_envelope_status"] == 401 and o["resent_envelope_admitted"] is False
+          for d in o["datasets"]:
+              assert d["archive_sha256_verified"] and d["admitted"] >= 1, d
+              assert all(x["due_to"] == "change_event" for x in d["scheduler_due_after_admission"]), d
+
+          c = json.load(open("/tmp/ps-cdn.json"))
+          assert c["summary"]["all_attested"] is True, c["attestations"]
+          for k, v in c["summary"]["monitoring"].items():
+              want = "NOT VERIFIED" if k == "version_changed_under_registration" else "VERIFIED"
+              assert v == want, (k, v)
+          b = c["browser_sri"]
+          assert b["jquery-3.7.1-published-sri"]["library_ran"] is True
+          assert b["lodash-4.17.21-published-sri"]["library_ran"] is True
+          assert b["jquery-3.7.1-with-3.7.0-sri"]["library_ran"] is False
+
+          d = json.load(open("/tmp/ps-dependency.json"))
+          assert d["advisory_source"] == "osv" and d["audit_log_chain_intact"] is True
+          assert d["incidents"]["4.17.15"]["final_status"] == "ROLLED_BACK", d["summary"]
+          assert d["incidents"]["4.17.15"]["installed_after"] == "4.17.11"
+          for v, i in d["incidents"].items():
+              assert i["without_approval"] == "REFUSED", (v, i["without_approval"])
+              assert i["final_status"] in ("APPLIED_VERIFIED", "ROLLED_BACK"), (v, i["final_status"])
+              if i["final_status"] == "APPLIED_VERIFIED":
+                  assert set(i["verification_detail"]["assertions"].values()) == {"VERIFIED"}, (v, i)
+                  assert i["installed_after"] == v
+              else:
+                  assert i["installed_after"] == "4.17.11", (v, i["installed_after"])
+
+          # OSV must place the starting version inside CVE-2020-8203's advisory.
+          before = scan_with_osv("lodash", "npm", "4.17.11", now=datetime.now(timezone.utc))
+          assert "GHSA-p6mc-m468-83gw" in before.advisories_covering_version, before
+          print(json.dumps({"otrf": s, "cdn": c["summary"], "dependency": d["summary"]}, indent=1, sort_keys=True))
+          PY
+      - name: Retain the reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: public-sources-telemetry-advisories-cdn
+          path: /tmp/ps-*.json
+          if-no-files-found: warn
+          retention-days: 90
+
+  et-open-rules:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install Suricata, suricata-update and the signature library
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y suricata
+          pip install 'cryptography>=42'
+          suricata -V
+      - name: Download ET Open, load it in Suricata, fire a public rule, admit the alert
+        working-directory: experiment-b/public-sources
+        run: python run_et_rules.py --sudo --workdir /tmp/ps-et --output /tmp/ps-et-rules.json
+      - name: Check the results
+        run: |
+          python - <<'PY'
+          import json
+          r = json.load(open("/tmp/ps-et-rules.json"))
+          assert r["ruleset"]["source"] == "ET Open via suricata-update", r["ruleset"]
+          assert r["ruleset"]["enabled_rules"] > 10000, r["ruleset"]["enabled_rules"]
+          assert r["ruleset"]["test_rule_enabled"] is True
+          assert r["test_rule_fired"] is True, r["alerts"]
+          assert len(r["admitted"]) >= 1 and r["intake_rejections"] == 0, r
+          print(json.dumps({k: r[k] for k in ("rules_loaded_by_suricata", "seconds_to_admission", "admitted")}, indent=1))
+          print("ruleset sha256", r["ruleset"]["sha256"], "enabled", r["ruleset"]["enabled_rules"])
+          PY
+      - name: Retain the report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: public-sources-et-open-rules
+          path: /tmp/ps-et-rules.json
+          if-no-files-found: warn
+          retention-days: 90
+
+  dvwa-sast-chain:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install PHP, Semgrep and the signature library
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y php-cli php-mysql
+          pip install 'cryptography>=42' semgrep==1.185.0
+          php -v
+          semgrep --version
+      - name: Start a disposable MariaDB on loopback
+        run: |
+          docker run -d --name ps-dvwa-db -p 127.0.0.1:3306:3306 \
+            -e MARIADB_ROOT_PASSWORD=ps-lab-root -e MARIADB_DATABASE=dvwa \
+            -e MARIADB_USER=dvwa -e MARIADB_PASSWORD='p@ssw0rd' mariadb:11
+          for attempt in $(seq 1 60); do
+            if docker exec ps-dvwa-db mariadb-admin ping -h 127.0.0.1 -uroot -pps-lab-root --silent; then exit 0; fi
+            sleep 2
+          done
+          docker logs ps-dvwa-db; exit 1
+      - name: Run the SAST chain against DVWA
+        working-directory: experiment-b/public-sources/dvwa
+        env:
+          SEMGREP_ENABLE_VERSION_CHECK: '0'
+        run: python run_dvwa_sast_chain.py --db-port 3306 --output /tmp/ps-dvwa.json
+      - name: Check the results
+        run: |
+          python - <<'PY'
+          import json
+          r = json.load(open("/tmp/ps-dvwa.json"))
+          assert r["audit_log_chain_intact"] is True
+          bad = r["incidents"]["dvwa-incomplete-fix"]
+          assert bad["before_injection"]["1' OR '1'='1"]["injection_succeeded"] is True, bad["before_injection"]
+          assert bad["without_approval"] == "REFUSED"
+          assert bad["verification_detail"]["static_scan_says_resolved"] is True
+          assert bad["verification_detail"]["assertions"]["vulnerability_behavior_absent"] == "NOT VERIFIED"
+          assert bad["final_status"] == "ROLLED_BACK" and bad["target_file_after"] == "original", bad["final_status"]
+          good = r["incidents"]["dvwa-prepared-statement"]
+          assert good["final_status"] == "APPLIED_VERIFIED", good["verification_reason"]
+          assert set(good["verification_detail"]["assertions"].values()) == {"VERIFIED"}
+          assert good["target_file_after"] == "prepared_statement"
+          assert not any(v["injection_succeeded"] for v in good["live_after"]["injection"].values())
+          assert all(good["live_after"]["regression"].values())
+          print(json.dumps(r["summary"], indent=1, sort_keys=True))
+          PY
+      - name: Retain the report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: public-sources-dvwa-sast-chain
+          path: /tmp/ps-dvwa.json
+          if-no-files-found: warn
+          retention-days: 90
