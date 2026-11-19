@@ -77,8 +77,12 @@ jobs:
       - name: Check the protocol was followed
         run: |
           python - <<'PY'
-          import glob, json
-          for path in glob.glob("/tmp/ps-ai-rules-*.json"):
+          import json, pathlib
+          paths = [pathlib.Path("/tmp/ps-ai-rules-local.json")]
+          hosted = pathlib.Path("/tmp/ps-ai-rules-hosted.json")
+          if hosted.exists():
+              paths.append(hosted)
+          for path in paths:
               r = json.load(open(path))
               assert len(r["model_exchanges"]) == 5, (path, len(r["model_exchanges"]))
               assert len(r["accepted_set_sha256"]) == 64
