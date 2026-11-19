@@ -17,6 +17,7 @@ kept in the report.
 from __future__ import annotations
 
 import argparse
+import os
 import hashlib
 import json
 import sys
@@ -43,9 +44,22 @@ TECHNIQUE_NAMES = {
 }
 
 
+def write_checkpoint(path: Path, data: dict) -> None:
+    """Atomically preserve pre-freeze progress; never claim a complete score."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    tmp = path.with_name(path.name + ".tmp")
+    tmp.write_text(json.dumps(data, indent=1, sort_keys=True) + "\n", encoding="utf-8")
+    os.replace(tmp, path)
+
+
 class Recorder:
-    def __init__(self, inner):
+    def __init__(self, inner, *, on_exchange=None):
         self.inner, self.name, self.exchanges = inner, inner.name, []
+        self.on_exchange = on_exchange
+
+    def save(self):
+        if self.on_exchange is not None:
+            self.on_exchange(self.exchanges)
 
     def complete(self, system: str, prompt: str) -> str:
         started = time.monotonic()
@@ -55,9 +69,11 @@ class Recorder:
         except Exception as error:  # recorded, then re-raised for suggest() to handle
             record.update(reply=None, error=str(error), seconds=round(time.monotonic() - started, 1))
             self.exchanges.append(record)
+            self.save()
             raise
         record.update(reply=reply, seconds=round(time.monotonic() - started, 1))
         self.exchanges.append(record)
+        self.save()
         return reply
 
 
@@ -107,12 +123,29 @@ def main() -> None:
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--model", required=True)
     parser.add_argument("--model-digest", default="")
+    parser.add_argument("--checkpoint", type=Path, default=None,
+                        help="record incomplete pre-freeze development progress, not scoring evidence")
     args = parser.parse_args()
     split = json.loads((HERE / "split.json").read_text())
     dev_files = {e["file"] for e in split["development"]}
     if dev_files & {e["file"] for e in split["held_out"]}:
         raise RuntimeError("a recording is in both halves")
-    model = Recorder(build_model(args.model))
+    checkpoint = args.checkpoint
+    def persist(exchanges, *, status="INCOMPLETE", technique=None):
+        if checkpoint is not None:
+            write_checkpoint(checkpoint, {
+                "schema": "predict-shield/ai-rule-development-checkpoint/1",
+                "status": status,
+                "model": args.model,
+                "model_digest": args.model_digest,
+                "split_sha256": hashlib.sha256((HERE / "split.json").read_bytes()).hexdigest(),
+                "technique_in_progress": technique,
+                "model_exchanges": exchanges,
+                "held_out_seen": False,
+                "held_out_detection_rate": None,
+                "completed_evaluation": False,
+            })
+    model = Recorder(build_model(args.model), on_exchange=lambda exchanges: persist(exchanges))
     report = {"schema": "predict-shield/ai-rule-suggestion/1", "model": model.name,
               "model_digest": args.model_digest, "split_commit": split["commit"],
               "split_sha256": hashlib.sha256((HERE / "split.json").read_bytes()).hexdigest(),
@@ -124,6 +157,7 @@ def main() -> None:
         dev[entry["technique"]].append(load(entry))
     accepted = []
     for technique in split["targets"]:
+        persist(model.exchanges, technique=technique)
         contrast = [rec for other, recs in dev.items() if other != technique for rec in recs]
         summary = summarize(dev[technique], contrast=contrast, per_type=8)
         print(technique, "asking", model.name, flush=True)
@@ -147,6 +181,7 @@ def main() -> None:
     report["accepted_set_sha256"] = freeze(accepted)
     report["model_exchanges"] = model.exchanges
     args.output.write_text(json.dumps(report, indent=1, sort_keys=True) + "\n")
+    persist(model.exchanges, status="RULES_FROZEN_HELD_OUT_NOT_SCORED")
 
     # 6: held-out, scored once
     compiled = [r.compile() for r in accepted]
@@ -176,6 +211,9 @@ def main() -> None:
         "development_events": sum(len(rec) for recs in dev.values() for rec in recs),
     }
     args.output.write_text(json.dumps(report, indent=1, sort_keys=True) + "\n")
+    # A completed report is the only basis for measured held-out counts.
+    # Keep checkpoint explicitly non-scored even after a successful full run.
+    persist(model.exchanges, status="COMPLETED_REPORT_SEPARATELY_AVAILABLE")
     print(json.dumps(report["summary"], indent=1, sort_keys=True))
     for t, info in report["techniques"].items():
         print(t, "proposed", info["rules_proposed"], "grammar rejections", len(info["grammar_rejections"]),
