@@ -41,6 +41,38 @@ EVENT_TYPES: dict[str, tuple[tuple[tuple[str, int], ...], tuple[str, ...]]] = {
     "network_connection": (((SYSMON, 3),), ("Image", "DestinationPort", "DestinationHostname")),
     "image_load": (((SYSMON, 7),), ("Image", "ImageLoaded")),
 }
+# Provider-side JSON-schema decoding is a format constraint, NOT an
+# evidence/accuracy claim. The full closed grammar remains independently
+# validated by validate_rules() after model inference.
+CONDITION_OUTPUT_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "field": {"type": "string"},
+        "op": {"type": "string", "enum": ["equals", "contains", "startswith", "endswith"]},
+        "value": {"type": "string", "maxLength": 200},
+    },
+    "required": ["field", "op", "value"], "additionalProperties": False,
+}
+RULE_OUTPUT_SCHEMA = {
+    "type": "object",
+    "properties": {
+        "rules": {
+            "type": "array", "maxItems": 4,
+            "items": {"type": "object", "properties": {
+                "title": {"type": "string", "maxLength": 120},
+                "event_type": {"type": "string", "enum": list(EVENT_TYPES)},
+                "all_of": {"type": "array", "minItems": 1, "maxItems": 4,
+                           "items": CONDITION_OUTPUT_SCHEMA},
+                "none_of": {"type": "array", "maxItems": 2,
+                            "items": CONDITION_OUTPUT_SCHEMA},
+            }, "required": ["title", "event_type", "all_of", "none_of"],
+                "additionalProperties": False},
+        },
+        "uncertainty": {"type": "string", "maxLength": 280},
+    },
+    "required": ["rules", "uncertainty"], "additionalProperties": False,
+}
+
 OPERATORS = ("equals", "contains", "startswith", "endswith")
 MAX_RULES, MAX_CONDITIONS, MAX_VALUE = 6, 6, 200
 MIN_SUBSTRING = 4
@@ -199,11 +231,59 @@ class Suggestion:
     prompt_sha256: str
 
 
+def compact_development_evidence(summary: dict, *, max_chars: int = 1900) -> list[dict]:
+    """Bound model context to discriminative development patterns, never held-out.
+
+    The previous 4B real-model experiment echoed a verbose nested telemetry
+    summary and truncated all five JSON replies. Deterministic compression
+    reduces that failure mode. It is a changed research method and cannot
+    retroactively repair the earlier measured negative result.
+    """
+    if type(max_chars) is not int or max_chars < 400:
+        raise ValueError("invalid compact evidence budget")
+    ranked = sorted(
+        summary.items(),
+        key=lambda item: (-sum(int(r.get("recordings_seen_in", 0))
+                               for r in item[1]), item[0]),
+    )
+    compact = []
+    for event_type, rows in ranked:
+        if event_type not in EVENT_TYPES or not isinstance(rows, list):
+            continue
+        for row in rows[:2]:
+            if not isinstance(row, dict):
+                continue
+            fields = {}
+            for field in EVENT_TYPES[event_type][1]:
+                value = row.get(field)
+                if isinstance(value, str) and value:
+                    # Preserve path/file suffixes, but command-line beginnings.
+                    value = value[-82:] if field in (
+                        "Image", "TargetFilename", "ImageLoaded", "ParentImage",
+                        "SourceImage", "TargetImage",
+                    ) else value[:82]
+                    fields[field] = value
+            if not fields:
+                continue
+            candidate = {"event_type": event_type, "fields": fields,
+                         "recordings_seen_in": row.get("recordings_seen_in", 1)}
+            test = compact + [candidate]
+            if len(json.dumps(test, separators=(",", ":"))) > max_chars:
+                continue
+            compact.append(candidate)
+            if len(compact) >= 8:
+                return compact
+    return compact
+
+
 def suggest(model, technique: str, technique_name: str, summary: dict) -> Suggestion:
     strings = [str(v) for rows in summary.values() for row in rows for v in row.values()]
     injection = any(scan_for_injection(s).suspected for s in strings)
-    prompt = json.dumps({"technique": technique, "technique_name": technique_name,
-                         "event_summaries": summary}, indent=1, sort_keys=True)
+    prompt = json.dumps({
+        "task": "Generate at most two short rule objects. Do not echo, reproduce, or summarize the input. Return only the required JSON keys rules and uncertainty. An empty rules list is acceptable if evidence is insufficient.",
+        "technique": technique, "technique_name": technique_name,
+        "patterns": compact_development_evidence(summary),
+    }, separators=(",", ":"), sort_keys=True)
     try:
         reply = model.complete(SYSTEM_PROMPT, prompt)
     except ModelUnavailable as error:

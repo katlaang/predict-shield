@@ -32,7 +32,7 @@ sys.path.insert(0, str(ROOT / "engine"))
 
 from predict_shield.endpoint_telemetry import detect, iter_windows_events_xml  # noqa: E402
 from predict_shield.language_model import HostedChatModel, OllamaModel  # noqa: E402
-from predict_shield.rule_suggestion import acceptance_gate, freeze, suggest, summarize  # noqa: E402
+from predict_shield.rule_suggestion import RULE_OUTPUT_SCHEMA, acceptance_gate, freeze, suggest, summarize  # noqa: E402
 
 LIMIT = 64 * 1024 * 1024
 TECHNIQUE_NAMES = {
@@ -111,7 +111,8 @@ def build_model(spec: str):
         # No hidden reasoning pass and a bounded answer: on a CPU runner the
         # reasoning pass alone exceeded the job limit (run 44459993639).
         return OllamaModel(spec.split(":", 1)[1], timeout=900.0, context_tokens=12288,
-                           think=False, max_output_tokens=1500)
+                           think=False, max_output_tokens=1200,
+                           format_schema=RULE_OUTPUT_SCHEMA)
     if spec.startswith("hosted:"):
         _, provider, model = spec.split(":", 2)
         return HostedChatModel(provider, model)
@@ -149,7 +150,11 @@ def main() -> None:
     report = {"schema": "predict-shield/ai-rule-suggestion/1", "model": model.name,
               "model_digest": args.model_digest, "split_commit": split["commit"],
               "split_sha256": hashlib.sha256((HERE / "split.json").read_bytes()).hexdigest(),
-              "protocol": split["protocol"], "techniques": {}}
+              "protocol": split["protocol"], "techniques": {},
+              "prompt_revision": "compact-development-patterns-v2-schema-constrained",
+              "evaluation_status": "EXPLORATORY_REUSE_OF_PREVIOUSLY_SCORED_33_RECORDINGS",
+              "independently_unseen_since_revision": False,
+              "claim": "The 33-recording set was evaluated and inspected in run 44470495011; results after this prompt revision are exploratory, not fresh held-out evidence."}
 
     # 1-4: development only
     dev = {t: [] for t in split["targets"]}
