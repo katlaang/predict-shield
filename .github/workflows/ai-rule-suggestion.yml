@@ -87,6 +87,15 @@ jobs:
               assert accepted == gated, "a rule reached held-out without passing the gate"
               print(path, json.dumps(r["summary"], indent=1, sort_keys=True))
           PY
+      - name: Audit completed report separately from model-generated assertions
+        working-directory: experiment-b/public-sources/ai_rules
+        run: |
+          python audit_report.py --report /tmp/ps-ai-rules-local.json \
+            --registration split.json --output /tmp/ps-ai-rules-local-audit.json
+          if [ -f /tmp/ps-ai-rules-hosted.json ]; then
+            python audit_report.py --report /tmp/ps-ai-rules-hosted.json \
+              --registration split.json --output /tmp/ps-ai-rules-hosted-audit.json
+          fi
       - name: Retain the reports, including every model exchange
         if: always()
         uses: actions/upload-artifact@v4
