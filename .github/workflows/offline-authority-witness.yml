@@ -1,0 +1,31 @@
+name: Authority outage offline evidence bounds
+
+on:
+  pull_request:
+    paths:
+      - 'experiment-b/mechanism-lab/python/offline_authority_witness.py'
+      - 'experiment-b/mechanism-lab/python/test_offline_authority_witness.py'
+      - '.github/workflows/offline-authority-witness.yml'
+  push:
+    branches: [master]
+    paths:
+      - 'experiment-b/mechanism-lab/python/offline_authority_witness.py'
+      - 'experiment-b/mechanism-lab/python/test_offline_authority_witness.py'
+      - '.github/workflows/offline-authority-witness.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  offline-witness-negative-controls:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Check four-node bounds and no fabricated oracle success
+        working-directory: experiment-b/mechanism-lab/python
+        run: python -m unittest -v test_offline_authority_witness
