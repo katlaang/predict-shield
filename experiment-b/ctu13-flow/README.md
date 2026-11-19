@@ -48,8 +48,9 @@ Pre-register a JSON manifest **before fitting or examining test labels**:
 
 ```json
 {
-  "schema": "predict-shield/ctu13-flow-protocol/1",
+  "schema": "predict-shield/ctu13-flow-protocol/2",
   "sample_cap_per_label_per_scenario": 10000,
+  "max_calibration_sample_false_positive_rate": 0.10,
   "scenarios": [
     {
       "scenario_id": "CTU-42",
@@ -87,6 +88,25 @@ python experiment-b/ctu13-flow/fit_evaluate.py \
   --data-root /secure/research/ctu13-files \
   --output /secure/research/reports/ctu13-evaluation.json
 ```
+
+### Calibration-only alarm threshold
+
+Version 2 requires a preregistered **maximum calibration-sample false
+positive rate**, between 0 and 0.25 inclusive. The model is fit on
+**training scenarios only**. It scores both labels on separate
+**calibration scenarios**, then selects the **lowest** threshold from the
+fixed set `[0.10, 0.20, 0.35, 0.50, 0.65, 0.80, 0.90, 0.95, 1.00]`
+whose observed calibration sample false-positive rate does not exceed the
+manifest's limit. It then freezes that threshold and scores **test
+scenarios only once**. A missing class in any partition aborts the run.
+
+This is *threshold selection*, not probability calibration. Because this
+protocol uses class-stratified samples and 2011 historical recordings, a
+calibration-sample FPR <= 0.10 is **not** evidence of a 10% operational
+false-alarm rate. Neither the labeled sample nor the threshold proves
+modern enterprise or OT detection capability. Do not select a threshold
+after looking at test outcomes, and do not tune this pre-registered policy
+to the observed test results.
 
 The code computes all provided source-file SHA-256 digests **before**
 using their rows, and rejects a mismatch. It excludes IPs, start timestamps
