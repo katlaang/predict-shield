@@ -7,6 +7,26 @@ if [[ "${EUID}" -ne 0 || "${PREDICT_SHIELD_ISOLATED_LAB:-}" != "1" ]]; then
   exit 3
 fi
 OUT="${1:-/tmp/ps-ovs-grid-packet.json}"
+PLAN="${2:-}"
+if [[ -z "$PLAN" || "${PREDICT_SHIELD_LAB_APPROVAL:-}" != "1" ]]; then
+  echo "REFUSED: registered plan and separate explicit lab approval required" >&2
+  exit 3
+fi
+# Recompute grid safety gate before any switch or packet mutation.
+# Proposed commands are never executed without comparing against fixed values.
+PYTHONPATH=engine python3 experiment-b/grid-lab/gated_ovs_response.py verify \
+  --registration experiment-b/grid-lab/registration.json \
+  --plan "$PLAN" --output /tmp/ps-grid-ovs-authorization.json \
+  --trusted-lab-fixture --lab-operator-approved
+python3 - <<'PY'
+import json
+command = json.load(open('/tmp/ps-grid-ovs-authorization.json'))
+assert command['lab_approved_only'] is True
+assert command['production_authorized'] is False
+assert command['action_id'] == 'block_untrusted_remote_management'
+assert command['flow_add'] == 'priority=250,ip,nw_src=10.89.34.10,nw_dst=10.89.34.30,actions=drop'
+assert command['flow_match_for_delete'] == 'ip,nw_src=10.89.34.10,nw_dst=10.89.34.30'
+PY
 BR="psgridb"
 NS=(psguvpn psgctrl psgrelay)
 PORTS=(psgatt0 psgctl0 psgrel0)
@@ -93,6 +113,9 @@ report = {
         "/tmp/ps-grid-after.flows",
     ],
     "test_traffic": "ICMP only; no SCADA/relay protocols",
+    "registered_grid_policy_checked": True,
+    "lab_approval_checked_before_packet_mutation": True,
+    "authorization_record": "/tmp/ps-grid-ovs-authorization.json",
     "model_selected_action": False,
     "real_electric_grid": False,
     "grid_power_flow_coupled": False,
