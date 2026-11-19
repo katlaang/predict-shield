@@ -6,6 +6,23 @@ PREDICT-SHIELD finds what is running on a network or a public-facing website, ch
 
 > **Status: working prototype, not a finished product.** The pipeline below runs end to end today in a lab, unattended, from a detection through an applied change to independent verification, with automatic rollback when verification fails. Running it against a real operator's live infrastructure is the next phase of work and is not something already deployed.
 
+### Current learned attack-detection evidence
+
+The first completed five-technique **real-model rule-generation** evaluation
+(run [44470495011](https://github.com/katlaang/predict-shield/actions/runs/44470495011))
+accepted **zero** AI-proposed rules and detected **0 of 33** selected
+held-out attack recordings. The actual model responses were truncated
+JSON that echoed telemetry summaries, so they never reached the
+development acceptance gate as valid rules. Its successful workflow
+conclusion means the negative result was recorded and audited, **not
+that AI attack detection worked**. See the
+[measured negative-result record](docs/evidence/REAL_AI_RULE_SUGGESTION_NEGATIVE_RESULT_2026_11_19.md).
+
+A prompt/schema revision has since been merged, but additional use of
+those already-scored recordings is **exploratory**, not fresh held-out
+evidence. AI-driven detection performance on independently labeled
+attacks and benign traffic remains unproven.
+
 ## How it works
 
 1. **Discover.** Scan the network and build an inventory of running assets, services, and the dependencies between them, with every discovery record hashed so it can't be silently altered later.
