@@ -1,0 +1,29 @@
+name: Prospective detection cohort preflight tests
+
+on:
+  pull_request:
+    paths:
+      - 'experiment-b/public-sources/ai_rules/fresh_cohort_preflight.py'
+      - 'experiment-b/public-sources/ai_rules/test_fresh_cohort_preflight.py'
+      - '.github/workflows/fresh-detection-cohort-preflight.yml'
+  push:
+    branches: [master]
+    paths:
+      - 'experiment-b/public-sources/ai_rules/fresh_cohort_preflight.py'
+      - 'experiment-b/public-sources/ai_rules/test_fresh_cohort_preflight.py'
+      - '.github/workflows/fresh-detection-cohort-preflight.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  preflight-unit-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Cohort preflight unit tests (no model or field measurements)
+        working-directory: experiment-b/public-sources/ai_rules
+        run: python -m unittest -v test_fresh_cohort_preflight
