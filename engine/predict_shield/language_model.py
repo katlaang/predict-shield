@@ -70,7 +70,8 @@ class OllamaModel:
 
     def __init__(self, model: str, *, host: str = "http://127.0.0.1:11434",
                  timeout: float = 300.0, seed: int = 0, context_tokens: int = 8192,
-                 think: bool | None = None, max_output_tokens: int | None = None):
+                 think: bool | None = None, max_output_tokens: int | None = None,
+                 format_schema: dict | None = None):
         if not model:
             raise ValueError("model name required")
         self.name, self.host, self.timeout = f"ollama:{model}", host.rstrip("/"), timeout
@@ -78,9 +79,13 @@ class OllamaModel:
         # think=False turns off the hidden reasoning pass of models that have one
         # (qwen3 and others); None leaves the model's default.
         self.think, self.max_output_tokens = think, max_output_tokens
+        # Optional provider-side constrained decoding, not a security boundary.
+        # Parsed output must still satisfy the project's closed rule grammar.
+        self.format_schema = format_schema
 
     def complete(self, system: str, prompt: str) -> str:
-        payload = {"model": self.model, "stream": False, "format": "json",
+        payload = {"model": self.model, "stream": False,
+                   "format": self.format_schema if self.format_schema is not None else "json",
                    "messages": [{"role": "system", "content": system},
                                 {"role": "user", "content": prompt}],
                    "options": {"temperature": 0, "seed": self.seed, "num_ctx": self.context_tokens}}
