@@ -67,7 +67,7 @@ if ! probe psguvpn 10.89.34.30 /tmp/ps-grid-attacker-after.txt; then blocked=1; 
 control_alive=0
 if probe psgctrl 10.89.34.30 /tmp/ps-grid-control-after.txt; then control_alive=1; fi
 ovs-ofctl -O OpenFlow13 del-flows "$BR" \
-  "priority=250,ip,nw_src=10.89.34.10,nw_dst=10.89.34.30"
+  "ip,nw_src=10.89.34.10,nw_dst=10.89.34.30"
 restored=0
 if probe psguvpn 10.89.34.30 /tmp/ps-grid-attacker-restored.txt; then restored=1; fi
 export PS_BLOCKED="$blocked" PS_CONTROL="$control_alive" PS_RESTORED="$restored"
