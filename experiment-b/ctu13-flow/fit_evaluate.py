@@ -17,7 +17,8 @@ import math
 from pathlib import Path
 import random
 
-SCHEMA = "predict-shield/ctu13-flow-protocol/1"
+SCHEMA = "predict-shield/ctu13-flow-protocol/2"
+CANDIDATE_THRESHOLDS = (0.10, 0.20, 0.35, 0.50, 0.65, 0.80, 0.90, 0.95, 1.00)
 SPLITS = ("train", "calibration", "test")
 FIELDS = ("StartTime", "Dur", "Proto", "SrcAddr", "Sport", "Dir", "DstAddr",
           "Dport", "State", "sTos", "dTos", "TotPkts", "TotBytes", "SrcBytes", "Label")
@@ -63,6 +64,10 @@ def _validate_manifest(manifest: dict, root: Path) -> list[dict]:
     if not isinstance(manifest, dict) or manifest.get("schema") != SCHEMA:
         raise ValueError("unsupported registered protocol")
     cap = manifest.get("sample_cap_per_label_per_scenario")
+    max_fpr = manifest.get("max_calibration_sample_false_positive_rate")
+    if type(max_fpr) not in (float, int) or isinstance(max_fpr, bool) or not (
+            math.isfinite(max_fpr) and 0.0 <= max_fpr <= 0.25):
+        raise ValueError("pre-registered calibration sample FPR cap must be in [0, 0.25]")
     if type(cap) is not int or not 1 <= cap <= 50000:
         raise ValueError("pre-registered class-stratified cap required")
     sources = manifest.get("scenarios")
@@ -150,14 +155,48 @@ def run(manifest: dict, manifest_bytes: bytes, root: Path) -> tuple[dict, dict]:
         sample, record = _read_one(entry, root, manifest["sample_cap_per_label_per_scenario"])
         rows[entry["split"]].extend(sample)
         stats.append(record)
-    if any(not rows[s] for s in SPLITS) or set(y for _, y in rows["train"]) != {0, 1}:
-        raise ValueError("training must have both labeled classes and each split must have scored flows")
+    if any(not rows[s] for s in SPLITS) or any(
+            set(y for _, y in rows[split]) != {0, 1}
+            for split in ("train", "calibration", "test")):
+        raise ValueError("every partition must contain both Botnet and Normal labels; never silently drop missing classes")
     from sklearn.linear_model import LogisticRegression
     model = LogisticRegression(max_iter=1000, solver="liblinear", random_state=20261118, class_weight="balanced")
     model.fit([x for x, _ in rows["train"]], [y for _, y in rows["train"]])
+    # Threshold is chosen exclusively from a pre-registered candidate grid
+    # using CALIBRATION samples, never inspection of held-out test labels.
+    calibration_x = [x for x, y in rows["calibration"]]
+    calibration_y = [y for x, y in rows["calibration"]]
+    calibration_prob = model.predict_proba(calibration_x)[:, 1].tolist()
+    calibration_normal_count = calibration_y.count(0)
+    max_fpr = manifest["max_calibration_sample_false_positive_rate"]
+    evaluations = []
+    for threshold_candidate in CANDIDATE_THRESHOLDS:
+        false_positives = sum(p >= threshold_candidate
+                              for p, label in zip(calibration_prob, calibration_y)
+                              if label == 0)
+        true_positives = sum(p >= threshold_candidate
+                             for p, label in zip(calibration_prob, calibration_y)
+                             if label == 1)
+        evaluations.append({
+            "threshold": threshold_candidate,
+            "calibration_false_positives": false_positives,
+            "calibration_normals": calibration_normal_count,
+            "calibration_true_positives": true_positives,
+            "calibration_attacks": calibration_y.count(1),
+            "calibration_sample_false_positive_rate": false_positives / calibration_normal_count,
+        })
+    eligible = [entry for entry in evaluations
+                if entry["calibration_sample_false_positive_rate"] <= max_fpr]
+    if not eligible:
+        raise ValueError("no preregistered threshold satisfies calibration false-positive cap")
+    # From eligible thresholds, choose lowest to favor calibration recall.
+    # This is a fixed rule, not cherry-picking on held-out outcomes.
+    chosen = eligible[0]
+    threshold = chosen["threshold"]
     test_x = [x for x, y in rows["test"]]
     test_y = [y for x, y in rows["test"]]
-    predicted = model.predict(test_x).tolist()
+    probabilities = model.predict_proba(test_x)[:, 1].tolist()
+    predicted = [int(prob >= threshold) for prob in probabilities]
     counts = Counter(
         "TP" if p and y else "FP" if p else "FN" if y else "TN"
         for p, y in zip(predicted, test_y)
@@ -170,7 +209,8 @@ def run(manifest: dict, manifest_bytes: bytes, root: Path) -> tuple[dict, dict]:
         "features": list(NUMERIC) + ["proto=" + p for p in PROTOCOLS],
         "coefficients": [float(x) for x in model.coef_[0]],
         "intercept": float(model.intercept_[0]),
-        "threshold": 0.5,
+        "threshold": threshold,
+        "threshold_selection_method": "lowest_pregistered_grid_threshold_with_calibration_sample_fpr_at_or_below_cap",
         "training_source_digests": [s["source_sha256"] for s in stats if s["split"] == "train"],
         "production_deployable": False,
         "decision_authorized": False,
@@ -180,6 +220,11 @@ def run(manifest: dict, manifest_bytes: bytes, root: Path) -> tuple[dict, dict]:
         "manifest_sha256": hashlib.sha256(manifest_bytes).hexdigest(),
         "scenario_source_stats": stats,
         "model_fingerprint": hashlib.sha256(json.dumps(bundle, sort_keys=True).encode()).hexdigest(),
+        "calibration_threshold_candidates": evaluations,
+        "selected_threshold": threshold,
+        "max_calibration_sample_false_positive_rate": max_fpr,
+        "calibration_selected": chosen,
+        "threshold_selected_using_test_labels": False,
         "evaluated_flows": len(test_y), "TP": tp, "FP": fp, "FN": fn, "TN": tn,
         "sample_recall": rate(tp, tp + fn),
         "sample_precision": rate(tp, tp + fp),
@@ -193,6 +238,8 @@ def run(manifest: dict, manifest_bytes: bytes, root: Path) -> tuple[dict, dict]:
         "field_effectiveness_established": False,
         "model_is_trained": True,
         "model_calibrated": False,
+        "calibration_split_used_for_threshold_only": True,
+        "calibration_scores_probability_calibrated": False,
         "interpretation": "Historical CTU-13 sampled bidirectional network flows; only From-Botnet and From-Normal treated as labels, To-* and Background unknown; cross-scenario split, not operational precision.",
     }
     return bundle, report
