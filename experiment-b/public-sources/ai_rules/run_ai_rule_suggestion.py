@@ -20,6 +20,7 @@ import argparse
 import hashlib
 import json
 import sys
+import time
 import urllib.request
 from math import sqrt
 from pathlib import Path
@@ -47,9 +48,16 @@ class Recorder:
         self.inner, self.name, self.exchanges = inner, inner.name, []
 
     def complete(self, system: str, prompt: str) -> str:
-        reply = self.inner.complete(system, prompt)
-        self.exchanges.append({"prompt_sha256": hashlib.sha256(prompt.encode()).hexdigest(),
-                               "prompt": prompt, "reply": reply})
+        started = time.monotonic()
+        record = {"prompt_sha256": hashlib.sha256(prompt.encode()).hexdigest(), "prompt": prompt}
+        try:
+            reply = self.inner.complete(system, prompt)
+        except Exception as error:  # recorded, then re-raised for suggest() to handle
+            record.update(reply=None, error=str(error), seconds=round(time.monotonic() - started, 1))
+            self.exchanges.append(record)
+            raise
+        record.update(reply=reply, seconds=round(time.monotonic() - started, 1))
+        self.exchanges.append(record)
         return reply
 
 
@@ -84,7 +92,10 @@ def build_model(spec: str):
     if spec == "stub":
         return StubModel()
     if spec.startswith("ollama:"):
-        return OllamaModel(spec.split(":", 1)[1], timeout=1800.0, context_tokens=16384)
+        # No hidden reasoning pass and a bounded answer: on a CPU runner the
+        # reasoning pass alone exceeded the job limit (run 44459993639).
+        return OllamaModel(spec.split(":", 1)[1], timeout=900.0, context_tokens=12288,
+                           think=False, max_output_tokens=1500)
     if spec.startswith("hosted:"):
         _, provider, model = spec.split(":", 2)
         return HostedChatModel(provider, model)
@@ -114,8 +125,11 @@ def main() -> None:
     accepted = []
     for technique in split["targets"]:
         contrast = [rec for other, recs in dev.items() if other != technique for rec in recs]
-        summary = summarize(dev[technique], contrast=contrast, per_type=12)
+        summary = summarize(dev[technique], contrast=contrast, per_type=8)
+        print(technique, "asking", model.name, flush=True)
         suggestion = suggest(model, technique, TECHNIQUE_NAMES[technique], summary)
+        print(technique, "reply after", model.exchanges[-1]["seconds"] if model.exchanges else "-", "s;",
+              len(suggestion.rules), "rules,", len(suggestion.problems), "problems", flush=True)
         gates = [acceptance_gate(spec, dev[technique], contrast) for spec in suggestion.rules]
         accepted += [g.rule for g in gates if g.accepted]
         report["techniques"][technique] = {

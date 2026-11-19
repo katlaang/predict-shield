@@ -28,7 +28,7 @@ permissions:
 jobs:
   suggest-and-evaluate:
     runs-on: ubuntu-latest
-    timeout-minutes: 90
+    timeout-minutes: 100
     env:
       LOCAL_MODEL: ${{ github.event.inputs.local_model || 'qwen3:4b' }}
       HOSTED: ${{ github.event.inputs.hosted || '' }}
@@ -61,6 +61,7 @@ jobs:
           open("/tmp/ps-rules-model-digest.txt", "w").write("sha256:" + matched[0]["digest"])
           PY
       - name: Draft, gate, freeze, then score held-out (local model)
+        timeout-minutes: 80
         working-directory: experiment-b/public-sources/ai_rules
         run: |
           python run_ai_rule_suggestion.py --model "ollama:$LOCAL_MODEL" \

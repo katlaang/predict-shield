@@ -69,17 +69,25 @@ class OllamaModel:
     """A locally served model. Temperature 0 and a fixed seed for repeatable runs."""
 
     def __init__(self, model: str, *, host: str = "http://127.0.0.1:11434",
-                 timeout: float = 300.0, seed: int = 0, context_tokens: int = 8192):
+                 timeout: float = 300.0, seed: int = 0, context_tokens: int = 8192,
+                 think: bool | None = None, max_output_tokens: int | None = None):
         if not model:
             raise ValueError("model name required")
         self.name, self.host, self.timeout = f"ollama:{model}", host.rstrip("/"), timeout
         self.model, self.seed, self.context_tokens = model, seed, context_tokens
+        # think=False turns off the hidden reasoning pass of models that have one
+        # (qwen3 and others); None leaves the model's default.
+        self.think, self.max_output_tokens = think, max_output_tokens
 
     def complete(self, system: str, prompt: str) -> str:
         payload = {"model": self.model, "stream": False, "format": "json",
                    "messages": [{"role": "system", "content": system},
                                 {"role": "user", "content": prompt}],
                    "options": {"temperature": 0, "seed": self.seed, "num_ctx": self.context_tokens}}
+        if self.think is not None:
+            payload["think"] = self.think
+        if self.max_output_tokens:
+            payload["options"]["num_predict"] = self.max_output_tokens
         request = urllib.request.Request(self.host + "/api/chat",
                                          data=json.dumps(payload).encode("utf-8"),
                                          headers={"Content-Type": "application/json"})
