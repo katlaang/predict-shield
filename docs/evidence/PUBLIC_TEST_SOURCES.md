@@ -17,11 +17,21 @@ PREDICT-SHIELD's lab results so far came from servers, packages and fixtures the
 
 **CDN files.** jQuery 3.7.1, jQuery 3.7.0 and lodash 4.17.21 are each registered only after both CDNs' bytes match both publishers' hashes and each other. The production probe, with every default intact, must report VERIFIED for each and NOT VERIFIED when the 3.7.0 hash is registered for the 3.7.1 URL. In Chromium, a page loading the real cdnjs file with its published SRI value must run the library, and the same file with the other version's SRI value must not.
 
-**OSV and dependency upgrades.** Starting from lodash 4.17.11, upgrades to 4.17.15, 4.17.21 and 4.18.1 each go through staging measurement, the policy gate, a refused unsigned attempt, a signed dry run, the applied change and the four-assertion verdict, with OSV deciding the "no known vulnerability" assertion. 4.17.15 must be rolled back. For the other two, OSV's current data decides; the run records which advisories, if any, cover each version.
+**OSV and dependency upgrades.** Starting from lodash 4.17.11, upgrades to 4.17.15, 4.17.21 and 4.18.1 each go through staging measurement, the policy gate, a refused unsigned attempt, a signed dry run, the applied change and the four-assertion verdict, with OSV deciding the "no known vulnerability" assertion. 4.17.15 must be rolled back. For the other two, OSV's current data decides; the run records which advisories, if any, cover each version. The run also checks that OSV places 4.17.11 inside GHSA-p6mc-m468-83gw (CVE-2020-8203).
 
 **ET Open.** The full ruleset is downloaded for the installed Suricata, loaded alongside the lab rule, and the public rule "GPL ATTACK_RESPONSE id check returned root" (sid 2100498) must fire on lab traffic and its alert must be admitted through the signed intake.
 
 **DVWA.** Semgrep with a pinned repo-local rule finds request data reaching the query in DVWA's SQL-injection page. Two registered fixes are measured on a staging copy, approved with a signature and applied. The first is DVWA's own "medium" pattern, escaping the input while dropping the quotes. It clears all four static assertions, including a re-scan that no longer flags the MySQL path, but live payloads still return other users' rows, so the opt-in fifth assertion fails and the change is rolled back. The second, a prepared statement, passes all five assertions and is kept.
+
+## GitHub Actions run, 2026-11-18
+
+Run [44451381802](https://github.com/katlaang/predict-shield/actions/runs/44451381802), commit `6bf4b5f`. All three jobs passed.
+
+- **OTRF:** the same result as locally: 8,920 events, 6 hits all agreeing with their labels, all three techniques detected, 6 detections admitted, each host marked due by `change_event`, the re-sent envelope refused.
+- **CDN files:** jQuery 3.7.1, jQuery 3.7.0 and lodash 4.17.21 each matched both cdnjs's and jsDelivr's published hashes, and the two CDNs served identical bytes. The production probe reported VERIFIED for all three over the public internet, and NOT VERIFIED with the 3.7.0 hash registered for the 3.7.1 URL. Chromium ran both libraries with their published SRI values and refused jQuery 3.7.1 with 3.7.0's.
+- **OSV and dependency upgrades:** 4.17.15 rolled back; OSV listed five advisories covering it, among them GHSA-p6mc-m468-83gw, and the live probe still saw prototype pollution. **4.17.21 rolled back as well:** the live probe passed, but OSV listed two advisories covering 4.17.21, GHSA-r5fr-rjxr-66jc and GHSA-xxjr-mmjv-4gpg, and its version query agreed. 4.18.1 was kept with all four assertions VERIFIED and no covering advisory. The existing lodash CVE pilot accepted 4.17.21 against the two advisories registered at the time; OSV shows that is no longer a clean version.
+- **ET Open:** 53,559 enabled rules downloaded for the runner's Suricata (merged ruleset SHA-256 `1ca3bd88...0f648a`); Suricata loaded 53,560 rules including the lab rule. The public rule sid 2100498 fired on lab traffic and its alert was admitted through the signed intake in 0.51 seconds, as T1059.
+- **DVWA:** the same as locally. The incomplete fix cleared all four static assertions, with Semgrep reporting the finding resolved, failed the live check (half of the payloads still returned other users' rows on staging and on the target), and was rolled back to the original file. The prepared statement passed all five and was kept.
 
 ## Local run, 2026-11-18
 

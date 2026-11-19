@@ -1,5 +1,15 @@
 # Development changelog
 
+## 2026-11-18 (7): Public test sources
+
+- OTRF Security-Datasets (pinned commit and archive hashes) replayed through `endpoint_telemetry.py` rules and the signed intake; every hit agreed with its dataset's published ATT&CK label.
+- Real cdnjs and jsDelivr files registered only when both publishers' hashes and the live bytes agree; monitored with the production probe and SRI-loaded in Chromium.
+- `osv_source.py`: OSV.dev as the advisory source for the post-fix vulnerability check, cross-checked against OSV's own version query; disagreement or unreachability is never a clean result.
+- `sast_findings.evaluate_fix(require_dynamic=True)`: an opt-in fifth assertion from live exploitation attempts. Against DVWA it caught an incomplete fix that the static assertions passed.
+- Dependency upgrades and DVWA source fixes run through `change_execution.py` with staging measurement, signed approval, verification and rollback.
+- ET Open loaded into Suricata through `suricata-update`; a public rule's alert admitted through the signed intake.
+- Finding: OSV lists two advisories covering lodash 4.17.21 (GHSA-r5fr-rjxr-66jc, GHSA-xxjr-mmjv-4gpg), so the version the earlier lodash pilot accepted now fails the known-vulnerability assertion. The earlier record is kept with a dated note.
+
 ## 2026-11-18 (6): End-to-end chain, safe apply, live data, source identity and navigation containment
 
 - **Source identity.** Every registered detection source carries an Ed25519 public key or a client-certificate fingerprint. `admit()` accepts only an `AuthenticatedDetection` from `authenticate_signed()` or `authenticate_mtls()`, so a detection that only names a source is refused. Signatures are checked against the named source's key, replays (nonce or detection ID) are refused, and a rotated-out credential stops admitting. `intake_server.py` serves both routes over TLS.
