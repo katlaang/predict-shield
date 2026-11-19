@@ -30,6 +30,10 @@ Incidents A to D and F use `FixedChoiceModel`, which always returns one named ac
 
 nginx 1.24.0, Suricata 7.0.3, Chromium through Playwright. Results: A kept, B rolled back and confirmed at baseline, C kept with the widget working, D refused then applied with a signature, F kept after a Suricata-triggered probe 1.7 seconds after the tamper, with two alerts seen, signed, admitted and none rejected. The audit chain was intact and the live view showed all five incidents, advanced, and reported NO LIVE DATA once the feed was stopped. Incident E needs the local model and runs in CI.
 
+## GitHub Actions run, 2026-11-18
+
+Run [44447514610](https://github.com/katlaang/predict-shield/actions/runs/44447514610), commit `577229a`, nginx 1.28.3, Suricata 8.0.3, `qwen3:0.6b` with its installed digest recorded. All six incidents matched the local run: A kept, B rolled back and confirmed at the snapshot, C kept with the widget working, D refused unsigned and applied with a signed approval, F kept after a probe triggered by the admitted Suricata alert 1.6 seconds after the tamper. In incident E the real model chose `restrict_all_fetch_targets` for the fetch channel; the proposal was accepted, the gate allowed it, and it was kept after verification. The audit chain was intact and every live-view check passed. The report is retained as the `end-to-end-chain-evidence` artifact.
+
 ## Limits
 
 - The site, vendor and sink are lab servers on loopback that the chain itself controls. No operator's site has been registered.
