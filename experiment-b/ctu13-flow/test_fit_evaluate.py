@@ -30,9 +30,11 @@ class CTU13Tests(unittest.TestCase):
             with target.open("w", encoding="utf-8", newline="") as f:
                 writer = csv.DictWriter(f, fieldnames=HEADERS)
                 writer.writeheader()
-                for i in range(7):
+                for i in range(9):
                     attack = i % 3 == 0
                     label = ("Background" if i == 6 else
+                             "To-Botnet-V42" if i == 7 else
+                             "To-Normal-V42" if i == 8 else
                              "From-Botnet-V42" if attack else "From-Normal-V42")
                     writer.writerow({
                         "StartTime": "2011/01/01 12:00:00", "Dur": 13 if attack else .2,
@@ -59,7 +61,8 @@ class CTU13Tests(unittest.TestCase):
     def test_explicit_botnet_normal_and_unknown(self):
         self.assertEqual(classify_label("From-Botnet-V42"), 1)
         self.assertEqual(classify_label("From-Normal-V42"), 0)
-        for label in ("Background", "", "From-Botnet-Normal", "C&C"):
+        for label in ("Background", "", "From-Botnet-Normal", "C&C",
+                      "To-Botnet-V42", "To-Normal-V42", "Botnet", "Normal"):
             self.assertIsNone(classify_label(label))
 
     def test_only_predefined_flow_features(self):
@@ -78,7 +81,7 @@ class CTU13Tests(unittest.TestCase):
         self.assertEqual(report["test_scenario_ids"], ["scenario-unseen"])
         self.assertEqual(report["evaluated_flows"], 4)
         self.assertEqual(sum(report[k] for k in ("TP", "FP", "FN", "TN")), 4)
-        self.assertEqual(report["unknown_background_excluded"], 4)
+        self.assertEqual(report["unknown_or_ambiguous_excluded"], 12)
         self.assertEqual(len(model["features"]), 7)
 
     def test_wrong_source_sha_is_rejected(self):
@@ -100,7 +103,7 @@ class CTU13Tests(unittest.TestCase):
         for s in report["scenario_source_stats"]:
             self.assertEqual(s["total_botnet"], 2)
             self.assertEqual(s["total_normal"], 4)
-            self.assertEqual(s["excluded_unknown"], 1)
+            self.assertEqual(s["excluded_unknown"], 3)
             self.assertEqual(s["sample_normal"], 2)
             self.assertEqual(s["sample_botnet"], 2)
 
