@@ -33,6 +33,30 @@ Run [44451381802](https://github.com/katlaang/predict-shield/actions/runs/444513
 - **ET Open:** 53,559 enabled rules downloaded for the runner's Suricata (merged ruleset SHA-256 `1ca3bd88...0f648a`); Suricata loaded 53,560 rules including the lab rule. The public rule sid 2100498 fired on lab traffic and its alert was admitted through the signed intake in 0.51 seconds, as T1059.
 - **DVWA:** the same as locally. The incomplete fix cleared all four static assertions, with Semgrep reporting the finding resolved, failed the live check (half of the payloads still returned other users' rows on staging and on the target), and was rolled back to the original file. The prepared statement passed all five and was kept.
 
+## Endpoint rules v2 on a second publisher's recordings, 2026-11-18
+
+**Deterministic rules, not AI.** Version 2 (`RULES_V2`) changes only what the OTRF held-out run exposed: Task Manager is no longer treated as benign, the Azure guest agent's path is excluded, LSASS dump files and dump command lines are new signals, and the registry rule watches a registered list of about ten security-relevant values instead of one. Version 1 stays the default and its results above are unchanged.
+
+**Protocol.** Version 2 was committed (`98ffd13`) before any evaluation data was chosen. The set was then selected from Splunk `attack_data` metadata alone (a different publisher, recorded in a different lab), pinned by repository commit and file SHA-256, and committed (`3fa1df9`) before it was run: every Sysmon recording labelled T1003.001 or T1112 except two files whose first lines had been opened, plus the first Sysmon recording of ten other techniques. One file returned 404 and is recorded as skipped.
+
+**Two runs, same rules.** The first run used a parser that assumed one event per line and dropped about ten events whose values contain newlines (477 fragment lines; summary kept in `data/splunk_heldout_run1_summary.json`). The parser was fixed to split on event boundaries (`efff42e`) and the set run again with the rules unchanged; the headline numbers did not change. The second run is the result:
+
+| Recordings | Count | Alert agreeing with the label | 95% Wilson interval |
+| --- | --- | --- | --- |
+| T1003.001, LSASS credential dumping | 3 | 3 | 44% to 100% |
+| T1112, registry modification | 27 | 2 | 2% to 23% |
+| Covered techniques together | 30 | 5 | 7% to 34% |
+| Ten other techniques | 10 | alerts in 4 | |
+
+75,155 events, all parsed.
+
+**What the numbers say.**
+- *LSASS dumping:* all three caught, each by a different signal (a memory read, a dump command line, a dump file written by WerFault). Three recordings is a small denominator; the interval says so.
+- *Registry modification:* T1112 covers any registry change used by an attacker (wallpaper policy, proxy settings, firewall rules, Safe Mode, notification centre and so on). Version 2 watches about ten values. It caught WDigest and a ransomware sample disabling UAC, and missed the other 25. The rule's T1112 label claims far more coverage than it has.
+- *Other techniques:* one alert is AsyncRAT reading LSASS, real credential-access behavior under a scheduled-task label. The other three recordings, all Atomic Red Team, each contain PowerShell opening LSASS with `0x1410`. The labels cannot say whether that is the test harness or another test run on the same host; they are reported, not classified.
+
+These measure two small rule sets. They do not test the AI: the next experiment for that is the AI correlating several telemetry sources, assessing risk, choosing a registered response and stating its uncertainty, with the policy gate unchanged.
+
 ## A stale-code race in the DVWA chain
 
 The next CI run after the one above rolled back the prepared-statement fix: staging had measured it clean, but the live check on the target still saw injection. PHP's opcode cache was on for the built-in web server and rechecks a changed file only every `opcache.revalidate_freq` seconds (2 by default), so verification run immediately after the change exercised the previous code. The first run had passed by timing alone. The lab servers now run with the opcode cache off, and each report records the PHP flags. A production PHP adapter would make cache invalidation part of activation (an opcache reset or a PHP-FPM reload). The failure was in the safe direction: a correct fix was refused because it could not be confirmed live; an unverified fix was never kept. This is the same kind of race as the nginx reload in the end-to-end chain.

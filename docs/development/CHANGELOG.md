@@ -1,5 +1,12 @@
 # Development changelog
 
+## 2026-11-18 (9): Endpoint rules v2 on a pre-registered second-publisher held-out set
+
+- Reworded the detection results as integration behavior and labelled the endpoint rules as deterministic, not AI; held-out 2 of 5 carries its Wilson interval.
+- `RULES_V2` frozen (`98ffd13`) before evaluation data was chosen; Splunk attack_data set selected from metadata, pinned and committed (`3fa1df9`) before it ran.
+- Result: T1003.001 3 of 3, T1112 2 of 27, alerts in 4 of 10 other-technique recordings, 75,155 events.
+- Found and fixed: the Windows event XML reader assumed one event per line and dropped events with newlines in their values. Re-run with unchanged rules; first run's summary kept.
+
 ## 2026-11-18 (8): Held-out measurement of the endpoint rules
 
 - Twenty more OTRF datasets, pinned and run only after the rules were committed (`run_otrf_coverage.py`). The rules caught 2 of 5 held-out attacks of the techniques they target and alerted on 2 of 15 datasets of other techniques (one real LSASS access during pass-the-hash, one false alarm from an Azure agent), across 170,434 events.

@@ -61,6 +61,9 @@ jobs:
       - name: Measure the endpoint rules on held-out OTRF datasets
         working-directory: experiment-b/public-sources
         run: python run_otrf_coverage.py --output /tmp/ps-otrf-coverage.json
+      - name: Run endpoint rules v2 once on the pre-registered Splunk attack_data held-out set
+        working-directory: experiment-b/public-sources
+        run: python run_splunk_heldout.py --output /tmp/ps-splunk-heldout.json
       - name: Attest, monitor and SRI-load real public CDN files
         working-directory: experiment-b/public-sources
         run: python run_cdn_scripts.py --output /tmp/ps-cdn.json
@@ -92,6 +95,12 @@ jobs:
           assert (cov["datasets"], cov["covered_datasets"], cov["covered_detected"]) == (20, 5, 2), cov
           assert cov["uncovered_datasets_with_any_hit"] == ["Empire Over-Pass-The-Hash", "Empire Invoke SMBExec"], cov
           assert (cov["events"], cov["hits_total"]) == (170434, 5), cov
+
+          sp = json.load(open("/tmp/ps-splunk-heldout.json"))["summary"]
+          assert sp["unparsed_events"] == 0 and sp["events"] == 75155, sp
+          assert sp["by_technique"]["T1003.001"]["detected"] == 3 and sp["by_technique"]["T1003.001"]["recordings"] == 3, sp
+          assert sp["by_technique"]["T1112"]["detected"] == 2 and sp["by_technique"]["T1112"]["recordings"] == 27, sp
+          assert len(sp["other_with_any_alert"]) == 4 and sp["other_recordings"] == 10, sp
 
           c = json.load(open("/tmp/ps-cdn.json"))
           assert c["summary"]["all_attested"] is True, c["attestations"]
