@@ -16,11 +16,19 @@ CTU-13 (Stratosphere Laboratory / Czech Technical University) contains
 thirteen 2011 network captures with manually labeled **bidirectional
 NetFlows**. The publisher describes three principal categories:
 
-- **Botnet:** labeled botnet-related flow; positive attack label for this
-  deliberately narrow *botnet flow classification* experiment.
-- **Normal:** verified normal host traffic; negative label.
-- **Background:** not independently known benign. **UNKNOWN**, excluded
-  from model fitting and denominator calculations, but counted.
+- **From-Botnet:** originated at a known infected host; positive label for
+  this deliberately narrow *known-botnet-source flow classification*.
+- **From-Normal:** originated at a registered known normal host; negative label.
+- **To-Botnet / To-Normal:** may originate from unknown computers, and the
+  publisher specifically says they must **not** be labeled malicious or
+  legitimate by destination alone. Treat them as **UNKNOWN**.
+- **Background and all other labels:** UNKNOWN. Exclude from supervised
+  positive/negative denominators but report the counts separately.
+
+The parser explicitly rejects the naive substring method that would
+misclassify To-Botnet / To-Normal by label name alone. The source README
+for scenario 42 provides the original warning:
+https://mcfp.felk.cvut.cz/publicDatasets/CTU-Malware-Capture-Botnet-42/README.html
 
 The parser also excludes all ambiguous and unrecognized labels. This does
 not equate a Botnet flow to a complete independent incident adjudication,
@@ -90,7 +98,8 @@ test-label tuning. No production action is connected.
 ## Required result reporting
 
 - Source identity and SHA, file-level and scenario-level train/test split.
-- Total Botnet, Normal, UNKNOWN and malformed counts per scenario.
+- Total From-Botnet, From-Normal, UNKNOWN (including To-* and Background)
+  and malformed counts per scenario.
 - Number of stratified sampled attack and benign flows. Class-stratified
   subsampling changes class prevalence.
 - Exact test TP, FP, FN, TN; sample recall, precision and FPR; confidence
