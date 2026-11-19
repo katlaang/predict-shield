@@ -50,8 +50,9 @@ class CTU13Tests(unittest.TestCase):
                 "scenario_id": scenario, "split": split, "file": filename,
                 "sha256": hashlib.sha256(target.read_bytes()).hexdigest()
             })
-        self.manifest = {"schema": "predict-shield/ctu13-flow-protocol/1",
+        self.manifest = {"schema": "predict-shield/ctu13-flow-protocol/2",
                          "sample_cap_per_label_per_scenario": 2,
+                         "max_calibration_sample_false_positive_rate": 0.10,
                          "scenarios": self.entries}
 
     def evaluate(self):
@@ -83,6 +84,47 @@ class CTU13Tests(unittest.TestCase):
         self.assertEqual(sum(report[k] for k in ("TP", "FP", "FN", "TN")), 4)
         self.assertEqual(report["unknown_or_ambiguous_excluded"], 12)
         self.assertEqual(len(model["features"]), 7)
+
+    def test_calibration_threshold_is_frozen_before_held_out_score(self):
+        model, report = self.evaluate()
+        self.assertTrue(report["calibration_split_used_for_threshold_only"])
+        self.assertFalse(report["calibration_scores_probability_calibrated"])
+        self.assertFalse(report["threshold_selected_using_test_labels"])
+        self.assertEqual(model["threshold"], report["selected_threshold"])
+        self.assertLessEqual(
+            report["calibration_selected"]["calibration_sample_false_positive_rate"],
+            self.manifest["max_calibration_sample_false_positive_rate"],
+        )
+        self.assertEqual(len(report["calibration_threshold_candidates"]), 9)
+        # Change test labels and features only; update the source digest.
+        # Neither training nor calibration data are changed.
+        path = self.root / "scenario-unseen.binetflow"
+        content = path.read_text(encoding="utf-8")
+        path.write_text(content.replace("From-Botnet-V42", "From-Normal-V42")
+                        .replace("From-Normal-V42", "From-Botnet-V42"), encoding="utf-8")
+        self.entries[-1]["sha256"] = hashlib.sha256(path.read_bytes()).hexdigest()
+        other, changed = self.evaluate()
+        self.assertEqual(model["threshold"], other["threshold"])
+        self.assertEqual(
+            report["calibration_threshold_candidates"],
+            changed["calibration_threshold_candidates"],
+        )
+
+    def test_calibration_fpr_policy_must_be_registered(self):
+        for value in (None, -0.01, 0.26, True, "0.1"):
+            with self.subTest(value=value):
+                self.manifest["max_calibration_sample_false_positive_rate"] = value
+                with self.assertRaisesRegex(ValueError, "pre-registered calibration"):
+                    self.evaluate()
+
+    def test_missing_class_in_calibration_fails_closed(self):
+        path = self.root / "scenario-calibration.binetflow"
+        path.write_text(
+            path.read_text(encoding="utf-8").replace("From-Botnet-V42", "Background"),
+            encoding="utf-8")
+        self.entries[2]["sha256"] = hashlib.sha256(path.read_bytes()).hexdigest()
+        with self.assertRaisesRegex(ValueError, "every partition"):
+            self.evaluate()
 
     def test_wrong_source_sha_is_rejected(self):
         self.entries[-1]["sha256"] = "0" * 64
