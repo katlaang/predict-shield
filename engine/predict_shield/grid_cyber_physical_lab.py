@@ -112,7 +112,7 @@ def connected(links: list, source: str, target: str) -> bool:
         cur = queue.popleft()
         if cur == target:
             return True
-        for other in graph.get(cur, ()) - found:
+        for other in graph.get(cur, set()) - found:
             found.add(other)
             queue.append(other)
     return False
@@ -226,7 +226,7 @@ def observe_power(*, load_scaling: float = 1.0, min_voltage: float = 0.90,
         net = case33bw()
         net.load["p_mw"] = net.load["p_mw"] * load_scaling
         net.load["q_mvar"] = net.load["q_mvar"] * load_scaling
-        pp.runpp(net, algorithm="nr", init="auto", max_iteration=50)
+        pp.runpp(net, algorithm="nr", init="auto", max_iteration=50, numba=False)
         if not net.converged:
             raise RuntimeError("AC power flow not converged")
         voltages = net.res_bus.vm_pu.tolist()
