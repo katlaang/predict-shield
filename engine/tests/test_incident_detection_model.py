@@ -5,6 +5,7 @@ All generated rows are synthetic fixtures, NOT independent attack recordings.
 from __future__ import annotations
 
 import copy
+import importlib.util
 import math
 import unittest
 
@@ -52,6 +53,8 @@ def fixture():
     return items
 
 
+@unittest.skipUnless(importlib.util.find_spec('sklearn') is not None,
+                     'scikit-learn optional; exercised in dedicated model CI')
 class IncidentDetectorTests(unittest.TestCase):
     def test_fit_evaluate_and_freeze_without_field_claim(self):
         model, report = train_and_evaluate(fixture())
