@@ -4,6 +4,7 @@ No third-party grid is contacted, and tests never issue OpenFlow commands.
 """
 from __future__ import annotations
 import copy
+import importlib.util
 import json
 import unittest
 from pathlib import Path
@@ -129,6 +130,8 @@ class GridLabTests(unittest.TestCase):
                                                {"status": "INDETERMINATE"})["outcome"], "INDETERMINATE")
 
 
+@unittest.skipUnless(importlib.util.find_spec('pandapower') is not None,
+                     'pandapower optional: run electrical integration tests in dedicated grid CI')
 class PowerFlowIntegrationTests(unittest.TestCase):
     def test_real_ieee_33_bus_power_flow(self):
         baseline = observe_power()
