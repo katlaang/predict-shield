@@ -1,0 +1,45 @@
+name: Commit attribution hygiene
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  attribution:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Validate repository attribution settings
+        run: |
+          python - <<'PY'
+          import json
+          with open('.claude/settings.json', encoding='utf-8') as fp:
+              d = json.load(fp)
+          a = d.get('attribution', {})
+          assert a.get('commit') == '', 'commit coauthor trailer must be disabled'
+          assert a.get('pr') == '', 'PR attribution must be disabled'
+          assert a.get('sessionUrl') is False, 'session URL attribution must be disabled'
+          print('Project-level attribution configuration valid')
+          PY
+      - name: Refuse new automated co-author trailers
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          if [ -z "$BASE_SHA" ] || [ -z "$HEAD_SHA" ]; then
+            echo "Manual run: skipping pull request message inspection."
+            exit 0
+          fi
+          git fetch origin "$BASE_SHA" "$HEAD_SHA" --no-tags
+          git log --format=%B "$BASE_SHA..$HEAD_SHA" > /tmp/pr-commit-messages.txt
+          if grep -Eiq '^[[:space:]]*Co-authored-by:[[:space:]]+.*(claude|anthropic\.com)' /tmp/pr-commit-messages.txt; then
+            echo "Refusing automatic AI co-author trailers in new PR commits."
+            exit 1
+          fi
+          echo "PR commit messages contain no prohibited automatic AI co-author trailer."
