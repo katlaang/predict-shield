@@ -1,0 +1,85 @@
+name: Preserve historical Experiment B protocol-v3 annotated tag
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/protocol-v3-historical-tag.yml'
+  push:
+    branches: [master]
+    paths:
+      - '.github/workflows/protocol-v3-historical-tag.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify-historical-protocol:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    outputs:
+      target: ${{ steps.check.outputs.target }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Validate immutable original historical commit and protocol blob
+        id: check
+        shell: bash
+        run: |
+          set -euo pipefail
+          target=8f1c5101dc26e9080a7910ac95a2e4a545dca9df
+          expected_blob=3ac868036435720d6a809c3de3b3e265ea766fcf
+          git cat-file -e "${target}^{commit}"
+          actual="$(git show "${target}:experiment-b/mechanism-lab/PROTOCOL_V3_AI_EVALUATION.md" | git hash-object --stdin)"
+          test "$actual" = "$expected_blob" || {
+            echo "HISTORICAL PROTOCOL BLOB MISMATCH: refusing tag creation"
+            exit 1
+          }
+          git cat-file -e "${target}:experiment-b/mechanism-lab/PROTOCOL_V3_FREEZE.md"
+          echo "target=$target" >> "$GITHUB_OUTPUT"
+          echo "Confirmed original commit and unchanged protocol blob"
+
+  create-if-missing:
+    needs: verify-historical-protocol
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master' && github.repository == 'katlaang/predict-shield'
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+      - name: Create an annotated tag only when missing and verify remote
+        env:
+          TARGET_COMMIT: ${{ needs.verify-historical-protocol.outputs.target }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          tag=protocol-v3
+          if git ls-remote --tags origin "refs/tags/$tag" | grep -q .; then
+            git fetch origin "refs/tags/$tag:refs/tags/$tag"
+            test "$(git cat-file -t "refs/tags/$tag")" = tag || {
+              echo "Existing ref is not an annotated tag"
+              exit 1
+            }
+            test "$(git rev-parse "refs/tags/$tag^{}")" = "$TARGET_COMMIT" || {
+              echo "Existing tag targets another commit: DO NOT OVERWRITE"
+              exit 1
+            }
+            echo "Existing correct annotated tag retained, not rewritten"
+          else
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git tag -a "$tag" "$TARGET_COMMIT" -m 'Experiment B v3 original prospective protocol; annotated tag created after initial exploratory pilots, not retroactively dated'
+            git push origin "refs/tags/$tag"
+          fi
+          remote="$(git ls-remote --tags origin "refs/tags/$tag^{}" | cut -f1)"
+          test "$remote" = "$TARGET_COMMIT" || {
+            echo "Remote peeled tag commit mismatches historical target"
+            exit 1
+          }
+          echo "Verified remote annotated tag $tag targets $TARGET_COMMIT"
