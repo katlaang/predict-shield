@@ -1,0 +1,62 @@
+name: Electric grid cyber-physical laboratory
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'engine/predict_shield/grid_cyber_physical_lab.py'
+      - 'engine/tests/test_grid_cyber_physical_lab.py'
+      - 'experiment-b/grid-lab/**'
+      - '.github/workflows/grid-cyber-physical-lab.yml'
+  pull_request:
+    paths:
+      - 'engine/predict_shield/grid_cyber_physical_lab.py'
+      - 'engine/tests/test_grid_cyber_physical_lab.py'
+      - 'experiment-b/grid-lab/**'
+      - '.github/workflows/grid-cyber-physical-lab.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  simulated-feeder:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned power-system solver
+        run: |
+          python -m pip install 'pandapower==3.2.1'
+          python -c 'import pandapower; print("pandapower:", pandapower.__version__)'
+      - name: Run cyber/physical lab tests and adversarial controls
+        run: PYTHONPATH=engine python -m unittest discover -s engine/tests -p 'test_grid_cyber_physical_lab.py' -v
+      - name: Run approved virtual-link pilot and AC feeder analysis
+        run: python experiment-b/grid-lab/run_grid_lab.py --output /tmp/ps-grid-lab.json
+      - name: Assert the recorded outcome and experiment scope
+        run: |
+          python - <<'PY'
+          import json
+          report = json.load(open('/tmp/ps-grid-lab.json'))
+          assert report['outcome'] == 'VERIFIED_LAB_ONLY', report
+          assert report['verification']['essential_paths_preserved'] is True
+          assert report['verification']['threat_path_blocked'] is True
+          assert report['verification']['power_within_declared_limits'] is True
+          assert report['model_is_real_ai'] is False
+          assert report['real_sdn_switches_used'] is False
+          assert report['field_effectiveness_established'] is False
+          assert report['preapproval_gate']['decision'] == 'PROPOSE_FOR_APPROVAL'
+          assert report['lab_gate']['decision'] == 'LAB_APPROVED_ONLY'
+          print(json.dumps(report['verification'], indent=2))
+          PY
+      - name: Preserve lab evidence even on failed checks
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: grid-cyber-physical-lab-evidence
+          path: /tmp/ps-grid-lab.json
+          retention-days: 90
+          if-no-files-found: warn
