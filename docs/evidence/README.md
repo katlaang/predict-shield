@@ -12,6 +12,10 @@ Dated results, lab protocols and design notes behind the capabilities in the mai
 
 - [Detect, plan, apply, verify, keep or roll back](END_TO_END_CHAIN.md): the unattended chain against real nginx, Chromium and Suricata, with signed approvals, signed or mTLS detection intake, sandboxed-frame isolation and the live view.
 
+## Public test sources
+
+- [Public test sources](PUBLIC_TEST_SOURCES.md): OTRF attack telemetry, cdnjs and jsDelivr files, OSV.dev, Emerging Threats Open, DVWA and real lodash releases, each plugged into the pipeline for testing.
+
 ## Policy-governed actions in the mechanism lab
 
 - [Physical lab execution with a trained action model](PHYSICAL_TRAINED_AI_PILOT_PROTOCOL.md).
