@@ -210,7 +210,7 @@ def run(manifest: dict, manifest_bytes: bytes, root: Path) -> tuple[dict, dict]:
         "coefficients": [float(x) for x in model.coef_[0]],
         "intercept": float(model.intercept_[0]),
         "threshold": threshold,
-        "threshold_selection_method": "lowest_pregistered_grid_threshold_with_calibration_sample_fpr_at_or_below_cap",
+        "threshold_selection_method": "lowest_preregistered_grid_threshold_with_calibration_sample_fpr_at_or_below_cap",
         "training_source_digests": [s["source_sha256"] for s in stats if s["split"] == "train"],
         "production_deployable": False,
         "decision_authorized": False,
