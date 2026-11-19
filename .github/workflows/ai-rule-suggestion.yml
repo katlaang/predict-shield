@@ -1,0 +1,97 @@
+name: AI-suggested detection rules
+
+# A language model drafts detection rules from development recordings of the
+# pre-registered split (experiment-b/public-sources/ai_rules/split.json). The
+# rules must fit a closed grammar, pass an acceptance gate on development
+# data, and are frozen by hash before the held-out recordings are loaded and
+# scored once. The checks below are on the protocol, not on the scores.
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'experiment-b/public-sources/ai_rules/**'
+      - 'engine/predict_shield/rule_suggestion.py'
+      - '.github/workflows/ai-rule-suggestion.yml'
+  workflow_dispatch:
+    inputs:
+      local_model:
+        description: 'Ollama model run on the runner'
+        default: 'qwen3:4b'
+      hosted:
+        description: 'Optional hosted model, provider:model (needs that provider key in repository secrets)'
+        default: ''
+
+permissions:
+  contents: read
+
+jobs:
+  suggest-and-evaluate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      LOCAL_MODEL: ${{ github.event.inputs.local_model || 'qwen3:4b' }}
+      HOSTED: ${{ github.event.inputs.hosted || '' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Unit tests
+        run: PYTHONPATH=engine:engine/tests python -m unittest test_rule_suggestion test_endpoint_telemetry -v
+      - name: Start the local model on loopback and record its digest
+        run: |
+          docker run --rm -d --name ps-rules-ai -e OLLAMA_NUM_PARALLEL=1 -p 127.0.0.1:11434:11434 ollama/ollama:latest
+          for attempt in $(seq 1 60); do
+            if curl -fsS http://127.0.0.1:11434/api/version >/dev/null; then break; fi
+            sleep 2
+          done
+          downloaded=false
+          for attempt in 1 2 3 4 5; do
+            if docker exec ps-rules-ai ollama pull "$LOCAL_MODEL"; then downloaded=true; break; fi
+            sleep 15
+          done
+          if [ "$downloaded" != "true" ]; then echo "No model fetched; no AI result can be claimed."; exit 1; fi
+          python - <<'PY'
+          import json, os, urllib.request
+          tags = json.load(urllib.request.urlopen("http://127.0.0.1:11434/api/tags", timeout=10))
+          name = os.environ["LOCAL_MODEL"]
+          matched = [m for m in tags.get("models", []) if m.get("name") == name]
+          assert len(matched) == 1 and len(matched[0]["digest"]) == 64, tags
+          open("/tmp/ps-rules-model-digest.txt", "w").write("sha256:" + matched[0]["digest"])
+          PY
+      - name: Draft, gate, freeze, then score held-out (local model)
+        working-directory: experiment-b/public-sources/ai_rules
+        run: |
+          python run_ai_rule_suggestion.py --model "ollama:$LOCAL_MODEL" \
+            --model-digest "$(cat /tmp/ps-rules-model-digest.txt)" --output /tmp/ps-ai-rules-local.json
+      - name: Draft, gate, freeze, then score held-out (hosted model, if requested)
+        if: env.HOSTED != ''
+        working-directory: experiment-b/public-sources/ai_rules
+        env:
+          FEATHERLESS_API_KEY: ${{ secrets.FEATHERLESS_API_KEY }}
+          TOGETHER_API_KEY: ${{ secrets.TOGETHER_API_KEY }}
+        run: python run_ai_rule_suggestion.py --model "hosted:$HOSTED" --output /tmp/ps-ai-rules-hosted.json
+      - name: Check the protocol was followed
+        run: |
+          python - <<'PY'
+          import glob, json
+          for path in glob.glob("/tmp/ps-ai-rules-*.json"):
+              r = json.load(open(path))
+              assert len(r["model_exchanges"]) == 5, (path, len(r["model_exchanges"]))
+              assert len(r["accepted_set_sha256"]) == 64
+              assert r["summary"]["held_out_recordings"] == 33, r["summary"]
+              accepted = {json.dumps(x, sort_keys=True) for x in r["accepted_rules"]}
+              gated = {json.dumps(g["rule"], sort_keys=True) for t in r["techniques"].values()
+                       for g in t["gate"] if g["accepted"]}
+              assert accepted == gated, "a rule reached held-out without passing the gate"
+              print(path, json.dumps(r["summary"], indent=1, sort_keys=True))
+          PY
+      - name: Retain the reports, including every model exchange
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ai-rule-suggestion
+          path: /tmp/ps-ai-rules-*.json
+          if-no-files-found: warn
+          retention-days: 90
