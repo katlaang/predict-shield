@@ -66,3 +66,21 @@ python -m unittest -v test_offline_authority_witness
 
 No model receives witness content through the current implementation.
 Future integration must separately enforce this no-leakage boundary.
+
+## Integrated physical direct-probe increment (2026-11-19)
+
+`experiment-b/mechanism-lab/authority_outage_actions.py` now uses the
+pre-outage witness and independently sends a revoked-principal and a
+legitimate-principal HTTP GET to **each of four Docker enforcement JVMs**
+after stopping the policy authority. The requests use synthetic lab
+identity headers, not authentication suitable for production. The resulting
+raw four-node statuses and conservative fractions are written alongside
+the preexisting gateway observations and historical-witness bounds.
+
+The integration is tested by the physical four-action CI workflow in
+`.github/workflows/authority-outage-actions.yml`. The unit tests use mocked
+HTTP responses. **Only a completed successful physical workflow establishes
+that Docker stop/restart and the eight real direct HTTP requests executed.**
+The output is not a final calibrated action-utility measure, an operational
+policy guarantee, or a claim of measured AI superiority. Full live-authority
+reconciliation remains mandatory after each restoration.
