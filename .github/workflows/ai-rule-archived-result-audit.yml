@@ -1,0 +1,93 @@
+name: Retrospective audit of actual 2026-11-19 AI rule experiment
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/ai-rule-archived-result-audit.yml'
+      - '.github/workflows/ai-rule-suggestion.yml'
+  push:
+    branches: [master]
+    paths:
+      - '.github/workflows/ai-rule-archived-result-audit.yml'
+      - '.github/workflows/ai-rule-suggestion.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  independently-audit-recorded-exploratory-run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Fetch original archived JSON outputs from failed workflow, no model rerun
+        uses: actions/download-artifact@v4
+        with:
+          name: ai-rule-suggestion
+          run-id: 44477985951
+          repository: katlaang/predict-shield
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: /tmp/ps-recorded-20261119
+      - name: Separate progress checkpoint from completed evaluated results
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          root=Path('/tmp/ps-recorded-20261119')
+          reports=list(root.glob('ps-ai-rules-local.json'))
+          checkpoints=list(root.glob('ps-ai-rules-local-progress.json'))
+          assert len(reports)==1 and len(checkpoints)==1, sorted(p.name for p in root.iterdir())
+          report=json.loads(reports[0].read_text())
+          checkpoint=json.loads(checkpoints[0].read_text())
+          assert report['schema']=='predict-shield/ai-rule-suggestion/1'
+          assert checkpoint['schema']=='predict-shield/ai-rule-development-checkpoint/1'
+          assert report['evaluation_status']=='EXPLORATORY_REUSE_OF_PREVIOUSLY_SCORED_33_RECORDINGS'
+          assert report['independently_unseen_since_revision'] is False
+          assert checkpoint['completed_evaluation'] is False
+          assert checkpoint['held_out_detection_rate'] is None
+          print('Verified separate checkpoint and completed report: no confusion of evidence types')
+          PY
+      - name: Independently audit the historical frozen report
+        working-directory: experiment-b/public-sources/ai_rules
+        run: |
+          python audit_report.py \
+            --report /tmp/ps-recorded-20261119/ps-ai-rules-local.json \
+            --registration split.json \
+            --output /tmp/ps-recorded-20261119/audited-result.json
+      - name: Validate exactly the actually observed failure and denominators
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          root=Path('/tmp/ps-recorded-20261119')
+          report=json.loads((root/'ps-ai-rules-local.json').read_text())
+          audit=json.loads((root/'audited-result.json').read_text())
+          assert audit['report_structurally_consistent'] is True, audit['issues']
+          assert audit['reported_scenario_detection'] == {
+              'detected':3,'denominator':33,
+              'by_technique':{
+                  'T1562.001': {'detected':0,'denominator':11},
+                  'T1059.001': {'detected':2,'denominator':10},
+                  'T1053.005': {'detected':1,'denominator':5},
+                  'T1036.003': {'detected':0,'denominator':3},
+                  'T1047': {'detected':0,'denominator':4},
+              },
+          }
+          assert report['summary']['accepted_rules']==3
+          assert report['summary']['recordings_with_other_technique_alerts']==2
+          assert audit['held_out_events_processed']==130176
+          assert audit['event_level_detection_recall_established'] is False
+          assert audit['false_positive_rate_established'] is False
+          assert audit['field_detection_effectiveness_established'] is False
+          print('PASS: archived exploratory result integrity, not detection efficacy.')
+          PY
+      - name: Retain original third-party audit verdict
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: audited-exploratory-ai-rule-result-20261119
+          path: /tmp/ps-recorded-20261119/audited-result.json
+          retention-days: 90
+          if-no-files-found: warn
