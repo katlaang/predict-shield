@@ -1,0 +1,31 @@
+name: Independent AI rule result audit tests
+
+on:
+  pull_request:
+    paths:
+      - 'experiment-b/public-sources/ai_rules/audit_report.py'
+      - 'experiment-b/public-sources/ai_rules/test_audit_report.py'
+      - '.github/workflows/ai-rule-result-audit.yml'
+  push:
+    branches: [master]
+    paths:
+      - 'experiment-b/public-sources/ai_rules/audit_report.py'
+      - 'experiment-b/public-sources/ai_rules/test_audit_report.py'
+      - '.github/workflows/ai-rule-result-audit.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit-unit-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Test report audit and negative outcomes
+        working-directory: experiment-b/public-sources/ai_rules
+        run: python -m unittest -v test_audit_report
