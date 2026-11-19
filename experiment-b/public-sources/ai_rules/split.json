@@ -1,0 +1,767 @@
+{
+ "commit": "5879f5423e6c08df2b22b63f7b36e84866f9c51c",
+ "targets": [
+  "T1562.001",
+  "T1059.001",
+  "T1053.005",
+  "T1036.003",
+  "T1047"
+ ],
+ "development": [
+  {
+   "file": "datasets/attack_techniques/T1562.001/atomic_red_team/windows-sysmon.log",
+   "technique": "T1562.001",
+   "labels": [
+    "T1562.001"
+   ],
+   "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1562.001/atomic_red_team/windows-sysmon.log",
+   "sha256": "696e1d2800d215e13c8f1ea5252cf2c2118e1018c1cacda82c041fdbeeac403d",
+   "bytes": 14504430,
+   "previously_opened": false
+  },
+  {
+   "file": "datasets/attack_techniques/T1562.001/cisco_secure_endpoint_tampering/service_stop.log",
+   "technique": "T1562.001",
+   "labels": [
+    "T1562.001"
+   ],
+   "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1562.001/cisco_secure_endpoint_tampering/service_stop.log",
+   "sha256": "4bc5b5685a35eeea435098ba176cf82366895ed5c85c155807aad834564b0079",
+   "bytes": 2343,
+   "previously_opened": false
+  },
+  {
+   "file": "datasets/attack_techniques/T1562.001/defender_exclusion_sysmon/sysmon.log",
+   "technique": "T1562.001",
+   "labels": [
+    "T1562.001"
+   ],
+   "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1562.001/defender_exclusion_sysmon/sysmon.log",
+   "sha256": "9898052d0f26516f344af733a7f58bcfe863848cdf1195549d94737c350bcd28",
+   "bytes": 11241416,
+   "previously_opened": false
+  },
+  {
+   "file": "datasets/attack_techniques/T1562.001/delete_win_defender_context_menu/sysmon.log",
+   "technique": "T1562.001",
+   "labels": [
+    "T1562.001"
+   ],
+   "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1562.001/delete_win_defender_context_menu/sysmon.log",
+   "sha256": "e83ff83620cd67fec440e040d6b1a21198e8a455be04080e542f0765a00de310",
+   "bytes": 3020318,
+   "previously_opened": false
+  },
+  {
+   "file": "datasets/attack_techniques/T1562.001/disable-windows-security-defender-features/windefender-bypas-2-sysmon.log",
+   "technique": "T1562.001",
+   "labels": [
+    "T1562.001"
+   ],
+   "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1562.001/disable-windows-security-defender-features/windefender-bypas-2-sysmon.log",
+   "sha256": "18281db53af013649ebf55d7a600be05b20c3cbedb21d72ae91902d21c6cbac8",
+   "bytes": 44393,
+   "previously_opened": false
+  },
+  {
+   "file": "datasets/attack_techniques/T1562.001/disable_defender_asr_or_threats/disable_defender_asr_or_threats.log",
+   "technique": "T1562.001",
+   "labels": [
+    "T1562.001"
+   ],
+   "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1562.001/disable_defender_asr_or_threats/disable_defender_asr_or_threats.log",
+   "sha256": "ba24768e57d593f7fb188ddbd9612a54709e72562d084f60f50359497ba04ab3",
+   "bytes": 10743,
+   "previously_opened": false
+  },
+  {
+   "file": "datasets/attack_techniques/T1562.001/mpcmdrun_remove/mpcmdrun_remove.log",
+   "technique": "T1562.001",
+   "labels": [
+    "T1562.001"
+   ],
+   "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1562.001/mpcmdrun_remove/mpcmdrun_remove.log",
+   "sha256": "0f531ac45216cb4e996f2359f64050edd3bd67f4fc58b9b65d8efd9b8645fc33",
+   "bytes": 5439,
+   "previously_opened": false
+  },
+  {
+   "file": "datasets/attack_techniques/T1562.001/pwh_defender_disabling/windows-sysmon.log",
+   "technique": "T1562.001",
+   "labels": [
+    "T1562.001"
+   ],
+   "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1562.001/pwh_defender_disabling/windows-sysmon.log",
+   "sha256": "8ab3d091f0a6fa2c6bff98af1ae1f6b523c9f450666a64bf0185c37d76480981",
+   "bytes": 42122,
+   "previously_opened": false
+  },
+  {
+   "file": "datasets/attack_techniques/T1562.001/sc_service_start_disabled/windows-sysmon.log",
+   "technique": "T1562.001",
+   "labels": [
+    "T1562.001"
+   ],
+   "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1562.001/sc_service_start_disabled/windows-sysmon.log",
+   "sha256": "83ae68da1c0adccd5f8b9e8170aef56c815e3a36747b583be13cb93b4f28a38e",
+   "bytes": 4982097,
+   "previously_opened": false
+  },
+  {
+   "file": "datasets/attack_techniques/T1562.001/win_app_defender_disabling/windows-xml.log",
+   "technique": "T1562.001",
+   "labels": [
+    "T1562.001"
+   ],
+   "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1562.001/win_app_defender_disabling/windows-xml.log",
+   "sha256": "cfacbb447566204fd06e97745c7d994e1323cda27af99734b071ef0e61d900f5",
+   "bytes": 680777,
+   "previously_opened": false
+  },
+  {
+   "file": "datasets/attack_techniques/T1562.001/win_defend_service_stop/windows-sysmon.log",
+   "technique": "T1562.001",
+   "labels": [
+    "T1562.001"
+   ],
+   "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1562.001/win_defend_service_stop/windows-sysmon.log",
+   "sha256": "f9dc84160d71a405117cbf792cb724bfe2779d1e0406e9be387ba591ceaacd71",
+   "bytes": 13833365,
+   "previously_opened": false
+  },
+  {
+   "file": "datasets/attack_techniques/T1059.001/atomic_red_team/captcha_windows-sysmon.log",
+   "technique": "T1059.001",
+   "labels": [
+    "T1059.001"
+   ],
+   "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1059.001/atomic_red_team/captcha_windows-sysmon.log",
+   "sha256": "2349326b9042ba212dc16a4764a2cd1fbfa318a792c5591594b77bbfd20ddc9e",
+   "bytes": 2153,
+   "previously_opened": true
+  },
+  {
+   "file": "datasets/attack_techniques/T1059.001/atomic_red_team/windows-sysmon.log",
+   "technique": "T1059.001",
+   "labels": [
+    "T1059.001"
+   ],
+   "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1059.001/atomic_red_team/windows-sysmon.log",
+   "sha256": "8f71b2a0ef81892551cd6a9ad115b8ec5c42d9f2071547b064c496511898c4e9",
+   "bytes": 38928903,
+   "previously_opened": false
+  },
+  {
+   "file": "datasets/attack_techniques/T1059.001/encoded_powershell/explorer_spawns_windows-sysmon.log",
+   "technique": "T1059.001",
+   "labels": [
+    "T1059.001"
+   ],
+   "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1059.001/encoded_powershell/explorer_spawns_windows-sysmon.log",
+   "sha256": "9200692ad74037b5234fe6f7da733d3e416b0ea8bb7f6d8ebb5bd16fc39b8b22",
+   "bytes": 13142,
+   "previously_opened": false
+  },
+  {
+   "file": "datasets/attack_techniques/T1059.001/encoded_powershell/padded_windows-sysmon.log",
+   "technique": "T1059.001",
+   "labels": [
+    "T1059.001"
+   ],
+   "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1059.001/encoded_powershell/padded_windows-sysmon.log",
+   "sha256": "0324ee4e5f2cb4c761e10862808c37a046097a2ad800d034490e3980c3e86dec",
+   "bytes": 11135,
+   "previously_opened": false
+  },
+  {
+   "file": "datasets/attack_techniques/T1059.001/powershell_execution_policy/windows-sysmon.log",
+   "technique": "T1059.001",
+   "labels": [
+    "T1059.001"
+   ],
+   "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1059.001/powershell_execution_policy/windows-sysmon.log",
+   "sha256": "7854054b5fa788e7c430b7045ddbebb09be43300d2b0b2478cb893e70aaaca41",
+   "bytes": 14601853,
+   "previously_opened": false
+  },
+  {
+   "file": "datasets/attack_techniques/T1059.001/powershell_remotesigned/remotesigned_sysmon.log",
+   "technique": "T1059.001",
+   "labels": [
+    "T1059.001"
+   ],
+   "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1059.001/powershell_remotesigned/remotesigned_sysmon.log",
+   "sha256": "a47baee10e74c0f675a26a9f3153a35109938a6570b9b75cb5047be03eea78c5",
+   "bytes": 2017,
+   "previously_opened": false
+  },
+  {
+   "file": "datasets/attack_techniques/T1059.001/powershell_script_block_logging/windows-sysmon.log",
+   "technique": "T1059.001",
+   "labels": [
+    "T1059.001"
+   ],
+   "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1059.001/powershell_script_block_logging/windows-sysmon.log",
+   "sha256": "04daf83b69e4b798e21f74fde0dc68d9de1732f139ce4a4463fcaa36d4995589",
+   "bytes": 18183460,
+   "previously_opened": false
+  },
+  {
+   "file": "datasets/attack_techniques/T1059.001/powershell_xml_requests/windows-sysmon.log",
+   "technique": "T1059.001",
+   "labels": [
+    "T1059.001"
+   ],
+   "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1059.001/powershell_xml_requests/windows-sysmon.log",
+   "sha256": "c9c7f3a36611ed52e40b4f29440a45a07f1aac601a340f5ee4bf07fe5afa97b8",
+   "bytes": 10784074,
+   "previously_opened": false
+  },
+  {
+   "file": "datasets/attack_techniques/T1059.001/trickbot_cmd_powershell/windows-sysmon.log",
+   "technique": "T1059.001",
+   "labels": [
+    "T1059.001"
+   ],
+   "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1059.001/trickbot_cmd_powershell/windows-sysmon.log",
+   "sha256": "7ba1d02c6b44d877cfef9f4c690515ae04edb2347581ea93bb9657cb864aeec7",
+   "bytes": 46116,
+   "previously_opened": false
+  },
+  {
+   "file": "datasets/attack_techniques/T1053.005/asyncrat_highest_priv_schtasks/sysmon.log",
+   "technique": "T1053.005",
+   "labels": [
+    "T1053.005"
+   ],
+   "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1053.005/asyncrat_highest_priv_schtasks/sysmon.log",
+   "sha256": "068cba2851e13e3708d353247c37891e2cdc5b78bc94f5d7099ada494ae644d9",
+   "bytes": 16999744,
+   "previously_opened": true
+  },
+  {
+   "file": "datasets/attack_techniques/T1053.005/lateral_movement/windows-sysmon.log",
+   "technique": "T1053.005",
+   "labels": [
+    "T1053.005"
+   ],
+   "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1053.005/lateral_movement/windows-sysmon.log",
+   "sha256": "b2fba83212dba31492fe34b90786e9019437ab25da78e22bc9688021c5e36825",
+   "bytes": 6297522,
+   "previously_opened": false
+  },
+  {
+   "file": "datasets/attack_techniques/T1053.005/scheduled_task_on_console/scheduled_task_on_console.log",
+   "technique": "T1053.005",
+   "labels": [
+    "T1053.005"
+   ],
+   "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1053.005/scheduled_task_on_console/scheduled_task_on_console.log",
+   "sha256": "ddae693ab57a5a81cc71a6161c88f3729e90d6da42a9109a68b780fdb230bd81",
+   "bytes": 3176,
+   "previously_opened": false
+  },
+  {
+   "file": "datasets/attack_techniques/T1053.005/schtask_shutdown/windows-sysmon.log",
+   "technique": "T1053.005",
+   "labels": [
+    "T1053.005"
+   ],
+   "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1053.005/schtask_shutdown/windows-sysmon.log",
+   "sha256": "cafa411c6706fab418e8f26735a96298de18bc7d041d8702a8c2ad0c819eb98e",
+   "bytes": 15400399,
+   "previously_opened": false
+  },
+  {
+   "file": "datasets/attack_techniques/T1053.005/taskschedule/sd_delete_windows-sysmon.log",
+   "technique": "T1053.005",
+   "labels": [
+    "T1053.005"
+   ],
+   "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1053.005/taskschedule/sd_delete_windows-sysmon.log",
+   "sha256": "dc674b9030db4675edb2c205c71e8366850e7c7dc8ab3d94de1001a2c35a691f",
+   "bytes": 376865,
+   "previously_opened": false
+  },
+  {
+   "file": "datasets/attack_techniques/T1036.003/atomic_red_team/windows-sysmon.log",
+   "technique": "T1036.003",
+   "labels": [
+    "T1036.003"
+   ],
+   "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1036.003/atomic_red_team/windows-sysmon.log",
+   "sha256": "c9e2c2d4c29fa0e6054617b0743cb2574b28aa03a6560d80e4a66a4ee607aa75",
+   "bytes": 12615448,
+   "previously_opened": false
+  },
+  {
+   "file": "datasets/attack_techniques/T1036.003/renamed_3rd_party_software/renamed_3rd_party_software.log",
+   "technique": "T1036.003",
+   "labels": [
+    "T1036.003"
+   ],
+   "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1036.003/renamed_3rd_party_software/renamed_3rd_party_software.log",
+   "sha256": "ce82892b197330266afe57e650841d9cd4fb83675943725386f114ea944d0957",
+   "bytes": 4094,
+   "previously_opened": false
+  },
+  {
+   "file": "datasets/attack_techniques/T1036.003/renamed_command_interpreter/renamed_command_interpreter.log",
+   "technique": "T1036.003",
+   "labels": [
+    "T1036.003"
+   ],
+   "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1036.003/renamed_command_interpreter/renamed_command_interpreter.log",
+   "sha256": "9e53987a2828fe0cce719abee62df2eca8da92625fc29448f7a59825f50dbda7",
+   "bytes": 8138,
+   "previously_opened": false
+  },
+  {
+   "file": "datasets/attack_techniques/T1036.003/renamed_powershell/renamed_powershell.log",
+   "technique": "T1036.003",
+   "labels": [
+    "T1036.003"
+   ],
+   "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1036.003/renamed_powershell/renamed_powershell.log",
+   "sha256": "3f8e9196494a0d2d114c8f87efc6a43e2470ea00fffd748bdc671eef29afd1f8",
+   "bytes": 6244,
+   "previously_opened": false
+  },
+  {
+   "file": "datasets/attack_techniques/T1036.003/samsam_extension/windows-sysmon.log",
+   "technique": "T1036.003",
+   "labels": [
+    "T1036.003"
+   ],
+   "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1036.003/samsam_extension/windows-sysmon.log",
+   "sha256": "d5e36c38774af61b12a073e0333d277161f63308045a9087c17b23b60d2025ef",
+   "bytes": 15926594,
+   "previously_opened": false
+  },
+  {
+   "file": "datasets/attack_techniques/T1047/atomic_red_team/windows-sysmon.log",
+   "technique": "T1047",
+   "labels": [
+    "T1047"
+   ],
+   "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1047/atomic_red_team/windows-sysmon.log",
+   "sha256": "64651720e10813aa57d0f25ce149005ab06039b1974dbc09818b1fb45fbbc196",
+   "bytes": 11815541,
+   "previously_opened": true
+  },
+  {
+   "file": "datasets/attack_techniques/T1047/snapattack/snapattack.log",
+   "technique": "T1047",
+   "labels": [
+    "T1047"
+   ],
+   "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1047/snapattack/snapattack.log",
+   "sha256": "bb44e5f8b7542016c841c9e7ea62587555081aa55c4be541816db85fc35b8829",
+   "bytes": 2492,
+   "previously_opened": false
+  },
+  {
+   "file": "datasets/attack_techniques/T1047/wmi_impersonate/sysmon.log",
+   "technique": "T1047",
+   "labels": [
+    "T1047"
+   ],
+   "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1047/wmi_impersonate/sysmon.log",
+   "sha256": "c5959a3ea71f381f7a7b1916bf966fd7204e5e11fc76b7dba535d02a191fbc9f",
+   "bytes": 18588420,
+   "previously_opened": false
+  },
+  {
+   "file": "datasets/attack_techniques/T1047/wmic_classes/wmic_cmd.log",
+   "technique": "T1047",
+   "labels": [
+    "T1047"
+   ],
+   "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1047/wmic_classes/wmic_cmd.log",
+   "sha256": "4d4894fe9a4d6bc11315788d0cd4f83e5865a7fbb7be9c2441eedd451fe4f8e5",
+   "bytes": 16015,
+   "previously_opened": false
+  }
+ ],
+ "held_out": [
+  {
+   "file": "datasets/attack_techniques/T1562.001/atomic_red_team/hvci_windows-sysmon.log",
+   "technique": "T1562.001",
+   "labels": [
+    "T1562.001"
+   ],
+   "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1562.001/atomic_red_team/hvci_windows-sysmon.log",
+   "sha256": "c7f4485d1cc21f919d6aa985ccdbc36d8553b20c9cf34c4a19e9dba46395ee1c",
+   "bytes": 19322,
+   "previously_opened": false
+  },
+  {
+   "file": "datasets/attack_techniques/T1562.001/atomic_red_team/windows-sysmon_raccine.log",
+   "technique": "T1562.001",
+   "labels": [
+    "T1562.001"
+   ],
+   "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1562.001/atomic_red_team/windows-sysmon_raccine.log",
+   "sha256": "f6e66def655541bb6f82d14a2fa1a0769e5ee653b2fefbab2f94c73879d7fbc8",
+   "bytes": 3079745,
+   "previously_opened": false
+  },
+  {
+   "file": "datasets/attack_techniques/T1562.001/atomic_red_team/windows-sysmon_dism.log",
+   "technique": "T1562.001",
+   "labels": [
+    "T1562.001"
+   ],
+   "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1562.001/atomic_red_team/windows-sysmon_dism.log",
+   "sha256": "c4c136f7115500f6303f1ed7ef2b7dd9170f523f7e84cde91c70d4f804ecddb0",
+   "bytes": 996035,
+   "previously_opened": false
+  },
+  {
+   "file": "datasets/attack_techniques/T1562.001/cisco_secure_endpoint_tampering/sfc_tampering.log",
+   "technique": "T1562.001",
+   "labels": [
+    "T1562.001"
+   ],
+   "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1562.001/cisco_secure_endpoint_tampering/sfc_tampering.log",
+   "sha256": "f424d7dad8f504aa7c3c73d5b808a5378ec5e7f28f5e4ed3fd1cc93d9e01a9e6",
+   "bytes": 16455,
+   "previously_opened": false
+  },
+  {
+   "file": "datasets/attack_techniques/T1562.001/disable_defender_logging/sysmon.log",
+   "technique": "T1562.001",
+   "labels": [
+    "T1562.001"
+   ],
+   "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1562.001/disable_defender_logging/sysmon.log",
+   "sha256": "5a4b56945aa8474bb3b9ce30b22469a77f821a24c040447c0f1b557051a0c64b",
+   "bytes": 3064595,
+   "previously_opened": false
+  },
+  {
+   "file": "datasets/attack_techniques/T1562.001/hotkey_disabled_hidden_user/windows-sysmon.log",
+   "technique": "T1562.001",
+   "labels": [
+    "T1562.001"
+   ],
+   "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1562.001/hotkey_disabled_hidden_user/windows-sysmon.log",
+   "sha256": "28efd456106f6bd080835507f43d3808e045193d16992b19c22364b166fc69ff",
+   "bytes": 10576705,
+   "previously_opened": false
+  },
+  {
+   "file": "datasets/attack_techniques/T1562.001/snapattack/snapattack.log",
+   "technique": "T1562.001",
+   "labels": [
+    "T1562.001"
+   ],
+   "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1562.001/snapattack/snapattack.log",
+   "sha256": "bc19e0c681cb39944eaa8bc9466514bfb63c3f9bfb5961a13bbc25d37396d7d6",
+   "bytes": 1215,
+   "previously_opened": false
+  },
+  {
+   "file": "datasets/attack_techniques/T1562.001/taskkill/taskkill_im.log",
+   "technique": "T1562.001",
+   "labels": [
+    "T1562.001"
+   ],
+   "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1562.001/taskkill/taskkill_im.log",
+   "sha256": "47f313998031e200dd6780a9bb9a91718fbb08ff78657e631eab4863a0ee31bf",
+   "bytes": 1962,
+   "previously_opened": false
+  },
+  {
+   "file": "datasets/attack_techniques/T1562.001/taskkill_browser/braodo_taskkill.log",
+   "technique": "T1562.001",
+   "labels": [
+    "T1562.001"
+   ],
+   "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1562.001/taskkill_browser/braodo_taskkill.log",
+   "sha256": "7dc469cf85d0d9c79b5bc34d87f16553b8e1ae74ea66e097d5d701abaf6ae85b",
+   "bytes": 110045,
+   "previously_opened": false
+  },
+  {
+   "file": "datasets/attack_techniques/T1562.001/unload_sysmon/windows-sysmon.log",
+   "technique": "T1562.001",
+   "labels": [
+    "T1562.001"
+   ],
+   "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1562.001/unload_sysmon/windows-sysmon.log",
+   "sha256": "99ebf6dab3ce8d632929c39b92758c97c279003dada3600769f6bfb2700ed64e",
+   "bytes": 4685,
+   "previously_opened": false
+  },
+  {
+   "file": "datasets/attack_techniques/T1562.001/win_app_defender_disabling/windows-sysmon.log",
+   "technique": "T1562.001",
+   "labels": [
+    "T1562.001"
+   ],
+   "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1562.001/win_app_defender_disabling/windows-sysmon.log",
+   "sha256": "8886e363b137555f5a0403783106e656b77e328fab2e503a645015f5e1cc3756",
+   "bytes": 20091826,
+   "previously_opened": false
+  },
+  {
+   "file": "datasets/attack_techniques/T1059.001/atomic_red_team/enableat_windows-sysmon.log",
+   "technique": "T1059.001",
+   "labels": [
+    "T1059.001"
+   ],
+   "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1059.001/atomic_red_team/enableat_windows-sysmon.log",
+   "sha256": "277289fa911c6c7999f338f735c29a9811d03249e8d9584ec722af85aa051ded",
+   "bytes": 2285,
+   "previously_opened": false
+  },
+  {
+   "file": "datasets/attack_techniques/T1059.001/encoded_powershell/windows-sysmon.log",
+   "technique": "T1059.001",
+   "labels": [
+    "T1059.001"
+   ],
+   "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1059.001/encoded_powershell/windows-sysmon.log",
+   "sha256": "b9c8438a0d8cd62714a38ed093fc583c3318d1cac768c6513ad40a3b8203fd05",
+   "bytes": 2012605,
+   "previously_opened": false
+  },
+  {
+   "file": "datasets/attack_techniques/T1059.001/hidden_powershell/windows-sysmon.log",
+   "technique": "T1059.001",
+   "labels": [
+    "T1059.001"
+   ],
+   "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1059.001/hidden_powershell/windows-sysmon.log",
+   "sha256": "bac9c10fe7ae07c2ede09014c44f92df074055d9764a92cde4161c0c8e19ef96",
+   "bytes": 32626602,
+   "previously_opened": false
+  },
+  {
+   "file": "datasets/attack_techniques/T1059.001/malicious_cmd_line_samples/windows-sysmon.log",
+   "technique": "T1059.001",
+   "labels": [
+    "T1059.001"
+   ],
+   "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1059.001/malicious_cmd_line_samples/windows-sysmon.log",
+   "sha256": "64ab32d34f2e6aef53f80ae092a6caf9e3f737e362c522b9c1791e91b7defab4",
+   "bytes": 32017,
+   "previously_opened": false
+  },
+  {
+   "file": "datasets/attack_techniques/T1059.001/msix_powershell/windows-sysmon.log",
+   "technique": "T1059.001",
+   "labels": [
+    "T1059.001"
+   ],
+   "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1059.001/msix_powershell/windows-sysmon.log",
+   "sha256": "3f349b90eead3e2eda89bcc776b5f250f1ece2bd1a2c9d128ca79ad087d72e93",
+   "bytes": 7346,
+   "previously_opened": false
+  },
+  {
+   "file": "datasets/attack_techniques/T1059.001/obfuscated_powershell/windows-sysmon.log",
+   "technique": "T1059.001",
+   "labels": [
+    "T1059.001"
+   ],
+   "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1059.001/obfuscated_powershell/windows-sysmon.log",
+   "sha256": "70d3c6982eb05a2897b9e4adcba25da2a5f1fbfbf07eca373cf4ca0c063f56a3",
+   "bytes": 54722634,
+   "previously_opened": false
+  },
+  {
+   "file": "datasets/attack_techniques/T1059.001/powershell_testing/windows-sysmon.log",
+   "technique": "T1059.001",
+   "labels": [
+    "T1059.001"
+   ],
+   "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1059.001/powershell_testing/windows-sysmon.log",
+   "sha256": "fa2961e63bef58669c7a634b1466bfa540fc836730cffb2959bf6fc56ad01eb4",
+   "bytes": 13630939,
+   "previously_opened": false
+  },
+  {
+   "file": "datasets/attack_techniques/T1059.001/sharphound/windows-sysmon.log",
+   "technique": "T1059.001",
+   "labels": [
+    "T1059.001"
+   ],
+   "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1059.001/sharphound/windows-sysmon.log",
+   "sha256": "29f4f1a561c219f2fe98db0e1269417a7632804c1431a9f1fadfccfba4f170c0",
+   "bytes": 14699348,
+   "previously_opened": false
+  },
+  {
+   "file": "datasets/attack_techniques/T1059.001/soaphound/sysmon_soaphound.log",
+   "technique": "T1059.001",
+   "labels": [
+    "T1059.001"
+   ],
+   "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1059.001/soaphound/sysmon_soaphound.log",
+   "sha256": "99d01ead83b5a6d435c25fc101a1886a698ca0880c8da769d6914bbd23a475cc",
+   "bytes": 118213,
+   "previously_opened": false
+  },
+  {
+   "file": "datasets/attack_techniques/T1059.001/unmanaged_powershell_execution/windows-sysmon.log",
+   "technique": "T1059.001",
+   "labels": [
+    "T1059.001"
+   ],
+   "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1059.001/unmanaged_powershell_execution/windows-sysmon.log",
+   "sha256": "e7905b25fc39c794cf37e7c6ddfab273dc3f4ce61786556f9e61bd0bcc57300a",
+   "bytes": 89107,
+   "previously_opened": false
+  },
+  {
+   "file": "datasets/attack_techniques/T1053.005/atomic_red_team/windows-sysmon.log",
+   "technique": "T1053.005",
+   "labels": [
+    "T1053.005"
+   ],
+   "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1053.005/atomic_red_team/windows-sysmon.log",
+   "sha256": "d346ab6c75b3151217dfc2c4c166c951fc16d68c31b7d5a8f3e577d9545ff9f0",
+   "bytes": 11410982,
+   "previously_opened": false
+  },
+  {
+   "file": "datasets/attack_techniques/T1053.005/lateral_movement_lolbas/windows-sysmon.log",
+   "technique": "T1053.005",
+   "labels": [
+    "T1053.005"
+   ],
+   "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1053.005/lateral_movement_lolbas/windows-sysmon.log",
+   "sha256": "722963980c277664e31993c1b4c4007906a014a9a718dd21cce04cf19e2ef799",
+   "bytes": 5583791,
+   "previously_opened": false
+  },
+  {
+   "file": "datasets/attack_techniques/T1053.005/schtask_system/windows-sysmon.log",
+   "technique": "T1053.005",
+   "labels": [
+    "T1053.005"
+   ],
+   "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1053.005/schtask_system/windows-sysmon.log",
+   "sha256": "598b761436a1a39b1561c3f0ce59cd8b0439601f4137c73aaf32a4f9bc35077e",
+   "bytes": 2142,
+   "previously_opened": false
+  },
+  {
+   "file": "datasets/attack_techniques/T1053.005/schtasks/windows-sysmon.log",
+   "technique": "T1053.005",
+   "labels": [
+    "T1053.005"
+   ],
+   "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1053.005/schtasks/windows-sysmon.log",
+   "sha256": "2af70b9815a95c0be345a10e7c833cbcd5c4dd6919040d7652396b008475acba",
+   "bytes": 626881,
+   "previously_opened": false
+  },
+  {
+   "file": "datasets/attack_techniques/T1053.005/svchost_lolbas_execution_process_spawn/windows-xml.log",
+   "technique": "T1053.005",
+   "labels": [
+    "T1053.005"
+   ],
+   "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1053.005/svchost_lolbas_execution_process_spawn/windows-xml.log",
+   "sha256": "44d9f8b1c6d7e29221c87bfbc57e72a585d5a04f1d3686d6c012dfb9e587a342",
+   "bytes": 1045277,
+   "previously_opened": false
+  },
+  {
+   "file": "datasets/attack_techniques/T1036.003/copy_sysmon/sysmon.log",
+   "technique": "T1036.003",
+   "labels": [
+    "T1036.003"
+   ],
+   "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1036.003/copy_sysmon/sysmon.log",
+   "sha256": "c51aee2eef5d10ac1b9814ac48dc408d5cd9bcad3c848e0ec68b6f9a94ef4d75",
+   "bytes": 16340683,
+   "previously_opened": false
+  },
+  {
+   "file": "datasets/attack_techniques/T1036.003/renamed_lolbas_binary/renamed_lolbas_binary.log",
+   "technique": "T1036.003",
+   "labels": [
+    "T1036.003"
+   ],
+   "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1036.003/renamed_lolbas_binary/renamed_lolbas_binary.log",
+   "sha256": "f363825665776d98e8d4b3f0b411ab7159cd514001234b807e77a765faa5fdc8",
+   "bytes": 2026,
+   "previously_opened": false
+  },
+  {
+   "file": "datasets/attack_techniques/T1036.003/renamed_python_binary/renamed_python_binary.log",
+   "technique": "T1036.003",
+   "labels": [
+    "T1036.003"
+   ],
+   "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1036.003/renamed_python_binary/renamed_python_binary.log",
+   "sha256": "ec3fa313bceda2f28d0f79c8cba900ab8570ed421f9f4e234cd912bff062fc10",
+   "bytes": 11591,
+   "previously_opened": false
+  },
+  {
+   "file": "datasets/attack_techniques/T1047/execution_scrcons/windows-sysmon.log",
+   "technique": "T1047",
+   "labels": [
+    "T1047"
+   ],
+   "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1047/execution_scrcons/windows-sysmon.log",
+   "sha256": "6181de032b63ca66cbbd61e43dffd9ea5acc41713b8ccb0a163dfb4afd1d86f9",
+   "bytes": 20686548,
+   "previously_opened": false
+  },
+  {
+   "file": "datasets/attack_techniques/T1047/lateral_movement/windows-sysmon.log",
+   "technique": "T1047",
+   "labels": [
+    "T1047"
+   ],
+   "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1047/lateral_movement/windows-sysmon.log",
+   "sha256": "4ed13872c41a8db35cd5c910a125bbd22345c8f6104b3d361eb05e5db11a2ad4",
+   "bytes": 5437888,
+   "previously_opened": false
+  },
+  {
+   "file": "datasets/attack_techniques/T1047/lateral_movement_lolbas/windows-sysmon.log",
+   "technique": "T1047",
+   "labels": [
+    "T1047"
+   ],
+   "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1047/lateral_movement_lolbas/windows-sysmon.log",
+   "sha256": "3498742b7cd8d802b9bf7fec402f20b12ba5de2a837538af457938f1b0e92caa",
+   "bytes": 5431535,
+   "previously_opened": false
+  },
+  {
+   "file": "datasets/attack_techniques/T1047/susp_winrar/blank123.log",
+   "technique": "T1047",
+   "labels": [
+    "T1047"
+   ],
+   "url": "https://media.githubusercontent.com/media/splunk/attack_data/5879f5423e6c08df2b22b63f7b36e84866f9c51c/datasets/attack_techniques/T1047/susp_winrar/blank123.log",
+   "sha256": "57d7d9159fb48e074cd2954cbb2778ec1276502e9ca0bcd64d8f89cedea90fb4",
+   "bytes": 4342,
+   "previously_opened": false
+  }
+ ],
+ "skipped": [
+  {
+   "file": "datasets/attack_techniques/T1053.005/taskschedule/windows-sysmon.log",
+   "technique": "T1053.005",
+   "reason": "larger than 64 MB"
+  }
+ ],
+ "schema": "predict-shield/ai-rule-suggestion-split/1",
+ "repository": "https://github.com/splunk/attack_data",
+ "protocol": [
+  "Targets: five Windows techniques with enough Sysmon recordings for a split (T1562.001, T1059.001, T1053.005, T1036.003, T1047).",
+  "Each recording goes to development or held-out by the parity of SHA-256 of its path; the three files opened in earlier runs are forced into development.",
+  "The model is shown summaries of development recordings only. Held-out recordings are loaded only after the AI's rules have passed the acceptance gate and the accepted set's hash is recorded.",
+  "Each held-out recording is scored once: detected when an accepted rule for its technique fires; any alert from a rule for another technique is listed for a reader to judge.",
+  "Pinned by repository commit and file SHA-256; files over 64 MB are skipped and recorded. Committed before any recording in this split was parsed."
+ ]
+}
