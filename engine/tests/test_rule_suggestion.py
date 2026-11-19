@@ -2,7 +2,8 @@ import json
 import unittest
 
 from predict_shield.endpoint_telemetry import normalize
-from predict_shield.rule_suggestion import acceptance_gate, freeze, suggest, summarize, validate_rules
+from predict_shield.rule_suggestion import (RULE_OUTPUT_SCHEMA, acceptance_gate, compact_development_evidence,
+                                            freeze, suggest, summarize, validate_rules)
 
 SYSMON = "Microsoft-Windows-Sysmon/Operational"
 
@@ -86,6 +87,28 @@ class SuggestAndGateTests(unittest.TestCase):
         self.assertEqual((s.model, len(s.rules)), ("scripted", 1))
         self.assertTrue(s.injection_suspected)
         self.assertIn("T1562.001", model.seen)
+
+    def test_compact_evidence_is_bounded_and_does_not_echo_long_nested_summaries(self):
+        bulky = {"file_create": [
+            {"Image": "C:\\\\Windows\\\\System32\\\\WindowsPowerShell\\\\v1.0\\\\powershell.exe",
+             "TargetFilename": "C:\\\\Users\\\\Administrator\\\\AppData\\\\Local\\\\Temp\\\\" + "x" * 400,
+             "recordings_seen_in": 3} for _ in range(12)]}
+        rows = compact_development_evidence(bulky, max_chars=800)
+        self.assertTrue(rows)
+        self.assertLessEqual(len(json.dumps(rows, separators=(",", ":"))), 800)
+        self.assertFalse(any("x" * 90 in str(row) for row in rows))
+        model = Scripted(reply([GOOD]))
+        result = suggest(model, "T1562.001", "Impair Defenses", bulky)
+        self.assertEqual(len(result.rules), 1)
+        self.assertNotIn("event_summaries", model.seen)
+        self.assertLess(len(model.seen), 2500)
+        self.assertIn("T1562.001", model.seen)
+
+    def test_schema_forbids_echoing_event_summaries(self):
+        self.assertEqual(set(RULE_OUTPUT_SCHEMA["properties"]), {"rules", "uncertainty"})
+        self.assertFalse(RULE_OUTPUT_SCHEMA["additionalProperties"])
+        self.assertEqual(RULE_OUTPUT_SCHEMA["properties"]["rules"]["maxItems"], 4)
+        self.assertIn("schema", "schema-constrained")
 
     def test_gate_keeps_only_rules_that_fire_on_their_technique_and_not_elsewhere(self):
         rule = validate_rules(reply([GOOD]), "T1562.001")[0][0]
