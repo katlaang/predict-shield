@@ -83,6 +83,8 @@ jobs:
               assert len(r["model_exchanges"]) == 5, (path, len(r["model_exchanges"]))
               assert len(r["accepted_set_sha256"]) == 64
               assert r["summary"]["held_out_recordings"] == 33, r["summary"]
+              assert r["evaluation_status"] == "EXPLORATORY_REUSE_OF_PREVIOUSLY_SCORED_33_RECORDINGS"
+              assert r["independently_unseen_since_revision"] is False
               accepted = {json.dumps(x, sort_keys=True) for x in r["accepted_rules"]}
               gated = {json.dumps(g["rule"], sort_keys=True) for t in r["techniques"].values()
                        for g in t["gate"] if g["accepted"]}
