@@ -60,5 +60,44 @@ class RuleTests(unittest.TestCase):
         self.assertFalse(technique_matches_label("T1112", ["T1003"]))
 
 
+class RulesV2Tests(unittest.TestCase):
+    def hit(self, event):
+        from predict_shield.endpoint_telemetry import RULES_V2
+        return sorted(h.rule_id for h in detect([event], RULES_V2))
+
+    def test_v1_is_preserved_unchanged(self):
+        from predict_shield.endpoint_telemetry import RULES, RULES_V1
+        self.assertIs(RULES, RULES_V1)
+        self.assertEqual([r.rule_id for r in RULES_V1],
+                         ["ps-wdigest-downgrade", "ps-lsass-memory-access", "ps-comsvcs-minidump"])
+
+    def test_task_manager_reading_lsass_is_no_longer_skipped(self):
+        event = flat(EventID=10, TargetImage="C:\\Windows\\system32\\lsass.exe", GrantedAccess="0x1fffff",
+                     SourceImage="C:\\Windows\\system32\\Taskmgr.exe")
+        self.assertEqual(self.hit(event), ["ps2-lsass-memory-access"])
+
+    def test_the_azure_guest_agent_path_is_excluded(self):
+        event = flat(EventID=10, TargetImage="C:\\Windows\\system32\\lsass.exe", GrantedAccess="0x1410",
+                     SourceImage="C:\\WindowsAzure\\GuestAgent_2.7\\CollectGuestLogs.exe")
+        self.assertEqual(self.hit(event), [])
+
+    def test_lsass_dump_file_and_command(self):
+        self.assertEqual(self.hit(flat(EventID=11, TargetFilename="C:\\Temp\\lsass.DMP")), ["ps2-lsass-dump-file"])
+        self.assertEqual(self.hit(flat(EventID=11, TargetFilename="C:\\Temp\\notes.dmp")), [])
+        self.assertEqual(self.hit(flat(EventID=1, CommandLine="tool.exe -ma lsass.exe out.dmp")), ["ps2-lsass-dump-command"])
+
+    def test_sam_hive_save(self):
+        self.assertEqual(self.hit(flat(EventID=1, CommandLine="reg save HKLM\\SAM C:\\t\\sam")), ["ps2-sam-hive-save"])
+        self.assertEqual(self.hit(flat(EventID=1, CommandLine="reg query HKLM\\SAM")), [])
+
+    def test_registered_registry_values(self):
+        rdp = "HKLM\\System\\CurrentControlSet\\Control\\Terminal Server\\fDenyTSConnections"
+        self.assertEqual(self.hit(flat(EventID=13, TargetObject=rdp, Details="DWORD (0x00000000)")),
+                         ["ps2-security-registry-tamper"])
+        self.assertEqual(self.hit(flat(EventID=13, TargetObject=rdp, Details="DWORD (0x00000001)")), [])
+        ifeo = "HKLM\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\sethc.exe\\Debugger"
+        self.assertEqual(self.hit(flat(EventID=13, TargetObject=ifeo, Details="cmd.exe")), ["ps2-security-registry-tamper"])
+
+
 if __name__ == "__main__":
     unittest.main()

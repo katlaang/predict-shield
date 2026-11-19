@@ -95,7 +95,7 @@ def _comsvcs_minidump(e: dict) -> bool:
     return "comsvcs" in command and "minidump" in command
 
 
-RULES: tuple[TelemetryRule, ...] = (
+RULES_V1: tuple[TelemetryRule, ...] = (
     TelemetryRule("ps-wdigest-downgrade", "T1112", "WDigest set to store plaintext credentials",
                   ("Sysmon 13", "TargetObject", "Details"), _wdigest_downgrade, 0.9,
                   ("TargetObject", "Details", "Image")),
@@ -105,6 +105,108 @@ RULES: tuple[TelemetryRule, ...] = (
     TelemetryRule("ps-comsvcs-minidump", "T1003.001", "comsvcs.dll MiniDump invoked",
                   ("Sysmon 1 / Security 4688", "CommandLine"), _comsvcs_minidump, 0.9,
                   ("CommandLine",)),
+)
+
+
+# The first rule set, preserved unchanged so its recorded results can be
+# reproduced. `RULES` stays bound to it.
+RULES = RULES_V1
+
+
+# ---------------------------------------------------------------- rules v2
+#
+# Changes from v1 come only from the defects v1 showed on its held-out set
+# (OTRF coverage datasets, 2026-11-18) and from generic, widely published
+# detection logic. Frozen in a commit before the v2 evaluation data was
+# read. Still deterministic field matching, not AI.
+
+LSASS_BENIGN_SOURCES_V2 = LSASS_BENIGN_SOURCES - {"taskmgr.exe"}   # v1 hid a Task Manager LSASS dump
+LSASS_BENIGN_PREFIXES_V2 = ("c:\\windowsazure\\",)                 # v1 alerted on the Azure guest agent
+
+
+def _lsass_memory_access_v2(e: dict) -> bool:
+    source = _lower(e.get("SourceImage")).replace("/", "\\")
+    return (e["_channel"] == SYSMON and e["_event_id"] == 10
+            and _basename(e.get("TargetImage")) == "lsass.exe"
+            and _lower(e.get("GrantedAccess")) in LSASS_READ_MASKS
+            and _basename(source) not in LSASS_BENIGN_SOURCES_V2
+            and not source.startswith(LSASS_BENIGN_PREFIXES_V2))
+
+
+# Sysmon event 11: file created. A dump file named for LSASS.
+def _lsass_dump_file(e: dict) -> bool:
+    name = _basename(e.get("TargetFilename"))
+    return e["_channel"] == SYSMON and e["_event_id"] == 11 and "lsass" in name and name.endswith(".dmp")
+
+
+def _process_command(e: dict) -> str | None:
+    if (e["_channel"] == SYSMON and e["_event_id"] == 1) or (e["_channel"] == SECURITY and e["_event_id"] == 4688):
+        return _lower(e.get("CommandLine") or e.get("ProcessCommandLine"))
+    return None
+
+
+# A process command line naming LSASS together with a dump.
+def _lsass_dump_command(e: dict) -> bool:
+    command = _process_command(e)
+    return bool(command) and "lsass" in command and (".dmp" in command or "minidump" in command or " -ma " in command)
+
+
+def _comsvcs_minidump_v2(e: dict) -> bool:
+    return _comsvcs_minidump(e)
+
+
+# `reg save` of the SAM, SYSTEM or SECURITY hive.
+_HIVE_SAVE = __import__("re").compile(r"\breg(\.exe)?\s+save\s+\"?hklm\\(sam|system|security)\b")
+
+
+def _sam_hive_save(e: dict) -> bool:
+    command = _process_command(e)
+    return bool(command) and bool(_HIVE_SAVE.search(command))
+
+
+# Sysmon event 13: registry value set, on a registered list of
+# security-relevant values. Each entry: key suffix, and the values that
+# indicate tampering (None: any write).
+SECURITY_REGISTRY_VALUES_V2 = (
+    ("\\control\\securityproviders\\wdigest\\uselogoncredential", {"1", "dword (0x00000001)"}),
+    ("\\control\\terminal server\\fdenytsconnections", {"0", "dword (0x00000000)"}),
+    ("\\control\\lsa\\lmcompatibilitylevel", None),
+    ("\\control\\lsa\\msv1_0\\ntlmminclientsec", None),
+    ("\\control\\lsa\\msv1_0\\restrictsendingntlmtraffic", None),
+    ("\\control\\lsa\\disablerestrictedadmin", {"0", "dword (0x00000000)"}),
+    ("\\control\\lsa\\runasppl", {"0", "dword (0x00000000)"}),
+    ("\\policies\\microsoft\\windows defender\\disableantispyware", {"1", "dword (0x00000001)"}),
+    ("\\windows defender\\real-time protection\\disablerealtimemonitoring", {"1", "dword (0x00000001)"}),
+    ("\\currentversion\\policies\\system\\enablelua", {"0", "dword (0x00000000)"}),
+)
+
+
+def _security_registry_tamper(e: dict) -> bool:
+    if not (e["_channel"] == SYSMON and e["_event_id"] == 13):
+        return False
+    target = _lower(e.get("TargetObject"))
+    details = _lower(e.get("Details"))
+    if "\\image file execution options\\" in target and target.endswith("\\debugger"):
+        return True
+    return any(target.endswith(suffix) and (values is None or details in values)
+               for suffix, values in SECURITY_REGISTRY_VALUES_V2)
+
+
+RULES_V2: tuple[TelemetryRule, ...] = (
+    TelemetryRule("ps2-lsass-memory-access", "T1003.001", "LSASS opened with a memory-read access mask",
+                  ("Sysmon 10", "TargetImage", "GrantedAccess", "SourceImage"), _lsass_memory_access_v2, 0.8,
+                  ("SourceImage", "GrantedAccess", "TargetImage")),
+    TelemetryRule("ps2-lsass-dump-file", "T1003.001", "A dump file named for LSASS was written",
+                  ("Sysmon 11", "TargetFilename"), _lsass_dump_file, 0.9, ("TargetFilename", "Image")),
+    TelemetryRule("ps2-lsass-dump-command", "T1003.001", "A command line names LSASS and a dump",
+                  ("Sysmon 1 / Security 4688", "CommandLine"), _lsass_dump_command, 0.9, ("CommandLine",)),
+    TelemetryRule("ps2-comsvcs-minidump", "T1003.001", "comsvcs.dll MiniDump invoked",
+                  ("Sysmon 1 / Security 4688", "CommandLine"), _comsvcs_minidump_v2, 0.9, ("CommandLine",)),
+    TelemetryRule("ps2-sam-hive-save", "T1003.002", "SAM, SYSTEM or SECURITY hive saved with reg save",
+                  ("Sysmon 1 / Security 4688", "CommandLine"), _sam_hive_save, 0.9, ("CommandLine",)),
+    TelemetryRule("ps2-security-registry-tamper", "T1112", "A registered security-relevant registry value changed",
+                  ("Sysmon 13", "TargetObject", "Details"), _security_registry_tamper, 0.8,
+                  ("TargetObject", "Details", "Image")),
 )
 
 

@@ -27,7 +27,7 @@ PREDICT-SHIELD's lab results so far came from servers, packages and fixtures the
 
 Run [44451381802](https://github.com/katlaang/predict-shield/actions/runs/44451381802), commit `6bf4b5f`. All three jobs passed.
 
-- **OTRF:** the same result as locally: all 3 recorded attacks detected, with 6 detections that all agree with their labels and none among about 8,900 background events; all 6 admitted, each host marked due by `change_event`, the re-sent envelope refused. These are the datasets the rules were written from; see the held-out results below.
+- **OTRF:** the same result as locally. Three selected OTRF attack recordings containing 8,920 telemetry events generated six matching rule alerts. Each recording produced at least one alert consistent with its published ATT&CK label. Event-level detection recall, precision and false-positive rate could not be determined from the available labels. These results demonstrate integration behavior, not generalized detection accuracy. All six alerts were signed and admitted, each host was marked due by `change_event`, and the re-sent envelope was refused.
 - **CDN files:** jQuery 3.7.1, jQuery 3.7.0 and lodash 4.17.21 each matched both cdnjs's and jsDelivr's published hashes, and the two CDNs served identical bytes. The production probe reported VERIFIED for all three over the public internet, and NOT VERIFIED with the 3.7.0 hash registered for the 3.7.1 URL. Chromium ran both libraries with their published SRI values and refused jQuery 3.7.1 with 3.7.0's.
 - **OSV and dependency upgrades:** 4.17.15 rolled back; OSV listed five advisories covering it, among them GHSA-p6mc-m468-83gw, and the live probe still saw prototype pollution. **4.17.21 rolled back as well:** the live probe passed, but OSV listed two advisories covering 4.17.21, GHSA-r5fr-rjxr-66jc and GHSA-xxjr-mmjv-4gpg, and its version query agreed. 4.18.1 was kept with all four assertions VERIFIED and no covering advisory. The existing lodash CVE pilot accepted 4.17.21 against the two advisories registered at the time; OSV shows that is no longer a clean version.
 - **ET Open:** 53,559 enabled rules downloaded for the runner's Suricata (merged ruleset SHA-256 `1ca3bd88...0f648a`); Suricata loaded 53,560 rules including the lab rule. The public rule sid 2100498 fired on lab traffic and its alert was admitted through the signed intake in 0.51 seconds, as T1059.
@@ -39,13 +39,15 @@ The next CI run after the one above rolled back the prepared-statement fix: stag
 
 ## How good are the endpoint rules? Held-out results, 2026-11-18
 
+**These are deterministic rules, not AI.** Each is a fixed match on named event fields. Nothing here tests whether PREDICT-SHIELD's AI can recognize unfamiliar attack behavior; the replay is an end-to-end detection-integration test (telemetry, rule match, signed admission, replay refusal, scheduled re-check).
+
 The three OTRF datasets above are the ones the rules were written from, so detecting all three says the pipeline works, not that the rules detect well. A dataset is one attack recorded with all the host's normal background activity around it; OTRF labels datasets, not individual events, so a per-event detection rate cannot be computed. Detection is therefore measured per recorded attack.
 
 Twenty more OTRF datasets were pinned and run only after the rules were committed (`6bf4b5f`), and the rules were not changed in response (`run_otrf_coverage.py`, `coverage_datasets` in sources.json). 170,434 events in all.
 
 | Set | Recorded attacks | Detected | Alerts elsewhere |
 | --- | --- | --- | --- |
-| Development (rules written from these) | 3, all covered by a rule | 3 of 3 | none in 8,914 background events |
+| Development (rules written from these) | 3, covering 2 techniques | 3 of 3 recordings with an alert consistent with the label | not determinable: no event-level labels |
 | Held out, technique covered by a rule | 5 | **2 of 5** | n/a |
 | Held out, other techniques | 15 | n/a | alerts in 2 of 15 datasets |
 
@@ -57,15 +59,15 @@ Twenty more OTRF datasets were pinned and run only after the rules were committe
 
 **Alerts on datasets labelled with other techniques:**
 - *Empire Over-Pass-The-Hash* (T1550.002): PowerShell opened LSASS with `0x1010`. Mimikatz patches LSASS for this attack, so the alert reflects real malicious activity; only the label differs.
-- *Empire Invoke SMBExec* (T1021.002): the Azure guest agent's log collector (`CollectGuestLogs.exe`) opened LSASS with `0x1410`. This is a false alarm on benign software.
+- *Empire Invoke SMBExec* (T1021.002): the Azure guest agent's log collector (`CollectGuestLogs.exe`) opened LSASS with `0x1410`. Judged by reading the matched fields, this is an alert on benign software. The dataset has no event-level label to confirm it.
 
-**Reading these numbers.** Three hand-written rules caught 2 of the 5 held-out attacks they target and raised one false alarm in about 170,000 events. That is a measurement of these three rules, not of the pipeline's intake, scheduler or verification, which behaved as designed throughout. Improving the rules (for example, keying on LSASS access with dump-file creation rather than trusting process names, and covering more registry paths) would need a fresh held-out set to measure, since these twenty have now been seen.
+**Reading these numbers.** Three hand-written rules raised an alert consistent with the label on 2 of the 5 held-out recordings of the techniques they target (95% Wilson interval 12% to 77%), and alerted on 2 of 15 recordings of other techniques, one of them judged benign, across 170,434 events. Event-level recall, precision and false-positive rate cannot be determined from these labels. That is a measurement of these three rules, not of the pipeline's intake, scheduler or verification, which behaved as designed throughout. Improving the rules (for example, keying on LSASS access with dump-file creation rather than trusting process names, and covering more registry paths) would need a fresh held-out set to measure, since these twenty have now been seen.
 
 ## Local run, 2026-11-18
 
 This machine can reach GitHub and npm but not the CDNs, OSV, the ET download or Docker Hub, so those parts ran only in CI.
 
-- OTRF: all 3 recorded attacks detected, 6 detections all agreeing with their published labels, no alert among the other 8,914 events; 6 detections admitted; each host marked due by `change_event`; the re-sent envelope refused with HTTP 401.
+- OTRF: Three selected OTRF attack recordings containing 8,920 telemetry events generated six matching rule alerts. Each recording produced at least one alert consistent with its published ATT&CK label. Event-level detection recall, precision and false-positive rate could not be determined from the available labels. These results demonstrate integration behavior, not generalized detection accuracy. All six alerts were admitted, each host was marked due by `change_event`, and the re-sent envelope was refused with HTTP 401.
 - DVWA: the incomplete fix rolled back with static analysis reporting it resolved and the live check failing; the prepared statement kept with all five assertions VERIFIED.
 - Dependency chain with the two hand-registered advisories in place of OSV: 4.17.15 rolled back; 4.17.21 and 4.18.1 kept.
 - Suricata with only the public sid 2100498 rule (not the full ET download): the rule fired and the alert was admitted in about half a second.
