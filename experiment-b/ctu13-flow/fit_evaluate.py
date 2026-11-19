@@ -31,13 +31,16 @@ def classify_label(raw: str) -> int | None:
     if not isinstance(raw, str):
         return None
     label = raw.strip().lower()
-    if "background" in label:
+    # The original CTU-13 publisher explicitly warns that To-Botnet and
+    # To-Normal flows originate from unknown hosts. Only From- labels
+    # identify flows originating from the known botnet/normal machines.
+    if "botnet" in label and "normal" in label:
         return None
-    botnet = "botnet" in label
-    normal = "normal" in label
-    if botnet == normal:
-        return None
-    return 1 if botnet else 0
+    if label.startswith("from-botnet"):
+        return 1
+    if label.startswith("from-normal"):
+        return 0
+    return None
 
 
 def feature(row: dict) -> list[float]:
@@ -182,7 +185,7 @@ def run(manifest: dict, manifest_bytes: bytes, root: Path) -> tuple[dict, dict]:
         "sample_precision": rate(tp, tp + fp),
         "sample_false_positive_rate": rate(fp, fp + tn),
         "test_scenario_ids": [s["scenario_id"] for s in stats if s["split"] == "test"],
-        "unknown_background_excluded": sum(s["excluded_unknown"] for s in stats),
+        "unknown_or_ambiguous_excluded": sum(s["excluded_unknown"] for s in stats),
         "class_stratified_sampling": True,
         "sample_precision_is_operational_precision": False,
         "reviewer_ground_truth_independently_authenticated": False,
@@ -190,7 +193,7 @@ def run(manifest: dict, manifest_bytes: bytes, root: Path) -> tuple[dict, dict]:
         "field_effectiveness_established": False,
         "model_is_trained": True,
         "model_calibrated": False,
-        "interpretation": "Historical CTU-13 sampled bidirectional network flows, cross-scenario split; selected flows only, unknown background excluded, not operational alert precision.",
+        "interpretation": "Historical CTU-13 sampled bidirectional network flows; only From-Botnet and From-Normal treated as labels, To-* and Background unknown; cross-scenario split, not operational precision.",
     }
     return bundle, report
 
