@@ -6,6 +6,7 @@
 - Found: the LSASS rule lists `taskmgr.exe` as benign, which hides the Task Manager LSASS dump; the T1112 rule covers only the WDigest key. Not changed here, so the held-out result stays valid.
 - Reworded every summary that read "8,920 events, 6 detections", which looked like a per-event rate. Detection is per recorded attack: 3 of 3 on the development set, 2 of 5 held out.
 - Archive format is now read from the bytes, not the file name; each rule hit records the fields it matched.
+- Fixed a stale-code race in the DVWA chain: PHP's opcode cache could serve the previous file for up to two seconds after a change, so a correct fix was once refused. The lab PHP servers now run with the cache off, recorded in each report.
 
 ## 2026-11-18 (7): Public test sources
 

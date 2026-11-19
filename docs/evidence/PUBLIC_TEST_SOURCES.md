@@ -33,6 +33,10 @@ Run [44451381802](https://github.com/katlaang/predict-shield/actions/runs/444513
 - **ET Open:** 53,559 enabled rules downloaded for the runner's Suricata (merged ruleset SHA-256 `1ca3bd88...0f648a`); Suricata loaded 53,560 rules including the lab rule. The public rule sid 2100498 fired on lab traffic and its alert was admitted through the signed intake in 0.51 seconds, as T1059.
 - **DVWA:** the same as locally. The incomplete fix cleared all four static assertions, with Semgrep reporting the finding resolved, failed the live check (half of the payloads still returned other users' rows on staging and on the target), and was rolled back to the original file. The prepared statement passed all five and was kept.
 
+## A stale-code race in the DVWA chain
+
+The next CI run after the one above rolled back the prepared-statement fix: staging had measured it clean, but the live check on the target still saw injection. PHP's opcode cache was on for the built-in web server and rechecks a changed file only every `opcache.revalidate_freq` seconds (2 by default), so verification run immediately after the change exercised the previous code. The first run had passed by timing alone. The lab servers now run with the opcode cache off, and each report records the PHP flags. A production PHP adapter would make cache invalidation part of activation (an opcache reset or a PHP-FPM reload). The failure was in the safe direction: a correct fix was refused because it could not be confirmed live; an unverified fix was never kept. This is the same kind of race as the nginx reload in the end-to-end chain.
+
 ## How good are the endpoint rules? Held-out results, 2026-11-18
 
 The three OTRF datasets above are the ones the rules were written from, so detecting all three says the pipeline works, not that the rules detect well. A dataset is one attack recorded with all the host's normal background activity around it; OTRF labels datasets, not individual events, so a per-event detection rate cannot be computed. Detection is therefore measured per recorded attack.

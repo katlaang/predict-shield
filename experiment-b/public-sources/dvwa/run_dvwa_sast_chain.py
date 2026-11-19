@@ -103,7 +103,12 @@ class DvwaServer:
         env = dict(os.environ, DB_SERVER=db_host, DB_PORT=str(db_port), DISABLE_AUTHENTICATION="true",
                    DEFAULT_SECURITY_LEVEL="low")
         self.base = f"http://127.0.0.1:{port}"
-        self.process = subprocess.Popen(["php", "-S", f"127.0.0.1:{port}", "-t", str(docroot)], env=env,
+        # The opcode cache is off: with it on, PHP rechecks a changed file only
+        # every opcache.revalidate_freq seconds, so a verification run right
+        # after a change can exercise the previous code. (A production adapter
+        # would reset the cache or reload PHP-FPM as its activation step.)
+        self.process = subprocess.Popen(["php", "-d", "opcache.enable=0", "-d", "opcache.enable_cli=0",
+                                         "-S", f"127.0.0.1:{port}", "-t", str(docroot)], env=env,
                                         stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         jar = http.cookiejar.CookieJar()
         self.opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(jar))
@@ -344,7 +349,9 @@ def main() -> None:
               "semgrep_version": registry["semgrep-pinned-rule"].version,
               "rule_file_sha256": hashlib.sha256(RULE_FILE.read_bytes()).hexdigest(),
               "renderings_sha256": {k: hashlib.sha256(v.read_bytes()).hexdigest() for k, v in RENDERINGS.items()},
-              "payloads": list(PAYLOADS), "incidents": {}}
+              "payloads": list(PAYLOADS), "incidents": {},
+              "php_version": subprocess.run(["php", "-v"], capture_output=True, text=True).stdout.splitlines()[0],
+              "php_server_flags": ["-d", "opcache.enable=0", "-d", "opcache.enable_cli=0"]}
     try:
         target.setup_database()
         baseline = {i: [list(r) for r in target.lookup(i)] for i in LEGIT_IDS}
