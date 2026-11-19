@@ -28,4 +28,4 @@ jobs:
           python-version: '3.12'
       - name: Test report audit and negative outcomes
         working-directory: experiment-b/public-sources/ai_rules
-        run: python -m unittest -v test_audit_report
+        run: python -m unittest -v test_audit_report test_partial_checkpoint
