@@ -65,14 +65,15 @@ jobs:
         working-directory: experiment-b/public-sources/ai_rules
         run: |
           python run_ai_rule_suggestion.py --model "ollama:$LOCAL_MODEL" \
-            --model-digest "$(cat /tmp/ps-rules-model-digest.txt)" --output /tmp/ps-ai-rules-local.json
+            --model-digest "$(cat /tmp/ps-rules-model-digest.txt)" --output /tmp/ps-ai-rules-local.json \
+            --checkpoint /tmp/ps-ai-rules-local-progress.json
       - name: Draft, gate, freeze, then score held-out (hosted model, if requested)
         if: env.HOSTED != ''
         working-directory: experiment-b/public-sources/ai_rules
         env:
           FEATHERLESS_API_KEY: ${{ secrets.FEATHERLESS_API_KEY }}
           TOGETHER_API_KEY: ${{ secrets.TOGETHER_API_KEY }}
-        run: python run_ai_rule_suggestion.py --model "hosted:$HOSTED" --output /tmp/ps-ai-rules-hosted.json
+        run: python run_ai_rule_suggestion.py --model "hosted:$HOSTED" --output /tmp/ps-ai-rules-hosted.json --checkpoint /tmp/ps-ai-rules-hosted-progress.json
       - name: Check the protocol was followed
         run: |
           python - <<'PY'
