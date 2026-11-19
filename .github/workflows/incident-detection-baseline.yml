@@ -1,0 +1,64 @@
+name: Supervised incident detector baseline
+
+on:
+  pull_request:
+    paths:
+      - 'engine/predict_shield/incident_feedback.py'
+      - 'engine/predict_shield/incident_detection_model.py'
+      - 'engine/tests/test_incident_feedback.py'
+      - 'engine/tests/test_incident_detection_model.py'
+      - '.github/workflows/incident-detection-baseline.yml'
+  push:
+    branches: [master]
+    paths:
+      - 'engine/predict_shield/incident_feedback.py'
+      - 'engine/predict_shield/incident_detection_model.py'
+      - 'engine/tests/test_incident_feedback.py'
+      - 'engine/tests/test_incident_detection_model.py'
+      - '.github/workflows/incident-detection-baseline.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  supervised-baseline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned supervised learning dependency
+        run: |
+          python -m pip install 'scikit-learn==1.7.2'
+          python -c 'import sklearn; print("sklearn", sklearn.__version__)'
+      - name: Test reviewed-incident dataset contract and baseline
+        run: |
+          PYTHONPATH=engine python -m unittest             engine.tests.test_incident_feedback             engine.tests.test_incident_detection_model -v
+      - name: Record scope of the evaluation
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          report = {
+            "schema": "predict-shield/supervised-baseline-ci-evidence/1",
+            "synthetic_unit_test_fixtures": True,
+            "actual_operator_labeled_data": False,
+            "trained_model_exists_in_repository_workflow": True,
+            "field_detection_accuracy_established": False,
+            "deployment_authorized": False,
+            "note": "This job establishes code behavior on unit test fixtures only, not model effectiveness.",
+          }
+          path = Path('/tmp/incident-baseline-ci-evidence.json')
+          path.write_text(json.dumps(report, indent=2, sort_keys=True) + '\n')
+          PY
+      - name: Preserve CI evidence, including on failures
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: supervised-incident-baseline-ci
+          path: /tmp/incident-baseline-ci-evidence.json
+          if-no-files-found: warn
+          retention-days: 90
