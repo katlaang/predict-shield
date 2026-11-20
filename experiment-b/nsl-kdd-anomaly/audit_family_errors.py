@@ -85,7 +85,9 @@ def audit(report, *, raw_bytes=None):
     unseen_names = report.get("unseen_attack_type_names")
     if not isinstance(unseen_names, list) or not unseen_names:
         raise ValueError("Missing or empty unseen attack-type list")
-    if len(unseen_names) != len(set(str(name) for name in unseen_names)):
+    if not all(isinstance(name, str) and name for name in unseen_names):
+        raise ValueError("Invalid unseen attack-type name")
+    if len(unseen_names) != len(set(unseen_names)):
         raise ValueError("Duplicate unseen attack-type names")
     novel = set(unseen_names)
     if not all(isinstance(name, str) and name in families for name in novel):
