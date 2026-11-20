@@ -7,6 +7,7 @@ on:
       - 'experiment-b/mechanism-lab/java/src/main/java/org/predictshield/mechanism/AuthorityPolicyStore.java'
       - 'experiment-b/mechanism-lab/java/src/test/java/org/predictshield/mechanism/AuthorityPolicyStoreTest.java'
       - 'experiment-b/mechanism-lab/authority_cold_restart_smoke.py'
+      - 'experiment-b/mechanism-lab/AUTHORITY_OUTAGE_ACTIONS.md'
       - 'experiment-b/mechanism-lab/compose.yaml'
       - '.github/workflows/authority-cold-restart.yml'
   push:
@@ -16,6 +17,7 @@ on:
       - 'experiment-b/mechanism-lab/java/src/main/java/org/predictshield/mechanism/AuthorityPolicyStore.java'
       - 'experiment-b/mechanism-lab/java/src/test/java/org/predictshield/mechanism/AuthorityPolicyStoreTest.java'
       - 'experiment-b/mechanism-lab/authority_cold_restart_smoke.py'
+      - 'experiment-b/mechanism-lab/AUTHORITY_OUTAGE_ACTIONS.md'
       - 'experiment-b/mechanism-lab/compose.yaml'
       - '.github/workflows/authority-cold-restart.yml'
 
