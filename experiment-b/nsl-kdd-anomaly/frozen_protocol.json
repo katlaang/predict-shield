@@ -1,0 +1,25 @@
+{
+  "schema": "predict-shield/nsl-kdd-historical-normal-only-detection/1",
+  "created_for": "public benchmark validation after primary CTU13 publisher timeout (PR #136)",
+  "benchmark_authority": "https://www.unb.ca/cic/datasets/nsl.html",
+  "mirror_repository": "https://github.com/Jehuty4949/NSL_KDD",
+  "mirror_commit": "27bbbdf5c5cccf9970b8b6037a0f19dc09c5a0a9",
+  "train_file": "KDDTrain+.txt",
+  "test_file": "KDDTest+.txt",
+  "train_git_blob_sha1": "20002897492adc110190a10509aa694f26f7f308",
+  "test_git_blob_sha1": "b30e89605285a5ccd8cf8fd38dba72906c20d3dd",
+  "train_expected_rows": 125973,
+  "test_expected_rows": 22544,
+  "calibration_normal_assignment": "First 25 percent of normal training rows assigned by SHA256(row bytes) modulo 4, remainder fit; no test rows used until model and threshold frozen",
+  "calibration_fpr_ceiling": 0.05,
+  "learned_model": "IsolationForest(n_estimators=100,max_samples=512,contamination=auto,random_state=20261119,n_jobs=1)",
+  "features": "11 fixed numeric pre-action features only; no attack labels, source/destination IP, or explicit attack signatures",
+  "test_outcomes": "TP FP FN TN and unseen-label attack recall; unseen means attack-type string absent from published KDDTrain+ label set, not previously unknown to security community",
+  "scientific_limits": [
+    "NSL-KDD is an old benchmark derived from KDD 1999; not current authentic production telemetry",
+    "Public GitHub repository is a nonpublisher mirror, pinned by git blob and immutable commit, not independently reauthenticated against original bytes",
+    "Calibration split is from the official training file, not disjoint operators or attack campaigns",
+    "No independently verified modern infrastructure labels, no concept-drift test, no zero-day claim",
+    "Outputs are learned anomaly suspicions, not confirmed hostile incidents or authorized responses"
+  ]
+}
