@@ -1,0 +1,44 @@
+{
+  "schema": "predict-shield/ctu13-published-cross-family-source-registration/1",
+  "status": "PREDECLARED_BEFORE_PUBLIC_RECORDING_DOWNLOAD",
+  "collection": "CTU-13 original author-labeled bidirectional flow records, 2011",
+  "publisher_url": "https://www.stratosphereips.org/datasets-ctu13/",
+  "dataset_publication": "https://doi.org/10.1016/j.cose.2014.05.011",
+  "purpose": "Exploratory cross-scenario anomaly recognition with an attack family absent from training and threshold-calibration scenarios",
+  "method": "Isolation Forest normal-only trained on Rbot-era train flows; benign-only threshold on separate Rbot scenario; NSIS.ay family test",
+  "sample_cap_per_label_per_scenario": 2000,
+  "max_calibration_sample_false_positive_rate": 0.05,
+  "sources": [
+    {
+      "scenario_id": "CTU-45",
+      "family": "Rbot",
+      "split": "train",
+      "url": "https://mcfp.felk.cvut.cz/publicDatasets/CTU-Malware-Capture-Botnet-45/detailed-bidirectional-flow-labels/capture20110815.binetflow",
+      "file": "ctu45-train.binetflow"
+    },
+    {
+      "scenario_id": "CTU-52",
+      "family": "Rbot",
+      "split": "calibration",
+      "url": "https://mcfp.felk.cvut.cz/publicDatasets/CTU-Malware-Capture-Botnet-52/detailed-bidirectional-flow-labels/capture20110818-2.binetflow",
+      "file": "ctu52-calibration.binetflow"
+    },
+    {
+      "scenario_id": "CTU-53",
+      "family": "NSIS.ay",
+      "split": "test",
+      "url": "https://mcfp.felk.cvut.cz/publicDatasets/CTU-Malware-Capture-Botnet-53/detailed-bidirectional-flow-labels/capture20110819.binetflow",
+      "file": "ctu53-test.binetflow"
+    }
+  ],
+  "label_policy": "Only From-Botnet-positive / From-Normal-negative; exclude unknown To-*/Background",
+  "novelty_scope": "Publisher-identified NSIS.ay family absent from registered training and threshold-calibration Rbot scenarios. This is not zero-day discovery, current-infrastructure validation, or attack attribution.",
+  "limitations": [
+    "All sources are historical and public; previously known to research community",
+    "Source file checksums are established during first download then must be frozen in a later manifest",
+    "Publisher labels have not been independently re-adjudicated",
+    "Class-stratified sample precision is not deployment precision",
+    "A single held-out attack family cannot establish broader generalization",
+    "No automatically authorized response or production actions"
+  ]
+}
