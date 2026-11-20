@@ -109,6 +109,15 @@ jobs:
           df -h "$RUNNER_TEMP" | cat
           curl -fSL --retry 8 --retry-all-errors --continue-at - -m 7000 -o "$RUNNER_TEMP/test.zip" \
             "$(python -c "import json;print(json.load(open('experiment-b/cic-flow-v2/protocol_v2.json'))['sources']['test']['url'])")"
+          ls -l "$RUNNER_TEMP/test.zip"
+          got=$(sha256sum "$RUNNER_TEMP/test.zip" | cut -d' ' -f1)
+          want=$(python -c "import json;print(json.load(open('experiment-b/cic-flow-v2/protocol_v2.json'))['sources']['test']['sha256'])")
+          echo "downloaded $got"; echo "pinned     $want"
+          if [ "$got" != "$want" ]; then
+            echo "mismatch: fetching the server's headers"; curl -sSIL -m 60 "$(python -c "import json;print(json.load(open('experiment-b/cic-flow-v2/protocol_v2.json'))['sources']['test']['url'])")" | grep -i -E "HTTP/|length|last-modified|etag"
+            python -c "import zipfile,sys; z=zipfile.ZipFile(sys.argv[1]); print('zip members', len(z.infolist())); bad=z.testzip(); print('first bad member', bad)" "$RUNNER_TEMP/test.zip" || true
+            exit 1
+          fi
       - name: Score every test flow once
         working-directory: experiment-b/cic-flow-v2
         run: |
