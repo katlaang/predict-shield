@@ -113,6 +113,26 @@ TP + FN; per-day totals equal the flow count.
   detector that alerts on a large share of all traffic detects nearly
   everything.
 
+## Defects found in review after the run
+
+Two findings from the automated review of PR #141, checked on 20 November:
+
+- **Feature code was not covered by the freeze.** The freeze hashed the model
+  bundle, protocol and archives, but `score_test.py` computes inputs with the
+  checked-out `flow_features.py`. For this run the risk did not materialize:
+  `git diff 3769e4e a1ff061` shows no change to `flow_features.py`,
+  `train_dev.py` or `score_test.py` between the develop and test commits; only
+  the freeze record was added. The next version must hash the feature code
+  into the freeze.
+- **Context counts assume flows arrive in time order.** The 60-second window
+  evicts from the front of a queue, so a flow whose timestamp is earlier than
+  one already seen can be counted wrongly. CICFlowMeter writes flows when they
+  end and stamps them with their start time, so out-of-order rows are likely.
+  The same code ran in development and test, so the result above measures the
+  detector as built, but the six context inputs did not exactly match their
+  description. The next version must sort or reject out-of-order rows and
+  report how many there were.
+
 ## Limits
 
 Both networks are lab captures of simulated enterprises. Flows within a day are
