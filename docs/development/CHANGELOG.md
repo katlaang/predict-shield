@@ -1,5 +1,12 @@
 # Development changelog
 
+## 2026-11-19: Learned flow detector measured across two networks
+
+- `experiment-b/cic-flow/`: supervised gradient boosting plus a benign-only Isolation Forest over flow statistics, traffic type and causal 60-second context. No hand-written rules. Protocol, features, thresholds and a 1% benign alert budget fixed before any result was read; both archives pinned by SHA-256.
+- Developed on CIC-IDS2017 (corrected version), frozen (model `aeb53fb9`, freeze `d2355cb3`), then scored once on all 63,195,145 CSE-CIC-IDS2018 flows.
+- Result: 99.97% of attack flows detected, but 30.85% of benign flows alerted (20.9% to 40.3% per day), against the 1% budget. Precision 16.11%. The threshold set on 2017 benign traffic did not carry over. Recorded as a failed budget in `docs/evidence/MEASURED_CROSS_DATASET_FLOW_DETECTOR_2026_11_19.md`.
+- The bundle and both reports are committed in `experiment-b/cic-flow/frozen/` so the evidence does not depend on artifact retention.
+
 ## 2026-11-18 (9): Endpoint rules v2 on a pre-registered second-publisher held-out set
 
 - Reworded the detection results as integration behavior and labelled the endpoint rules as deterministic, not AI; held-out 2 of 5 carries its Wilson interval.

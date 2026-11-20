@@ -1,5 +1,10 @@
 # Cross-dataset flow detector: CIC-IDS2017 to CSE-CIC-IDS2018
 
+**Measured 19 November 2026: failed its 1% benign alert budget.** On the 2018
+network it detected 99.97% of 3,535,422 attack flows but alerted on 30.85% of
+59,659,723 benign flows. Full record:
+`docs/evidence/MEASURED_CROSS_DATASET_FLOW_DETECTOR_2026_11_19.md`.
+
 A learned network-flow detector that has no hand-written detection rules.
 It is fitted on one lab network's traffic and then measured once on a
 different lab network's traffic, captured a year later with different hosts,
