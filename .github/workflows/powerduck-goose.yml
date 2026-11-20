@@ -1,0 +1,29 @@
+name: PowerDuck GOOSE detector
+
+on:
+  push:
+    branches: [feat/powerduck-goose-detector]
+    paths: ['experiment-b/powerduck/**', '.github/workflows/powerduck-goose.yml']
+  workflow_dispatch:
+    inputs:
+      stage:
+        description: 'inspect, develop or test'
+        default: 'inspect'
+
+permissions:
+  contents: read
+
+jobs:
+  inspect:
+    if: github.event_name == 'push' || github.event.inputs.stage == 'inspect'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download from Zenodo and print the layout
+        run: |
+          curl -sS -m 60 https://zenodo.org/api/records/6724225 -o rec.json
+          python3 -c "import json;d=json.load(open('rec.json'));print(d['metadata']['title']);print(d['metadata'].get('license'));[print(f['key'],f['size'],f.get('checksum'),f['links']['self']) for f in d['files']]"
+          url=$(python3 -c "import json;print(json.load(open('rec.json'))['files'][0]['links']['self'])")
+          curl -fsSL -m 300 -o "$RUNNER_TEMP/powerduck.zip" "$url"
+          python3 experiment-b/powerduck/inspect_archive.py "$RUNNER_TEMP/powerduck.zip"
