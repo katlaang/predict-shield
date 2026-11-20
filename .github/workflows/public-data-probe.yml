@@ -1,0 +1,42 @@
+name: Public training data probe
+
+# Reachability and size only: HEAD requests and directory listings. Downloads
+# nothing larger than a listing.
+
+on:
+  push:
+    branches: [chore/probe-public-data]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Probe
+        run: |
+          head() { echo "=== $1"; curl -sSIL -m 40 -A 'Mozilla/5.0' "$1" 2>&1 | grep -i -E '^HTTP/|content-length|content-type|content-disposition|location' | tail -8 || true; }
+          # UQ NetFlow datasets (v3 and v2)
+          head https://rdm.uq.edu.au/files/abd2f5d8-e268-4ff0-84fb-f2f7b3ca3e8f
+          head https://rdm.uq.edu.au/files/343e2e8c-6e6e-4a0c-813d-a46acea1b7f4
+          head https://rdm.uq.edu.au/files/db0187cc-1f78-4215-8e34-303364498866
+          head https://rdm.uq.edu.au/files/4ac221b1-6bd6-42b1-bdf7-03f4fc7efb22
+          head https://rdm.uq.edu.au/files/8c6e2a00-ef9c-11ed-827d-e762de186848
+          # PowerDuck GOOSE (Zenodo)
+          head https://doi.org/10.5281/zenodo.6724225
+          curl -sSL -m 40 https://zenodo.org/api/records/6724225 | python3 -c "import json,sys;d=json.load(sys.stdin);print(d.get('metadata',{}).get('license'));[print(f['key'],f['size']) for f in d.get('files',[])]" || true
+          # HAI ICS dataset (GitHub, LFS from 22.04)
+          curl -sS -m 40 https://api.github.com/repos/icsdataset/hai/contents | python3 -c "import json,sys;[print(e['name'],e['type']) for e in json.load(sys.stdin)]" || true
+          curl -sS -m 40 "https://api.github.com/repos/icsdataset/hai/contents/hai-23.05" | python3 -c "import json,sys;[print(e['name'],e['size']) for e in json.load(sys.stdin)]" || true
+          curl -sS -m 40 https://raw.githubusercontent.com/icsdataset/hai/master/LICENSE | head -3 || true
+          # IEC 61850 GOOSE synthesized substation (GitHub)
+          curl -sS -m 40 https://api.github.com/repos/SitinCloud/IEC61850SecurityDataset | python3 -c "import json,sys;d=json.load(sys.stdin);print(d.get('size'),'KB',d.get('license'))" || true
+          # Morris power system datasets, PNNL electricity and gas IDS
+          head https://sites.google.com/a/uah.edu/tommy-morris-uah/ics-data-sets
+          head https://data.pnnl.gov/group/nodes/dataset/13470
+          # LYCOS-IDS2017, EVTX attack samples
+          head https://lycos-ids.univ-lemans.fr/
+          curl -sS -m 40 https://api.github.com/repos/sbousseaden/EVTX-ATTACK-SAMPLES | python3 -c "import json,sys;d=json.load(sys.stdin);print(d.get('size'),'KB',d.get('license'))" || true
