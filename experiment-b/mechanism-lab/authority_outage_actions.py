@@ -92,6 +92,46 @@ def collect_dual_principal_probes(request_fn, *, witness: dict,
     )
 
 
+
+def verify_authority_restored(request_fn, *, oracle_token: str,
+                              expected_policy: dict,
+                              expected_inventory: tuple[str, ...] = ENFORCERS) -> dict:
+    """Fail closed if recovering the authority silently changes the frozen trial.
+
+    This verifies source revision continuity and target *observation scope*,
+    not enforcement correctness. A recovered authority does not retroactively
+    certify the outage or a previously collected HTTP observation.
+    """
+    status, snapshot, _ = request_fn(
+        "oracle", "/oracle/observe", oracle=oracle_token, timeout=5)
+    if status != 200 or not isinstance(snapshot, dict):
+        raise RuntimeError("Recovery oracle unavailable; no next trial permitted")
+    if snapshot.get("authority_http") != 200:
+        raise RuntimeError("Authority still unavailable after restoration")
+    actual = snapshot.get("authority")
+    if not isinstance(expected_policy, dict) or not isinstance(actual, dict):
+        raise RuntimeError("Recovery policy snapshot invalid")
+    for key in ("trialId", "revision", "revoked"):
+        if key not in expected_policy or actual.get(key) != expected_policy[key]:
+            raise RuntimeError("Recovered authority source revision changed")
+    if type(actual["revoked"]) is not bool:
+        raise RuntimeError("Recovered authority revocation type invalid")
+    targets = snapshot.get("targets")
+    if not isinstance(targets, list) or len(targets) != len(expected_inventory):
+        raise RuntimeError("Incomplete recovery observation inventory")
+    identities = [urlsplit(t.get("node", "")).hostname
+                  for t in targets if isinstance(t, dict)]
+    if len(identities) != len(expected_inventory) or (
+            set(identities) != set(expected_inventory)):
+        raise RuntimeError("Recovery inventory differs from frozen experiment scope")
+    return {
+        "authority_source_revision_continuity_observed": True,
+        "declared_target_inventory_observed": len(expected_inventory),
+        "enforcement_outcome_during_outage": "INDETERMINATE",
+        "next_trial_requires_fresh_setup_fault_and_quiescence": True,
+    }
+
+
 def execute(control: str, oracle: str, compose_dir: Path) -> dict:
     if min(len(control), len(oracle)) < 24 or control == oracle:
         raise ValueError("Distinct disposable control and oracle credentials required")
@@ -161,6 +201,11 @@ def execute(control: str, oracle: str, compose_dir: Path) -> dict:
             if stopped:
                 compose_command(["start", "authority"], cwd=compose_dir)
                 wait_ready()
+                # The next action must not start if the recovered authority
+                # no longer matches the policy captured before this outage.
+                verify_authority_restored(
+                    request, oracle_token=oracle,
+                    expected_policy=dual_witness["policy"])
     if len(results) != 4:
         raise RuntimeError("Incomplete exploratory action set")
     return {"schema": "predict-shield/v31-outage-action-observations/1",
