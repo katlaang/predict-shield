@@ -1,0 +1,38 @@
+name: CIC flow source probe
+
+# Reachability probe only: lists where CIC-IDS2017 and CSE-CIC-IDS2018 can be
+# fetched from a runner. Downloads nothing larger than a directory listing.
+
+on:
+  push:
+    branches: [feat/cross-dataset-flow-detector]
+    paths: ['.github/workflows/cic-flow-source-probe.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: AWS open data bucket (CSE-CIC-IDS2018)
+        run: |
+          aws --version || true
+          aws s3 ls --no-sign-request --region ca-central-1 "s3://cse-cic-ids2018/" || true
+          aws s3 ls --no-sign-request --region ca-central-1 "s3://cse-cic-ids2018/Processed Traffic Data for ML Algorithms/" || true
+      - name: Publisher and corrected-version hosts
+        run: |
+          for u in \
+            "https://www.unb.ca/cic/datasets/ids-2017.html" \
+            "http://cicresearch.ca/CICDataset/CIC-IDS-2017/" \
+            "http://cicresearch.ca/CICDataset/CIC-IDS-2017/Dataset/" \
+            "http://cicresearch.ca/CICDataset/CIC-IDS-2017/Dataset/CIC-IDS-2017/CSVs/" \
+            "https://intrusion-detection.distrinet-research.be/CNS2022/" \
+            "https://intrusion-detection.distrinet-research.be/CNS2022/Dataset_Download.html" \
+            "https://intrusion-detection.distrinet-research.be/WTMC2021/tools_datasets.html" ; do
+            echo "=== $u"
+            curl -sSL -m 30 -A 'Mozilla/5.0' "$u" -o page.html -w 'HTTP %{http_code} %{size_download} bytes\n' || true
+            grep -o -i -E 'href="[^"]+"' page.html | grep -i -E 'csv|zip|tar|pcap|download|dataset|\.7z|gz' | head -40 || true
+          done
