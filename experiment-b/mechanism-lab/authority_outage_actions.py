@@ -159,7 +159,7 @@ def execute(control: str, oracle: str, compose_dir: Path) -> dict:
             raise RuntimeError("Physical missed-revocation state not observed")
         stopped = False
         try:
-            compose_command(["stop", "authority"], cwd=compose_dir)
+            compose_command(["pause", "authority"], cwd=compose_dir)
             stopped = True
             wait_authority_unavailable()
             timed = observe_during_action(
@@ -199,7 +199,7 @@ def execute(control: str, oracle: str, compose_dir: Path) -> dict:
             })
         finally:
             if stopped:
-                compose_command(["start", "authority"], cwd=compose_dir)
+                compose_command(["unpause", "authority"], cwd=compose_dir)
                 wait_ready()
                 # The next action must not start if the recovered authority
                 # no longer matches the policy captured before this outage.
