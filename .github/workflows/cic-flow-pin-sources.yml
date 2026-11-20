@@ -1,0 +1,47 @@
+name: CIC flow sources, pin
+
+# Downloads both corrected CIC archives, records SHA-256, sizes, member names
+# and headers. Development labels are counted; test labels are not read.
+
+on:
+  push:
+    branches: [feat/cross-dataset-flow-detector]
+    paths: ['experiment-b/cic-flow/pin_sources.py', '.github/workflows/cic-flow-pin-sources.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  pin:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - role: development
+            file: CICIDS2017_improved.zip
+          - role: test
+            file: CSECICIDS2018_improved.zip
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Download
+        run: |
+          df -h /mnt "$RUNNER_TEMP" | cat
+          curl -fSL --retry 8 --retry-all-errors --continue-at - -m 7000 \
+            -o "$RUNNER_TEMP/${{ matrix.file }}" \
+            "https://intrusion-detection.distrinet-research.be/CNS2022/Datasets/${{ matrix.file }}"
+          ls -l "$RUNNER_TEMP/${{ matrix.file }}"
+      - name: Hash, list members and headers
+        run: |
+          python experiment-b/cic-flow/pin_sources.py --role ${{ matrix.role }} \
+            --archive "$RUNNER_TEMP/${{ matrix.file }}" --output "$RUNNER_TEMP/pin-${{ matrix.role }}.json"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cic-flow-pin-${{ matrix.role }}
+          path: ${{ runner.temp }}/pin-${{ matrix.role }}.json
+          retention-days: 90
