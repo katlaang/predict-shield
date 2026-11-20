@@ -61,7 +61,7 @@ def fit_and_evaluate(manifest: dict, manifest_bytes: bytes, root: Path):
     # Load train/calibration before test to enforce model/threshold freeze.
     rows = {split: [] for split in SPLITS}
     records = []
-    for split in SPLITS:
+    for split in ("train", "calibration"):
         for entry in sources:
             if entry["split"] != split:
                 continue
@@ -69,7 +69,7 @@ def fit_and_evaluate(manifest: dict, manifest_bytes: bytes, root: Path):
                 entry, root, manifest["sample_cap_per_label_per_scenario"])
             rows[split].extend(samples)
             records.append(stats)
-    for split in SPLITS:
+    for split in ("train", "calibration"):
         labels = {label for _, label in rows[split]}
         if labels != {0, 1}:
             raise ValueError("both known botnet and normal samples required in every split")
@@ -91,6 +91,14 @@ def fit_and_evaluate(manifest: dict, manifest_bytes: bytes, root: Path):
     assert calibration_fp / len(calibration_scores) <= ceiling + 1e-12
 
     # Only now evaluate the predeclared separate scenario test population.
+    for entry in sources:
+        if entry["split"] == "test":
+            sample, stats = _read_one(
+                entry, root, manifest["sample_cap_per_label_per_scenario"])
+            rows["test"].extend(sample)
+            records.append(stats)
+    if {label for _, label in rows["test"]} != {0, 1}:
+        raise ValueError("both known botnet and normal samples required in test split")
     # Labels are used solely for evaluation, never model fitting/cutoff.
     scores = _score(model, [vec for vec, _ in rows["test"]])
     labels = [label for _, label in rows["test"]]
@@ -146,7 +154,8 @@ def fit_and_evaluate(manifest: dict, manifest_bytes: bytes, root: Path):
         "anomaly_is_confirmed_attack": False,
         "production_effectiveness_established": False,
         "independently_authenticated_labels": False,
-        "actual_ctu13_data_measured": True,
+        "source_files_sha256_verified": True,
+        "test_source_is_real_ctu13_independently_authenticated": False,
         "interpretation": "Suspect flow anomalies learned from publisher-labeled normal training samples; sampled held-out scenario results only. Not novel-attack confirmation.",
     }
     return model, bundle, report
