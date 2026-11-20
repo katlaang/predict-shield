@@ -33,7 +33,7 @@ def read_pinned(url: str, expected_blob: str) -> tuple[bytes, dict]:
         data = stream.read(MAX_BYTES + 1)
     if len(data) > MAX_BYTES:
         raise ValueError("Unbounded benchmark file")
-    git_sha = hashlib.sha1(f"blob {len(data)}\\0".encode() + data).hexdigest()
+    git_sha = hashlib.sha1(f"blob {len(data)}".encode() + bytes([0]) + data).hexdigest()
     if git_sha != expected_blob:
         raise ValueError("Dataset bytes do not match the GitHub-pinned Git blob")
     return data, {"url": url, "bytes": len(data),
