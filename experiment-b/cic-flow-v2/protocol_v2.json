@@ -21,13 +21,17 @@
     "wednesday.csv",
     "thursday.csv",
     "friday.csv"
-   ]
+   ],
+   "pinned_by": "same run: header, rows and label counts read (development data)"
   },
   "test": {
    "dataset": "CSE-CIC-IDS2018, improved version by the same authors, same fixed CICFlowMeter",
    "url": "https://intrusion-detection.distrinet-research.be/CNS2022/Datasets/CSECICIDS2018_improved.zip",
-   "sha256": "PENDING_PIN",
-   "bytes": "PENDING_PIN"
+   "sha256": "7f7b6f8065a88527bcb6e1579f088e1d0480a49903c5fd7e4e907ab238344f6e",
+   "bytes": 10426851729,
+   "members": 10,
+   "rows": 63195145,
+   "pinned_by": "workflow 'CIC flow sources, pin', run 44654927940: header and row count read, labels not read"
   }
  },
  "labels": "BENIGN and every label containing 'Attempted' are benign (the dataset authors' recommendation for flows without attack behaviour). Every other label is an attack. Families come from features_v2.FAMILY_PATTERNS; a test label matching none is reported as 'unmapped'.",
@@ -47,5 +51,6 @@
  "development_reporting": "for each 2017 day with attacks (tuesday to friday): supervised refit without that day; anomaly model and thresholds set on that day exactly as the calibration step does (fit on buckets 0-2, first 200,000; thresholds on buckets 3-5, labels not read); TP, FP, FN, TN on buckets 6-9, per family. Reported as they come out; nothing above changes because of them.",
  "freeze": "supervised model bytes SHA-256; SHA-256 of features_v2.py, train_dev_v2.py, score_test_v2.py and this file; both source pins. The test stage refuses to run on any mismatch.",
  "test_reporting": "the nine non-calibration 2018 days, every flow, once: TP, FP, FN, TN, detection rate and benign alert rate with Wilson 95% intervals, precision, per family, per day, which part fired, out-of-order rows per day. Pass condition, stated in advance: benign alert rate at most 1% pooled and on every day.",
- "not_claimed": "Performance on networks other than these two lab captures; attack types absent from both; real-time operation; that the 2018 data is unseen (see relation_to_version_1)."
+ "not_claimed": "Performance on networks other than these two lab captures; attack types absent from both; real-time operation; that the 2018 data is unseen (see relation_to_version_1).",
+ "pin_correction": "The first v2 freeze (e06a8191, develop run 44772051464) carried the placeholder PENDING_PIN for the test archive because the v2 branch was cut from a v1 commit made before the pin. Both v2 test attempts (runs 44775516751, 44777151240) refused to score on that mismatch; no test flow was scored. The pin was copied from v1 here, and development was re-run to re-freeze. No model, feature or threshold setting changed."
 }

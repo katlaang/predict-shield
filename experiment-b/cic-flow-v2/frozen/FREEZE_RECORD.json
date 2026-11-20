@@ -1,9 +1,0 @@
-{
- "develop_run": 44772051464,
- "develop_commit": "39a15d3",
- "artifact": "cic-flow-v2-frozen",
- "artifact_digest": "sha256:92603c74dbc28f1f78da5c5a2b39ee73c65ee8c0d7a77b90f5e611b95981e484",
- "supervised_sha256": "f1fa7e6536e7d623f461c7719fd4ef2fbe5ffe121843b888be061ffb5ffeff3a",
- "freeze_sha256": "e06a8191f3b367673609a81b3ac159bf05a9d3b66180dcfacbbd23c061a819bb",
- "recorded": "2026-11-20, before any version 2 code read the test archive"
-}
