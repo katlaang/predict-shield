@@ -1,5 +1,11 @@
 # Development changelog
 
+## 2026-11-20: Vulnerability response: fix, mitigate, quarantine, escalate or monitor
+
+- `vulnerability_response.decide()` chooses the response for a finding, with reasons. Quarantine blocks the vulnerable route with an nginx include from a closed grammar, through `change_execution` (signed approval, `nginx -t`, reload, verification, rollback).
+- DVWA lab (run 44777352174): over-broad quarantine rolled back by verification; quarantine of the SQL injection route verified (route 403, payloads refused, five other pages 200); quarantine lifted after the source fix, verified.
+- Fixed: `render_csp` accepted a source ending in a line break. Evidence: `docs/evidence/VULNERABILITY_QUARANTINE_DVWA_2026_11_20.md`.
+
 ## 2026-11-19: Learned flow detector measured across two networks
 
 - `experiment-b/cic-flow/`: supervised gradient boosting plus a benign-only Isolation Forest over flow statistics, traffic type and causal 60-second context. No hand-written rules. Protocol, features, thresholds and a 1% benign alert budget fixed before any result was read; both archives pinned by SHA-256.
