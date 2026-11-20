@@ -28,7 +28,7 @@ jobs:
         run: python -m pip install 'scikit-learn==1.7.2'
       - name: Validate source pin, model cutoff and safety claims
         working-directory: experiment-b/nsl-kdd-anomaly
-        run: python -m unittest test_historical_benchmark -v
+        run: python -m unittest test_historical_benchmark test_audit_family_errors -v
       - name: Score external pinned historical benchmark without detection rules
         working-directory: experiment-b/nsl-kdd-anomaly
         run: |
@@ -57,11 +57,18 @@ jobs:
             "test_false_positive_rate","unseen_attack_type_rows",
             "unseen_attack_type_TP","unseen_attack_type_FN","unseen_attack_type_recall")})
           PY
+      - name: Audit per-family errors on regenerated historical report
+        run: |
+          python experiment-b/nsl-kdd-anomaly/audit_family_errors.py \
+            --input "${RUNNER_TEMP}/nsl-kdd-historical-result.json" \
+            --output "${RUNNER_TEMP}/nsl-kdd-family-error-audit.json"
       - name: Retain reproducible result and source hashes, not raw traffic
         if: success()
         uses: actions/upload-artifact@v4
         with:
           name: nsl-kdd-historical-learned-anomaly-metrics
-          path: ${{ runner.temp }}/nsl-kdd-historical-result.json
+          path: |
+            ${{ runner.temp }}/nsl-kdd-historical-result.json
+            ${{ runner.temp }}/nsl-kdd-family-error-audit.json
           retention-days: 90
           if-no-files-found: error
