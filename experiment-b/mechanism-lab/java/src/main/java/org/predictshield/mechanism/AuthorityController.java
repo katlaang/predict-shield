@@ -1,5 +1,7 @@
 package org.predictshield.mechanism;
 
+import java.nio.file.Path;
+import jakarta.annotation.PostConstruct;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
@@ -20,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
  * Mutating a desired revision queues an event, not a claim of successful
  * enforcement. A policy resynchronization republishes the existing revision
  * so an enforcement point can recover from missed or reordered updates.
- * This lab fixture persists revisions only in memory and must never
+ * This lab fixture can persist its revision to a disposable local volume but must never
  * serve real identity or production authorization controls.</p>
  *
  * <p>Both control and private read paths require disposable credentials.
@@ -34,6 +36,9 @@ public final class AuthorityController {
     private final String internalToken;
     private final AtomicLong sequence = new AtomicLong(0);
     private volatile PolicyRevision current = new PolicyRevision(0, false);
+    @Value("${lab.authority-state-file:}")
+    private String stateFile = "";
+    private AuthorityPolicyStore durableStore;
 
     /**
      * Configures the authority with a Kafka transport and scoped secrets.
@@ -49,6 +54,25 @@ public final class AuthorityController {
         this.publisher = publisher;
         this.controlToken = controlToken;
         this.internalToken = internalToken;
+    }
+
+    @PostConstruct
+    public synchronized void restorePersistedAuthority() {
+        if (stateFile == null || stateFile.isBlank()) {
+            return; // Only the disposable Compose authority mounts durable state.
+        }
+        durableStore = new AuthorityPolicyStore(Path.of(stateFile));
+        PolicyRevision restored = durableStore.loadOrInitialize();
+        current = restored;
+        sequence.set(restored.revision());
+    }
+
+    private void commitPolicy(PolicyRevision desired) {
+        // Persistent file must be durably replaced before the visible state
+        // and any Kafka publication can advance. Write failure fails closed.
+        if (durableStore != null) durableStore.save(desired);
+        current = desired;
+        sequence.set(desired.revision());
     }
 
     /**
@@ -76,7 +100,7 @@ public final class AuthorityController {
     public synchronized ResponseEntity<Map<String, Object>> revoke(
             @RequestHeader(value = "X-Lab-Control", required = false) String token) {
         if (!authorized(token, controlToken)) return denied();
-        current = new PolicyRevision(sequence.incrementAndGet(), true, current.trialId());
+        commitPolicy(new PolicyRevision(Math.addExact(sequence.get(), 1L), true, current.trialId()));
         return publish(current);
     }
 
@@ -107,7 +131,7 @@ public final class AuthorityController {
     public synchronized ResponseEntity<Map<String, Object>> reset(
             @RequestHeader(value = "X-Lab-Control", required = false) String token) {
         if (!authorized(token, controlToken)) return denied();
-        current = new PolicyRevision(sequence.incrementAndGet(), false, UUID.randomUUID().toString());
+        commitPolicy(new PolicyRevision(Math.addExact(sequence.get(), 1L), false, UUID.randomUUID().toString()));
         return publish(current);
     }
 
@@ -126,8 +150,8 @@ public final class AuthorityController {
     public synchronized ResponseEntity<Map<String, Object>> reaffirm(
             @RequestHeader(value = "X-Lab-Control", required = false) String token) {
         if (!authorized(token, controlToken)) return denied();
-        current = new PolicyRevision(sequence.incrementAndGet(),
-                current.revoked(), current.trialId());
+        commitPolicy(new PolicyRevision(Math.addExact(sequence.get(), 1L),
+                current.revoked(), current.trialId()));
         return publish(current);
     }
 
