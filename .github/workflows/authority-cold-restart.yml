@@ -1,0 +1,77 @@
+name: Physical durable-authority cold restart smoke
+
+on:
+  pull_request:
+    paths:
+      - 'experiment-b/mechanism-lab/java/src/main/java/org/predictshield/mechanism/AuthorityController.java'
+      - 'experiment-b/mechanism-lab/java/src/main/java/org/predictshield/mechanism/AuthorityPolicyStore.java'
+      - 'experiment-b/mechanism-lab/java/src/test/java/org/predictshield/mechanism/AuthorityPolicyStoreTest.java'
+      - 'experiment-b/mechanism-lab/authority_cold_restart_smoke.py'
+      - 'experiment-b/mechanism-lab/AUTHORITY_OUTAGE_ACTIONS.md'
+      - 'experiment-b/mechanism-lab/compose.yaml'
+      - '.github/workflows/authority-cold-restart.yml'
+  push:
+    branches: [master]
+    paths:
+      - 'experiment-b/mechanism-lab/java/src/main/java/org/predictshield/mechanism/AuthorityController.java'
+      - 'experiment-b/mechanism-lab/java/src/main/java/org/predictshield/mechanism/AuthorityPolicyStore.java'
+      - 'experiment-b/mechanism-lab/java/src/test/java/org/predictshield/mechanism/AuthorityPolicyStoreTest.java'
+      - 'experiment-b/mechanism-lab/authority_cold_restart_smoke.py'
+      - 'experiment-b/mechanism-lab/AUTHORITY_OUTAGE_ACTIONS.md'
+      - 'experiment-b/mechanism-lab/compose.yaml'
+      - '.github/workflows/authority-cold-restart.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  cold-restart:
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 24
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Create isolated disposable credentials
+        run: |
+          for name in LAB_CONTROL_TOKEN LAB_ORACLE_TOKEN LAB_INTERNAL_TOKEN; do
+            value="$(python -c 'import secrets;print(secrets.token_urlsafe(32))')"
+            echo "::add-mask::$value"
+            echo "$name=$value" >> "$GITHUB_ENV"
+          done
+      - name: Build isolated authority/enforcer/Kafka physical lab
+        working-directory: experiment-b/mechanism-lab
+        run: |
+          for attempt in 1 2 3; do
+            if docker compose up --build -d; then exit 0; fi
+            docker compose down --remove-orphans --volumes || true
+            if [ "$attempt" -lt 3 ]; then sleep $((attempt * 8)); fi
+          done
+          exit 1
+      - name: Test real stop/start with source continuity and UNKNOWN outage truth
+        working-directory: experiment-b/mechanism-lab
+        run: |
+          python authority_cold_restart_smoke.py --execute-lab --output reports/cold-restart.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r = json.loads(Path("reports/cold-restart.json").read_text())
+          assert r["physical_authority_stop_and_start"] is True
+          assert r["authority_recovered_same_source_trial_and_revision"] is True
+          assert r["full_target_scope_observed_after_recovery"] is True
+          assert r["outage_verification_outcome"] == "INDETERMINATE"
+          assert r["operator_field_effectiveness_established"] is False
+          print("PASS: actual authority stop/start preserves test policy source; outage still unverified")
+          PY
+      - name: Preserve non-sensitive cold-restart result
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: isolated-authority-cold-restart
+          path: experiment-b/mechanism-lab/reports/cold-restart.json
+      - name: Clean disposable lab and durable state
+        if: always()
+        working-directory: experiment-b/mechanism-lab
+        run: docker compose down --remove-orphans --volumes
