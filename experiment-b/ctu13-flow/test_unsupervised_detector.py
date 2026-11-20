@@ -11,6 +11,7 @@ class UnsupervisedFlowDetectorTests(unittest.TestCase):
     def setUp(self):
         self.fixture = CTU13Tests("test_only_predefined_flow_features")
         self.fixture.setUp()
+        self.fixture.manifest["sample_cap_per_label_per_scenario"] = 4
         self.addCleanup(self.fixture.doCleanups)
 
     def fitted(self):
@@ -23,8 +24,8 @@ class UnsupervisedFlowDetectorTests(unittest.TestCase):
         self.assertFalse(bundle["explicit_signatures_used_for_detection"])
         self.assertFalse(bundle["production_deployable"])
         self.assertFalse(report["independently_authenticated_labels"])
-        self.assertEqual(report["test_flows"], 4)
-        self.assertEqual(sum(report[k] for k in ("TP", "FP", "FN", "TN")), 4)
+        self.assertEqual(report["test_flows"], 6)
+        self.assertEqual(sum(report[k] for k in ("TP", "FP", "FN", "TN")), 6)
 
     def test_freezing_threshold_does_not_read_test_labels(self):
         model, bundle, report = self.fitted()
