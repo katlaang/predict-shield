@@ -6,6 +6,7 @@ or claims operational effectiveness. The test set has already been viewed.
 import argparse
 import hashlib
 import json
+import math
 from pathlib import Path
 
 
@@ -19,7 +20,16 @@ def _nonnegative_int(value, name):
     return value
 
 
-def audit(report):
+def _assert_rate(report, key, numerator, denominator):
+    value = report.get(key)
+    if type(value) not in (int, float) or not math.isfinite(value):
+        raise ValueError(f"{key} must be a finite number")
+    if not 0 <= value <= 1 or not math.isclose(
+            value, numerator / denominator, rel_tol=0, abs_tol=1e-12):
+        raise ValueError(f"{key} does not reconcile with measured counts")
+
+
+def audit(report, *, raw_bytes=None):
     if not isinstance(report, dict):
         raise ValueError("Report must be an object")
     # Exact schema comes from run_historical_benchmark.py, not a generic score CSV.
@@ -39,6 +49,16 @@ def audit(report):
         raise ValueError("Operational-effectiveness claim must remain false")
     if report.get("zero_day_detection_established") is not False:
         raise ValueError("Zero-day claim must remain false")
+    if report.get("external_current_critical_infrastructure_effectiveness_established") is not False:
+        raise ValueError("Current critical-infrastructure effectiveness must remain false")
+    _assert_rate(report, "test_attack_recall", tp, tp + fn)
+    _assert_rate(report, "test_false_positive_rate", fp, fp + tn)
+    _assert_rate(report, "test_precision", tp, tp + fp)
+    if raw_bytes is not None:
+        if type(raw_bytes) is not bytes or len(raw_bytes) > 2_000_000:
+            raise ValueError("Raw report bytes invalid")
+        if json.loads(raw_bytes) != report:
+            raise ValueError("Raw bytes do not match audited report")
     families = report.get("per_attack_type")
     if not isinstance(families, dict) or not families:
         raise ValueError("Missing per-family evidence")
@@ -62,7 +82,12 @@ def audit(report):
         raise ValueError("Family totals disagree with attack confusion matrix")
     failures.sort(key=lambda item: (-item["missed"], item["attack_type"]))
     missing = [item for item in failures if item["detected"] == 0]
-    novel = {name for name in report.get("unseen_attack_type_names", [])}
+    unseen_names = report.get("unseen_attack_type_names")
+    if not isinstance(unseen_names, list) or not unseen_names:
+        raise ValueError("Missing or empty unseen attack-type list")
+    if len(unseen_names) != len(set(str(name) for name in unseen_names)):
+        raise ValueError("Duplicate unseen attack-type names")
+    novel = set(unseen_names)
     if not all(isinstance(name, str) and name in families for name in novel):
         raise ValueError("Unseen attack-type roster invalid")
     n_tp = _nonnegative_int(report.get("unseen_attack_type_TP"), "unseen TP")
@@ -74,8 +99,13 @@ def audit(report):
         raise ValueError("Unseen family denominators inconsistent")
     if sum(families[name]["detected"] for name in novel) != n_tp:
         raise ValueError("Unseen family detections inconsistent")
+    _assert_rate(report, "unseen_attack_type_recall", n_tp, n_total)
+    if not math.isclose(sum(item["share_of_all_missed_attacks"] for item in failures),
+                        1.0, abs_tol=1e-12):
+        raise ValueError("Missed-share totals inconsistent")
     return {
         "schema": OUT_SCHEMA,
+        "raw_source_file_sha256": hashlib.sha256(raw_bytes).hexdigest() if raw_bytes is not None else None,
         "source_report_sha256": hashlib.sha256(
             json.dumps(report, sort_keys=True, separators=(",", ":")).encode()
         ).hexdigest(),
@@ -110,7 +140,7 @@ def main():
     source = args.input.read_bytes()
     if len(source) > 2_000_000:
         raise ValueError("Report too large")
-    result = audit(json.loads(source))
+    result = audit(json.loads(source), raw_bytes=source)
     args.output.parent.mkdir(parents=True, exist_ok=True)
     with args.output.open("x", encoding="utf-8") as f:
         json.dump(result, f, sort_keys=True, indent=2)
