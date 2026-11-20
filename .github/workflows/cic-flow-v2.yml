@@ -70,12 +70,22 @@ jobs:
     needs: unit-tests
     runs-on: ubuntu-latest
     timeout-minutes: 360
+    permissions:
+      contents: write
+      actions: read
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
       - run: pip install 'scikit-learn==1.7.2' 'pandas==2.3.3' 'numpy==2.3.4'
+      - name: Fetch the frozen bundle from the recorded develop run
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          run=$(python -c "import json;print(json.load(open('experiment-b/cic-flow-v2/frozen/FREEZE_RECORD.json'))['develop_run'])")
+          gh run download "$run" --repo "$GITHUB_REPOSITORY" --name cic-flow-v2-frozen --dir "$RUNNER_TEMP/frozen"
+          ls -l "$RUNNER_TEMP/frozen"
       - name: Refuse to start unless the bundle and code match the recorded freeze and the input
         working-directory: experiment-b/cic-flow-v2
         env:
@@ -102,7 +112,7 @@ jobs:
       - name: Score every test flow once
         working-directory: experiment-b/cic-flow-v2
         run: |
-          python score_test_v2.py --archive "$RUNNER_TEMP/test.zip" --frozen-dir frozen \
+          python score_test_v2.py --archive "$RUNNER_TEMP/test.zip" --frozen-dir "$RUNNER_TEMP/frozen" \
             --expected-freeze-sha256 "${{ github.event.inputs.freeze_sha256 }}" --output "$RUNNER_TEMP/test-report.json"
       - name: Check the accounting
         run: |
@@ -125,3 +135,12 @@ jobs:
           path: ${{ runner.temp }}/test-report.json
           if-no-files-found: warn
           retention-days: 90
+      - name: Commit the frozen model, both reports and the freeze to the branch
+        run: |
+          cp "$RUNNER_TEMP"/frozen/supervised.pkl "$RUNNER_TEMP"/frozen/freeze.json "$RUNNER_TEMP"/frozen/development-report.json experiment-b/cic-flow-v2/frozen/
+          cp "$RUNNER_TEMP/test-report.json" experiment-b/cic-flow-v2/frozen/test-report.json
+          git config user.name katlaang
+          git config user.email katlaang@users.noreply.github.com
+          git add experiment-b/cic-flow-v2/frozen
+          git commit -m "cic-flow-v2: record the frozen model, development report and single test report (run ${{ github.run_id }})"
+          git push origin HEAD:${{ github.ref_name }}
