@@ -22,17 +22,17 @@ jobs:
           aws --version || true
           aws s3 ls --no-sign-request --region ca-central-1 "s3://cse-cic-ids2018/" || true
           aws s3 ls --no-sign-request --region ca-central-1 "s3://cse-cic-ids2018/Processed Traffic Data for ML Algorithms/" || true
-      - name: Publisher and corrected-version hosts
+      - name: Corrected-version listings and the 2017 publisher page
         run: |
-          for u in \
-            "https://www.unb.ca/cic/datasets/ids-2017.html" \
-            "http://cicresearch.ca/CICDataset/CIC-IDS-2017/" \
-            "http://cicresearch.ca/CICDataset/CIC-IDS-2017/Dataset/" \
-            "http://cicresearch.ca/CICDataset/CIC-IDS-2017/Dataset/CIC-IDS-2017/CSVs/" \
-            "https://intrusion-detection.distrinet-research.be/CNS2022/" \
-            "https://intrusion-detection.distrinet-research.be/CNS2022/Dataset_Download.html" \
-            "https://intrusion-detection.distrinet-research.be/WTMC2021/tools_datasets.html" ; do
-            echo "=== $u"
-            curl -sSL -m 30 -A 'Mozilla/5.0' "$u" -o page.html -w 'HTTP %{http_code} %{size_download} bytes\n' || true
-            grep -o -i -E 'href="[^"]+"' page.html | grep -i -E 'csv|zip|tar|pcap|download|dataset|\.7z|gz' | head -40 || true
-          done
+          show() { echo "=== $1"; curl -sSL -m 60 -A 'Mozilla/5.0' "$1" -o page.html -w 'HTTP %{http_code} %{size_download} bytes\n' || true; }
+          show "https://intrusion-detection.distrinet-research.be/CNS2022/Datasets/"
+          sed -e 's/<[^>]*>/ /g' page.html | tr -s ' ' | grep -v '^\s*$' | head -60
+          grep -o -i -E 'href="[^"]+"' page.html | head -60
+          show "https://intrusion-detection.distrinet-research.be/CNS2022/Dataset_Download.html"
+          sed -e 's/<[^>]*>/ /g' page.html | tr -s ' ' | grep -v '^\s*$' | head -30
+          show "https://intrusion-detection.distrinet-research.be/WTMC2021/tools_datasets.html"
+          sed -e 's/<[^>]*>/ /g' page.html | tr -s ' ' | grep -v '^\s*$' | head -60
+          curl -sSIL -m 60 "https://intrusion-detection.distrinet-research.be/WTMC2021/Dataset/dataset.zip" | grep -i -E 'HTTP/|content-length|last-modified|content-type' || true
+          show "http://cicresearch.ca/CICDataset/CIC-IDS-2017/"
+          sed -e 's/<[^>]*>/ /g' page.html | tr -s ' ' | grep -v '^\s*$' | head -40
+          grep -o -i -E '(href|action)="[^"]+"' page.html | head -30
