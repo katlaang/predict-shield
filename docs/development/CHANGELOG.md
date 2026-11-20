@@ -1,5 +1,11 @@
 # Development changelog
 
+## 2026-11-20: Learned exploitation likelihood for CVEs
+
+- `experiment-b/exploit-likelihood/`: CVE records (CNA container only) with CISA KEV as labels; train 2017 to 2022, choose on 2023 H1, freeze, score 2024 once (run 44777279550).
+- Test: 39,924 CVEs, 161 in KEV. Top 1% by score held 53 of them (32.9%), top 10% held 99 (61.5%); 33 of the top 100 were in KEV; ROC AUC 0.876.
+- Training fit is reported beside validation for all eight candidates: structured-field-only models underfit, the largest text model overfits, and the learning curve was still rising. Evidence: `docs/evidence/MEASURED_EXPLOIT_LIKELIHOOD_2026_11_20.md`.
+
 ## 2026-11-19: Learned flow detector measured across two networks
 
 - `experiment-b/cic-flow/`: supervised gradient boosting plus a benign-only Isolation Forest over flow statistics, traffic type and causal 60-second context. No hand-written rules. Protocol, features, thresholds and a 1% benign alert budget fixed before any result was read; both archives pinned by SHA-256.
