@@ -27,8 +27,10 @@ jobs:
       - run: python -m pip install 'scikit-learn==1.7.2'
       - name: Check labels, splits, frozen checksums and evaluation on synthetic fixtures
         working-directory: experiment-b/ctu13-flow
-        run: python -m unittest -v test_fit_evaluate
+        run: python -m unittest -v test_fit_evaluate test_unsupervised_detector
       - name: Confirm no operational efficacy is being claimed
         run: |
           grep -q '"field_effectiveness_established": False' experiment-b/ctu13-flow/fit_evaluate.py
           grep -q '"sample_precision_is_operational_precision": False' experiment-b/ctu13-flow/fit_evaluate.py
+          grep -q '"anomaly_is_confirmed_attack": False' experiment-b/ctu13-flow/unsupervised_detector.py
+          grep -q '"decision_authorized": False' experiment-b/ctu13-flow/unsupervised_detector.py
