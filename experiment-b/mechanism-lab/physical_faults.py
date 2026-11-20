@@ -18,7 +18,8 @@ from pilot import request, wait_ready, wait_for_target
 def compose_command(args: list[str], *, cwd: str | Path) -> None:
     """Fail closed on an allowlisted Docker Compose lifecycle operation."""
     if args not in (["stop", "authority"], ["start", "authority"],
-                    ["restart", "enforcer-b"]):
+                    ["restart", "enforcer-b"], ["pause", "authority"],
+                    ["unpause", "authority"]):
         raise ValueError("Unexpected Docker Compose operation")
     result = subprocess.run(["docker", "compose", *args], cwd=cwd, check=False,
                             capture_output=True, text=True, timeout=120)
