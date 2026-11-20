@@ -1,0 +1,68 @@
+name: Real publisher CTU-13 cross-family learned detection (exploratory)
+
+on:
+  pull_request:
+    paths:
+      - 'experiment-b/ctu13-flow/real_cross_family_evaluation.py'
+      - 'experiment-b/ctu13-flow/cross_family_protocol.json'
+      - 'experiment-b/ctu13-flow/test_real_cross_family_evaluation.py'
+      - '.github/workflows/real-ctu13-cross-family.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  real-external-flow-evaluation:
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 75
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Pin the learning software dependency
+        run: python -m pip install 'scikit-learn==1.7.2'
+      - name: Test frozen split, source allowlist and independent claim boundaries
+        working-directory: experiment-b/ctu13-flow
+        run: python -m unittest -v test_fit_evaluate test_unsupervised_detector test_real_cross_family_evaluation
+      - name: Acquire original publisher flow CSVs and independently score unseen NSIS.ay scenario
+        working-directory: experiment-b/ctu13-flow
+        timeout-minutes: 55
+        run: |
+          python real_cross_family_evaluation.py \
+            --protocol cross_family_protocol.json \
+            --download-dir "${RUNNER_TEMP}/ctu13-original-recordings" \
+            --output "${RUNNER_TEMP}/ctu13-cross-family-measured.json"
+      - name: Audit result counts and prevent unsupported claims
+        run: |
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          r = json.loads((Path(os.environ["RUNNER_TEMP"]) / "ctu13-cross-family-measured.json").read_text())
+          e = r["evaluation"]
+          assert r["genuine_external_bytes_downloaded_and_hashed"] is True
+          assert r["accuracy_claim_status"] == "EXPLORATORY_PUBLISHER_LABELED_EXTERNAL_BENCHMARK_ONLY"
+          assert r["source_digests_were_precommitted_before_download"] is False
+          assert r["previously_unseen_zero_day_attack_established"] is False
+          assert r["independent_operational_field_effectiveness_established"] is False
+          assert len(r["publisher_files"]) == 3
+          assert e["test_flows"] > 0
+          assert sum(e[k] for k in ("TP", "FP", "FN", "TN")) == e["test_flows"]
+          assert all(len(x["sha256"]) == 64 for x in r["publisher_files"])
+          assert e["train_known_botnet_flows_used"] == 0
+          print("EXPLORATORY external-source result audited; accuracy numbers, including failures, retained")
+          print({k: e[k] for k in ("TP", "FP", "FN", "TN", "test_sample_recall", "test_sample_false_positive_rate")})
+          PY
+      - name: Retain raw metric and source checksums, never unredacted flows
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: publisher-ctu13-cross-family-exploratory
+          path: ${{ runner.temp }}/ctu13-cross-family-measured.json
+          retention-days: 90
+          if-no-files-found: error
+      - name: Delete raw public recordings after evaluation
+        if: always()
+        run: rm -rf "${RUNNER_TEMP}/ctu13-original-recordings"
