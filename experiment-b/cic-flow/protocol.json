@@ -1,0 +1,32 @@
+{
+ "name": "cross-dataset flow detector, CIC-IDS2017 to CSE-CIC-IDS2018",
+ "registered": "2026-11-19, before any development result or test label was read",
+ "sources": {
+  "development": {
+   "dataset": "CIC-IDS2017, improved version by Engelen, Rimmer and Joosen (CNS 2022), regenerated with the fixed CICFlowMeter",
+   "url": "https://intrusion-detection.distrinet-research.be/CNS2022/Datasets/CICIDS2017_improved.zip",
+   "sha256": "97fdb91d339e2d8cf5627f981b831e5e7e400b981c58181c451a38fd03c48883",
+   "bytes": 343549013,
+   "members_in_order": ["monday.csv", "tuesday.csv", "wednesday.csv", "thursday.csv", "friday.csv"]
+  },
+  "test": {
+   "dataset": "CSE-CIC-IDS2018, improved version by the same authors, same fixed CICFlowMeter",
+   "url": "https://intrusion-detection.distrinet-research.be/CNS2022/Datasets/CSECICIDS2018_improved.zip",
+   "sha256": "PENDING_PIN",
+   "bytes": "PENDING_PIN"
+  }
+ },
+ "labels": "BENIGN and every label containing 'Attempted' are benign (the dataset authors' recommendation for flows without attack behaviour). Every other label is an attack. Families come from flow_features.FAMILY_PATTERNS; a test label matching none is reported as 'unmapped'.",
+ "inputs": "flow_features.build: signed-log flow statistics (all non-identifier numeric columns), protocol one-hot, destination-service bucket, six causal 60-second context counts per source and per destination. Never inputs: id, Flow ID, IP addresses, source port, timestamp, label.",
+ "development_split": "per row, flow_features.split_bucket(member, id): buckets 0-5 train, 6-7 calibration, 8-9 development evaluation",
+ "models": {
+  "supervised": "sklearn HistGradientBoostingClassifier(max_iter=200, learning_rate=0.1, max_leaf_nodes=31, class_weight='balanced', early_stopping=False, random_state=20261119), fit on all train rows, attack versus benign",
+  "anomaly": "sklearn IsolationForest(n_estimators=200, max_samples=1024, random_state=20261119), fit on the first 200,000 benign train rows in file order; score = -score_samples",
+  "alert": "supervised attack probability > t_s OR anomaly score > t_a"
+ },
+ "alert_budget": "t_s and t_a each set with flow_features.benign_threshold at 0.5% of benign calibration flows, so at most 1% of benign calibration flows alert in total",
+ "development_reporting": "development-evaluation buckets: TP, FP, FN, TN, per family, and which part fired; plus leave-one-family-out runs (supervised model refit without that family, same anomaly model, t_s re-set on calibration) reporting that family's detection rate. Reported as they come out; no setting above is changed because of them. A defect fix is allowed and must be recorded.",
+ "freeze": "model bundle bytes SHA-256, thresholds, feature names, this file's SHA-256 and both source pins are recorded and printed before the test archive is downloaded",
+ "test_reporting": "one run over every flow of every test CSV member: TP, FP, FN, TN; detection rate and false-alarm rate with Wilson 95% intervals; per family; per member (day); which part fired; whether the family occurs in development. Flows within a day are dependent, so intervals understate real uncertainty and per-day results are reported alongside.",
+ "not_claimed": "Performance on any network other than these two lab captures; performance on attack types absent from both; real-time operation."
+}

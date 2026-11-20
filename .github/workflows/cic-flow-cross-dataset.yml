@@ -1,0 +1,122 @@
+name: Cross-dataset flow detector
+
+# Develop on CIC-IDS2017 improved, freeze, then score CSE-CIC-IDS2018 improved
+# once. See experiment-b/cic-flow/protocol.json.
+#   stage=develop  fits, sets thresholds, reports development results and
+#                  uploads the frozen bundle. Never downloads the test archive.
+#   stage=test     scores the test archive once with the bundle committed in
+#                  experiment-b/cic-flow/frozen/, refusing any mismatch with
+#                  the freeze hash given as input.
+
+on:
+  push:
+    branches: [feat/cross-dataset-flow-detector]
+    paths: ['experiment-b/cic-flow/**', '.github/workflows/cic-flow-cross-dataset.yml']
+  pull_request:
+    paths: ['experiment-b/cic-flow/**', '.github/workflows/cic-flow-cross-dataset.yml']
+  workflow_dispatch:
+    inputs:
+      stage:
+        description: 'develop or test'
+        required: true
+        default: 'develop'
+      freeze_sha256:
+        description: 'test stage only: the freeze hash recorded in frozen/freeze.json'
+        default: ''
+
+permissions:
+  contents: read
+
+jobs:
+  unit-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install 'scikit-learn==1.7.2' 'pandas==2.3.3' 'numpy==2.3.4'
+      - working-directory: experiment-b/cic-flow
+        run: python -m unittest test_cic_flow -v
+
+  develop:
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.stage == 'develop'
+    needs: unit-tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install 'scikit-learn==1.7.2' 'pandas==2.3.3' 'numpy==2.3.4'
+      - name: Download the development archive
+        run: |
+          curl -fSL --retry 8 --retry-all-errors -m 3600 -o "$RUNNER_TEMP/dev.zip" \
+            "$(python -c "import json;print(json.load(open('experiment-b/cic-flow/protocol.json'))['sources']['development']['url'])")"
+      - name: Fit, set thresholds, report development results, freeze
+        working-directory: experiment-b/cic-flow
+        run: python train_dev.py --archive "$RUNNER_TEMP/dev.zip" --out-dir "$RUNNER_TEMP/frozen"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cic-flow-frozen
+          path: ${{ runner.temp }}/frozen/
+          retention-days: 90
+
+  test:
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.stage == 'test'
+    needs: unit-tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install 'scikit-learn==1.7.2' 'pandas==2.3.3' 'numpy==2.3.4'
+      - name: Refuse to start unless the committed freeze matches the input
+        working-directory: experiment-b/cic-flow
+        env:
+          WANT: ${{ github.event.inputs.freeze_sha256 }}
+        run: |
+          python - <<'PY'
+          import hashlib, json, os
+          f = json.load(open("frozen/freeze.json"))
+          rec = f.pop("freeze_sha256")
+          assert rec == os.environ["WANT"], "freeze input does not match the committed freeze"
+          assert hashlib.sha256(json.dumps(f, sort_keys=True).encode()).hexdigest() == rec
+          assert hashlib.sha256(open("frozen/model.pkl", "rb").read()).hexdigest() == f["model_sha256"]
+          assert hashlib.sha256(open("protocol.json", "rb").read()).hexdigest() == f["protocol_sha256"]
+          print("freeze verified", rec)
+          PY
+      - name: Download the test archive
+        run: |
+          df -h "$RUNNER_TEMP" | cat
+          curl -fSL --retry 8 --retry-all-errors --continue-at - -m 7000 -o "$RUNNER_TEMP/test.zip" \
+            "$(python -c "import json;print(json.load(open('experiment-b/cic-flow/protocol.json'))['sources']['test']['url'])")"
+      - name: Score every test flow once
+        working-directory: experiment-b/cic-flow
+        run: |
+          python score_test.py --archive "$RUNNER_TEMP/test.zip" --frozen-dir frozen \
+            --expected-freeze-sha256 "${{ github.event.inputs.freeze_sha256 }}" --output "$RUNNER_TEMP/test-report.json"
+      - name: Check the accounting
+        run: |
+          python - <<'PY'
+          import json, os
+          r = json.load(open(os.environ["RUNNER_TEMP"] + "/test-report.json"))
+          assert r["flows"] == r["TP"] + r["FP"] + r["FN"] + r["TN"] > 0
+          fam = r["by_family"]
+          assert sum(v["flows"] for k, v in fam.items() if k != "benign") == r["TP"] + r["FN"]
+          assert sum(v["detected"] for k, v in fam.items() if k != "benign") == r["TP"]
+          assert fam["benign"]["flows"] == r["FP"] + r["TN"] and fam["benign"]["false_alarms"] == r["FP"]
+          assert sum(sum(m.values()) for m in r["by_member"].values()) == r["flows"]
+          print("accounting reconciles")
+          PY
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cic-flow-test-report
+          path: ${{ runner.temp }}/test-report.json
+          if-no-files-found: warn
+          retention-days: 90
