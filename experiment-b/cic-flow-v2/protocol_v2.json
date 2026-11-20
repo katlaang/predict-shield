@@ -1,0 +1,51 @@
+{
+ "name": "cross-dataset flow detector, version 2, CIC-IDS2017 to CSE-CIC-IDS2018",
+ "registered": "2026-11-20, before any version 2 result was read",
+ "relation_to_version_1": "Version 1 (experiment-b/cic-flow, evidence docs/evidence/MEASURED_CROSS_DATASET_FLOW_DETECTOR_2026_11_19.md) failed its 1% benign alert budget on CSE-CIC-IDS2018 (30.85%). Version 1 read every 2018 label once. Version 2 changes the design in response to that result, so its 2018 measurement is a second measurement on the same data, not an untouched held-out test. The version 1 result stays on record unchanged.",
+ "changes_from_version_1": [
+  "thresholds and the anomaly model are set on the protected network's own traffic: the first 2018 day, all flows, labels not read, as a deployment's first day would be",
+  "no per-source context inputs",
+  "context computed in timestamp order; out-of-order rows counted and reported",
+  "feature and scoring code hashed into the freeze and checked before scoring",
+  "2017 development reported by leave-one-day-out instead of a random row split"
+ ],
+ "sources": {
+  "development": {
+   "dataset": "CIC-IDS2017, improved version by Engelen, Rimmer and Joosen (CNS 2022), regenerated with the fixed CICFlowMeter",
+   "url": "https://intrusion-detection.distrinet-research.be/CNS2022/Datasets/CICIDS2017_improved.zip",
+   "sha256": "97fdb91d339e2d8cf5627f981b831e5e7e400b981c58181c451a38fd03c48883",
+   "bytes": 343549013,
+   "members_in_order": [
+    "monday.csv",
+    "tuesday.csv",
+    "wednesday.csv",
+    "thursday.csv",
+    "friday.csv"
+   ]
+  },
+  "test": {
+   "dataset": "CSE-CIC-IDS2018, improved version by the same authors, same fixed CICFlowMeter",
+   "url": "https://intrusion-detection.distrinet-research.be/CNS2022/Datasets/CSECICIDS2018_improved.zip",
+   "sha256": "PENDING_PIN",
+   "bytes": "PENDING_PIN"
+  }
+ },
+ "labels": "BENIGN and every label containing 'Attempted' are benign (the dataset authors' recommendation for flows without attack behaviour). Every other label is an attack. Families come from features_v2.FAMILY_PATTERNS; a test label matching none is reported as 'unmapped'.",
+ "inputs": "features_v2.build: signed-log flow statistics (all non-identifier numeric columns), protocol one-hot, destination-service bucket, two per-destination 60-second context counts computed in timestamp order. Never inputs: id, Flow ID, IP addresses, ports, timestamp, label.",
+ "models": {
+  "supervised": "sklearn HistGradientBoostingClassifier(max_iter=200, learning_rate=0.1, max_leaf_nodes=31, class_weight='balanced', early_stopping=False, random_state=20261120), fit on every CIC-IDS2017 row, attack versus benign. Frozen before any 2018 flow is read by v2 code.",
+  "anomaly": "sklearn IsolationForest(n_estimators=200, max_samples=1024, random_state=20261120), fit at calibration on the first 200,000 calibration-day flows in file order with split_bucket 0-4; score = -score_samples",
+  "alert": "supervised attack probability > t_s OR anomaly score > t_a"
+ },
+ "calibration": {
+  "member": "Wednesday-14-02-2018.csv",
+  "why_this_day": "first day in time order; chosen by that rule, not by version 1 per-day results",
+  "rows_for_thresholds": "split_bucket 5-9 of the calibration day, all flows, labels not read",
+  "budget": "t_s and t_a each at 0.5% of those flows (features_v2.benign_threshold), so at most 1% of calibration-day flows alert",
+  "excluded_from_test": "every flow of the calibration day"
+ },
+ "development_reporting": "for each 2017 day with attacks (tuesday to friday): supervised refit without that day; anomaly model and thresholds set on that day exactly as the calibration step does (fit on buckets 0-2, first 200,000; thresholds on buckets 3-5, labels not read); TP, FP, FN, TN on buckets 6-9, per family. Reported as they come out; nothing above changes because of them.",
+ "freeze": "supervised model bytes SHA-256; SHA-256 of features_v2.py, train_dev_v2.py, score_test_v2.py and this file; both source pins. The test stage refuses to run on any mismatch.",
+ "test_reporting": "the nine non-calibration 2018 days, every flow, once: TP, FP, FN, TN, detection rate and benign alert rate with Wilson 95% intervals, precision, per family, per day, which part fired, out-of-order rows per day. Pass condition, stated in advance: benign alert rate at most 1% pooled and on every day.",
+ "not_claimed": "Performance on networks other than these two lab captures; attack types absent from both; real-time operation; that the 2018 data is unseen (see relation_to_version_1)."
+}
