@@ -1,5 +1,12 @@
 # Development changelog
 
+## 2026-11-20 (1): Cross-dataset flow detector v2 measured on CSE-CIC-IDS2018
+
+- Thresholds and the anomaly model calibrated on the first 2018 day with its labels unread; per-source context removed; the freeze now covers the code as well as the model.
+- Single locked run (freeze `793d315f`, run 44782232012): benign alert rate 0.55%, every day under 1%, so the pre-stated condition was met. Detection was 0.83% (28,643 of 3,441,225 attack flows), so this version is not usable as a detector.
+- Cause: the calibration day contained brute-force traffic, which pushed the supervised threshold to 0.99999997 and taught the anomaly model attacks as normal. Version 3 calibrates on verified-normal traffic and adds a detection floor to the pass condition.
+- Disclosed: attempt 1 was stopped by a runner shutdown after one day's result was printed; the placeholder test pin in the first freeze; the 2018 files are not stored in time order (context is computed after sorting).
+
 ## 2026-11-18 (9): Endpoint rules v2 on a pre-registered second-publisher held-out set
 
 - Reworded the detection results as integration behavior and labelled the endpoint rules as deterministic, not AI; held-out 2 of 5 carries its Wilson interval.
