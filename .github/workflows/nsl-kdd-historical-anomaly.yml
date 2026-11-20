@@ -1,0 +1,67 @@
+name: Historical external NSL-KDD learned anomaly evaluation
+
+on:
+  pull_request:
+    paths:
+      - 'experiment-b/nsl-kdd-anomaly/**'
+      - '.github/workflows/nsl-kdd-historical-anomaly.yml'
+  push:
+    branches: [master]
+    paths:
+      - 'experiment-b/nsl-kdd-anomaly/**'
+      - '.github/workflows/nsl-kdd-historical-anomaly.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  learned-detection-historical:
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 22
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install fixed learning dependency
+        run: python -m pip install 'scikit-learn==1.7.2'
+      - name: Validate source pin, model cutoff and safety claims
+        working-directory: experiment-b/nsl-kdd-anomaly
+        run: python -m unittest test_historical_benchmark -v
+      - name: Score external pinned historical benchmark without detection rules
+        working-directory: experiment-b/nsl-kdd-anomaly
+        run: |
+          python run_historical_benchmark.py \
+            --protocol frozen_protocol.json \
+            --output "${RUNNER_TEMP}/nsl-kdd-historical-result.json"
+      - name: Independent measurement accounting audit
+        run: |
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          p = Path(os.environ["RUNNER_TEMP"]) / "nsl-kdd-historical-result.json"
+          r = json.loads(p.read_text())
+          assert r["test_rows"] == 22544
+          assert sum(r[k] for k in ("TP", "FP", "FN", "TN")) == r["test_rows"]
+          assert r["unseen_attack_type_rows"] == r["unseen_attack_type_TP"] + r["unseen_attack_type_FN"]
+          assert r["train_malicious_examples_used_for_fit"] == 0
+          assert r["fit_normal_only"] is True
+          assert r["publisher_labels_independently_reauthenticated"] is False
+          assert r["zero_day_detection_established"] is False
+          assert r["operational_attack_detection_established"] is False
+          assert r["external_current_critical_infrastructure_effectiveness_established"] is False
+          assert len(r["pretest_freeze_sha256"]) == 64
+          print("HISTORICAL BENCHMARK COUNT AUDIT PASSED. Actual values:")
+          print({k:r[k] for k in ("TP","FP","FN","TN","test_attack_recall",
+            "test_false_positive_rate","unseen_attack_type_rows",
+            "unseen_attack_type_TP","unseen_attack_type_FN","unseen_attack_type_recall")})
+          PY
+      - name: Retain reproducible result and source hashes, not raw traffic
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: nsl-kdd-historical-learned-anomaly-metrics
+          path: ${{ runner.temp }}/nsl-kdd-historical-result.json
+          retention-days: 90
+          if-no-files-found: error
