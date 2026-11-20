@@ -23,11 +23,12 @@ jobs:
       - name: Download from Zenodo and print the layout
         run: |
           for attempt in 1 2 3 4 5; do
-            curl -sS -m 60 -H 'Accept: application/json' -A 'predict-shield-ci' https://zenodo.org/api/records/6724225 -o rec.json || true
+            curl -sSL -m 60 -H 'Accept: application/json' -A 'predict-shield-ci' https://zenodo.org/api/records/6724225 -o rec.json || true
             python3 -c "import json;json.load(open('rec.json'))" 2>/dev/null && break
             echo "record not JSON yet: $(head -c 200 rec.json)"; sleep $((attempt * 15))
           done
           python3 -c "import json;d=json.load(open('rec.json'));print(d['metadata']['title']);print(d['metadata'].get('license'));[print(f['key'],f['size'],f.get('checksum'),f['links']['self']) for f in d['files']]" || true
-          curl -fsSL --retry 5 --retry-all-errors -m 300 -A 'predict-shield-ci' -o "$RUNNER_TEMP/powerduck.zip" \
-            "https://zenodo.org/records/6724225/files/dataset.zip?download=1"
+          url=$(python3 -c "import json;print(json.load(open('rec.json'))['files'][0]['links']['self'])")
+          echo "record $(python3 -c "import json;print(json.load(open('rec.json'))['id'])") file $url"
+          curl -fsSL --retry 5 --retry-all-errors -m 300 -A 'predict-shield-ci' -o "$RUNNER_TEMP/powerduck.zip" "$url"
           python3 experiment-b/powerduck/inspect_archive.py "$RUNNER_TEMP/powerduck.zip"
