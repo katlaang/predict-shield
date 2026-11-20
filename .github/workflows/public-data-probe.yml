@@ -20,7 +20,7 @@ jobs:
         run: |
           head() { echo "=== $1"; curl -sSIL -m 40 -A 'Mozilla/5.0' "$1" 2>&1 | grep -i -E '^HTTP/|content-length|content-type|content-disposition|location' | tail -8 || true; }
           # UQ NetFlow datasets (v3 and v2)
-          head https://rdm.uq.edu.au/files/abd2f5d8-e268-4ff0-84fb-f2f7b3ca3e8f
+          curl -sSL -m 40 https://rdm.uq.edu.au/files/abd2f5d8-e268-4ff0-84fb-f2f7b3ca3e8f | head -c 1925; echo; curl -sSIL -m 40 "https://rdm.uq.edu.au/api/v1/files/abd2f5d8-e268-4ff0-84fb-f2f7b3ca3e8f" | grep -i -E "^HTTP|content-" ; curl -sSL -m 40 "https://rdm.uq.edu.au/files/abd2f5d8-e268-4ff0-84fb-f2f7b3ca3e8f?download=1" -o /tmp/x -w "%{http_code} %{size_download} %{content_type}\n"
           head https://rdm.uq.edu.au/files/343e2e8c-6e6e-4a0c-813d-a46acea1b7f4
           head https://rdm.uq.edu.au/files/db0187cc-1f78-4215-8e34-303364498866
           head https://rdm.uq.edu.au/files/4ac221b1-6bd6-42b1-bdf7-03f4fc7efb22
