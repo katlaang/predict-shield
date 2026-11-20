@@ -95,6 +95,60 @@ class OutageActionsTests(unittest.TestCase):
                 observed_at="2026-11-19T00:00:30Z",
             )
 
+    def test_restored_authority_requires_same_trial_and_revision(self):
+        pre = {"trialId": "trial-123", "revision": 4, "revoked": True}
+        snapshot = {
+            "authority_http": 200,
+            "authority": dict(pre),
+            "targets": [{"node": "http://" + node + ":8080"} for node in exp.ENFORCERS],
+        }
+        def observed(name, path, *, oracle, timeout):
+            self.assertEqual((name, path), ("oracle", "/oracle/observe"))
+            return 200, snapshot, 1
+        result = exp.verify_authority_restored(
+            observed, oracle_token="x" * 32, expected_policy=pre)
+        self.assertTrue(result["authority_source_revision_continuity_observed"])
+        self.assertEqual(result["enforcement_outcome_during_outage"], "INDETERMINATE")
+
+    def test_restored_authority_source_mutation_blocks_next_action(self):
+        pre = {"trialId": "trial-123", "revision": 4, "revoked": True}
+        for key, different in (("trialId", "other-trial"),
+                               ("revision", 5), ("revoked", False)):
+            actual = dict(pre)
+            actual[key] = different
+            response = {"authority_http": 200, "authority": actual,
+                        "targets": [{"node": "http://" + n + ":8080"}
+                                    for n in exp.ENFORCERS]}
+            def observed(*args, **kwargs):
+                return 200, response, 1
+            with self.subTest(key=key):
+                with self.assertRaisesRegex(RuntimeError, "source revision changed"):
+                    exp.verify_authority_restored(
+                        observed, oracle_token="x" * 32, expected_policy=pre)
+
+    def test_missing_or_duplicate_recovery_node_blocks_next_action(self):
+        pre = {"trialId": "trial-123", "revision": 4, "revoked": True}
+        for nodes in (exp.ENFORCERS[:3],
+                      (exp.ENFORCERS[0],) * 4):
+            response = {"authority_http": 200, "authority": pre,
+                        "targets": [{"node": "http://" + n + ":8080"} for n in nodes]}
+            def observed(*args, **kwargs):
+                return 200, response, 1
+            with self.subTest(nodes=nodes):
+                with self.assertRaisesRegex(RuntimeError, "inventory"):
+                    exp.verify_authority_restored(
+                        observed, oracle_token="x" * 32, expected_policy=pre)
+
+    def test_healthy_oracle_http_without_authority_is_not_recovery(self):
+        pre = {"trialId": "trial-123", "revision": 4, "revoked": True}
+        response = {"authority_http": None, "authority": pre,
+                    "targets": [{"node": "http://" + n + ":8080"}
+                                for n in exp.ENFORCERS]}
+        with self.assertRaisesRegex(RuntimeError, "still unavailable"):
+            exp.verify_authority_restored(
+                lambda *args, **kwargs: (200, response, 1),
+                oracle_token="x" * 32, expected_policy=pre)
+
     def test_no_same_credential_execution(self):
         with self.assertRaises(ValueError):
             exp.execute("x" * 32, "x" * 32, Path("."))
