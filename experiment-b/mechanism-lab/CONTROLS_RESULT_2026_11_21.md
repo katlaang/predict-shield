@@ -56,3 +56,35 @@ too. Most of the 1,200 trials would therefore measure cases where doing
 nothing is correct.
 
 The plan should be revised before it is locked.
+
+## Second control run (plan v3.1, CI run 44870659784)
+
+This run used plan v3.1, before locking.
+
+**Negative control:** 8 of 8 runs HEALTHY, at TTL 10 s and 30 s.
+
+**Positive controls:** 9 of the 10 registered cells behaved as their class
+says.
+
+| Cell | Runs | Outcome | Time until access was denied |
+|---|---|---|---|
+| loss, TTL 10 s | 4 | persisted past 6 s | 9.0 to 9.1 s |
+| loss, TTL 30 s | 4 | persisted past 6 s | 29.0 to 29.1 s |
+| loss, TTL 2.5 s | 4 | self-healed | 2.05 to 2.06 s |
+| loss, TTL 4 s | 4 | self-healed | 3.07 to 3.08 s |
+| listener pause, TTL 10 s | 4 | persisted past 6 s | 9.0 to 9.1 s |
+| listener pause, TTL 30 s | 4 | persisted past 6 s | 29.0 to 29.1 s |
+| delay 2.5 s | 4 | self-healed | 2.04 s |
+| **delay 1 s** | 4 | **not exercised** (already denied at the first read) | 0.01 s |
+
+**Why delay 1 s failed:** the event arrives before the first read after setup,
+so it never exposes access. The plan's delay range therefore moved from 1 to
+2.5 s up to 2 to 3 s. This change was also made before locking, and the
+controls run again on the new cells.
+
+**v3.1 pilot:** all 16 trials completed, with no reruns and no exclusions.
+Verifier results:
+- no false VERIFIED;
+- 2 correct VERIFIED and 4 correct NOT VERIFIED;
+- abstention on 10 of 16 trials, all because the gateway scope check was
+  inconclusive.

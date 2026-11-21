@@ -26,9 +26,9 @@
   ],
   "composition": {
    "persistent": "35 loss and 35 consumer_paused configurations, cache TTL 10-30 s",
-   "self_healing": "15 delay (1-2.5 s, TTL 10-30 s) and 15 loss with TTL 2.5-4 s; 30% of configurations, where monitor_only is a legitimate outcome"
+   "self_healing": "15 delay (2-3 s, TTL 10-30 s) and 15 loss with TTL 2.5-4 s; 30% of configurations, where monitor_only is a legitimate outcome"
   },
-  "revision_reason": "Plan v3 was revised before locking after the first control run (CONTROLS_RESULT_2026_11_21.md): duplicate and reorder never exposed revoked access without action, delay healed in about 2 s, and loss persisted past the window only when TTL exceeded it. The control results were seen; no scored trial had run."
+  "revision_reason": "Plan v3 was revised before locking after the first control run (CONTROLS_RESULT_2026_11_21.md): duplicate and reorder never exposed revoked access without action, delay healed in about 2 s, and loss persisted past the window only when TTL exceeded it. The control results were seen; no scored trial had run. A second control run confirmed 9 of 10 cells; the delay cell at 1000 ms was not exercised (delivered before the first read), so the delay range moved from 1-2.5 s to 2-3 s, also before locking."
  },
  "questions": [
   "Q1. For each fault mode, how often does each action leave every revoked access denied, judged by injected ground truth (the oracle's direct cache read plus direct target probe)?",
@@ -154,14 +154,14 @@
    [
     "delay",
     10000,
-    1000,
+    2000,
     "self_healing",
     4
    ],
    [
     "delay",
     10000,
-    2500,
+    3000,
     "self_healing",
     4
    ]

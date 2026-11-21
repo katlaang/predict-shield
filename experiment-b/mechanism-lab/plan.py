@@ -31,7 +31,7 @@ SCHEMA = "predict-shield/mechanism-experiment-plan/1"
 # cache TTL was longer than the window. Version 3.1 uses two fault modes that
 # persist past the window (loss and a physically paused Kafka listener, each
 # with TTL 10-30 s) in 70 configurations, and keeps 30 configurations whose
-# fault heals within the window (delay 1-2.5 s; loss with TTL 2.5-4 s), where
+# fault heals within the window (delay 2-3 s; loss with TTL 2.5-4 s), where
 # doing nothing is a legitimate outcome.
 SCHEMA_V31 = "predict-shield/mechanism-experiment-plan/3.1"
 FAULTS_V31 = ("loss", "consumer_paused", "delay")
@@ -64,7 +64,9 @@ def v31_fault_settings(i: int, seed: int) -> dict:
     if control_class == "persistent":
         ttl, delay = rng.randint(10000, 30000), 0
     elif mode == "delay":
-        ttl, delay = rng.randint(10000, 30000), rng.randint(1000, 2500)
+        # Delays under about 1.2 s are delivered before the first read after
+        # setup and expose nothing (second control run), so 2-3 s.
+        ttl, delay = rng.randint(10000, 30000), rng.randint(2000, 3000)
     else:
         ttl, delay = rng.randint(2500, 4000), 0
     return {"fault_mode": mode, "control_class": control_class,
