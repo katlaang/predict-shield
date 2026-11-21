@@ -1,7 +1,7 @@
 name: Public training data probe
 
-# Reachability, listings and API metadata only. Downloads nothing larger than
-# a page or a script.
+# Inspect candidate open datasets: size, hash, columns and label counts.
+# Nothing is kept beyond the job.
 
 on:
   push:
@@ -14,14 +14,21 @@ permissions:
 jobs:
   probe:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 20
     steps:
-      - name: Probe UQ RDM download chunk and API
+      - name: HIKARI-2021 (Zenodo 6463389, CC BY 4.0)
         run: |
-          for c in download-DFRITavk.js openFileDownload-uFmIzgZv.js view-DLsVmOBp.js; do
-            curl -sSL -m 60 "https://rdm.uq.edu.au/assets/$c" -o c.js; echo "=== $c $(wc -c < c.js)"
-            grep -o -E '.{0,160}(`/[a-z][^`]*`|api\.rdm).{0,200}' c.js | head -20 || true
-          done
-          for path in files/abd2f5d8-e268-4ff0-84fb-f2f7b3ca3e8f files/abd2f5d8-e268-4ff0-84fb-f2f7b3ca3e8f/download datasetfiles/abd2f5d8-e268-4ff0-84fb-f2f7b3ca3e8f v1/files/abd2f5d8-e268-4ff0-84fb-f2f7b3ca3e8f; do
-            echo "=== api $path"; curl -sS -m 40 -o r.bin -w "%{http_code} %{size_download} %{content_type}\n" "https://api.rdm.uq.edu.au/$path" || true; head -c 600 r.bin; echo
-          done
+          curl -sSL -m 60 https://zenodo.org/api/records/6463389 | python3 -c "import json,sys;d=json.load(sys.stdin);print(d['metadata'].get('license'),d['metadata'].get('version'));[print(f['key'],f['size'],f['checksum'],f['links']['self']) for f in d['files']]"
+          url=$(curl -sSL -m 60 https://zenodo.org/api/records/6463389 | python3 -c "import json,sys;d=json.load(sys.stdin);print([f['links']['self'] for f in d['files'] if f['key']=='ALLFLOWMETER_HIKARI2021.csv.zip'][0])")
+          curl -fsSL --retry 5 -m 900 -o h.zip "$url"; ls -l h.zip; sha256sum h.zip
+          python3 - <<'PY'
+          import zipfile, pandas as pd
+          z = zipfile.ZipFile("h.zip"); print([ (i.filename, i.file_size) for i in z.infolist()])
+          name = [i.filename for i in z.infolist() if i.filename.endswith(".csv")][0]
+          df = pd.read_csv(z.open(name), low_memory=False)
+          print("rows", len(df)); print("columns", len(df.columns)); print(list(df.columns))
+          for c in ("traffic_category", "Label", "label"):
+              if c in df.columns: print(c, df[c].value_counts().to_dict())
+          if "traffic_category" in df.columns and "Label" in df.columns: print(pd.crosstab(df["traffic_category"], df["Label"]))
+          print(df.head(3).T.to_string()[:4000])
+          PY
