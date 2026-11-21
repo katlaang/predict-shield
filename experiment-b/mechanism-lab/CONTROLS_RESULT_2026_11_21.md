@@ -88,3 +88,15 @@ Verifier results:
 - 2 correct VERIFIED and 4 correct NOT VERIFIED;
 - abstention on 10 of 16 trials, all because the gateway scope check was
   inconclusive.
+
+## Third control run (plan v3.1 with the 2 to 3 s delay range, CI run 44872887577)
+
+All 10 registered cells behaved as their class says:
+- the negative control was HEALTHY in 8 of 8 runs;
+- 16 of 16 persistent runs persisted past the 6 s window;
+- 16 of 16 self-healing runs healed within it, including delay 2 s and 3 s.
+
+The v3.1 pilot again completed all 16 trials with no reruns or exclusions.
+
+The preregistration was locked on this code (`PREREGISTRATION.lock.json`, tag
+`mechanism-prereg-v1`).

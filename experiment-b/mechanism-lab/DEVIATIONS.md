@@ -19,4 +19,4 @@ Entries are appended, never edited or removed.
 
 ## Entries
 
-None. The preregistration is not locked yet.
+None since locking (tag `mechanism-prereg-v1`). Changes made before locking, after the control runs, are described in `PREREGISTRATION.json` (plan.revision_reason) and `CONTROLS_RESULT_2026_11_21.md`.
