@@ -1,0 +1,680 @@
+{
+ "by_fault_and_action": {
+  "ALL/ALL": {
+   "dual_evidence": {
+    "FN": 0,
+    "TN": 334,
+    "TP": 122,
+    "abstain_rate": 0.62,
+    "abstain_truly_denied": 448,
+    "abstain_truly_exposed": 296,
+    "cases": 1200,
+    "false_VERIFIED": 0,
+    "sensitivity_when_answering": 1.0,
+    "sensitivity_wilson_95": [
+     0.969473821610987,
+     1.0
+    ],
+    "specificity_when_answering": 1.0,
+    "specificity_wilson_95": [
+     0.9886294037620382,
+     1.0
+    ]
+   },
+   "dual_reasons": {
+    "evidence disagrees or is incomplete (scope VERIFIED, telemetry UNAVAILABLE)": 51,
+    "scope and telemetry agree": 122,
+    "scope indeterminate": 693,
+    "scope negative; telemetry agrees": 295,
+    "scope negative; telemetry unavailable": 39
+   },
+   "single_evidence": {
+    "FN": 0,
+    "TN": 334,
+    "TP": 173,
+    "abstain_rate": 0.5775,
+    "abstain_truly_denied": 397,
+    "abstain_truly_exposed": 296,
+    "cases": 1200,
+    "false_VERIFIED": 0,
+    "sensitivity_when_answering": 1.0,
+    "sensitivity_wilson_95": [
+     0.9782773855954833,
+     0.9999999999999999
+    ],
+    "specificity_when_answering": 1.0,
+    "specificity_wilson_95": [
+     0.9886294037620382,
+     1.0
+    ]
+   }
+  },
+  "consumer_paused/ALL": {
+   "dual_evidence": {
+    "FN": 0,
+    "TN": 175,
+    "TP": 41,
+    "abstain_rate": 0.4857142857142857,
+    "abstain_truly_denied": 64,
+    "abstain_truly_exposed": 140,
+    "cases": 420,
+    "false_VERIFIED": 0,
+    "sensitivity_when_answering": 1.0,
+    "sensitivity_wilson_95": [
+     0.9143324298155681,
+     0.9999999999999999
+    ],
+    "specificity_when_answering": 1.0,
+    "specificity_wilson_95": [
+     0.9785203115316479,
+     1.0
+    ]
+   },
+   "dual_reasons": {
+    "scope and telemetry agree": 41,
+    "scope indeterminate": 204,
+    "scope negative; telemetry agrees": 153,
+    "scope negative; telemetry unavailable": 22
+   },
+   "single_evidence": {
+    "FN": 0,
+    "TN": 175,
+    "TP": 41,
+    "abstain_rate": 0.4857142857142857,
+    "abstain_truly_denied": 64,
+    "abstain_truly_exposed": 140,
+    "cases": 420,
+    "false_VERIFIED": 0,
+    "sensitivity_when_answering": 1.0,
+    "sensitivity_wilson_95": [
+     0.9143324298155681,
+     0.9999999999999999
+    ],
+    "specificity_when_answering": 1.0,
+    "specificity_wilson_95": [
+     0.9785203115316479,
+     1.0
+    ]
+   }
+  },
+  "consumer_paused/gateway_restrict": {
+   "dual_evidence": {
+    "FN": 0,
+    "TN": 0,
+    "TP": 0,
+    "abstain_rate": 1.0,
+    "abstain_truly_denied": 0,
+    "abstain_truly_exposed": 105,
+    "cases": 105,
+    "false_VERIFIED": 0,
+    "sensitivity_when_answering": null,
+    "sensitivity_wilson_95": null,
+    "specificity_when_answering": null,
+    "specificity_wilson_95": null
+   },
+   "dual_reasons": {
+    "scope indeterminate": 105
+   },
+   "single_evidence": {
+    "FN": 0,
+    "TN": 0,
+    "TP": 0,
+    "abstain_rate": 1.0,
+    "abstain_truly_denied": 0,
+    "abstain_truly_exposed": 105,
+    "cases": 105,
+    "false_VERIFIED": 0,
+    "sensitivity_when_answering": null,
+    "sensitivity_wilson_95": null,
+    "specificity_when_answering": null,
+    "specificity_wilson_95": null
+   }
+  },
+  "consumer_paused/monitor_only": {
+   "dual_evidence": {
+    "FN": 0,
+    "TN": 88,
+    "TP": 0,
+    "abstain_rate": 0.1619047619047619,
+    "abstain_truly_denied": 0,
+    "abstain_truly_exposed": 17,
+    "cases": 105,
+    "false_VERIFIED": 0,
+    "sensitivity_when_answering": null,
+    "sensitivity_wilson_95": null,
+    "specificity_when_answering": 1.0,
+    "specificity_wilson_95": [
+     0.9581729333351078,
+     0.9999999999999999
+    ]
+   },
+   "dual_reasons": {
+    "scope indeterminate": 17,
+    "scope negative; telemetry agrees": 78,
+    "scope negative; telemetry unavailable": 10
+   },
+   "single_evidence": {
+    "FN": 0,
+    "TN": 88,
+    "TP": 0,
+    "abstain_rate": 0.1619047619047619,
+    "abstain_truly_denied": 0,
+    "abstain_truly_exposed": 17,
+    "cases": 105,
+    "false_VERIFIED": 0,
+    "sensitivity_when_answering": null,
+    "sensitivity_wilson_95": null,
+    "specificity_when_answering": 1.0,
+    "specificity_wilson_95": [
+     0.9581729333351078,
+     0.9999999999999999
+    ]
+   }
+  },
+  "consumer_paused/restart_enforcer": {
+   "dual_evidence": {
+    "FN": 0,
+    "TN": 0,
+    "TP": 41,
+    "abstain_rate": 0.6095238095238096,
+    "abstain_truly_denied": 64,
+    "abstain_truly_exposed": 0,
+    "cases": 105,
+    "false_VERIFIED": 0,
+    "sensitivity_when_answering": 1.0,
+    "sensitivity_wilson_95": [
+     0.9143324298155681,
+     0.9999999999999999
+    ],
+    "specificity_when_answering": null,
+    "specificity_wilson_95": null
+   },
+   "dual_reasons": {
+    "scope and telemetry agree": 41,
+    "scope indeterminate": 64
+   },
+   "single_evidence": {
+    "FN": 0,
+    "TN": 0,
+    "TP": 41,
+    "abstain_rate": 0.6095238095238096,
+    "abstain_truly_denied": 64,
+    "abstain_truly_exposed": 0,
+    "cases": 105,
+    "false_VERIFIED": 0,
+    "sensitivity_when_answering": 1.0,
+    "sensitivity_wilson_95": [
+     0.9143324298155681,
+     0.9999999999999999
+    ],
+    "specificity_when_answering": null,
+    "specificity_wilson_95": null
+   }
+  },
+  "consumer_paused/resync_policy": {
+   "dual_evidence": {
+    "FN": 0,
+    "TN": 87,
+    "TP": 0,
+    "abstain_rate": 0.17142857142857143,
+    "abstain_truly_denied": 0,
+    "abstain_truly_exposed": 18,
+    "cases": 105,
+    "false_VERIFIED": 0,
+    "sensitivity_when_answering": null,
+    "sensitivity_wilson_95": null,
+    "specificity_when_answering": 1.0,
+    "specificity_wilson_95": [
+     0.9577124930558795,
+     0.9999999999999999
+    ]
+   },
+   "dual_reasons": {
+    "scope indeterminate": 18,
+    "scope negative; telemetry agrees": 75,
+    "scope negative; telemetry unavailable": 12
+   },
+   "single_evidence": {
+    "FN": 0,
+    "TN": 87,
+    "TP": 0,
+    "abstain_rate": 0.17142857142857143,
+    "abstain_truly_denied": 0,
+    "abstain_truly_exposed": 18,
+    "cases": 105,
+    "false_VERIFIED": 0,
+    "sensitivity_when_answering": null,
+    "sensitivity_wilson_95": null,
+    "specificity_when_answering": 1.0,
+    "specificity_wilson_95": [
+     0.9577124930558795,
+     0.9999999999999999
+    ]
+   }
+  },
+  "delay/ALL": {
+   "dual_evidence": {
+    "FN": 0,
+    "TN": 0,
+    "TP": 27,
+    "abstain_rate": 0.85,
+    "abstain_truly_denied": 153,
+    "abstain_truly_exposed": 0,
+    "cases": 180,
+    "false_VERIFIED": 0,
+    "sensitivity_when_answering": 1.0,
+    "sensitivity_wilson_95": [
+     0.8754449702581328,
+     0.9999999999999998
+    ],
+    "specificity_when_answering": null,
+    "specificity_wilson_95": null
+   },
+   "dual_reasons": {
+    "evidence disagrees or is incomplete (scope VERIFIED, telemetry UNAVAILABLE)": 23,
+    "scope and telemetry agree": 27,
+    "scope indeterminate": 130
+   },
+   "single_evidence": {
+    "FN": 0,
+    "TN": 0,
+    "TP": 50,
+    "abstain_rate": 0.7222222222222222,
+    "abstain_truly_denied": 130,
+    "abstain_truly_exposed": 0,
+    "cases": 180,
+    "false_VERIFIED": 0,
+    "sensitivity_when_answering": 1.0,
+    "sensitivity_wilson_95": [
+     0.9286524008666414,
+     1.0
+    ],
+    "specificity_when_answering": null,
+    "specificity_wilson_95": null
+   }
+  },
+  "delay/gateway_restrict": {
+   "dual_evidence": {
+    "FN": 0,
+    "TN": 0,
+    "TP": 0,
+    "abstain_rate": 1.0,
+    "abstain_truly_denied": 45,
+    "abstain_truly_exposed": 0,
+    "cases": 45,
+    "false_VERIFIED": 0,
+    "sensitivity_when_answering": null,
+    "sensitivity_wilson_95": null,
+    "specificity_when_answering": null,
+    "specificity_wilson_95": null
+   },
+   "dual_reasons": {
+    "scope indeterminate": 45
+   },
+   "single_evidence": {
+    "FN": 0,
+    "TN": 0,
+    "TP": 0,
+    "abstain_rate": 1.0,
+    "abstain_truly_denied": 45,
+    "abstain_truly_exposed": 0,
+    "cases": 45,
+    "false_VERIFIED": 0,
+    "sensitivity_when_answering": null,
+    "sensitivity_wilson_95": null,
+    "specificity_when_answering": null,
+    "specificity_wilson_95": null
+   }
+  },
+  "delay/monitor_only": {
+   "dual_evidence": {
+    "FN": 0,
+    "TN": 0,
+    "TP": 7,
+    "abstain_rate": 0.8444444444444444,
+    "abstain_truly_denied": 38,
+    "abstain_truly_exposed": 0,
+    "cases": 45,
+    "false_VERIFIED": 0,
+    "sensitivity_when_answering": 1.0,
+    "sensitivity_wilson_95": [
+     0.6456695649333126,
+     1.0
+    ],
+    "specificity_when_answering": null,
+    "specificity_wilson_95": null
+   },
+   "dual_reasons": {
+    "evidence disagrees or is incomplete (scope VERIFIED, telemetry UNAVAILABLE)": 9,
+    "scope and telemetry agree": 7,
+    "scope indeterminate": 29
+   },
+   "single_evidence": {
+    "FN": 0,
+    "TN": 0,
+    "TP": 16,
+    "abstain_rate": 0.6444444444444445,
+    "abstain_truly_denied": 29,
+    "abstain_truly_exposed": 0,
+    "cases": 45,
+    "false_VERIFIED": 0,
+    "sensitivity_when_answering": 1.0,
+    "sensitivity_wilson_95": [
+     0.8063923194655637,
+     1.0
+    ],
+    "specificity_when_answering": null,
+    "specificity_wilson_95": null
+   }
+  },
+  "delay/restart_enforcer": {
+   "dual_evidence": {
+    "FN": 0,
+    "TN": 0,
+    "TP": 13,
+    "abstain_rate": 0.7111111111111111,
+    "abstain_truly_denied": 32,
+    "abstain_truly_exposed": 0,
+    "cases": 45,
+    "false_VERIFIED": 0,
+    "sensitivity_when_answering": 1.0,
+    "sensitivity_wilson_95": [
+     0.7719046276458016,
+     0.9999999999999999
+    ],
+    "specificity_when_answering": null,
+    "specificity_wilson_95": null
+   },
+   "dual_reasons": {
+    "evidence disagrees or is incomplete (scope VERIFIED, telemetry UNAVAILABLE)": 3,
+    "scope and telemetry agree": 13,
+    "scope indeterminate": 29
+   },
+   "single_evidence": {
+    "FN": 0,
+    "TN": 0,
+    "TP": 16,
+    "abstain_rate": 0.6444444444444445,
+    "abstain_truly_denied": 29,
+    "abstain_truly_exposed": 0,
+    "cases": 45,
+    "false_VERIFIED": 0,
+    "sensitivity_when_answering": 1.0,
+    "sensitivity_wilson_95": [
+     0.8063923194655637,
+     1.0
+    ],
+    "specificity_when_answering": null,
+    "specificity_wilson_95": null
+   }
+  },
+  "delay/resync_policy": {
+   "dual_evidence": {
+    "FN": 0,
+    "TN": 0,
+    "TP": 7,
+    "abstain_rate": 0.8444444444444444,
+    "abstain_truly_denied": 38,
+    "abstain_truly_exposed": 0,
+    "cases": 45,
+    "false_VERIFIED": 0,
+    "sensitivity_when_answering": 1.0,
+    "sensitivity_wilson_95": [
+     0.6456695649333126,
+     1.0
+    ],
+    "specificity_when_answering": null,
+    "specificity_wilson_95": null
+   },
+   "dual_reasons": {
+    "evidence disagrees or is incomplete (scope VERIFIED, telemetry UNAVAILABLE)": 11,
+    "scope and telemetry agree": 7,
+    "scope indeterminate": 27
+   },
+   "single_evidence": {
+    "FN": 0,
+    "TN": 0,
+    "TP": 18,
+    "abstain_rate": 0.6,
+    "abstain_truly_denied": 27,
+    "abstain_truly_exposed": 0,
+    "cases": 45,
+    "false_VERIFIED": 0,
+    "sensitivity_when_answering": 1.0,
+    "sensitivity_wilson_95": [
+     0.8241207763533425,
+     1.0
+    ],
+    "specificity_when_answering": null,
+    "specificity_wilson_95": null
+   }
+  },
+  "loss/ALL": {
+   "dual_evidence": {
+    "FN": 0,
+    "TN": 159,
+    "TP": 54,
+    "abstain_rate": 0.645,
+    "abstain_truly_denied": 231,
+    "abstain_truly_exposed": 156,
+    "cases": 600,
+    "false_VERIFIED": 0,
+    "sensitivity_when_answering": 1.0,
+    "sensitivity_wilson_95": [
+     0.9335864119091037,
+     1.0
+    ],
+    "specificity_when_answering": 1.0,
+    "specificity_wilson_95": [
+     0.9764098230971759,
+     1.0
+    ]
+   },
+   "dual_reasons": {
+    "evidence disagrees or is incomplete (scope VERIFIED, telemetry UNAVAILABLE)": 28,
+    "scope and telemetry agree": 54,
+    "scope indeterminate": 359,
+    "scope negative; telemetry agrees": 142,
+    "scope negative; telemetry unavailable": 17
+   },
+   "single_evidence": {
+    "FN": 0,
+    "TN": 159,
+    "TP": 82,
+    "abstain_rate": 0.5983333333333334,
+    "abstain_truly_denied": 203,
+    "abstain_truly_exposed": 156,
+    "cases": 600,
+    "false_VERIFIED": 0,
+    "sensitivity_when_answering": 1.0,
+    "sensitivity_wilson_95": [
+     0.9552493763098998,
+     1.0
+    ],
+    "specificity_when_answering": 1.0,
+    "specificity_wilson_95": [
+     0.9764098230971759,
+     1.0
+    ]
+   }
+  },
+  "loss/gateway_restrict": {
+   "dual_evidence": {
+    "FN": 0,
+    "TN": 0,
+    "TP": 0,
+    "abstain_rate": 1.0,
+    "abstain_truly_denied": 45,
+    "abstain_truly_exposed": 105,
+    "cases": 150,
+    "false_VERIFIED": 0,
+    "sensitivity_when_answering": null,
+    "sensitivity_wilson_95": null,
+    "specificity_when_answering": null,
+    "specificity_wilson_95": null
+   },
+   "dual_reasons": {
+    "scope indeterminate": 150
+   },
+   "single_evidence": {
+    "FN": 0,
+    "TN": 0,
+    "TP": 0,
+    "abstain_rate": 1.0,
+    "abstain_truly_denied": 45,
+    "abstain_truly_exposed": 105,
+    "cases": 150,
+    "false_VERIFIED": 0,
+    "sensitivity_when_answering": null,
+    "sensitivity_wilson_95": null,
+    "specificity_when_answering": null,
+    "specificity_wilson_95": null
+   }
+  },
+  "loss/monitor_only": {
+   "dual_evidence": {
+    "FN": 0,
+    "TN": 79,
+    "TP": 6,
+    "abstain_rate": 0.43333333333333335,
+    "abstain_truly_denied": 39,
+    "abstain_truly_exposed": 26,
+    "cases": 150,
+    "false_VERIFIED": 0,
+    "sensitivity_when_answering": 1.0,
+    "sensitivity_wilson_95": [
+     0.6096657120978346,
+     1.0
+    ],
+    "specificity_when_answering": 1.0,
+    "specificity_wilson_95": [
+     0.9536287883460772,
+     1.0
+    ]
+   },
+   "dual_reasons": {
+    "evidence disagrees or is incomplete (scope VERIFIED, telemetry UNAVAILABLE)": 7,
+    "scope and telemetry agree": 6,
+    "scope indeterminate": 58,
+    "scope negative; telemetry agrees": 71,
+    "scope negative; telemetry unavailable": 8
+   },
+   "single_evidence": {
+    "FN": 0,
+    "TN": 79,
+    "TP": 13,
+    "abstain_rate": 0.38666666666666666,
+    "abstain_truly_denied": 32,
+    "abstain_truly_exposed": 26,
+    "cases": 150,
+    "false_VERIFIED": 0,
+    "sensitivity_when_answering": 1.0,
+    "sensitivity_wilson_95": [
+     0.7719046276458016,
+     0.9999999999999999
+    ],
+    "specificity_when_answering": 1.0,
+    "specificity_wilson_95": [
+     0.9536287883460772,
+     1.0
+    ]
+   }
+  },
+  "loss/restart_enforcer": {
+   "dual_evidence": {
+    "FN": 0,
+    "TN": 0,
+    "TP": 44,
+    "abstain_rate": 0.7066666666666667,
+    "abstain_truly_denied": 106,
+    "abstain_truly_exposed": 0,
+    "cases": 150,
+    "false_VERIFIED": 0,
+    "sensitivity_when_answering": 1.0,
+    "sensitivity_wilson_95": [
+     0.9197043962415192,
+     1.0
+    ],
+    "specificity_when_answering": null,
+    "specificity_wilson_95": null
+   },
+   "dual_reasons": {
+    "evidence disagrees or is incomplete (scope VERIFIED, telemetry UNAVAILABLE)": 11,
+    "scope and telemetry agree": 44,
+    "scope indeterminate": 95
+   },
+   "single_evidence": {
+    "FN": 0,
+    "TN": 0,
+    "TP": 55,
+    "abstain_rate": 0.6333333333333333,
+    "abstain_truly_denied": 95,
+    "abstain_truly_exposed": 0,
+    "cases": 150,
+    "false_VERIFIED": 0,
+    "sensitivity_when_answering": 1.0,
+    "sensitivity_wilson_95": [
+     0.9347150988829137,
+     1.0
+    ],
+    "specificity_when_answering": null,
+    "specificity_wilson_95": null
+   }
+  },
+  "loss/resync_policy": {
+   "dual_evidence": {
+    "FN": 0,
+    "TN": 80,
+    "TP": 4,
+    "abstain_rate": 0.44,
+    "abstain_truly_denied": 41,
+    "abstain_truly_exposed": 25,
+    "cases": 150,
+    "false_VERIFIED": 0,
+    "sensitivity_when_answering": 1.0,
+    "sensitivity_wilson_95": [
+     0.5101091635454027,
+     1.0
+    ],
+    "specificity_when_answering": 1.0,
+    "specificity_wilson_95": [
+     0.9541818704644728,
+     0.9999999999999999
+    ]
+   },
+   "dual_reasons": {
+    "evidence disagrees or is incomplete (scope VERIFIED, telemetry UNAVAILABLE)": 10,
+    "scope and telemetry agree": 4,
+    "scope indeterminate": 56,
+    "scope negative; telemetry agrees": 71,
+    "scope negative; telemetry unavailable": 9
+   },
+   "single_evidence": {
+    "FN": 0,
+    "TN": 80,
+    "TP": 14,
+    "abstain_rate": 0.37333333333333335,
+    "abstain_truly_denied": 31,
+    "abstain_truly_exposed": 25,
+    "cases": 150,
+    "false_VERIFIED": 0,
+    "sensitivity_when_answering": 1.0,
+    "sensitivity_wilson_95": [
+     0.7846891972623643,
+     1.0
+    ],
+    "specificity_when_answering": 1.0,
+    "specificity_wilson_95": [
+     0.9541818704644728,
+     0.9999999999999999
+    ]
+   }
+  }
+ },
+ "cases": 1200,
+ "label": "oracle actual_revoked_access_denied (injected ground truth), never the verifier",
+ "note": "Trials sharing a configuration share a seed; Wilson intervals treat them as independent and understate uncertainty.",
+ "positive_class": "access truly denied after the action",
+ "schema": "predict-shield/verifier-scoring/1",
+ "with_post_action_telemetry": 1009
+}

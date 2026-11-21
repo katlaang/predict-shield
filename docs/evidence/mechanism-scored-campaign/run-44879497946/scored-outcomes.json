@@ -1,0 +1,887 @@
+{
+ "by_fault_and_class": {
+  "ALL/persistent": {
+   "arms": {
+    "gateway_restrict": {
+     "configuration_level_wilson_95": [
+      0.0,
+      0.05202306241026692
+     ],
+     "configurations": 70,
+     "configurations_remediated_in_majority_of_repeats": 0,
+     "error_counts": {
+      "abstention": 210,
+      "disruption": 105,
+      "late_fix": 0,
+      "missed_fix": 210,
+      "unnecessary_action": 0
+     },
+     "exposure_seconds_lower_mean": 0.24732253612855098,
+     "exposure_seconds_upper_mean": 0.2502096777809194,
+     "exposure_seconds_upper_median": 0.22435741599929315,
+     "failed_requests_mean": 25.49047619047619,
+     "mean_cost_by_missed_weight": {
+      "1": 5.5,
+      "20": 24.5,
+      "5": 9.5
+     },
+     "remediated": 0,
+     "remediated_rate": 0.0,
+     "remediated_wilson_95": [
+      0.0,
+      0.017964050759283236
+     ],
+     "restart_not_permitted_trials": 0,
+     "trials": 210
+    },
+    "monitor_only": {
+     "configuration_level_wilson_95": [
+      0.0,
+      0.05202306241026692
+     ],
+     "configurations": 70,
+     "configurations_remediated_in_majority_of_repeats": 0,
+     "error_counts": {
+      "abstention": 43,
+      "disruption": 0,
+      "late_fix": 0,
+      "missed_fix": 210,
+      "unnecessary_action": 0
+     },
+     "exposure_seconds_lower_mean": 0.9011512603428974,
+     "exposure_seconds_upper_mean": 0.9040774434429013,
+     "exposure_seconds_upper_median": 0.6927107155004251,
+     "failed_requests_mean": 0,
+     "mean_cost_by_missed_weight": {
+      "1": 1.4095238095238096,
+      "20": 20.409523809523808,
+      "5": 5.40952380952381
+     },
+     "remediated": 0,
+     "remediated_rate": 0.0,
+     "remediated_wilson_95": [
+      0.0,
+      0.017964050759283236
+     ],
+     "restart_not_permitted_trials": 0,
+     "trials": 210
+    },
+    "restart_enforcer": {
+     "configuration_level_wilson_95": [
+      0.9479769375897331,
+      1.0
+     ],
+     "configurations": 70,
+     "configurations_remediated_in_majority_of_repeats": 70,
+     "error_counts": {
+      "abstention": 134,
+      "disruption": 47,
+      "late_fix": 31,
+      "missed_fix": 0,
+      "unnecessary_action": 0
+     },
+     "exposure_seconds_lower_mean": 0.37909461136185396,
+     "exposure_seconds_upper_mean": 0.8694987533904341,
+     "exposure_seconds_upper_median": 0.6978915784995934,
+     "failed_requests_mean": 17.64761904761905,
+     "mean_cost_by_missed_weight": {
+      "1": 3.1333333333333333,
+      "20": 3.1333333333333333,
+      "5": 3.1333333333333333
+     },
+     "remediated": 210,
+     "remediated_rate": 1.0,
+     "remediated_wilson_95": [
+      0.9820359492407167,
+      1.0
+     ],
+     "restart_not_permitted_trials": 102,
+     "trials": 210
+    },
+    "resync_policy": {
+     "configuration_level_wilson_95": [
+      0.0,
+      0.05202306241026692
+     ],
+     "configurations": 70,
+     "configurations_remediated_in_majority_of_repeats": 0,
+     "error_counts": {
+      "abstention": 43,
+      "disruption": 0,
+      "late_fix": 0,
+      "missed_fix": 210,
+      "unnecessary_action": 0
+     },
+     "exposure_seconds_lower_mean": 0.825242172238152,
+     "exposure_seconds_upper_mean": 0.8281559843571672,
+     "exposure_seconds_upper_median": 0.6671683635006502,
+     "failed_requests_mean": 0,
+     "mean_cost_by_missed_weight": {
+      "1": 1.4095238095238096,
+      "20": 20.409523809523808,
+      "5": 5.40952380952381
+     },
+     "remediated": 0,
+     "remediated_rate": 0.0,
+     "remediated_wilson_95": [
+      0.0,
+      0.017964050759283236
+     ],
+     "restart_not_permitted_trials": 0,
+     "trials": 210
+    }
+   },
+   "lowest_cost_actions": {
+    "1:1": [
+     "monitor_only",
+     "resync_policy"
+    ],
+    "1:20": [
+     "restart_enforcer"
+    ],
+    "1:5": [
+     "restart_enforcer"
+    ]
+   },
+   "robust_across_ratios": false
+  },
+  "ALL/self_healing": {
+   "arms": {
+    "gateway_restrict": {
+     "configuration_level_wilson_95": [
+      0.8864866068260312,
+      0.9999999999999999
+     ],
+     "configurations": 30,
+     "configurations_remediated_in_majority_of_repeats": 30,
+     "error_counts": {
+      "abstention": 90,
+      "disruption": 48,
+      "late_fix": 0,
+      "missed_fix": 0,
+      "unnecessary_action": 90
+     },
+     "exposure_seconds_lower_mean": 0.21428835734444268,
+     "exposure_seconds_upper_mean": 0.21725819002217578,
+     "exposure_seconds_upper_median": 0.20953909899981227,
+     "failed_requests_mean": 27.033333333333335,
+     "mean_cost_by_missed_weight": {
+      "1": 5.666666666666667,
+      "20": 5.666666666666667,
+      "5": 5.666666666666667
+     },
+     "remediated": 90,
+     "remediated_rate": 1.0,
+     "remediated_wilson_95": [
+      0.9590643744356734,
+      1.0
+     ],
+     "restart_not_permitted_trials": 0,
+     "trials": 90
+    },
+    "monitor_only": {
+     "configuration_level_wilson_95": [
+      0.8864866068260312,
+      0.9999999999999999
+     ],
+     "configurations": 30,
+     "configurations_remediated_in_majority_of_repeats": 30,
+     "error_counts": {
+      "abstention": 77,
+      "disruption": 0,
+      "late_fix": 0,
+      "missed_fix": 0,
+      "unnecessary_action": 0
+     },
+     "exposure_seconds_lower_mean": 0.32876452231107073,
+     "exposure_seconds_upper_mean": 0.3315933054222266,
+     "exposure_seconds_upper_median": 0.23843875049988128,
+     "failed_requests_mean": 0,
+     "mean_cost_by_missed_weight": {
+      "1": 1.711111111111111,
+      "20": 1.711111111111111,
+      "5": 1.711111111111111
+     },
+     "remediated": 90,
+     "remediated_rate": 1.0,
+     "remediated_wilson_95": [
+      0.9590643744356734,
+      1.0
+     ],
+     "restart_not_permitted_trials": 0,
+     "trials": 90
+    },
+    "restart_enforcer": {
+     "configuration_level_wilson_95": [
+      0.8864866068260312,
+      0.9999999999999999
+     ],
+     "configurations": 30,
+     "configurations_remediated_in_majority_of_repeats": 30,
+     "error_counts": {
+      "abstention": 68,
+      "disruption": 23,
+      "late_fix": 6,
+      "missed_fix": 0,
+      "unnecessary_action": 90
+     },
+     "exposure_seconds_lower_mean": 0.29995180639999086,
+     "exposure_seconds_upper_mean": 0.6986959355223209,
+     "exposure_seconds_upper_median": 0.617005424499439,
+     "failed_requests_mean": 16.7,
+     "mean_cost_by_missed_weight": {
+      "1": 4.122222222222222,
+      "20": 4.122222222222222,
+      "5": 4.122222222222222
+     },
+     "remediated": 90,
+     "remediated_rate": 1.0,
+     "remediated_wilson_95": [
+      0.9590643744356734,
+      1.0
+     ],
+     "restart_not_permitted_trials": 42,
+     "trials": 90
+    },
+    "resync_policy": {
+     "configuration_level_wilson_95": [
+      0.8864866068260312,
+      0.9999999999999999
+     ],
+     "configurations": 30,
+     "configurations_remediated_in_majority_of_repeats": 30,
+     "error_counts": {
+      "abstention": 79,
+      "disruption": 0,
+      "late_fix": 0,
+      "missed_fix": 0,
+      "unnecessary_action": 90
+     },
+     "exposure_seconds_lower_mean": 0.32045569972215665,
+     "exposure_seconds_upper_mean": 0.32337411267775074,
+     "exposure_seconds_upper_median": 0.23609464199989816,
+     "failed_requests_mean": 0,
+     "mean_cost_by_missed_weight": {
+      "1": 2.7555555555555555,
+      "20": 2.7555555555555555,
+      "5": 2.7555555555555555
+     },
+     "remediated": 90,
+     "remediated_rate": 1.0,
+     "remediated_wilson_95": [
+      0.9590643744356734,
+      1.0
+     ],
+     "restart_not_permitted_trials": 0,
+     "trials": 90
+    }
+   },
+   "lowest_cost_actions": {
+    "1:1": [
+     "monitor_only"
+    ],
+    "1:20": [
+     "monitor_only"
+    ],
+    "1:5": [
+     "monitor_only"
+    ]
+   },
+   "robust_across_ratios": true
+  },
+  "consumer_paused/persistent": {
+   "arms": {
+    "gateway_restrict": {
+     "configuration_level_wilson_95": [
+      6.938893903907228e-18,
+      0.09890099232440402
+     ],
+     "configurations": 35,
+     "configurations_remediated_in_majority_of_repeats": 0,
+     "error_counts": {
+      "abstention": 105,
+      "disruption": 39,
+      "late_fix": 0,
+      "missed_fix": 105,
+      "unnecessary_action": 0
+     },
+     "exposure_seconds_lower_mean": 0.26353255518090357,
+     "exposure_seconds_upper_mean": 0.26635314056187176,
+     "exposure_seconds_upper_median": 0.2301105359997564,
+     "failed_requests_mean": 22.238095238095237,
+     "mean_cost_by_missed_weight": {
+      "1": 4.857142857142857,
+      "20": 23.857142857142858,
+      "5": 8.857142857142858
+     },
+     "remediated": 0,
+     "remediated_rate": 0.0,
+     "remediated_wilson_95": [
+      0.0,
+      0.035294076929109894
+     ],
+     "restart_not_permitted_trials": 0,
+     "trials": 105
+    },
+    "monitor_only": {
+     "configuration_level_wilson_95": [
+      6.938893903907228e-18,
+      0.09890099232440402
+     ],
+     "configurations": 35,
+     "configurations_remediated_in_majority_of_repeats": 0,
+     "error_counts": {
+      "abstention": 17,
+      "disruption": 0,
+      "late_fix": 0,
+      "missed_fix": 105,
+      "unnecessary_action": 0
+     },
+     "exposure_seconds_lower_mean": 0.9492262913048004,
+     "exposure_seconds_upper_mean": 0.9521249570190948,
+     "exposure_seconds_upper_median": 0.7471055870000782,
+     "failed_requests_mean": 0,
+     "mean_cost_by_missed_weight": {
+      "1": 1.3238095238095238,
+      "20": 20.323809523809523,
+      "5": 5.3238095238095235
+     },
+     "remediated": 0,
+     "remediated_rate": 0.0,
+     "remediated_wilson_95": [
+      0.0,
+      0.035294076929109894
+     ],
+     "restart_not_permitted_trials": 0,
+     "trials": 105
+    },
+    "restart_enforcer": {
+     "configuration_level_wilson_95": [
+      0.9010990076755959,
+      0.9999999999999999
+     ],
+     "configurations": 35,
+     "configurations_remediated_in_majority_of_repeats": 35,
+     "error_counts": {
+      "abstention": 64,
+      "disruption": 17,
+      "late_fix": 12,
+      "missed_fix": 0,
+      "unnecessary_action": 0
+     },
+     "exposure_seconds_lower_mean": 0.31556143279999993,
+     "exposure_seconds_upper_mean": 0.7710648630952835,
+     "exposure_seconds_upper_median": 0.5017972030009332,
+     "failed_requests_mean": 16.104761904761904,
+     "mean_cost_by_missed_weight": {
+      "1": 2.6,
+      "20": 2.6,
+      "5": 2.6
+     },
+     "remediated": 105,
+     "remediated_rate": 1.0,
+     "remediated_wilson_95": [
+      0.9647059230708901,
+      1.0
+     ],
+     "restart_not_permitted_trials": 51,
+     "trials": 105
+    },
+    "resync_policy": {
+     "configuration_level_wilson_95": [
+      6.938893903907228e-18,
+      0.09890099232440402
+     ],
+     "configurations": 35,
+     "configurations_remediated_in_majority_of_repeats": 0,
+     "error_counts": {
+      "abstention": 18,
+      "disruption": 0,
+      "late_fix": 0,
+      "missed_fix": 105,
+      "unnecessary_action": 0
+     },
+     "exposure_seconds_lower_mean": 0.7966434432095866,
+     "exposure_seconds_upper_mean": 0.7995519674286069,
+     "exposure_seconds_upper_median": 0.5003689189998113,
+     "failed_requests_mean": 0,
+     "mean_cost_by_missed_weight": {
+      "1": 1.3428571428571427,
+      "20": 20.34285714285714,
+      "5": 5.3428571428571425
+     },
+     "remediated": 0,
+     "remediated_rate": 0.0,
+     "remediated_wilson_95": [
+      0.0,
+      0.035294076929109894
+     ],
+     "restart_not_permitted_trials": 0,
+     "trials": 105
+    }
+   },
+   "lowest_cost_actions": {
+    "1:1": [
+     "monitor_only"
+    ],
+    "1:20": [
+     "restart_enforcer"
+    ],
+    "1:5": [
+     "restart_enforcer"
+    ]
+   },
+   "robust_across_ratios": false
+  },
+  "delay/self_healing": {
+   "arms": {
+    "gateway_restrict": {
+     "configuration_level_wilson_95": [
+      0.7961166989641515,
+      1.0
+     ],
+     "configurations": 15,
+     "configurations_remediated_in_majority_of_repeats": 15,
+     "error_counts": {
+      "abstention": 45,
+      "disruption": 30,
+      "late_fix": 0,
+      "missed_fix": 0,
+      "unnecessary_action": 45
+     },
+     "exposure_seconds_lower_mean": 0.2720821845111459,
+     "exposure_seconds_upper_mean": 0.275040487977761,
+     "exposure_seconds_upper_median": 0.23351501900106086,
+     "failed_requests_mean": 30.42222222222222,
+     "mean_cost_by_missed_weight": {
+      "1": 6.333333333333333,
+      "20": 6.333333333333333,
+      "5": 6.333333333333333
+     },
+     "remediated": 45,
+     "remediated_rate": 1.0,
+     "remediated_wilson_95": [
+      0.9213484012671117,
+      1.0
+     ],
+     "restart_not_permitted_trials": 0,
+     "trials": 45
+    },
+    "monitor_only": {
+     "configuration_level_wilson_95": [
+      0.7961166989641515,
+      1.0
+     ],
+     "configurations": 15,
+     "configurations_remediated_in_majority_of_repeats": 15,
+     "error_counts": {
+      "abstention": 38,
+      "disruption": 0,
+      "late_fix": 0,
+      "missed_fix": 0,
+      "unnecessary_action": 0
+     },
+     "exposure_seconds_lower_mean": 0.30146485446671756,
+     "exposure_seconds_upper_mean": 0.3043273414445442,
+     "exposure_seconds_upper_median": 0.2335823209996306,
+     "failed_requests_mean": 0,
+     "mean_cost_by_missed_weight": {
+      "1": 1.6888888888888889,
+      "20": 1.6888888888888889,
+      "5": 1.6888888888888889
+     },
+     "remediated": 45,
+     "remediated_rate": 1.0,
+     "remediated_wilson_95": [
+      0.9213484012671117,
+      1.0
+     ],
+     "restart_not_permitted_trials": 0,
+     "trials": 45
+    },
+    "restart_enforcer": {
+     "configuration_level_wilson_95": [
+      0.7961166989641515,
+      1.0
+     ],
+     "configurations": 15,
+     "configurations_remediated_in_majority_of_repeats": 15,
+     "error_counts": {
+      "abstention": 32,
+      "disruption": 17,
+      "late_fix": 5,
+      "missed_fix": 0,
+      "unnecessary_action": 45
+     },
+     "exposure_seconds_lower_mean": 0.3479168173777402,
+     "exposure_seconds_upper_mean": 0.8361921628667813,
+     "exposure_seconds_upper_median": 0.6911500779997368,
+     "failed_requests_mean": 20.866666666666667,
+     "mean_cost_by_missed_weight": {
+      "1": 4.866666666666666,
+      "20": 4.866666666666666,
+      "5": 4.866666666666666
+     },
+     "remediated": 45,
+     "remediated_rate": 1.0,
+     "remediated_wilson_95": [
+      0.9213484012671117,
+      1.0
+     ],
+     "restart_not_permitted_trials": 21,
+     "trials": 45
+    },
+    "resync_policy": {
+     "configuration_level_wilson_95": [
+      0.7961166989641515,
+      1.0
+     ],
+     "configurations": 15,
+     "configurations_remediated_in_majority_of_repeats": 15,
+     "error_counts": {
+      "abstention": 38,
+      "disruption": 0,
+      "late_fix": 0,
+      "missed_fix": 0,
+      "unnecessary_action": 45
+     },
+     "exposure_seconds_lower_mean": 0.3486242500443849,
+     "exposure_seconds_upper_mean": 0.351594004355502,
+     "exposure_seconds_upper_median": 0.23865361800017126,
+     "failed_requests_mean": 0,
+     "mean_cost_by_missed_weight": {
+      "1": 2.688888888888889,
+      "20": 2.688888888888889,
+      "5": 2.688888888888889
+     },
+     "remediated": 45,
+     "remediated_rate": 1.0,
+     "remediated_wilson_95": [
+      0.9213484012671117,
+      1.0
+     ],
+     "restart_not_permitted_trials": 0,
+     "trials": 45
+    }
+   },
+   "lowest_cost_actions": {
+    "1:1": [
+     "monitor_only"
+    ],
+    "1:20": [
+     "monitor_only"
+    ],
+    "1:5": [
+     "monitor_only"
+    ]
+   },
+   "robust_across_ratios": true
+  },
+  "loss/persistent": {
+   "arms": {
+    "gateway_restrict": {
+     "configuration_level_wilson_95": [
+      6.938893903907228e-18,
+      0.09890099232440402
+     ],
+     "configurations": 35,
+     "configurations_remediated_in_majority_of_repeats": 0,
+     "error_counts": {
+      "abstention": 105,
+      "disruption": 66,
+      "late_fix": 0,
+      "missed_fix": 105,
+      "unnecessary_action": 0
+     },
+     "exposure_seconds_lower_mean": 0.23111251707619843,
+     "exposure_seconds_upper_mean": 0.23406621499996705,
+     "exposure_seconds_upper_median": 0.20389980199979618,
+     "failed_requests_mean": 28.742857142857144,
+     "mean_cost_by_missed_weight": {
+      "1": 6.142857142857143,
+      "20": 25.142857142857142,
+      "5": 10.142857142857142
+     },
+     "remediated": 0,
+     "remediated_rate": 0.0,
+     "remediated_wilson_95": [
+      0.0,
+      0.035294076929109894
+     ],
+     "restart_not_permitted_trials": 0,
+     "trials": 105
+    },
+    "monitor_only": {
+     "configuration_level_wilson_95": [
+      6.938893903907228e-18,
+      0.09890099232440402
+     ],
+     "configurations": 35,
+     "configurations_remediated_in_majority_of_repeats": 0,
+     "error_counts": {
+      "abstention": 26,
+      "disruption": 0,
+      "late_fix": 0,
+      "missed_fix": 105,
+      "unnecessary_action": 0
+     },
+     "exposure_seconds_lower_mean": 0.8530762293809944,
+     "exposure_seconds_upper_mean": 0.8560299298667078,
+     "exposure_seconds_upper_median": 0.6695612849980535,
+     "failed_requests_mean": 0,
+     "mean_cost_by_missed_weight": {
+      "1": 1.4952380952380953,
+      "20": 20.495238095238093,
+      "5": 5.495238095238095
+     },
+     "remediated": 0,
+     "remediated_rate": 0.0,
+     "remediated_wilson_95": [
+      0.0,
+      0.035294076929109894
+     ],
+     "restart_not_permitted_trials": 0,
+     "trials": 105
+    },
+    "restart_enforcer": {
+     "configuration_level_wilson_95": [
+      0.9010990076755959,
+      0.9999999999999999
+     ],
+     "configurations": 35,
+     "configurations_remediated_in_majority_of_repeats": 35,
+     "error_counts": {
+      "abstention": 70,
+      "disruption": 30,
+      "late_fix": 19,
+      "missed_fix": 0,
+      "unnecessary_action": 0
+     },
+     "exposure_seconds_lower_mean": 0.442627789923708,
+     "exposure_seconds_upper_mean": 0.9679326436855847,
+     "exposure_seconds_upper_median": 0.7392436910004108,
+     "failed_requests_mean": 19.19047619047619,
+     "mean_cost_by_missed_weight": {
+      "1": 3.6666666666666665,
+      "20": 3.6666666666666665,
+      "5": 3.6666666666666665
+     },
+     "remediated": 105,
+     "remediated_rate": 1.0,
+     "remediated_wilson_95": [
+      0.9647059230708901,
+      1.0
+     ],
+     "restart_not_permitted_trials": 51,
+     "trials": 105
+    },
+    "resync_policy": {
+     "configuration_level_wilson_95": [
+      6.938893903907228e-18,
+      0.09890099232440402
+     ],
+     "configurations": 35,
+     "configurations_remediated_in_majority_of_repeats": 0,
+     "error_counts": {
+      "abstention": 25,
+      "disruption": 0,
+      "late_fix": 0,
+      "missed_fix": 105,
+      "unnecessary_action": 0
+     },
+     "exposure_seconds_lower_mean": 0.8538409012667173,
+     "exposure_seconds_upper_mean": 0.8567600012857275,
+     "exposure_seconds_upper_median": 0.7518132540003535,
+     "failed_requests_mean": 0,
+     "mean_cost_by_missed_weight": {
+      "1": 1.4761904761904763,
+      "20": 20.476190476190474,
+      "5": 5.476190476190476
+     },
+     "remediated": 0,
+     "remediated_rate": 0.0,
+     "remediated_wilson_95": [
+      0.0,
+      0.035294076929109894
+     ],
+     "restart_not_permitted_trials": 0,
+     "trials": 105
+    }
+   },
+   "lowest_cost_actions": {
+    "1:1": [
+     "resync_policy"
+    ],
+    "1:20": [
+     "restart_enforcer"
+    ],
+    "1:5": [
+     "restart_enforcer"
+    ]
+   },
+   "robust_across_ratios": false
+  },
+  "loss/self_healing": {
+   "arms": {
+    "gateway_restrict": {
+     "configuration_level_wilson_95": [
+      0.7961166989641515,
+      1.0
+     ],
+     "configurations": 15,
+     "configurations_remediated_in_majority_of_repeats": 15,
+     "error_counts": {
+      "abstention": 45,
+      "disruption": 18,
+      "late_fix": 0,
+      "missed_fix": 0,
+      "unnecessary_action": 45
+     },
+     "exposure_seconds_lower_mean": 0.15649453017773945,
+     "exposure_seconds_upper_mean": 0.15947589206659055,
+     "exposure_seconds_upper_median": 0.004278460999557865,
+     "failed_requests_mean": 23.644444444444446,
+     "mean_cost_by_missed_weight": {
+      "1": 5,
+      "20": 5,
+      "5": 5
+     },
+     "remediated": 45,
+     "remediated_rate": 1.0,
+     "remediated_wilson_95": [
+      0.9213484012671117,
+      1.0
+     ],
+     "restart_not_permitted_trials": 0,
+     "trials": 45
+    },
+    "monitor_only": {
+     "configuration_level_wilson_95": [
+      0.7961166989641515,
+      1.0
+     ],
+     "configurations": 15,
+     "configurations_remediated_in_majority_of_repeats": 15,
+     "error_counts": {
+      "abstention": 39,
+      "disruption": 0,
+      "late_fix": 0,
+      "missed_fix": 0,
+      "unnecessary_action": 0
+     },
+     "exposure_seconds_lower_mean": 0.3560641901554239,
+     "exposure_seconds_upper_mean": 0.358859269399909,
+     "exposure_seconds_upper_median": 0.2510224819998257,
+     "failed_requests_mean": 0,
+     "mean_cost_by_missed_weight": {
+      "1": 1.7333333333333334,
+      "20": 1.7333333333333334,
+      "5": 1.7333333333333334
+     },
+     "remediated": 45,
+     "remediated_rate": 1.0,
+     "remediated_wilson_95": [
+      0.9213484012671117,
+      1.0
+     ],
+     "restart_not_permitted_trials": 0,
+     "trials": 45
+    },
+    "restart_enforcer": {
+     "configuration_level_wilson_95": [
+      0.7961166989641515,
+      1.0
+     ],
+     "configurations": 15,
+     "configurations_remediated_in_majority_of_repeats": 15,
+     "error_counts": {
+      "abstention": 36,
+      "disruption": 6,
+      "late_fix": 1,
+      "missed_fix": 0,
+      "unnecessary_action": 45
+     },
+     "exposure_seconds_lower_mean": 0.2519867954222415,
+     "exposure_seconds_upper_mean": 0.5611997081778605,
+     "exposure_seconds_upper_median": 0.5033372130010321,
+     "failed_requests_mean": 12.533333333333333,
+     "mean_cost_by_missed_weight": {
+      "1": 3.3777777777777778,
+      "20": 3.3777777777777778,
+      "5": 3.3777777777777778
+     },
+     "remediated": 45,
+     "remediated_rate": 1.0,
+     "remediated_wilson_95": [
+      0.9213484012671117,
+      1.0
+     ],
+     "restart_not_permitted_trials": 21,
+     "trials": 45
+    },
+    "resync_policy": {
+     "configuration_level_wilson_95": [
+      0.7961166989641515,
+      1.0
+     ],
+     "configurations": 15,
+     "configurations_remediated_in_majority_of_repeats": 15,
+     "error_counts": {
+      "abstention": 41,
+      "disruption": 0,
+      "late_fix": 0,
+      "missed_fix": 0,
+      "unnecessary_action": 45
+     },
+     "exposure_seconds_lower_mean": 0.29228714939992845,
+     "exposure_seconds_upper_mean": 0.2951542209999995,
+     "exposure_seconds_upper_median": 0.23538489399970786,
+     "failed_requests_mean": 0,
+     "mean_cost_by_missed_weight": {
+      "1": 2.8222222222222224,
+      "20": 2.8222222222222224,
+      "5": 2.8222222222222224
+     },
+     "remediated": 45,
+     "remediated_rate": 1.0,
+     "remediated_wilson_95": [
+      0.9213484012671117,
+      1.0
+     ],
+     "restart_not_permitted_trials": 0,
+     "trials": 45
+    }
+   },
+   "lowest_cost_actions": {
+    "1:1": [
+     "monitor_only"
+    ],
+    "1:20": [
+     "monitor_only"
+    ],
+    "1:5": [
+     "monitor_only"
+    ]
+   },
+   "robust_across_ratios": true
+  }
+ },
+ "cost_matrix": {
+  "abstention": 2,
+  "disruption": 5,
+  "late_fix": 5,
+  "missed_fix": 20,
+  "robustness_rule": "A finding is reported as robust only if it holds at all three ratios; otherwise the ratios where it holds are stated.",
+  "sensitivity_ratios_unnecessary_to_missed": [
+   "1:1",
+   "1:5",
+   "1:20"
+  ],
+  "unnecessary_action": 1
+ },
+ "label": "oracle actual_revoked_access_denied (injected ground truth)",
+ "late_fix_rule": "remediated with exposure upper bound above 50% of the window",
+ "note": "Repeats of one configuration share a seed; configuration-level counts are the primary unit.",
+ "schema": "predict-shield/mechanism-outcomes/1",
+ "trials": 1200
+}

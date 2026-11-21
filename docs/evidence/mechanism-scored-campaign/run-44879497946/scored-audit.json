@@ -1,0 +1,36 @@
+{
+  "schema": "predict-shield/mechanism-campaign-audit/1",
+  "plan_sha256": "a246dea52d6af69469f3d7154cbfc5cf0b3108e35fcad8d97a401fbfa3130156",
+  "planned_trials": 1200,
+  "complete": 1200,
+  "missing": 0,
+  "partial": 0,
+  "invalid": 0,
+  "unexpected_files": 0,
+  "distinct_source_revisions": 1,
+  "single_source_revision": true,
+  "by_split": {
+    "train": {
+      "complete": 720,
+      "missing": 0,
+      "partial": 0,
+      "invalid": 0
+    },
+    "calibration": {
+      "complete": 240,
+      "missing": 0,
+      "partial": 0,
+      "invalid": 0
+    },
+    "test": {
+      "complete": 240,
+      "missing": 0,
+      "partial": 0,
+      "invalid": 0
+    }
+  },
+  "sample_problems": [],
+  "sample_unexpected_files": [],
+  "ready_for_training": true,
+  "caution": "Completed laboratory records do not establish real-world model efficacy"
+}
