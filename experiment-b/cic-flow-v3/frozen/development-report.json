@@ -1,0 +1,4979 @@
+{
+ "chosen": {
+  "config": {
+   "feature_set": "flow+service",
+   "max_iter": 100,
+   "max_leaf_nodes": 15
+  },
+  "eligible_configs": 7,
+  "rule": "highest mean held-out detection among configurations at most 1% normal alerts on both folds; ties to the smaller model"
+ },
+ "freeze_sha256": "36f81ceace5c5428af01366efe987f8449e5abd4a6b1e385c0a227b638bfecaf",
+ "grid_results": [
+  {
+   "config": {
+    "feature_set": "flow",
+    "max_iter": 100,
+    "max_leaf_nodes": 15
+   },
+   "folds": {
+    "cic2017": {
+     "held_out": {
+      "by_family": {
+       "botnet": {
+        "by_anomaly_only": 0,
+        "by_supervised": 1,
+        "detected": 1,
+        "detection_rate": 0.0017006802721088435,
+        "sampled_flows": 588
+       },
+       "brute-force-ftp": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 3223
+       },
+       "brute-force-ssh": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 2416
+       },
+       "ddos": {
+        "by_anomaly_only": 0,
+        "by_supervised": 15741,
+        "detected": 15741,
+        "detection_rate": 0.9868965517241379,
+        "sampled_flows": 15950
+       },
+       "dos-goldeneye": {
+        "by_anomaly_only": 0,
+        "by_supervised": 2983,
+        "detected": 2983,
+        "detection_rate": 0.49330246403175126,
+        "sampled_flows": 6047
+       },
+       "dos-hulk": {
+        "by_anomaly_only": 0,
+        "by_supervised": 6245,
+        "detected": 6245,
+        "detection_rate": 0.3927919994968237,
+        "sampled_flows": 15899
+       },
+       "dos-slow": {
+        "by_anomaly_only": 0,
+        "by_supervised": 3782,
+        "detected": 3782,
+        "detection_rate": 0.8440080339209998,
+        "sampled_flows": 4481
+       },
+       "heartbleed": {
+        "by_anomaly_only": 9,
+        "by_supervised": 0,
+        "detected": 9,
+        "detection_rate": 0.8181818181818182,
+        "sampled_flows": 11
+       },
+       "infiltration": {
+        "by_anomaly_only": 78,
+        "by_supervised": 6422,
+        "detected": 6500,
+        "detection_rate": 0.4040529620190216,
+        "sampled_flows": 16087
+       },
+       "portscan": {
+        "by_anomaly_only": 0,
+        "by_supervised": 7805,
+        "detected": 7805,
+        "detection_rate": 0.4886676684197345,
+        "sampled_flows": 15972
+       },
+       "web-attack": {
+        "by_anomaly_only": 0,
+        "by_supervised": 7,
+        "detected": 7,
+        "detection_rate": 0.28,
+        "sampled_flows": 25
+       },
+       "web-brute-force": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 58
+       }
+      },
+      "calibration_rows": {
+       "anomaly_fit": 29908,
+       "thresholds": 30037
+      },
+      "detection_weighted": 0.5367188967588412,
+      "normal_alert_rate_weighted": 0.01053218753038564,
+      "sampled": {
+       "FP": 2514,
+       "TP": 43073,
+       "attack": 80757,
+       "normal": 240055
+      },
+      "thresholds": {
+       "anomaly": 0.6444316196756747,
+       "supervised": 0.9642920851212223
+      }
+     },
+     "seconds": 29,
+     "train_network": "cic2018",
+     "training_fit": {
+      "by_family": {
+       "botnet": {
+        "by_anomaly_only": 0,
+        "by_supervised": 16120,
+        "detected": 16120,
+        "detection_rate": 1.0,
+        "sampled_flows": 16120
+       },
+       "brute-force-ssh": {
+        "by_anomaly_only": 0,
+        "by_supervised": 16054,
+        "detected": 16054,
+        "detection_rate": 1.0,
+        "sampled_flows": 16054
+       },
+       "ddos": {
+        "by_anomaly_only": 0,
+        "by_supervised": 32043,
+        "detected": 32043,
+        "detection_rate": 1.0,
+        "sampled_flows": 32043
+       },
+       "dos-goldeneye": {
+        "by_anomaly_only": 0,
+        "by_supervised": 16027,
+        "detected": 16027,
+        "detection_rate": 1.0,
+        "sampled_flows": 16027
+       },
+       "dos-hulk": {
+        "by_anomaly_only": 0,
+        "by_supervised": 15995,
+        "detected": 15995,
+        "detection_rate": 1.0,
+        "sampled_flows": 15995
+       },
+       "dos-slow": {
+        "by_anomaly_only": 0,
+        "by_supervised": 6805,
+        "detected": 6805,
+        "detection_rate": 1.0,
+        "sampled_flows": 6805
+       },
+       "infiltration": {
+        "by_anomaly_only": 0,
+        "by_supervised": 32009,
+        "detected": 32009,
+        "detection_rate": 0.9993755658934091,
+        "sampled_flows": 32029
+       },
+       "web-attack": {
+        "by_anomaly_only": 0,
+        "by_supervised": 110,
+        "detected": 110,
+        "detection_rate": 0.990990990990991,
+        "sampled_flows": 111
+       },
+       "web-brute-force": {
+        "by_anomaly_only": 0,
+        "by_supervised": 110,
+        "detected": 110,
+        "detection_rate": 0.990990990990991,
+        "sampled_flows": 111
+       }
+      },
+      "calibration_rows": {
+       "anomaly_fit": 60185,
+       "thresholds": 60328
+      },
+      "detection_weighted": 0.9999843393723608,
+      "normal_alert_rate_weighted": 0.00908093386977595,
+      "sampled": {
+       "FP": 4345,
+       "TP": 135273,
+       "attack": 135295,
+       "normal": 479487
+      },
+      "thresholds": {
+       "anomaly": 0.6515708135085305,
+       "supervised": 0.213793254721472
+      }
+     }
+    },
+    "cic2018": {
+     "held_out": {
+      "by_family": {
+       "botnet": {
+        "by_anomaly_only": 17,
+        "by_supervised": 0,
+        "detected": 17,
+        "detection_rate": 0.001054590570719603,
+        "sampled_flows": 16120
+       },
+       "brute-force-ssh": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 16054
+       },
+       "ddos": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 32043
+       },
+       "dos-goldeneye": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 16027
+       },
+       "dos-hulk": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 15995
+       },
+       "dos-slow": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 6805
+       },
+       "infiltration": {
+        "by_anomaly_only": 1382,
+        "by_supervised": 2218,
+        "detected": 3600,
+        "detection_rate": 0.11239813918636236,
+        "sampled_flows": 32029
+       },
+       "web-attack": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 111
+       },
+       "web-brute-force": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 111
+       }
+      },
+      "calibration_rows": {
+       "anomaly_fit": 60185,
+       "thresholds": 60328
+      },
+      "detection_weighted": 0.002908722445701293,
+      "normal_alert_rate_weighted": 0.006695771755488112,
+      "sampled": {
+       "FP": 3248,
+       "TP": 3617,
+       "attack": 135295,
+       "normal": 479487
+      },
+      "thresholds": {
+       "anomaly": 0.6515708135085305,
+       "supervised": 0.9993163029726192
+      }
+     },
+     "seconds": 21,
+     "train_network": "cic2017",
+     "training_fit": {
+      "by_family": {
+       "botnet": {
+        "by_anomaly_only": 0,
+        "by_supervised": 588,
+        "detected": 588,
+        "detection_rate": 1.0,
+        "sampled_flows": 588
+       },
+       "brute-force-ftp": {
+        "by_anomaly_only": 0,
+        "by_supervised": 3223,
+        "detected": 3223,
+        "detection_rate": 1.0,
+        "sampled_flows": 3223
+       },
+       "brute-force-ssh": {
+        "by_anomaly_only": 0,
+        "by_supervised": 2416,
+        "detected": 2416,
+        "detection_rate": 1.0,
+        "sampled_flows": 2416
+       },
+       "ddos": {
+        "by_anomaly_only": 0,
+        "by_supervised": 15950,
+        "detected": 15950,
+        "detection_rate": 1.0,
+        "sampled_flows": 15950
+       },
+       "dos-goldeneye": {
+        "by_anomaly_only": 0,
+        "by_supervised": 6047,
+        "detected": 6047,
+        "detection_rate": 1.0,
+        "sampled_flows": 6047
+       },
+       "dos-hulk": {
+        "by_anomaly_only": 0,
+        "by_supervised": 15899,
+        "detected": 15899,
+        "detection_rate": 1.0,
+        "sampled_flows": 15899
+       },
+       "dos-slow": {
+        "by_anomaly_only": 0,
+        "by_supervised": 4481,
+        "detected": 4481,
+        "detection_rate": 1.0,
+        "sampled_flows": 4481
+       },
+       "heartbleed": {
+        "by_anomaly_only": 0,
+        "by_supervised": 11,
+        "detected": 11,
+        "detection_rate": 1.0,
+        "sampled_flows": 11
+       },
+       "infiltration": {
+        "by_anomaly_only": 0,
+        "by_supervised": 16084,
+        "detected": 16084,
+        "detection_rate": 0.9998135140175297,
+        "sampled_flows": 16087
+       },
+       "portscan": {
+        "by_anomaly_only": 0,
+        "by_supervised": 15969,
+        "detected": 15969,
+        "detection_rate": 0.9998121712997746,
+        "sampled_flows": 15972
+       },
+       "web-attack": {
+        "by_anomaly_only": 0,
+        "by_supervised": 25,
+        "detected": 25,
+        "detection_rate": 1.0,
+        "sampled_flows": 25
+       },
+       "web-brute-force": {
+        "by_anomaly_only": 0,
+        "by_supervised": 58,
+        "detected": 58,
+        "detection_rate": 1.0,
+        "sampled_flows": 58
+       }
+      },
+      "calibration_rows": {
+       "anomaly_fit": 29908,
+       "thresholds": 30037
+      },
+      "detection_weighted": 0.9999141719719128,
+      "normal_alert_rate_weighted": 0.009318518089952176,
+      "sampled": {
+       "FP": 2246,
+       "TP": 80751,
+       "attack": 80757,
+       "normal": 240055
+      },
+      "thresholds": {
+       "anomaly": 0.6444316196756747,
+       "supervised": 0.07290469052159236
+      }
+     }
+    }
+   },
+   "mean_held_out_detection": 0.26981380960227125
+  },
+  {
+   "config": {
+    "feature_set": "flow",
+    "max_iter": 300,
+    "max_leaf_nodes": 15
+   },
+   "folds": {
+    "cic2017": {
+     "held_out": {
+      "by_family": {
+       "botnet": {
+        "by_anomaly_only": 0,
+        "by_supervised": 13,
+        "detected": 13,
+        "detection_rate": 0.022108843537414966,
+        "sampled_flows": 588
+       },
+       "brute-force-ftp": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 3223
+       },
+       "brute-force-ssh": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 2416
+       },
+       "ddos": {
+        "by_anomaly_only": 0,
+        "by_supervised": 2733,
+        "detected": 2733,
+        "detection_rate": 0.17134796238244515,
+        "sampled_flows": 15950
+       },
+       "dos-goldeneye": {
+        "by_anomaly_only": 0,
+        "by_supervised": 174,
+        "detected": 174,
+        "detection_rate": 0.0287745989746982,
+        "sampled_flows": 6047
+       },
+       "dos-hulk": {
+        "by_anomaly_only": 0,
+        "by_supervised": 457,
+        "detected": 457,
+        "detection_rate": 0.02874394616013586,
+        "sampled_flows": 15899
+       },
+       "dos-slow": {
+        "by_anomaly_only": 0,
+        "by_supervised": 2177,
+        "detected": 2177,
+        "detection_rate": 0.4858290560142825,
+        "sampled_flows": 4481
+       },
+       "heartbleed": {
+        "by_anomaly_only": 9,
+        "by_supervised": 0,
+        "detected": 9,
+        "detection_rate": 0.8181818181818182,
+        "sampled_flows": 11
+       },
+       "infiltration": {
+        "by_anomaly_only": 123,
+        "by_supervised": 4298,
+        "detected": 4421,
+        "detection_rate": 0.2748181761670914,
+        "sampled_flows": 16087
+       },
+       "portscan": {
+        "by_anomaly_only": 0,
+        "by_supervised": 7800,
+        "detected": 7800,
+        "detection_rate": 0.4883546205860255,
+        "sampled_flows": 15972
+       },
+       "web-attack": {
+        "by_anomaly_only": 0,
+        "by_supervised": 2,
+        "detected": 2,
+        "detection_rate": 0.08,
+        "sampled_flows": 25
+       },
+       "web-brute-force": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 58
+       }
+      },
+      "calibration_rows": {
+       "anomaly_fit": 29908,
+       "thresholds": 30037
+      },
+      "detection_weighted": 0.24017035566192327,
+      "normal_alert_rate_weighted": 0.009881585104495034,
+      "sampled": {
+       "FP": 2361,
+       "TP": 17786,
+       "attack": 80757,
+       "normal": 240055
+      },
+      "thresholds": {
+       "anomaly": 0.6444316196756747,
+       "supervised": 0.9681951852184095
+      }
+     },
+     "seconds": 52,
+     "train_network": "cic2018",
+     "training_fit": {
+      "by_family": {
+       "botnet": {
+        "by_anomaly_only": 0,
+        "by_supervised": 16120,
+        "detected": 16120,
+        "detection_rate": 1.0,
+        "sampled_flows": 16120
+       },
+       "brute-force-ssh": {
+        "by_anomaly_only": 0,
+        "by_supervised": 16054,
+        "detected": 16054,
+        "detection_rate": 1.0,
+        "sampled_flows": 16054
+       },
+       "ddos": {
+        "by_anomaly_only": 0,
+        "by_supervised": 32043,
+        "detected": 32043,
+        "detection_rate": 1.0,
+        "sampled_flows": 32043
+       },
+       "dos-goldeneye": {
+        "by_anomaly_only": 0,
+        "by_supervised": 16026,
+        "detected": 16026,
+        "detection_rate": 0.9999376052910713,
+        "sampled_flows": 16027
+       },
+       "dos-hulk": {
+        "by_anomaly_only": 0,
+        "by_supervised": 15995,
+        "detected": 15995,
+        "detection_rate": 1.0,
+        "sampled_flows": 15995
+       },
+       "dos-slow": {
+        "by_anomaly_only": 0,
+        "by_supervised": 6805,
+        "detected": 6805,
+        "detection_rate": 1.0,
+        "sampled_flows": 6805
+       },
+       "infiltration": {
+        "by_anomaly_only": 0,
+        "by_supervised": 32020,
+        "detected": 32020,
+        "detection_rate": 0.9997190046520341,
+        "sampled_flows": 32029
+       },
+       "web-attack": {
+        "by_anomaly_only": 0,
+        "by_supervised": 111,
+        "detected": 111,
+        "detection_rate": 1.0,
+        "sampled_flows": 111
+       },
+       "web-brute-force": {
+        "by_anomaly_only": 0,
+        "by_supervised": 111,
+        "detected": 111,
+        "detection_rate": 1.0,
+        "sampled_flows": 111
+       }
+      },
+      "calibration_rows": {
+       "anomaly_fit": 60185,
+       "thresholds": 60328
+      },
+      "detection_weighted": 0.9999927397729086,
+      "normal_alert_rate_weighted": 0.009227124143594017,
+      "sampled": {
+       "FP": 4415,
+       "TP": 135285,
+       "attack": 135295,
+       "normal": 479487
+      },
+      "thresholds": {
+       "anomaly": 0.6515708135085305,
+       "supervised": 0.10813225524775376
+      }
+     }
+    },
+    "cic2018": {
+     "held_out": {
+      "by_family": {
+       "botnet": {
+        "by_anomaly_only": 17,
+        "by_supervised": 0,
+        "detected": 17,
+        "detection_rate": 0.001054590570719603,
+        "sampled_flows": 16120
+       },
+       "brute-force-ssh": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 16054
+       },
+       "ddos": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 32043
+       },
+       "dos-goldeneye": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 16027
+       },
+       "dos-hulk": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 15995
+       },
+       "dos-slow": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 6805
+       },
+       "infiltration": {
+        "by_anomaly_only": 1382,
+        "by_supervised": 0,
+        "detected": 1382,
+        "detection_rate": 0.04314839676543133,
+        "sampled_flows": 32029
+       },
+       "web-attack": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 111
+       },
+       "web-brute-force": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 111
+       }
+      },
+      "calibration_rows": {
+       "anomaly_fit": 60185,
+       "thresholds": 60328
+      },
+      "detection_weighted": 0.0011435931113126328,
+      "normal_alert_rate_weighted": 0.004879817546661475,
+      "sampled": {
+       "FP": 2337,
+       "TP": 1399,
+       "attack": 135295,
+       "normal": 479487
+      },
+      "thresholds": {
+       "anomaly": 0.6515708135085305,
+       "supervised": 1.0
+      }
+     },
+     "seconds": 42,
+     "train_network": "cic2017",
+     "training_fit": {
+      "by_family": {
+       "botnet": {
+        "by_anomaly_only": 0,
+        "by_supervised": 588,
+        "detected": 588,
+        "detection_rate": 1.0,
+        "sampled_flows": 588
+       },
+       "brute-force-ftp": {
+        "by_anomaly_only": 0,
+        "by_supervised": 3223,
+        "detected": 3223,
+        "detection_rate": 1.0,
+        "sampled_flows": 3223
+       },
+       "brute-force-ssh": {
+        "by_anomaly_only": 0,
+        "by_supervised": 2415,
+        "detected": 2415,
+        "detection_rate": 0.9995860927152318,
+        "sampled_flows": 2416
+       },
+       "ddos": {
+        "by_anomaly_only": 0,
+        "by_supervised": 15950,
+        "detected": 15950,
+        "detection_rate": 1.0,
+        "sampled_flows": 15950
+       },
+       "dos-goldeneye": {
+        "by_anomaly_only": 0,
+        "by_supervised": 6047,
+        "detected": 6047,
+        "detection_rate": 1.0,
+        "sampled_flows": 6047
+       },
+       "dos-hulk": {
+        "by_anomaly_only": 0,
+        "by_supervised": 15899,
+        "detected": 15899,
+        "detection_rate": 1.0,
+        "sampled_flows": 15899
+       },
+       "dos-slow": {
+        "by_anomaly_only": 0,
+        "by_supervised": 4481,
+        "detected": 4481,
+        "detection_rate": 1.0,
+        "sampled_flows": 4481
+       },
+       "heartbleed": {
+        "by_anomaly_only": 0,
+        "by_supervised": 11,
+        "detected": 11,
+        "detection_rate": 1.0,
+        "sampled_flows": 11
+       },
+       "infiltration": {
+        "by_anomaly_only": 0,
+        "by_supervised": 16083,
+        "detected": 16083,
+        "detection_rate": 0.999751352023373,
+        "sampled_flows": 16087
+       },
+       "portscan": {
+        "by_anomaly_only": 0,
+        "by_supervised": 15972,
+        "detected": 15972,
+        "detection_rate": 1.0,
+        "sampled_flows": 15972
+       },
+       "web-attack": {
+        "by_anomaly_only": 0,
+        "by_supervised": 25,
+        "detected": 25,
+        "detection_rate": 1.0,
+        "sampled_flows": 25
+       },
+       "web-brute-force": {
+        "by_anomaly_only": 0,
+        "by_supervised": 58,
+        "detected": 58,
+        "detection_rate": 1.0,
+        "sampled_flows": 58
+       }
+      },
+      "calibration_rows": {
+       "anomaly_fit": 29908,
+       "thresholds": 30037
+      },
+      "detection_weighted": 0.9999619302141551,
+      "normal_alert_rate_weighted": 0.009824145692936125,
+      "sampled": {
+       "FP": 2367,
+       "TP": 80752,
+       "attack": 80757,
+       "normal": 240055
+      },
+      "thresholds": {
+       "anomaly": 0.6444316196756747,
+       "supervised": 0.01790296743579746
+      }
+     }
+    }
+   },
+   "mean_held_out_detection": 0.12065697438661795
+  },
+  {
+   "config": {
+    "feature_set": "flow",
+    "max_iter": 100,
+    "max_leaf_nodes": 31
+   },
+   "folds": {
+    "cic2017": {
+     "held_out": {
+      "by_family": {
+       "botnet": {
+        "by_anomaly_only": 0,
+        "by_supervised": 36,
+        "detected": 36,
+        "detection_rate": 0.061224489795918366,
+        "sampled_flows": 588
+       },
+       "brute-force-ftp": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 3223
+       },
+       "brute-force-ssh": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 2416
+       },
+       "ddos": {
+        "by_anomaly_only": 0,
+        "by_supervised": 8247,
+        "detected": 8247,
+        "detection_rate": 0.5170532915360502,
+        "sampled_flows": 15950
+       },
+       "dos-goldeneye": {
+        "by_anomaly_only": 0,
+        "by_supervised": 169,
+        "detected": 169,
+        "detection_rate": 0.02794774268232181,
+        "sampled_flows": 6047
+       },
+       "dos-hulk": {
+        "by_anomaly_only": 0,
+        "by_supervised": 150,
+        "detected": 150,
+        "detection_rate": 0.009434555632429712,
+        "sampled_flows": 15899
+       },
+       "dos-slow": {
+        "by_anomaly_only": 0,
+        "by_supervised": 1374,
+        "detected": 1374,
+        "detection_rate": 0.3066279848248159,
+        "sampled_flows": 4481
+       },
+       "heartbleed": {
+        "by_anomaly_only": 9,
+        "by_supervised": 0,
+        "detected": 9,
+        "detection_rate": 0.8181818181818182,
+        "sampled_flows": 11
+       },
+       "infiltration": {
+        "by_anomaly_only": 43,
+        "by_supervised": 8966,
+        "detected": 9009,
+        "detection_rate": 0.5600174053583639,
+        "sampled_flows": 16087
+       },
+       "portscan": {
+        "by_anomaly_only": 0,
+        "by_supervised": 7801,
+        "detected": 7801,
+        "detection_rate": 0.48841723015276733,
+        "sampled_flows": 15972
+       },
+       "web-attack": {
+        "by_anomaly_only": 0,
+        "by_supervised": 1,
+        "detected": 1,
+        "detection_rate": 0.04,
+        "sampled_flows": 25
+       },
+       "web-brute-force": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 58
+       }
+      },
+      "calibration_rows": {
+       "anomaly_fit": 29908,
+       "thresholds": 30037
+      },
+      "detection_weighted": 0.33804821102078875,
+      "normal_alert_rate_weighted": 0.010567988565640398,
+      "sampled": {
+       "FP": 2528,
+       "TP": 26796,
+       "attack": 80757,
+       "normal": 240055
+      },
+      "thresholds": {
+       "anomaly": 0.6444316196756747,
+       "supervised": 0.9770393987464173
+      }
+     },
+     "seconds": 29,
+     "train_network": "cic2018",
+     "training_fit": {
+      "by_family": {
+       "botnet": {
+        "by_anomaly_only": 0,
+        "by_supervised": 16120,
+        "detected": 16120,
+        "detection_rate": 1.0,
+        "sampled_flows": 16120
+       },
+       "brute-force-ssh": {
+        "by_anomaly_only": 0,
+        "by_supervised": 16054,
+        "detected": 16054,
+        "detection_rate": 1.0,
+        "sampled_flows": 16054
+       },
+       "ddos": {
+        "by_anomaly_only": 0,
+        "by_supervised": 32043,
+        "detected": 32043,
+        "detection_rate": 1.0,
+        "sampled_flows": 32043
+       },
+       "dos-goldeneye": {
+        "by_anomaly_only": 0,
+        "by_supervised": 16026,
+        "detected": 16026,
+        "detection_rate": 0.9999376052910713,
+        "sampled_flows": 16027
+       },
+       "dos-hulk": {
+        "by_anomaly_only": 0,
+        "by_supervised": 15995,
+        "detected": 15995,
+        "detection_rate": 1.0,
+        "sampled_flows": 15995
+       },
+       "dos-slow": {
+        "by_anomaly_only": 0,
+        "by_supervised": 6805,
+        "detected": 6805,
+        "detection_rate": 1.0,
+        "sampled_flows": 6805
+       },
+       "infiltration": {
+        "by_anomaly_only": 0,
+        "by_supervised": 32028,
+        "detected": 32028,
+        "detection_rate": 0.9999687782946705,
+        "sampled_flows": 32029
+       },
+       "web-attack": {
+        "by_anomaly_only": 0,
+        "by_supervised": 111,
+        "detected": 111,
+        "detection_rate": 1.0,
+        "sampled_flows": 111
+       },
+       "web-brute-force": {
+        "by_anomaly_only": 0,
+        "by_supervised": 111,
+        "detected": 111,
+        "detection_rate": 1.0,
+        "sampled_flows": 111
+       }
+      },
+      "calibration_rows": {
+       "anomaly_fit": 60185,
+       "thresholds": 60328
+      },
+      "detection_weighted": 0.9999988979600849,
+      "normal_alert_rate_weighted": 0.009676293544650738,
+      "sampled": {
+       "FP": 4628,
+       "TP": 135293,
+       "attack": 135295,
+       "normal": 479487
+      },
+      "thresholds": {
+       "anomaly": 0.6515708135085305,
+       "supervised": 0.05788342677502894
+      }
+     }
+    },
+    "cic2018": {
+     "held_out": {
+      "by_family": {
+       "botnet": {
+        "by_anomaly_only": 17,
+        "by_supervised": 0,
+        "detected": 17,
+        "detection_rate": 0.001054590570719603,
+        "sampled_flows": 16120
+       },
+       "brute-force-ssh": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 16054
+       },
+       "ddos": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 32043
+       },
+       "dos-goldeneye": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 16027
+       },
+       "dos-hulk": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 15995
+       },
+       "dos-slow": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 6805
+       },
+       "infiltration": {
+        "by_anomaly_only": 1382,
+        "by_supervised": 30,
+        "detected": 1412,
+        "detection_rate": 0.04408504792531768,
+        "sampled_flows": 32029
+       },
+       "web-attack": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 111
+       },
+       "web-brute-force": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 111
+       }
+      },
+      "calibration_rows": {
+       "anomaly_fit": 60185,
+       "thresholds": 60328
+      },
+      "detection_weighted": 0.0011684075551264448,
+      "normal_alert_rate_weighted": 0.007369533283091112,
+      "sampled": {
+       "FP": 3565,
+       "TP": 1429,
+       "attack": 135295,
+       "normal": 479487
+      },
+      "thresholds": {
+       "anomaly": 0.6515708135085305,
+       "supervised": 0.9998967317954699
+      }
+     },
+     "seconds": 22,
+     "train_network": "cic2017",
+     "training_fit": {
+      "by_family": {
+       "botnet": {
+        "by_anomaly_only": 0,
+        "by_supervised": 588,
+        "detected": 588,
+        "detection_rate": 1.0,
+        "sampled_flows": 588
+       },
+       "brute-force-ftp": {
+        "by_anomaly_only": 0,
+        "by_supervised": 3223,
+        "detected": 3223,
+        "detection_rate": 1.0,
+        "sampled_flows": 3223
+       },
+       "brute-force-ssh": {
+        "by_anomaly_only": 0,
+        "by_supervised": 2416,
+        "detected": 2416,
+        "detection_rate": 1.0,
+        "sampled_flows": 2416
+       },
+       "ddos": {
+        "by_anomaly_only": 0,
+        "by_supervised": 15950,
+        "detected": 15950,
+        "detection_rate": 1.0,
+        "sampled_flows": 15950
+       },
+       "dos-goldeneye": {
+        "by_anomaly_only": 0,
+        "by_supervised": 6047,
+        "detected": 6047,
+        "detection_rate": 1.0,
+        "sampled_flows": 6047
+       },
+       "dos-hulk": {
+        "by_anomaly_only": 0,
+        "by_supervised": 15899,
+        "detected": 15899,
+        "detection_rate": 1.0,
+        "sampled_flows": 15899
+       },
+       "dos-slow": {
+        "by_anomaly_only": 0,
+        "by_supervised": 4481,
+        "detected": 4481,
+        "detection_rate": 1.0,
+        "sampled_flows": 4481
+       },
+       "heartbleed": {
+        "by_anomaly_only": 0,
+        "by_supervised": 11,
+        "detected": 11,
+        "detection_rate": 1.0,
+        "sampled_flows": 11
+       },
+       "infiltration": {
+        "by_anomaly_only": 0,
+        "by_supervised": 16086,
+        "detected": 16086,
+        "detection_rate": 0.9999378380058432,
+        "sampled_flows": 16087
+       },
+       "portscan": {
+        "by_anomaly_only": 0,
+        "by_supervised": 15972,
+        "detected": 15972,
+        "detection_rate": 1.0,
+        "sampled_flows": 15972
+       },
+       "web-attack": {
+        "by_anomaly_only": 0,
+        "by_supervised": 25,
+        "detected": 25,
+        "detection_rate": 1.0,
+        "sampled_flows": 25
+       },
+       "web-brute-force": {
+        "by_anomaly_only": 0,
+        "by_supervised": 58,
+        "detected": 58,
+        "detection_rate": 1.0,
+        "sampled_flows": 58
+       }
+      },
+      "calibration_rows": {
+       "anomaly_fit": 29908,
+       "thresholds": 30037
+      },
+      "detection_weighted": 0.9999911021547564,
+      "normal_alert_rate_weighted": 0.009486640060600734,
+      "sampled": {
+       "FP": 2283,
+       "TP": 80756,
+       "attack": 80757,
+       "normal": 240055
+      },
+      "thresholds": {
+       "anomaly": 0.6444316196756747,
+       "supervised": 0.014960499102201005
+      }
+     }
+    }
+   },
+   "mean_held_out_detection": 0.1696083092879576
+  },
+  {
+   "config": {
+    "feature_set": "flow",
+    "max_iter": 300,
+    "max_leaf_nodes": 31
+   },
+   "folds": {
+    "cic2017": {
+     "held_out": {
+      "by_family": {
+       "botnet": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 588
+       },
+       "brute-force-ftp": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 3223
+       },
+       "brute-force-ssh": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 2416
+       },
+       "ddos": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 15950
+       },
+       "dos-goldeneye": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 6047
+       },
+       "dos-hulk": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 15899
+       },
+       "dos-slow": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 4481
+       },
+       "heartbleed": {
+        "by_anomaly_only": 9,
+        "by_supervised": 0,
+        "detected": 9,
+        "detection_rate": 0.8181818181818182,
+        "sampled_flows": 11
+       },
+       "infiltration": {
+        "by_anomaly_only": 174,
+        "by_supervised": 0,
+        "detected": 174,
+        "detection_rate": 0.010816186983278424,
+        "sampled_flows": 16087
+       },
+       "portscan": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 15972
+       },
+       "web-attack": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 25
+       },
+       "web-brute-force": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 58
+       }
+      },
+      "calibration_rows": {
+       "anomaly_fit": 29908,
+       "thresholds": 30037
+      },
+      "detection_weighted": 0.00157053071624428,
+      "normal_alert_rate_weighted": 0.005487394532712818,
+      "sampled": {
+       "FP": 1312,
+       "TP": 183,
+       "attack": 80757,
+       "normal": 240055
+      },
+      "thresholds": {
+       "anomaly": 0.6444316196756747,
+       "supervised": 1.0
+      }
+     },
+     "seconds": 57,
+     "train_network": "cic2018",
+     "training_fit": {
+      "by_family": {
+       "botnet": {
+        "by_anomaly_only": 17,
+        "by_supervised": 0,
+        "detected": 17,
+        "detection_rate": 0.001054590570719603,
+        "sampled_flows": 16120
+       },
+       "brute-force-ssh": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 16054
+       },
+       "ddos": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 32043
+       },
+       "dos-goldeneye": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 16027
+       },
+       "dos-hulk": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 15995
+       },
+       "dos-slow": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 6805
+       },
+       "infiltration": {
+        "by_anomaly_only": 1382,
+        "by_supervised": 0,
+        "detected": 1382,
+        "detection_rate": 0.04314839676543133,
+        "sampled_flows": 32029
+       },
+       "web-attack": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 111
+       },
+       "web-brute-force": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 111
+       }
+      },
+      "calibration_rows": {
+       "anomaly_fit": 60185,
+       "thresholds": 60328
+      },
+      "detection_weighted": 0.0011435931113126328,
+      "normal_alert_rate_weighted": 0.004879817546661475,
+      "sampled": {
+       "FP": 2337,
+       "TP": 1399,
+       "attack": 135295,
+       "normal": 479487
+      },
+      "thresholds": {
+       "anomaly": 0.6515708135085305,
+       "supervised": 1.0
+      }
+     }
+    },
+    "cic2018": {
+     "held_out": {
+      "by_family": {
+       "botnet": {
+        "by_anomaly_only": 17,
+        "by_supervised": 0,
+        "detected": 17,
+        "detection_rate": 0.001054590570719603,
+        "sampled_flows": 16120
+       },
+       "brute-force-ssh": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 16054
+       },
+       "ddos": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 32043
+       },
+       "dos-goldeneye": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 16027
+       },
+       "dos-hulk": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 15995
+       },
+       "dos-slow": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 6805
+       },
+       "infiltration": {
+        "by_anomaly_only": 1382,
+        "by_supervised": 0,
+        "detected": 1382,
+        "detection_rate": 0.04314839676543133,
+        "sampled_flows": 32029
+       },
+       "web-attack": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 111
+       },
+       "web-brute-force": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 111
+       }
+      },
+      "calibration_rows": {
+       "anomaly_fit": 60185,
+       "thresholds": 60328
+      },
+      "detection_weighted": 0.0011435931113126328,
+      "normal_alert_rate_weighted": 0.004879817546661475,
+      "sampled": {
+       "FP": 2337,
+       "TP": 1399,
+       "attack": 135295,
+       "normal": 479487
+      },
+      "thresholds": {
+       "anomaly": 0.6515708135085305,
+       "supervised": 1.0
+      }
+     },
+     "seconds": 48,
+     "train_network": "cic2017",
+     "training_fit": {
+      "by_family": {
+       "botnet": {
+        "by_anomaly_only": 0,
+        "by_supervised": 582,
+        "detected": 582,
+        "detection_rate": 0.9897959183673469,
+        "sampled_flows": 588
+       },
+       "brute-force-ftp": {
+        "by_anomaly_only": 0,
+        "by_supervised": 3223,
+        "detected": 3223,
+        "detection_rate": 1.0,
+        "sampled_flows": 3223
+       },
+       "brute-force-ssh": {
+        "by_anomaly_only": 0,
+        "by_supervised": 2414,
+        "detected": 2414,
+        "detection_rate": 0.9991721854304636,
+        "sampled_flows": 2416
+       },
+       "ddos": {
+        "by_anomaly_only": 0,
+        "by_supervised": 15947,
+        "detected": 15947,
+        "detection_rate": 0.9998119122257053,
+        "sampled_flows": 15950
+       },
+       "dos-goldeneye": {
+        "by_anomaly_only": 0,
+        "by_supervised": 6013,
+        "detected": 6013,
+        "detection_rate": 0.9943773772118406,
+        "sampled_flows": 6047
+       },
+       "dos-hulk": {
+        "by_anomaly_only": 0,
+        "by_supervised": 15894,
+        "detected": 15894,
+        "detection_rate": 0.9996855148122523,
+        "sampled_flows": 15899
+       },
+       "dos-slow": {
+        "by_anomaly_only": 0,
+        "by_supervised": 4421,
+        "detected": 4421,
+        "detection_rate": 0.9866101316670386,
+        "sampled_flows": 4481
+       },
+       "heartbleed": {
+        "by_anomaly_only": 5,
+        "by_supervised": 4,
+        "detected": 9,
+        "detection_rate": 0.8181818181818182,
+        "sampled_flows": 11
+       },
+       "infiltration": {
+        "by_anomaly_only": 1,
+        "by_supervised": 16017,
+        "detected": 16018,
+        "detection_rate": 0.9957108224031826,
+        "sampled_flows": 16087
+       },
+       "portscan": {
+        "by_anomaly_only": 0,
+        "by_supervised": 15966,
+        "detected": 15966,
+        "detection_rate": 0.9996243425995492,
+        "sampled_flows": 15972
+       },
+       "web-attack": {
+        "by_anomaly_only": 0,
+        "by_supervised": 25,
+        "detected": 25,
+        "detection_rate": 1.0,
+        "sampled_flows": 25
+       },
+       "web-brute-force": {
+        "by_anomaly_only": 0,
+        "by_supervised": 58,
+        "detected": 58,
+        "detection_rate": 1.0,
+        "sampled_flows": 58
+       }
+      },
+      "calibration_rows": {
+       "anomaly_fit": 29908,
+       "thresholds": 30037
+      },
+      "detection_weighted": 0.9988764678183226,
+      "normal_alert_rate_weighted": 0.00947267289699317,
+      "sampled": {
+       "FP": 2283,
+       "TP": 80570,
+       "attack": 80757,
+       "normal": 240055
+      },
+      "thresholds": {
+       "anomaly": 0.6444316196756747,
+       "supervised": 0.20062345716443805
+      }
+     }
+    }
+   },
+   "mean_held_out_detection": 0.0013570619137784562
+  },
+  {
+   "config": {
+    "feature_set": "flow",
+    "max_iter": 100,
+    "max_leaf_nodes": 63
+   },
+   "folds": {
+    "cic2017": {
+     "held_out": {
+      "by_family": {
+       "botnet": {
+        "by_anomaly_only": 0,
+        "by_supervised": 36,
+        "detected": 36,
+        "detection_rate": 0.061224489795918366,
+        "sampled_flows": 588
+       },
+       "brute-force-ftp": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 3223
+       },
+       "brute-force-ssh": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 2416
+       },
+       "ddos": {
+        "by_anomaly_only": 0,
+        "by_supervised": 7287,
+        "detected": 7287,
+        "detection_rate": 0.4568652037617555,
+        "sampled_flows": 15950
+       },
+       "dos-goldeneye": {
+        "by_anomaly_only": 0,
+        "by_supervised": 780,
+        "detected": 780,
+        "detection_rate": 0.12898958161071605,
+        "sampled_flows": 6047
+       },
+       "dos-hulk": {
+        "by_anomaly_only": 0,
+        "by_supervised": 6,
+        "detected": 6,
+        "detection_rate": 0.0003773822252971885,
+        "sampled_flows": 15899
+       },
+       "dos-slow": {
+        "by_anomaly_only": 0,
+        "by_supervised": 1736,
+        "detected": 1736,
+        "detection_rate": 0.38741352376701627,
+        "sampled_flows": 4481
+       },
+       "heartbleed": {
+        "by_anomaly_only": 9,
+        "by_supervised": 0,
+        "detected": 9,
+        "detection_rate": 0.8181818181818182,
+        "sampled_flows": 11
+       },
+       "infiltration": {
+        "by_anomaly_only": 104,
+        "by_supervised": 1753,
+        "detected": 1857,
+        "detection_rate": 0.11543482314912662,
+        "sampled_flows": 16087
+       },
+       "portscan": {
+        "by_anomaly_only": 0,
+        "by_supervised": 764,
+        "detected": 764,
+        "detection_rate": 0.04783370899073378,
+        "sampled_flows": 15972
+       },
+       "web-attack": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 25
+       },
+       "web-brute-force": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 58
+       }
+      },
+      "calibration_rows": {
+       "anomaly_fit": 29908,
+       "thresholds": 30037
+      },
+      "detection_weighted": 0.12396358224696756,
+      "normal_alert_rate_weighted": 0.010367985814967874,
+      "sampled": {
+       "FP": 2486,
+       "TP": 12475,
+       "attack": 80757,
+       "normal": 240055
+      },
+      "thresholds": {
+       "anomaly": 0.6444316196756747,
+       "supervised": 0.9791424164611129
+      }
+     },
+     "seconds": 32,
+     "train_network": "cic2018",
+     "training_fit": {
+      "by_family": {
+       "botnet": {
+        "by_anomaly_only": 0,
+        "by_supervised": 16120,
+        "detected": 16120,
+        "detection_rate": 1.0,
+        "sampled_flows": 16120
+       },
+       "brute-force-ssh": {
+        "by_anomaly_only": 0,
+        "by_supervised": 16054,
+        "detected": 16054,
+        "detection_rate": 1.0,
+        "sampled_flows": 16054
+       },
+       "ddos": {
+        "by_anomaly_only": 0,
+        "by_supervised": 32043,
+        "detected": 32043,
+        "detection_rate": 1.0,
+        "sampled_flows": 32043
+       },
+       "dos-goldeneye": {
+        "by_anomaly_only": 0,
+        "by_supervised": 16027,
+        "detected": 16027,
+        "detection_rate": 1.0,
+        "sampled_flows": 16027
+       },
+       "dos-hulk": {
+        "by_anomaly_only": 0,
+        "by_supervised": 15995,
+        "detected": 15995,
+        "detection_rate": 1.0,
+        "sampled_flows": 15995
+       },
+       "dos-slow": {
+        "by_anomaly_only": 0,
+        "by_supervised": 6805,
+        "detected": 6805,
+        "detection_rate": 1.0,
+        "sampled_flows": 6805
+       },
+       "infiltration": {
+        "by_anomaly_only": 0,
+        "by_supervised": 32029,
+        "detected": 32029,
+        "detection_rate": 1.0,
+        "sampled_flows": 32029
+       },
+       "web-attack": {
+        "by_anomaly_only": 0,
+        "by_supervised": 111,
+        "detected": 111,
+        "detection_rate": 1.0,
+        "sampled_flows": 111
+       },
+       "web-brute-force": {
+        "by_anomaly_only": 0,
+        "by_supervised": 111,
+        "detected": 111,
+        "detection_rate": 1.0,
+        "sampled_flows": 111
+       }
+      },
+      "calibration_rows": {
+       "anomaly_fit": 60185,
+       "thresholds": 60328
+      },
+      "detection_weighted": 1.0,
+      "normal_alert_rate_weighted": 0.009224853996474157,
+      "sampled": {
+       "FP": 4413,
+       "TP": 135295,
+       "attack": 135295,
+       "normal": 479487
+      },
+      "thresholds": {
+       "anomaly": 0.6515708135085305,
+       "supervised": 0.006155469631663877
+      }
+     }
+    },
+    "cic2018": {
+     "held_out": {
+      "by_family": {
+       "botnet": {
+        "by_anomaly_only": 17,
+        "by_supervised": 0,
+        "detected": 17,
+        "detection_rate": 0.001054590570719603,
+        "sampled_flows": 16120
+       },
+       "brute-force-ssh": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 16054
+       },
+       "ddos": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 32043
+       },
+       "dos-goldeneye": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 16027
+       },
+       "dos-hulk": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 15995
+       },
+       "dos-slow": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 6805
+       },
+       "infiltration": {
+        "by_anomaly_only": 1382,
+        "by_supervised": 13535,
+        "detected": 14917,
+        "detection_rate": 0.46573417840082426,
+        "sampled_flows": 32029
+       },
+       "web-attack": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 111
+       },
+       "web-brute-force": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 111
+       }
+      },
+      "calibration_rows": {
+       "anomaly_fit": 60185,
+       "thresholds": 60328
+      },
+      "detection_weighted": 0.011856477397516944,
+      "normal_alert_rate_weighted": 0.005105239868554397,
+      "sampled": {
+       "FP": 2445,
+       "TP": 14934,
+       "attack": 135295,
+       "normal": 479487
+      },
+      "thresholds": {
+       "anomaly": 0.6515708135085305,
+       "supervised": 0.9999748894695327
+      }
+     },
+     "seconds": 23,
+     "train_network": "cic2017",
+     "training_fit": {
+      "by_family": {
+       "botnet": {
+        "by_anomaly_only": 0,
+        "by_supervised": 588,
+        "detected": 588,
+        "detection_rate": 1.0,
+        "sampled_flows": 588
+       },
+       "brute-force-ftp": {
+        "by_anomaly_only": 0,
+        "by_supervised": 3223,
+        "detected": 3223,
+        "detection_rate": 1.0,
+        "sampled_flows": 3223
+       },
+       "brute-force-ssh": {
+        "by_anomaly_only": 0,
+        "by_supervised": 2416,
+        "detected": 2416,
+        "detection_rate": 1.0,
+        "sampled_flows": 2416
+       },
+       "ddos": {
+        "by_anomaly_only": 0,
+        "by_supervised": 15950,
+        "detected": 15950,
+        "detection_rate": 1.0,
+        "sampled_flows": 15950
+       },
+       "dos-goldeneye": {
+        "by_anomaly_only": 0,
+        "by_supervised": 6047,
+        "detected": 6047,
+        "detection_rate": 1.0,
+        "sampled_flows": 6047
+       },
+       "dos-hulk": {
+        "by_anomaly_only": 0,
+        "by_supervised": 15899,
+        "detected": 15899,
+        "detection_rate": 1.0,
+        "sampled_flows": 15899
+       },
+       "dos-slow": {
+        "by_anomaly_only": 0,
+        "by_supervised": 4481,
+        "detected": 4481,
+        "detection_rate": 1.0,
+        "sampled_flows": 4481
+       },
+       "heartbleed": {
+        "by_anomaly_only": 0,
+        "by_supervised": 11,
+        "detected": 11,
+        "detection_rate": 1.0,
+        "sampled_flows": 11
+       },
+       "infiltration": {
+        "by_anomaly_only": 0,
+        "by_supervised": 16087,
+        "detected": 16087,
+        "detection_rate": 1.0,
+        "sampled_flows": 16087
+       },
+       "portscan": {
+        "by_anomaly_only": 0,
+        "by_supervised": 15972,
+        "detected": 15972,
+        "detection_rate": 1.0,
+        "sampled_flows": 15972
+       },
+       "web-attack": {
+        "by_anomaly_only": 0,
+        "by_supervised": 25,
+        "detected": 25,
+        "detection_rate": 1.0,
+        "sampled_flows": 25
+       },
+       "web-brute-force": {
+        "by_anomaly_only": 0,
+        "by_supervised": 58,
+        "detected": 58,
+        "detection_rate": 1.0,
+        "sampled_flows": 58
+       }
+      },
+      "calibration_rows": {
+       "anomaly_fit": 29908,
+       "thresholds": 30037
+      },
+      "detection_weighted": 1.0,
+      "normal_alert_rate_weighted": 0.00998434623461893,
+      "sampled": {
+       "FP": 2390,
+       "TP": 80757,
+       "attack": 80757,
+       "normal": 240055
+      },
+      "thresholds": {
+       "anomaly": 0.6444316196756747,
+       "supervised": 0.0009559180759984962
+      }
+     }
+    }
+   },
+   "mean_held_out_detection": 0.06791002982224226
+  },
+  {
+   "config": {
+    "feature_set": "flow",
+    "max_iter": 300,
+    "max_leaf_nodes": 63
+   },
+   "folds": {
+    "cic2017": {
+     "held_out": {
+      "by_family": {
+       "botnet": {
+        "by_anomaly_only": 0,
+        "by_supervised": 36,
+        "detected": 36,
+        "detection_rate": 0.061224489795918366,
+        "sampled_flows": 588
+       },
+       "brute-force-ftp": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 3223
+       },
+       "brute-force-ssh": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 2416
+       },
+       "ddos": {
+        "by_anomaly_only": 0,
+        "by_supervised": 9969,
+        "detected": 9969,
+        "detection_rate": 0.6250156739811912,
+        "sampled_flows": 15950
+       },
+       "dos-goldeneye": {
+        "by_anomaly_only": 0,
+        "by_supervised": 761,
+        "detected": 761,
+        "detection_rate": 0.1258475276996858,
+        "sampled_flows": 6047
+       },
+       "dos-hulk": {
+        "by_anomaly_only": 0,
+        "by_supervised": 299,
+        "detected": 299,
+        "detection_rate": 0.018806214227309895,
+        "sampled_flows": 15899
+       },
+       "dos-slow": {
+        "by_anomaly_only": 0,
+        "by_supervised": 2474,
+        "detected": 2474,
+        "detection_rate": 0.5521089042624414,
+        "sampled_flows": 4481
+       },
+       "heartbleed": {
+        "by_anomaly_only": 9,
+        "by_supervised": 0,
+        "detected": 9,
+        "detection_rate": 0.8181818181818182,
+        "sampled_flows": 11
+       },
+       "infiltration": {
+        "by_anomaly_only": 119,
+        "by_supervised": 2091,
+        "detected": 2210,
+        "detection_rate": 0.13737800708646733,
+        "sampled_flows": 16087
+       },
+       "portscan": {
+        "by_anomaly_only": 0,
+        "by_supervised": 5203,
+        "detected": 5203,
+        "detection_rate": 0.32575757575757575,
+        "sampled_flows": 15972
+       },
+       "web-attack": {
+        "by_anomaly_only": 0,
+        "by_supervised": 9,
+        "detected": 9,
+        "detection_rate": 0.36,
+        "sampled_flows": 25
+       },
+       "web-brute-force": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 58
+       }
+      },
+      "calibration_rows": {
+       "anomaly_fit": 29908,
+       "thresholds": 30037
+      },
+      "detection_weighted": 0.2537833915743711,
+      "normal_alert_rate_weighted": 0.01027441458616621,
+      "sampled": {
+       "FP": 2456,
+       "TP": 20970,
+       "attack": 80757,
+       "normal": 240055
+      },
+      "thresholds": {
+       "anomaly": 0.6444316196756747,
+       "supervised": 0.9668352687147413
+      }
+     },
+     "seconds": 75,
+     "train_network": "cic2018",
+     "training_fit": {
+      "by_family": {
+       "botnet": {
+        "by_anomaly_only": 0,
+        "by_supervised": 16120,
+        "detected": 16120,
+        "detection_rate": 1.0,
+        "sampled_flows": 16120
+       },
+       "brute-force-ssh": {
+        "by_anomaly_only": 0,
+        "by_supervised": 16054,
+        "detected": 16054,
+        "detection_rate": 1.0,
+        "sampled_flows": 16054
+       },
+       "ddos": {
+        "by_anomaly_only": 0,
+        "by_supervised": 32043,
+        "detected": 32043,
+        "detection_rate": 1.0,
+        "sampled_flows": 32043
+       },
+       "dos-goldeneye": {
+        "by_anomaly_only": 0,
+        "by_supervised": 16027,
+        "detected": 16027,
+        "detection_rate": 1.0,
+        "sampled_flows": 16027
+       },
+       "dos-hulk": {
+        "by_anomaly_only": 0,
+        "by_supervised": 15995,
+        "detected": 15995,
+        "detection_rate": 1.0,
+        "sampled_flows": 15995
+       },
+       "dos-slow": {
+        "by_anomaly_only": 0,
+        "by_supervised": 6805,
+        "detected": 6805,
+        "detection_rate": 1.0,
+        "sampled_flows": 6805
+       },
+       "infiltration": {
+        "by_anomaly_only": 0,
+        "by_supervised": 32029,
+        "detected": 32029,
+        "detection_rate": 1.0,
+        "sampled_flows": 32029
+       },
+       "web-attack": {
+        "by_anomaly_only": 0,
+        "by_supervised": 111,
+        "detected": 111,
+        "detection_rate": 1.0,
+        "sampled_flows": 111
+       },
+       "web-brute-force": {
+        "by_anomaly_only": 0,
+        "by_supervised": 111,
+        "detected": 111,
+        "detection_rate": 1.0,
+        "sampled_flows": 111
+       }
+      },
+      "calibration_rows": {
+       "anomaly_fit": 60185,
+       "thresholds": 60328
+      },
+      "detection_weighted": 1.0,
+      "normal_alert_rate_weighted": 0.00964309288359092,
+      "sampled": {
+       "FP": 4614,
+       "TP": 135295,
+       "attack": 135295,
+       "normal": 479487
+      },
+      "thresholds": {
+       "anomaly": 0.6515708135085305,
+       "supervised": 2.077714299786743e-05
+      }
+     }
+    },
+    "cic2018": {
+     "held_out": {
+      "by_family": {
+       "botnet": {
+        "by_anomaly_only": 17,
+        "by_supervised": 0,
+        "detected": 17,
+        "detection_rate": 0.001054590570719603,
+        "sampled_flows": 16120
+       },
+       "brute-force-ssh": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 16054
+       },
+       "ddos": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 32043
+       },
+       "dos-goldeneye": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 16027
+       },
+       "dos-hulk": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 15995
+       },
+       "dos-slow": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 6805
+       },
+       "infiltration": {
+        "by_anomaly_only": 1382,
+        "by_supervised": 18,
+        "detected": 1400,
+        "detection_rate": 0.04371038746136314,
+        "sampled_flows": 32029
+       },
+       "web-attack": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 111
+       },
+       "web-brute-force": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 111
+       }
+      },
+      "calibration_rows": {
+       "anomaly_fit": 60185,
+       "thresholds": 60328
+      },
+      "detection_weighted": 0.0011589054679154271,
+      "normal_alert_rate_weighted": 0.00890049223805304,
+      "sampled": {
+       "FP": 4352,
+       "TP": 1417,
+       "attack": 135295,
+       "normal": 479487
+      },
+      "thresholds": {
+       "anomaly": 0.6515708135085305,
+       "supervised": 0.9999999958608241
+      }
+     },
+     "seconds": 50,
+     "train_network": "cic2017",
+     "training_fit": {
+      "by_family": {
+       "botnet": {
+        "by_anomaly_only": 0,
+        "by_supervised": 588,
+        "detected": 588,
+        "detection_rate": 1.0,
+        "sampled_flows": 588
+       },
+       "brute-force-ftp": {
+        "by_anomaly_only": 0,
+        "by_supervised": 3223,
+        "detected": 3223,
+        "detection_rate": 1.0,
+        "sampled_flows": 3223
+       },
+       "brute-force-ssh": {
+        "by_anomaly_only": 0,
+        "by_supervised": 2416,
+        "detected": 2416,
+        "detection_rate": 1.0,
+        "sampled_flows": 2416
+       },
+       "ddos": {
+        "by_anomaly_only": 0,
+        "by_supervised": 15950,
+        "detected": 15950,
+        "detection_rate": 1.0,
+        "sampled_flows": 15950
+       },
+       "dos-goldeneye": {
+        "by_anomaly_only": 0,
+        "by_supervised": 6047,
+        "detected": 6047,
+        "detection_rate": 1.0,
+        "sampled_flows": 6047
+       },
+       "dos-hulk": {
+        "by_anomaly_only": 0,
+        "by_supervised": 15899,
+        "detected": 15899,
+        "detection_rate": 1.0,
+        "sampled_flows": 15899
+       },
+       "dos-slow": {
+        "by_anomaly_only": 0,
+        "by_supervised": 4481,
+        "detected": 4481,
+        "detection_rate": 1.0,
+        "sampled_flows": 4481
+       },
+       "heartbleed": {
+        "by_anomaly_only": 0,
+        "by_supervised": 11,
+        "detected": 11,
+        "detection_rate": 1.0,
+        "sampled_flows": 11
+       },
+       "infiltration": {
+        "by_anomaly_only": 0,
+        "by_supervised": 16087,
+        "detected": 16087,
+        "detection_rate": 1.0,
+        "sampled_flows": 16087
+       },
+       "portscan": {
+        "by_anomaly_only": 0,
+        "by_supervised": 15972,
+        "detected": 15972,
+        "detection_rate": 1.0,
+        "sampled_flows": 15972
+       },
+       "web-attack": {
+        "by_anomaly_only": 0,
+        "by_supervised": 25,
+        "detected": 25,
+        "detection_rate": 1.0,
+        "sampled_flows": 25
+       },
+       "web-brute-force": {
+        "by_anomaly_only": 0,
+        "by_supervised": 58,
+        "detected": 58,
+        "detection_rate": 1.0,
+        "sampled_flows": 58
+       }
+      },
+      "calibration_rows": {
+       "anomaly_fit": 29908,
+       "thresholds": 30037
+      },
+      "detection_weighted": 1.0,
+      "normal_alert_rate_weighted": 0.009196983305016634,
+      "sampled": {
+       "FP": 2200,
+       "TP": 80757,
+       "attack": 80757,
+       "normal": 240055
+      },
+      "thresholds": {
+       "anomaly": 0.6444316196756747,
+       "supervised": 1.027259732189568e-06
+      }
+     }
+    }
+   },
+   "mean_held_out_detection": 0.12747114852114325
+  },
+  {
+   "config": {
+    "feature_set": "flow+service",
+    "max_iter": 100,
+    "max_leaf_nodes": 15
+   },
+   "folds": {
+    "cic2017": {
+     "held_out": {
+      "by_family": {
+       "botnet": {
+        "by_anomaly_only": 0,
+        "by_supervised": 570,
+        "detected": 570,
+        "detection_rate": 0.9693877551020408,
+        "sampled_flows": 588
+       },
+       "brute-force-ftp": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 3223
+       },
+       "brute-force-ssh": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 2416
+       },
+       "ddos": {
+        "by_anomaly_only": 0,
+        "by_supervised": 7203,
+        "detected": 7203,
+        "detection_rate": 0.4515987460815047,
+        "sampled_flows": 15950
+       },
+       "dos-goldeneye": {
+        "by_anomaly_only": 0,
+        "by_supervised": 2850,
+        "detected": 2850,
+        "detection_rate": 0.47130808665453944,
+        "sampled_flows": 6047
+       },
+       "dos-hulk": {
+        "by_anomaly_only": 0,
+        "by_supervised": 4046,
+        "detected": 4046,
+        "detection_rate": 0.25448141392540413,
+        "sampled_flows": 15899
+       },
+       "dos-slow": {
+        "by_anomaly_only": 0,
+        "by_supervised": 994,
+        "detected": 994,
+        "detection_rate": 0.22182548538272706,
+        "sampled_flows": 4481
+       },
+       "heartbleed": {
+        "by_anomaly_only": 5,
+        "by_supervised": 6,
+        "detected": 11,
+        "detection_rate": 1.0,
+        "sampled_flows": 11
+       },
+       "infiltration": {
+        "by_anomaly_only": 151,
+        "by_supervised": 8797,
+        "detected": 8948,
+        "detection_rate": 0.5562255237148007,
+        "sampled_flows": 16087
+       },
+       "portscan": {
+        "by_anomaly_only": 7,
+        "by_supervised": 7776,
+        "detected": 7783,
+        "detection_rate": 0.48729025795141495,
+        "sampled_flows": 15972
+       },
+       "web-attack": {
+        "by_anomaly_only": 0,
+        "by_supervised": 7,
+        "detected": 7,
+        "detection_rate": 0.28,
+        "sampled_flows": 25
+       },
+       "web-brute-force": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 58
+       }
+      },
+      "calibration_rows": {
+       "anomaly_fit": 29908,
+       "thresholds": 30037
+      },
+      "detection_weighted": 0.40839498482655173,
+      "normal_alert_rate_weighted": 0.009725394059667998,
+      "sampled": {
+       "FP": 2349,
+       "TP": 32412,
+       "attack": 80757,
+       "normal": 240055
+      },
+      "thresholds": {
+       "anomaly": 0.6254882661128751,
+       "supervised": 0.9815107976158373
+      }
+     },
+     "seconds": 48,
+     "train_network": "cic2018",
+     "training_fit": {
+      "by_family": {
+       "botnet": {
+        "by_anomaly_only": 0,
+        "by_supervised": 16120,
+        "detected": 16120,
+        "detection_rate": 1.0,
+        "sampled_flows": 16120
+       },
+       "brute-force-ssh": {
+        "by_anomaly_only": 0,
+        "by_supervised": 16054,
+        "detected": 16054,
+        "detection_rate": 1.0,
+        "sampled_flows": 16054
+       },
+       "ddos": {
+        "by_anomaly_only": 0,
+        "by_supervised": 32043,
+        "detected": 32043,
+        "detection_rate": 1.0,
+        "sampled_flows": 32043
+       },
+       "dos-goldeneye": {
+        "by_anomaly_only": 0,
+        "by_supervised": 16027,
+        "detected": 16027,
+        "detection_rate": 1.0,
+        "sampled_flows": 16027
+       },
+       "dos-hulk": {
+        "by_anomaly_only": 0,
+        "by_supervised": 15995,
+        "detected": 15995,
+        "detection_rate": 1.0,
+        "sampled_flows": 15995
+       },
+       "dos-slow": {
+        "by_anomaly_only": 0,
+        "by_supervised": 6805,
+        "detected": 6805,
+        "detection_rate": 1.0,
+        "sampled_flows": 6805
+       },
+       "infiltration": {
+        "by_anomaly_only": 1,
+        "by_supervised": 32018,
+        "detected": 32019,
+        "detection_rate": 0.9996877829467046,
+        "sampled_flows": 32029
+       },
+       "web-attack": {
+        "by_anomaly_only": 0,
+        "by_supervised": 111,
+        "detected": 111,
+        "detection_rate": 1.0,
+        "sampled_flows": 111
+       },
+       "web-brute-force": {
+        "by_anomaly_only": 0,
+        "by_supervised": 110,
+        "detected": 110,
+        "detection_rate": 0.990990990990991,
+        "sampled_flows": 111
+       }
+      },
+      "calibration_rows": {
+       "anomaly_fit": 60185,
+       "thresholds": 60328
+      },
+      "detection_weighted": 0.9999919048797338,
+      "normal_alert_rate_weighted": 0.008691176674765069,
+      "sampled": {
+       "FP": 4167,
+       "TP": 135284,
+       "attack": 135295,
+       "normal": 479487
+      },
+      "thresholds": {
+       "anomaly": 0.6387466418991001,
+       "supervised": 0.09669355471378885
+      }
+     }
+    },
+    "cic2018": {
+     "held_out": {
+      "by_family": {
+       "botnet": {
+        "by_anomaly_only": 8,
+        "by_supervised": 0,
+        "detected": 8,
+        "detection_rate": 0.0004962779156327543,
+        "sampled_flows": 16120
+       },
+       "brute-force-ssh": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 16054
+       },
+       "ddos": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 32043
+       },
+       "dos-goldeneye": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 16027
+       },
+       "dos-hulk": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 15995
+       },
+       "dos-slow": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 6805
+       },
+       "infiltration": {
+        "by_anomaly_only": 836,
+        "by_supervised": 11065,
+        "detected": 11901,
+        "detection_rate": 0.3715695151269162,
+        "sampled_flows": 32029
+       },
+       "web-attack": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 111
+       },
+       "web-brute-force": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 111
+       }
+      },
+      "calibration_rows": {
+       "anomaly_fit": 60185,
+       "thresholds": 60328
+      },
+      "detection_weighted": 0.00944715578293692,
+      "normal_alert_rate_weighted": 0.006724408901559382,
+      "sampled": {
+       "FP": 3264,
+       "TP": 11909,
+       "attack": 135295,
+       "normal": 479487
+      },
+      "thresholds": {
+       "anomaly": 0.6387466418991001,
+       "supervised": 0.9997129115761085
+      }
+     },
+     "seconds": 36,
+     "train_network": "cic2017",
+     "training_fit": {
+      "by_family": {
+       "botnet": {
+        "by_anomaly_only": 0,
+        "by_supervised": 588,
+        "detected": 588,
+        "detection_rate": 1.0,
+        "sampled_flows": 588
+       },
+       "brute-force-ftp": {
+        "by_anomaly_only": 0,
+        "by_supervised": 3223,
+        "detected": 3223,
+        "detection_rate": 1.0,
+        "sampled_flows": 3223
+       },
+       "brute-force-ssh": {
+        "by_anomaly_only": 0,
+        "by_supervised": 2416,
+        "detected": 2416,
+        "detection_rate": 1.0,
+        "sampled_flows": 2416
+       },
+       "ddos": {
+        "by_anomaly_only": 0,
+        "by_supervised": 15950,
+        "detected": 15950,
+        "detection_rate": 1.0,
+        "sampled_flows": 15950
+       },
+       "dos-goldeneye": {
+        "by_anomaly_only": 0,
+        "by_supervised": 6047,
+        "detected": 6047,
+        "detection_rate": 1.0,
+        "sampled_flows": 6047
+       },
+       "dos-hulk": {
+        "by_anomaly_only": 0,
+        "by_supervised": 15899,
+        "detected": 15899,
+        "detection_rate": 1.0,
+        "sampled_flows": 15899
+       },
+       "dos-slow": {
+        "by_anomaly_only": 0,
+        "by_supervised": 4481,
+        "detected": 4481,
+        "detection_rate": 1.0,
+        "sampled_flows": 4481
+       },
+       "heartbleed": {
+        "by_anomaly_only": 0,
+        "by_supervised": 11,
+        "detected": 11,
+        "detection_rate": 1.0,
+        "sampled_flows": 11
+       },
+       "infiltration": {
+        "by_anomaly_only": 0,
+        "by_supervised": 16087,
+        "detected": 16087,
+        "detection_rate": 1.0,
+        "sampled_flows": 16087
+       },
+       "portscan": {
+        "by_anomaly_only": 0,
+        "by_supervised": 15972,
+        "detected": 15972,
+        "detection_rate": 1.0,
+        "sampled_flows": 15972
+       },
+       "web-attack": {
+        "by_anomaly_only": 0,
+        "by_supervised": 25,
+        "detected": 25,
+        "detection_rate": 1.0,
+        "sampled_flows": 25
+       },
+       "web-brute-force": {
+        "by_anomaly_only": 0,
+        "by_supervised": 58,
+        "detected": 58,
+        "detection_rate": 1.0,
+        "sampled_flows": 58
+       }
+      },
+      "calibration_rows": {
+       "anomaly_fit": 29908,
+       "thresholds": 30037
+      },
+      "detection_weighted": 1.0,
+      "normal_alert_rate_weighted": 0.008967500099643533,
+      "sampled": {
+       "FP": 2153,
+       "TP": 80757,
+       "attack": 80757,
+       "normal": 240055
+      },
+      "thresholds": {
+       "anomaly": 0.6254882661128751,
+       "supervised": 0.029196618467196653
+      }
+     }
+    }
+   },
+   "mean_held_out_detection": 0.20892107030474433
+  },
+  {
+   "config": {
+    "feature_set": "flow+service",
+    "max_iter": 300,
+    "max_leaf_nodes": 15
+   },
+   "folds": {
+    "cic2017": {
+     "held_out": {
+      "by_family": {
+       "botnet": {
+        "by_anomaly_only": 0,
+        "by_supervised": 457,
+        "detected": 457,
+        "detection_rate": 0.7772108843537415,
+        "sampled_flows": 588
+       },
+       "brute-force-ftp": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 3223
+       },
+       "brute-force-ssh": {
+        "by_anomaly_only": 0,
+        "by_supervised": 2383,
+        "detected": 2383,
+        "detection_rate": 0.9863410596026491,
+        "sampled_flows": 2416
+       },
+       "ddos": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 15950
+       },
+       "dos-goldeneye": {
+        "by_anomaly_only": 0,
+        "by_supervised": 33,
+        "detected": 33,
+        "detection_rate": 0.005457251529684141,
+        "sampled_flows": 6047
+       },
+       "dos-hulk": {
+        "by_anomaly_only": 0,
+        "by_supervised": 1,
+        "detected": 1,
+        "detection_rate": 6.289703754953141e-05,
+        "sampled_flows": 15899
+       },
+       "dos-slow": {
+        "by_anomaly_only": 0,
+        "by_supervised": 582,
+        "detected": 582,
+        "detection_rate": 0.12988172282972552,
+        "sampled_flows": 4481
+       },
+       "heartbleed": {
+        "by_anomaly_only": 9,
+        "by_supervised": 2,
+        "detected": 11,
+        "detection_rate": 1.0,
+        "sampled_flows": 11
+       },
+       "infiltration": {
+        "by_anomaly_only": 149,
+        "by_supervised": 6552,
+        "detected": 6701,
+        "detection_rate": 0.41654752284453284,
+        "sampled_flows": 16087
+       },
+       "portscan": {
+        "by_anomaly_only": 7,
+        "by_supervised": 696,
+        "detected": 703,
+        "detection_rate": 0.0440145254194841,
+        "sampled_flows": 15972
+       },
+       "web-attack": {
+        "by_anomaly_only": 0,
+        "by_supervised": 16,
+        "detected": 16,
+        "detection_rate": 0.64,
+        "sampled_flows": 25
+       },
+       "web-brute-force": {
+        "by_anomaly_only": 0,
+        "by_supervised": 55,
+        "detected": 55,
+        "detection_rate": 0.9482758620689655,
+        "sampled_flows": 58
+       }
+      },
+      "calibration_rows": {
+       "anomaly_fit": 29908,
+       "thresholds": 30037
+      },
+      "detection_weighted": 0.08226739910527939,
+      "normal_alert_rate_weighted": 0.009759504534505746,
+      "sampled": {
+       "FP": 2326,
+       "TP": 10942,
+       "attack": 80757,
+       "normal": 240055
+      },
+      "thresholds": {
+       "anomaly": 0.6254882661128751,
+       "supervised": 0.997682590999212
+      }
+     },
+     "seconds": 95,
+     "train_network": "cic2018",
+     "training_fit": {
+      "by_family": {
+       "botnet": {
+        "by_anomaly_only": 0,
+        "by_supervised": 16120,
+        "detected": 16120,
+        "detection_rate": 1.0,
+        "sampled_flows": 16120
+       },
+       "brute-force-ssh": {
+        "by_anomaly_only": 0,
+        "by_supervised": 16054,
+        "detected": 16054,
+        "detection_rate": 1.0,
+        "sampled_flows": 16054
+       },
+       "ddos": {
+        "by_anomaly_only": 0,
+        "by_supervised": 32037,
+        "detected": 32037,
+        "detection_rate": 0.9998127516150174,
+        "sampled_flows": 32043
+       },
+       "dos-goldeneye": {
+        "by_anomaly_only": 0,
+        "by_supervised": 16027,
+        "detected": 16027,
+        "detection_rate": 1.0,
+        "sampled_flows": 16027
+       },
+       "dos-hulk": {
+        "by_anomaly_only": 0,
+        "by_supervised": 15995,
+        "detected": 15995,
+        "detection_rate": 1.0,
+        "sampled_flows": 15995
+       },
+       "dos-slow": {
+        "by_anomaly_only": 0,
+        "by_supervised": 6805,
+        "detected": 6805,
+        "detection_rate": 1.0,
+        "sampled_flows": 6805
+       },
+       "infiltration": {
+        "by_anomaly_only": 1,
+        "by_supervised": 32019,
+        "detected": 32020,
+        "detection_rate": 0.9997190046520341,
+        "sampled_flows": 32029
+       },
+       "web-attack": {
+        "by_anomaly_only": 0,
+        "by_supervised": 111,
+        "detected": 111,
+        "detection_rate": 1.0,
+        "sampled_flows": 111
+       },
+       "web-brute-force": {
+        "by_anomaly_only": 0,
+        "by_supervised": 110,
+        "detected": 110,
+        "detection_rate": 0.990990990990991,
+        "sampled_flows": 111
+       }
+      },
+      "calibration_rows": {
+       "anomaly_fit": 60185,
+       "thresholds": 60328
+      },
+      "detection_weighted": 0.9999480165295752,
+      "normal_alert_rate_weighted": 0.008928220229631512,
+      "sampled": {
+       "FP": 4280,
+       "TP": 135279,
+       "attack": 135295,
+       "normal": 479487
+      },
+      "thresholds": {
+       "anomaly": 0.6387466418991001,
+       "supervised": 0.057299102118103636
+      }
+     }
+    },
+    "cic2018": {
+     "held_out": {
+      "by_family": {
+       "botnet": {
+        "by_anomaly_only": 8,
+        "by_supervised": 0,
+        "detected": 8,
+        "detection_rate": 0.0004962779156327543,
+        "sampled_flows": 16120
+       },
+       "brute-force-ssh": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 16054
+       },
+       "ddos": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 32043
+       },
+       "dos-goldeneye": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 16027
+       },
+       "dos-hulk": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 15995
+       },
+       "dos-slow": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 6805
+       },
+       "infiltration": {
+        "by_anomaly_only": 836,
+        "by_supervised": 12480,
+        "detected": 13316,
+        "detection_rate": 0.41574822816822254,
+        "sampled_flows": 32029
+       },
+       "web-attack": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 111
+       },
+       "web-brute-force": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 111
+       }
+      },
+      "calibration_rows": {
+       "anomaly_fit": 60185,
+       "thresholds": 60328
+      },
+      "detection_weighted": 0.010566109663372207,
+      "normal_alert_rate_weighted": 0.006574032283074819,
+      "sampled": {
+       "FP": 3192,
+       "TP": 13324,
+       "attack": 135295,
+       "normal": 479487
+      },
+      "thresholds": {
+       "anomaly": 0.6387466418991001,
+       "supervised": 0.9999922306623605
+      }
+     },
+     "seconds": 82,
+     "train_network": "cic2017",
+     "training_fit": {
+      "by_family": {
+       "botnet": {
+        "by_anomaly_only": 0,
+        "by_supervised": 588,
+        "detected": 588,
+        "detection_rate": 1.0,
+        "sampled_flows": 588
+       },
+       "brute-force-ftp": {
+        "by_anomaly_only": 0,
+        "by_supervised": 3223,
+        "detected": 3223,
+        "detection_rate": 1.0,
+        "sampled_flows": 3223
+       },
+       "brute-force-ssh": {
+        "by_anomaly_only": 0,
+        "by_supervised": 2416,
+        "detected": 2416,
+        "detection_rate": 1.0,
+        "sampled_flows": 2416
+       },
+       "ddos": {
+        "by_anomaly_only": 0,
+        "by_supervised": 15950,
+        "detected": 15950,
+        "detection_rate": 1.0,
+        "sampled_flows": 15950
+       },
+       "dos-goldeneye": {
+        "by_anomaly_only": 0,
+        "by_supervised": 6047,
+        "detected": 6047,
+        "detection_rate": 1.0,
+        "sampled_flows": 6047
+       },
+       "dos-hulk": {
+        "by_anomaly_only": 0,
+        "by_supervised": 15899,
+        "detected": 15899,
+        "detection_rate": 1.0,
+        "sampled_flows": 15899
+       },
+       "dos-slow": {
+        "by_anomaly_only": 0,
+        "by_supervised": 4481,
+        "detected": 4481,
+        "detection_rate": 1.0,
+        "sampled_flows": 4481
+       },
+       "heartbleed": {
+        "by_anomaly_only": 0,
+        "by_supervised": 11,
+        "detected": 11,
+        "detection_rate": 1.0,
+        "sampled_flows": 11
+       },
+       "infiltration": {
+        "by_anomaly_only": 0,
+        "by_supervised": 16087,
+        "detected": 16087,
+        "detection_rate": 1.0,
+        "sampled_flows": 16087
+       },
+       "portscan": {
+        "by_anomaly_only": 0,
+        "by_supervised": 15972,
+        "detected": 15972,
+        "detection_rate": 1.0,
+        "sampled_flows": 15972
+       },
+       "web-attack": {
+        "by_anomaly_only": 0,
+        "by_supervised": 25,
+        "detected": 25,
+        "detection_rate": 1.0,
+        "sampled_flows": 25
+       },
+       "web-brute-force": {
+        "by_anomaly_only": 0,
+        "by_supervised": 58,
+        "detected": 58,
+        "detection_rate": 1.0,
+        "sampled_flows": 58
+       }
+      },
+      "calibration_rows": {
+       "anomaly_fit": 29908,
+       "thresholds": 30037
+      },
+      "detection_weighted": 1.0,
+      "normal_alert_rate_weighted": 0.009324770687464661,
+      "sampled": {
+       "FP": 2235,
+       "TP": 80757,
+       "attack": 80757,
+       "normal": 240055
+      },
+      "thresholds": {
+       "anomaly": 0.6254882661128751,
+       "supervised": 0.00046314074047979794
+      }
+     }
+    }
+   },
+   "mean_held_out_detection": 0.0464167543843258
+  },
+  {
+   "config": {
+    "feature_set": "flow+service",
+    "max_iter": 100,
+    "max_leaf_nodes": 31
+   },
+   "folds": {
+    "cic2017": {
+     "held_out": {
+      "by_family": {
+       "botnet": {
+        "by_anomaly_only": 0,
+        "by_supervised": 567,
+        "detected": 567,
+        "detection_rate": 0.9642857142857143,
+        "sampled_flows": 588
+       },
+       "brute-force-ftp": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 3223
+       },
+       "brute-force-ssh": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 2416
+       },
+       "ddos": {
+        "by_anomaly_only": 0,
+        "by_supervised": 583,
+        "detected": 583,
+        "detection_rate": 0.036551724137931035,
+        "sampled_flows": 15950
+       },
+       "dos-goldeneye": {
+        "by_anomaly_only": 0,
+        "by_supervised": 163,
+        "detected": 163,
+        "detection_rate": 0.02695551513147015,
+        "sampled_flows": 6047
+       },
+       "dos-hulk": {
+        "by_anomaly_only": 0,
+        "by_supervised": 130,
+        "detected": 130,
+        "detection_rate": 0.008176614881439084,
+        "sampled_flows": 15899
+       },
+       "dos-slow": {
+        "by_anomaly_only": 0,
+        "by_supervised": 2747,
+        "detected": 2747,
+        "detection_rate": 0.6130328051774158,
+        "sampled_flows": 4481
+       },
+       "heartbleed": {
+        "by_anomaly_only": 11,
+        "by_supervised": 0,
+        "detected": 11,
+        "detection_rate": 1.0,
+        "sampled_flows": 11
+       },
+       "infiltration": {
+        "by_anomaly_only": 150,
+        "by_supervised": 8737,
+        "detected": 8887,
+        "detection_rate": 0.5524336420712377,
+        "sampled_flows": 16087
+       },
+       "portscan": {
+        "by_anomaly_only": 7,
+        "by_supervised": 7206,
+        "detected": 7213,
+        "detection_rate": 0.45160280490859,
+        "sampled_flows": 15972
+       },
+       "web-attack": {
+        "by_anomaly_only": 0,
+        "by_supervised": 2,
+        "detected": 2,
+        "detection_rate": 0.08,
+        "sampled_flows": 25
+       },
+       "web-brute-force": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 58
+       }
+      },
+      "calibration_rows": {
+       "anomaly_fit": 29908,
+       "thresholds": 30037
+      },
+      "detection_weighted": 0.2393304019458616,
+      "normal_alert_rate_weighted": 0.009942152154087865,
+      "sampled": {
+       "FP": 2384,
+       "TP": 20303,
+       "attack": 80757,
+       "normal": 240055
+      },
+      "thresholds": {
+       "anomaly": 0.6254882661128751,
+       "supervised": 0.9881723397522238
+      }
+     },
+     "seconds": 48,
+     "train_network": "cic2018",
+     "training_fit": {
+      "by_family": {
+       "botnet": {
+        "by_anomaly_only": 0,
+        "by_supervised": 16120,
+        "detected": 16120,
+        "detection_rate": 1.0,
+        "sampled_flows": 16120
+       },
+       "brute-force-ssh": {
+        "by_anomaly_only": 0,
+        "by_supervised": 16054,
+        "detected": 16054,
+        "detection_rate": 1.0,
+        "sampled_flows": 16054
+       },
+       "ddos": {
+        "by_anomaly_only": 0,
+        "by_supervised": 32043,
+        "detected": 32043,
+        "detection_rate": 1.0,
+        "sampled_flows": 32043
+       },
+       "dos-goldeneye": {
+        "by_anomaly_only": 0,
+        "by_supervised": 16026,
+        "detected": 16026,
+        "detection_rate": 0.9999376052910713,
+        "sampled_flows": 16027
+       },
+       "dos-hulk": {
+        "by_anomaly_only": 0,
+        "by_supervised": 15995,
+        "detected": 15995,
+        "detection_rate": 1.0,
+        "sampled_flows": 15995
+       },
+       "dos-slow": {
+        "by_anomaly_only": 0,
+        "by_supervised": 6805,
+        "detected": 6805,
+        "detection_rate": 1.0,
+        "sampled_flows": 6805
+       },
+       "infiltration": {
+        "by_anomaly_only": 0,
+        "by_supervised": 32028,
+        "detected": 32028,
+        "detection_rate": 0.9999687782946705,
+        "sampled_flows": 32029
+       },
+       "web-attack": {
+        "by_anomaly_only": 0,
+        "by_supervised": 111,
+        "detected": 111,
+        "detection_rate": 1.0,
+        "sampled_flows": 111
+       },
+       "web-brute-force": {
+        "by_anomaly_only": 0,
+        "by_supervised": 111,
+        "detected": 111,
+        "detection_rate": 1.0,
+        "sampled_flows": 111
+       }
+      },
+      "calibration_rows": {
+       "anomaly_fit": 60185,
+       "thresholds": 60328
+      },
+      "detection_weighted": 0.9999988979600849,
+      "normal_alert_rate_weighted": 0.008816237411012253,
+      "sampled": {
+       "FP": 4227,
+       "TP": 135293,
+       "attack": 135295,
+       "normal": 479487
+      },
+      "thresholds": {
+       "anomaly": 0.6387466418991001,
+       "supervised": 0.01698571043048159
+      }
+     }
+    },
+    "cic2018": {
+     "held_out": {
+      "by_family": {
+       "botnet": {
+        "by_anomaly_only": 8,
+        "by_supervised": 0,
+        "detected": 8,
+        "detection_rate": 0.0004962779156327543,
+        "sampled_flows": 16120
+       },
+       "brute-force-ssh": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 16054
+       },
+       "ddos": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 32043
+       },
+       "dos-goldeneye": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 16027
+       },
+       "dos-hulk": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 15995
+       },
+       "dos-slow": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 6805
+       },
+       "infiltration": {
+        "by_anomaly_only": 836,
+        "by_supervised": 10740,
+        "detected": 11576,
+        "detection_rate": 0.36142246089481406,
+        "sampled_flows": 32029
+       },
+       "web-attack": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 111
+       },
+       "web-brute-force": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 111
+       }
+      },
+      "calibration_rows": {
+       "anomaly_fit": 60185,
+       "thresholds": 60328
+      },
+      "detection_weighted": 0.009188130480143603,
+      "normal_alert_rate_weighted": 0.0049038039100161674,
+      "sampled": {
+       "FP": 2351,
+       "TP": 11584,
+       "attack": 135295,
+       "normal": 479487
+      },
+      "thresholds": {
+       "anomaly": 0.6387466418991001,
+       "supervised": 0.9999241131002399
+      }
+     },
+     "seconds": 36,
+     "train_network": "cic2017",
+     "training_fit": {
+      "by_family": {
+       "botnet": {
+        "by_anomaly_only": 0,
+        "by_supervised": 588,
+        "detected": 588,
+        "detection_rate": 1.0,
+        "sampled_flows": 588
+       },
+       "brute-force-ftp": {
+        "by_anomaly_only": 0,
+        "by_supervised": 3223,
+        "detected": 3223,
+        "detection_rate": 1.0,
+        "sampled_flows": 3223
+       },
+       "brute-force-ssh": {
+        "by_anomaly_only": 0,
+        "by_supervised": 2416,
+        "detected": 2416,
+        "detection_rate": 1.0,
+        "sampled_flows": 2416
+       },
+       "ddos": {
+        "by_anomaly_only": 0,
+        "by_supervised": 15950,
+        "detected": 15950,
+        "detection_rate": 1.0,
+        "sampled_flows": 15950
+       },
+       "dos-goldeneye": {
+        "by_anomaly_only": 0,
+        "by_supervised": 6047,
+        "detected": 6047,
+        "detection_rate": 1.0,
+        "sampled_flows": 6047
+       },
+       "dos-hulk": {
+        "by_anomaly_only": 0,
+        "by_supervised": 15899,
+        "detected": 15899,
+        "detection_rate": 1.0,
+        "sampled_flows": 15899
+       },
+       "dos-slow": {
+        "by_anomaly_only": 0,
+        "by_supervised": 4481,
+        "detected": 4481,
+        "detection_rate": 1.0,
+        "sampled_flows": 4481
+       },
+       "heartbleed": {
+        "by_anomaly_only": 0,
+        "by_supervised": 11,
+        "detected": 11,
+        "detection_rate": 1.0,
+        "sampled_flows": 11
+       },
+       "infiltration": {
+        "by_anomaly_only": 0,
+        "by_supervised": 16087,
+        "detected": 16087,
+        "detection_rate": 1.0,
+        "sampled_flows": 16087
+       },
+       "portscan": {
+        "by_anomaly_only": 0,
+        "by_supervised": 15972,
+        "detected": 15972,
+        "detection_rate": 1.0,
+        "sampled_flows": 15972
+       },
+       "web-attack": {
+        "by_anomaly_only": 0,
+        "by_supervised": 25,
+        "detected": 25,
+        "detection_rate": 1.0,
+        "sampled_flows": 25
+       },
+       "web-brute-force": {
+        "by_anomaly_only": 0,
+        "by_supervised": 58,
+        "detected": 58,
+        "detection_rate": 1.0,
+        "sampled_flows": 58
+       }
+      },
+      "calibration_rows": {
+       "anomaly_fit": 29908,
+       "thresholds": 30037
+      },
+      "detection_weighted": 1.0,
+      "normal_alert_rate_weighted": 0.009357158968799885,
+      "sampled": {
+       "FP": 2239,
+       "TP": 80757,
+       "attack": 80757,
+       "normal": 240055
+      },
+      "thresholds": {
+       "anomaly": 0.6254882661128751,
+       "supervised": 0.003490398210089874
+      }
+     }
+    }
+   },
+   "mean_held_out_detection": 0.12425926621300261
+  },
+  {
+   "config": {
+    "feature_set": "flow+service",
+    "max_iter": 300,
+    "max_leaf_nodes": 31
+   },
+   "folds": {
+    "cic2017": {
+     "held_out": {
+      "by_family": {
+       "botnet": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 588
+       },
+       "brute-force-ftp": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 3223
+       },
+       "brute-force-ssh": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 2416
+       },
+       "ddos": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 15950
+       },
+       "dos-goldeneye": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 6047
+       },
+       "dos-hulk": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 15899
+       },
+       "dos-slow": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 4481
+       },
+       "heartbleed": {
+        "by_anomaly_only": 11,
+        "by_supervised": 0,
+        "detected": 11,
+        "detection_rate": 1.0,
+        "sampled_flows": 11
+       },
+       "infiltration": {
+        "by_anomaly_only": 170,
+        "by_supervised": 0,
+        "detected": 170,
+        "detection_rate": 0.010567539006651333,
+        "sampled_flows": 16087
+       },
+       "portscan": {
+        "by_anomaly_only": 10,
+        "by_supervised": 0,
+        "detected": 10,
+        "detection_rate": 0.0006260956674179815,
+        "sampled_flows": 15972
+       },
+       "web-attack": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 25
+       },
+       "web-brute-force": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 58
+       }
+      },
+      "calibration_rows": {
+       "anomaly_fit": 29908,
+       "thresholds": 30037
+      },
+      "detection_weighted": 0.0017370111195288828,
+      "normal_alert_rate_weighted": 0.005083315118522076,
+      "sampled": {
+       "FP": 1201,
+       "TP": 191,
+       "attack": 80757,
+       "normal": 240055
+      },
+      "thresholds": {
+       "anomaly": 0.6254882661128751,
+       "supervised": 1.0
+      }
+     },
+     "seconds": 101,
+     "train_network": "cic2018",
+     "training_fit": {
+      "by_family": {
+       "botnet": {
+        "by_anomaly_only": 0,
+        "by_supervised": 16120,
+        "detected": 16120,
+        "detection_rate": 1.0,
+        "sampled_flows": 16120
+       },
+       "brute-force-ssh": {
+        "by_anomaly_only": 0,
+        "by_supervised": 16054,
+        "detected": 16054,
+        "detection_rate": 1.0,
+        "sampled_flows": 16054
+       },
+       "ddos": {
+        "by_anomaly_only": 0,
+        "by_supervised": 31993,
+        "detected": 31993,
+        "detection_rate": 0.998439596791811,
+        "sampled_flows": 32043
+       },
+       "dos-goldeneye": {
+        "by_anomaly_only": 0,
+        "by_supervised": 15983,
+        "detected": 15983,
+        "detection_rate": 0.997254632807138,
+        "sampled_flows": 16027
+       },
+       "dos-hulk": {
+        "by_anomaly_only": 0,
+        "by_supervised": 15995,
+        "detected": 15995,
+        "detection_rate": 1.0,
+        "sampled_flows": 15995
+       },
+       "dos-slow": {
+        "by_anomaly_only": 0,
+        "by_supervised": 6786,
+        "detected": 6786,
+        "detection_rate": 0.9972079353416605,
+        "sampled_flows": 6805
+       },
+       "infiltration": {
+        "by_anomaly_only": 2,
+        "by_supervised": 31953,
+        "detected": 31955,
+        "detection_rate": 0.9976895938056136,
+        "sampled_flows": 32029
+       },
+       "web-attack": {
+        "by_anomaly_only": 0,
+        "by_supervised": 111,
+        "detected": 111,
+        "detection_rate": 1.0,
+        "sampled_flows": 111
+       },
+       "web-brute-force": {
+        "by_anomaly_only": 0,
+        "by_supervised": 111,
+        "detected": 111,
+        "detection_rate": 1.0,
+        "sampled_flows": 111
+       }
+      },
+      "calibration_rows": {
+       "anomaly_fit": 60185,
+       "thresholds": 60328
+      },
+      "detection_weighted": 0.9996651783050584,
+      "normal_alert_rate_weighted": 0.008922444306350984,
+      "sampled": {
+       "FP": 4275,
+       "TP": 135108,
+       "attack": 135295,
+       "normal": 479487
+      },
+      "thresholds": {
+       "anomaly": 0.6387466418991001,
+       "supervised": 0.018819596519313378
+      }
+     }
+    },
+    "cic2018": {
+     "held_out": {
+      "by_family": {
+       "botnet": {
+        "by_anomaly_only": 8,
+        "by_supervised": 0,
+        "detected": 8,
+        "detection_rate": 0.0004962779156327543,
+        "sampled_flows": 16120
+       },
+       "brute-force-ssh": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 16054
+       },
+       "ddos": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 32043
+       },
+       "dos-goldeneye": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 16027
+       },
+       "dos-hulk": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 15995
+       },
+       "dos-slow": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 6805
+       },
+       "infiltration": {
+        "by_anomaly_only": 836,
+        "by_supervised": 1737,
+        "detected": 2573,
+        "detection_rate": 0.08033344781291954,
+        "sampled_flows": 32029
+       },
+       "web-attack": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 111
+       },
+       "web-brute-force": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 111
+       }
+      },
+      "calibration_rows": {
+       "anomaly_fit": 60185,
+       "thresholds": 60328
+      },
+      "detection_weighted": 0.002070223152017898,
+      "normal_alert_rate_weighted": 0.008885079730229811,
+      "sampled": {
+       "FP": 4347,
+       "TP": 2581,
+       "attack": 135295,
+       "normal": 479487
+      },
+      "thresholds": {
+       "anomaly": 0.6387466418991001,
+       "supervised": 0.9999999806526044
+      }
+     },
+     "seconds": 89,
+     "train_network": "cic2017",
+     "training_fit": {
+      "by_family": {
+       "botnet": {
+        "by_anomaly_only": 0,
+        "by_supervised": 588,
+        "detected": 588,
+        "detection_rate": 1.0,
+        "sampled_flows": 588
+       },
+       "brute-force-ftp": {
+        "by_anomaly_only": 0,
+        "by_supervised": 3223,
+        "detected": 3223,
+        "detection_rate": 1.0,
+        "sampled_flows": 3223
+       },
+       "brute-force-ssh": {
+        "by_anomaly_only": 0,
+        "by_supervised": 2416,
+        "detected": 2416,
+        "detection_rate": 1.0,
+        "sampled_flows": 2416
+       },
+       "ddos": {
+        "by_anomaly_only": 0,
+        "by_supervised": 15950,
+        "detected": 15950,
+        "detection_rate": 1.0,
+        "sampled_flows": 15950
+       },
+       "dos-goldeneye": {
+        "by_anomaly_only": 0,
+        "by_supervised": 6047,
+        "detected": 6047,
+        "detection_rate": 1.0,
+        "sampled_flows": 6047
+       },
+       "dos-hulk": {
+        "by_anomaly_only": 0,
+        "by_supervised": 15899,
+        "detected": 15899,
+        "detection_rate": 1.0,
+        "sampled_flows": 15899
+       },
+       "dos-slow": {
+        "by_anomaly_only": 0,
+        "by_supervised": 4481,
+        "detected": 4481,
+        "detection_rate": 1.0,
+        "sampled_flows": 4481
+       },
+       "heartbleed": {
+        "by_anomaly_only": 0,
+        "by_supervised": 11,
+        "detected": 11,
+        "detection_rate": 1.0,
+        "sampled_flows": 11
+       },
+       "infiltration": {
+        "by_anomaly_only": 0,
+        "by_supervised": 16087,
+        "detected": 16087,
+        "detection_rate": 1.0,
+        "sampled_flows": 16087
+       },
+       "portscan": {
+        "by_anomaly_only": 0,
+        "by_supervised": 15972,
+        "detected": 15972,
+        "detection_rate": 1.0,
+        "sampled_flows": 15972
+       },
+       "web-attack": {
+        "by_anomaly_only": 0,
+        "by_supervised": 25,
+        "detected": 25,
+        "detection_rate": 1.0,
+        "sampled_flows": 25
+       },
+       "web-brute-force": {
+        "by_anomaly_only": 0,
+        "by_supervised": 58,
+        "detected": 58,
+        "detection_rate": 1.0,
+        "sampled_flows": 58
+       }
+      },
+      "calibration_rows": {
+       "anomaly_fit": 29908,
+       "thresholds": 30037
+      },
+      "detection_weighted": 1.0,
+      "normal_alert_rate_weighted": 0.009249886981587107,
+      "sampled": {
+       "FP": 2214,
+       "TP": 80757,
+       "attack": 80757,
+       "normal": 240055
+      },
+      "thresholds": {
+       "anomaly": 0.6254882661128751,
+       "supervised": 4.013477654345478e-06
+      }
+     }
+    }
+   },
+   "mean_held_out_detection": 0.0019036171357733906
+  },
+  {
+   "config": {
+    "feature_set": "flow+service",
+    "max_iter": 100,
+    "max_leaf_nodes": 63
+   },
+   "folds": {
+    "cic2017": {
+     "held_out": {
+      "by_family": {
+       "botnet": {
+        "by_anomaly_only": 0,
+        "by_supervised": 588,
+        "detected": 588,
+        "detection_rate": 1.0,
+        "sampled_flows": 588
+       },
+       "brute-force-ftp": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 3223
+       },
+       "brute-force-ssh": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 2416
+       },
+       "ddos": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 15950
+       },
+       "dos-goldeneye": {
+        "by_anomaly_only": 0,
+        "by_supervised": 71,
+        "detected": 71,
+        "detection_rate": 0.011741359351744666,
+        "sampled_flows": 6047
+       },
+       "dos-hulk": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 15899
+       },
+       "dos-slow": {
+        "by_anomaly_only": 0,
+        "by_supervised": 1699,
+        "detected": 1699,
+        "detection_rate": 0.37915643829502343,
+        "sampled_flows": 4481
+       },
+       "heartbleed": {
+        "by_anomaly_only": 11,
+        "by_supervised": 0,
+        "detected": 11,
+        "detection_rate": 1.0,
+        "sampled_flows": 11
+       },
+       "infiltration": {
+        "by_anomaly_only": 154,
+        "by_supervised": 5864,
+        "detected": 6018,
+        "detection_rate": 0.3740908808354572,
+        "sampled_flows": 16087
+       },
+       "portscan": {
+        "by_anomaly_only": 7,
+        "by_supervised": 610,
+        "detected": 617,
+        "detection_rate": 0.03863010267968946,
+        "sampled_flows": 15972
+       },
+       "web-attack": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 25
+       },
+       "web-brute-force": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 58
+       }
+      },
+      "calibration_rows": {
+       "anomaly_fit": 29908,
+       "thresholds": 30037
+      },
+      "detection_weighted": 0.07158056774169848,
+      "normal_alert_rate_weighted": 0.009606299856783015,
+      "sampled": {
+       "FP": 2281,
+       "TP": 9004,
+       "attack": 80757,
+       "normal": 240055
+      },
+      "thresholds": {
+       "anomaly": 0.6254882661128751,
+       "supervised": 0.9947057816910795
+      }
+     },
+     "seconds": 49,
+     "train_network": "cic2018",
+     "training_fit": {
+      "by_family": {
+       "botnet": {
+        "by_anomaly_only": 0,
+        "by_supervised": 16120,
+        "detected": 16120,
+        "detection_rate": 1.0,
+        "sampled_flows": 16120
+       },
+       "brute-force-ssh": {
+        "by_anomaly_only": 0,
+        "by_supervised": 16054,
+        "detected": 16054,
+        "detection_rate": 1.0,
+        "sampled_flows": 16054
+       },
+       "ddos": {
+        "by_anomaly_only": 0,
+        "by_supervised": 32043,
+        "detected": 32043,
+        "detection_rate": 1.0,
+        "sampled_flows": 32043
+       },
+       "dos-goldeneye": {
+        "by_anomaly_only": 0,
+        "by_supervised": 16027,
+        "detected": 16027,
+        "detection_rate": 1.0,
+        "sampled_flows": 16027
+       },
+       "dos-hulk": {
+        "by_anomaly_only": 0,
+        "by_supervised": 15995,
+        "detected": 15995,
+        "detection_rate": 1.0,
+        "sampled_flows": 15995
+       },
+       "dos-slow": {
+        "by_anomaly_only": 0,
+        "by_supervised": 6805,
+        "detected": 6805,
+        "detection_rate": 1.0,
+        "sampled_flows": 6805
+       },
+       "infiltration": {
+        "by_anomaly_only": 0,
+        "by_supervised": 32029,
+        "detected": 32029,
+        "detection_rate": 1.0,
+        "sampled_flows": 32029
+       },
+       "web-attack": {
+        "by_anomaly_only": 0,
+        "by_supervised": 111,
+        "detected": 111,
+        "detection_rate": 1.0,
+        "sampled_flows": 111
+       },
+       "web-brute-force": {
+        "by_anomaly_only": 0,
+        "by_supervised": 111,
+        "detected": 111,
+        "detection_rate": 1.0,
+        "sampled_flows": 111
+       }
+      },
+      "calibration_rows": {
+       "anomaly_fit": 60185,
+       "thresholds": 60328
+      },
+      "detection_weighted": 1.0,
+      "normal_alert_rate_weighted": 0.008692563334638304,
+      "sampled": {
+       "FP": 4163,
+       "TP": 135295,
+       "attack": 135295,
+       "normal": 479487
+      },
+      "thresholds": {
+       "anomaly": 0.6387466418991001,
+       "supervised": 0.0012024113408847421
+      }
+     }
+    },
+    "cic2018": {
+     "held_out": {
+      "by_family": {
+       "botnet": {
+        "by_anomaly_only": 8,
+        "by_supervised": 0,
+        "detected": 8,
+        "detection_rate": 0.0004962779156327543,
+        "sampled_flows": 16120
+       },
+       "brute-force-ssh": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 16054
+       },
+       "ddos": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 32043
+       },
+       "dos-goldeneye": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 16027
+       },
+       "dos-hulk": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 15995
+       },
+       "dos-slow": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 6805
+       },
+       "infiltration": {
+        "by_anomaly_only": 836,
+        "by_supervised": 12443,
+        "detected": 13279,
+        "detection_rate": 0.41459302507102935,
+        "sampled_flows": 32029
+       },
+       "web-attack": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 111
+       },
+       "web-brute-force": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 111
+       }
+      },
+      "calibration_rows": {
+       "anomaly_fit": 60185,
+       "thresholds": 60328
+      },
+      "detection_weighted": 0.010535664066536445,
+      "normal_alert_rate_weighted": 0.0049097890367878205,
+      "sampled": {
+       "FP": 2354,
+       "TP": 13287,
+       "attack": 135295,
+       "normal": 479487
+      },
+      "thresholds": {
+       "anomaly": 0.6387466418991001,
+       "supervised": 0.9999754792584843
+      }
+     },
+     "seconds": 37,
+     "train_network": "cic2017",
+     "training_fit": {
+      "by_family": {
+       "botnet": {
+        "by_anomaly_only": 0,
+        "by_supervised": 588,
+        "detected": 588,
+        "detection_rate": 1.0,
+        "sampled_flows": 588
+       },
+       "brute-force-ftp": {
+        "by_anomaly_only": 0,
+        "by_supervised": 3223,
+        "detected": 3223,
+        "detection_rate": 1.0,
+        "sampled_flows": 3223
+       },
+       "brute-force-ssh": {
+        "by_anomaly_only": 0,
+        "by_supervised": 2416,
+        "detected": 2416,
+        "detection_rate": 1.0,
+        "sampled_flows": 2416
+       },
+       "ddos": {
+        "by_anomaly_only": 0,
+        "by_supervised": 15950,
+        "detected": 15950,
+        "detection_rate": 1.0,
+        "sampled_flows": 15950
+       },
+       "dos-goldeneye": {
+        "by_anomaly_only": 0,
+        "by_supervised": 6047,
+        "detected": 6047,
+        "detection_rate": 1.0,
+        "sampled_flows": 6047
+       },
+       "dos-hulk": {
+        "by_anomaly_only": 0,
+        "by_supervised": 15899,
+        "detected": 15899,
+        "detection_rate": 1.0,
+        "sampled_flows": 15899
+       },
+       "dos-slow": {
+        "by_anomaly_only": 0,
+        "by_supervised": 4481,
+        "detected": 4481,
+        "detection_rate": 1.0,
+        "sampled_flows": 4481
+       },
+       "heartbleed": {
+        "by_anomaly_only": 0,
+        "by_supervised": 11,
+        "detected": 11,
+        "detection_rate": 1.0,
+        "sampled_flows": 11
+       },
+       "infiltration": {
+        "by_anomaly_only": 0,
+        "by_supervised": 16087,
+        "detected": 16087,
+        "detection_rate": 1.0,
+        "sampled_flows": 16087
+       },
+       "portscan": {
+        "by_anomaly_only": 0,
+        "by_supervised": 15972,
+        "detected": 15972,
+        "detection_rate": 1.0,
+        "sampled_flows": 15972
+       },
+       "web-attack": {
+        "by_anomaly_only": 0,
+        "by_supervised": 25,
+        "detected": 25,
+        "detection_rate": 1.0,
+        "sampled_flows": 25
+       },
+       "web-brute-force": {
+        "by_anomaly_only": 0,
+        "by_supervised": 58,
+        "detected": 58,
+        "detection_rate": 1.0,
+        "sampled_flows": 58
+       }
+      },
+      "calibration_rows": {
+       "anomaly_fit": 29908,
+       "thresholds": 30037
+      },
+      "detection_weighted": 1.0,
+      "normal_alert_rate_weighted": 0.00941777289964461,
+      "sampled": {
+       "FP": 2242,
+       "TP": 80757,
+       "attack": 80757,
+       "normal": 240055
+      },
+      "thresholds": {
+       "anomaly": 0.6254882661128751,
+       "supervised": 0.0004914347360457043
+      }
+     }
+    }
+   },
+   "mean_held_out_detection": 0.04105811590411746
+  },
+  {
+   "config": {
+    "feature_set": "flow+service",
+    "max_iter": 300,
+    "max_leaf_nodes": 63
+   },
+   "folds": {
+    "cic2017": {
+     "held_out": {
+      "by_family": {
+       "botnet": {
+        "by_anomaly_only": 0,
+        "by_supervised": 558,
+        "detected": 558,
+        "detection_rate": 0.9489795918367347,
+        "sampled_flows": 588
+       },
+       "brute-force-ftp": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 3223
+       },
+       "brute-force-ssh": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 2416
+       },
+       "ddos": {
+        "by_anomaly_only": 0,
+        "by_supervised": 2003,
+        "detected": 2003,
+        "detection_rate": 0.12557993730407524,
+        "sampled_flows": 15950
+       },
+       "dos-goldeneye": {
+        "by_anomaly_only": 0,
+        "by_supervised": 3739,
+        "detected": 3739,
+        "detection_rate": 0.6183231354390607,
+        "sampled_flows": 6047
+       },
+       "dos-hulk": {
+        "by_anomaly_only": 0,
+        "by_supervised": 14723,
+        "detected": 14723,
+        "detection_rate": 0.9260330838417511,
+        "sampled_flows": 15899
+       },
+       "dos-slow": {
+        "by_anomaly_only": 0,
+        "by_supervised": 2047,
+        "detected": 2047,
+        "detection_rate": 0.4568176746261995,
+        "sampled_flows": 4481
+       },
+       "heartbleed": {
+        "by_anomaly_only": 11,
+        "by_supervised": 0,
+        "detected": 11,
+        "detection_rate": 1.0,
+        "sampled_flows": 11
+       },
+       "infiltration": {
+        "by_anomaly_only": 135,
+        "by_supervised": 1676,
+        "detected": 1811,
+        "detection_rate": 0.11257537141791508,
+        "sampled_flows": 16087
+       },
+       "portscan": {
+        "by_anomaly_only": 7,
+        "by_supervised": 2212,
+        "detected": 2219,
+        "detection_rate": 0.1389306286000501,
+        "sampled_flows": 15972
+       },
+       "web-attack": {
+        "by_anomaly_only": 0,
+        "by_supervised": 8,
+        "detected": 8,
+        "detection_rate": 0.32,
+        "sampled_flows": 25
+       },
+       "web-brute-force": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 58
+       }
+      },
+      "calibration_rows": {
+       "anomaly_fit": 29908,
+       "thresholds": 30037
+      },
+      "detection_weighted": 0.3883611461611087,
+      "normal_alert_rate_weighted": 0.010199342623578155,
+      "sampled": {
+       "FP": 2424,
+       "TP": 27119,
+       "attack": 80757,
+       "normal": 240055
+      },
+      "thresholds": {
+       "anomaly": 0.6254882661128751,
+       "supervised": 0.990212610625321
+      }
+     },
+     "seconds": 140,
+     "train_network": "cic2018",
+     "training_fit": {
+      "by_family": {
+       "botnet": {
+        "by_anomaly_only": 0,
+        "by_supervised": 16120,
+        "detected": 16120,
+        "detection_rate": 1.0,
+        "sampled_flows": 16120
+       },
+       "brute-force-ssh": {
+        "by_anomaly_only": 0,
+        "by_supervised": 16054,
+        "detected": 16054,
+        "detection_rate": 1.0,
+        "sampled_flows": 16054
+       },
+       "ddos": {
+        "by_anomaly_only": 0,
+        "by_supervised": 32043,
+        "detected": 32043,
+        "detection_rate": 1.0,
+        "sampled_flows": 32043
+       },
+       "dos-goldeneye": {
+        "by_anomaly_only": 0,
+        "by_supervised": 16027,
+        "detected": 16027,
+        "detection_rate": 1.0,
+        "sampled_flows": 16027
+       },
+       "dos-hulk": {
+        "by_anomaly_only": 0,
+        "by_supervised": 15995,
+        "detected": 15995,
+        "detection_rate": 1.0,
+        "sampled_flows": 15995
+       },
+       "dos-slow": {
+        "by_anomaly_only": 0,
+        "by_supervised": 6805,
+        "detected": 6805,
+        "detection_rate": 1.0,
+        "sampled_flows": 6805
+       },
+       "infiltration": {
+        "by_anomaly_only": 0,
+        "by_supervised": 32029,
+        "detected": 32029,
+        "detection_rate": 1.0,
+        "sampled_flows": 32029
+       },
+       "web-attack": {
+        "by_anomaly_only": 0,
+        "by_supervised": 111,
+        "detected": 111,
+        "detection_rate": 1.0,
+        "sampled_flows": 111
+       },
+       "web-brute-force": {
+        "by_anomaly_only": 0,
+        "by_supervised": 111,
+        "detected": 111,
+        "detection_rate": 1.0,
+        "sampled_flows": 111
+       }
+      },
+      "calibration_rows": {
+       "anomaly_fit": 60185,
+       "thresholds": 60328
+      },
+      "detection_weighted": 1.0,
+      "normal_alert_rate_weighted": 0.009229569198843011,
+      "sampled": {
+       "FP": 4420,
+       "TP": 135295,
+       "attack": 135295,
+       "normal": 479487
+      },
+      "thresholds": {
+       "anomaly": 0.6387466418991001,
+       "supervised": 2.6350883747104217e-06
+      }
+     }
+    },
+    "cic2018": {
+     "held_out": {
+      "by_family": {
+       "botnet": {
+        "by_anomaly_only": 8,
+        "by_supervised": 0,
+        "detected": 8,
+        "detection_rate": 0.0004962779156327543,
+        "sampled_flows": 16120
+       },
+       "brute-force-ssh": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 16054
+       },
+       "ddos": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 32043
+       },
+       "dos-goldeneye": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 16027
+       },
+       "dos-hulk": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 15995
+       },
+       "dos-slow": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 6805
+       },
+       "infiltration": {
+        "by_anomaly_only": 836,
+        "by_supervised": 12343,
+        "detected": 13179,
+        "detection_rate": 0.41147085453807486,
+        "sampled_flows": 32029
+       },
+       "web-attack": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 111
+       },
+       "web-brute-force": {
+        "by_anomaly_only": 0,
+        "by_supervised": 0,
+        "detected": 0,
+        "detection_rate": 0.0,
+        "sampled_flows": 111
+       }
+      },
+      "calibration_rows": {
+       "anomaly_fit": 60185,
+       "thresholds": 60328
+      },
+      "detection_weighted": 0.0104575392322309,
+      "normal_alert_rate_weighted": 0.007719252733403393,
+      "sampled": {
+       "FP": 3757,
+       "TP": 13187,
+       "attack": 135295,
+       "normal": 479487
+      },
+      "thresholds": {
+       "anomaly": 0.6387466418991001,
+       "supervised": 0.9999999974274305
+      }
+     },
+     "seconds": 95,
+     "train_network": "cic2017",
+     "training_fit": {
+      "by_family": {
+       "botnet": {
+        "by_anomaly_only": 0,
+        "by_supervised": 588,
+        "detected": 588,
+        "detection_rate": 1.0,
+        "sampled_flows": 588
+       },
+       "brute-force-ftp": {
+        "by_anomaly_only": 0,
+        "by_supervised": 3223,
+        "detected": 3223,
+        "detection_rate": 1.0,
+        "sampled_flows": 3223
+       },
+       "brute-force-ssh": {
+        "by_anomaly_only": 0,
+        "by_supervised": 2416,
+        "detected": 2416,
+        "detection_rate": 1.0,
+        "sampled_flows": 2416
+       },
+       "ddos": {
+        "by_anomaly_only": 0,
+        "by_supervised": 15950,
+        "detected": 15950,
+        "detection_rate": 1.0,
+        "sampled_flows": 15950
+       },
+       "dos-goldeneye": {
+        "by_anomaly_only": 0,
+        "by_supervised": 6047,
+        "detected": 6047,
+        "detection_rate": 1.0,
+        "sampled_flows": 6047
+       },
+       "dos-hulk": {
+        "by_anomaly_only": 0,
+        "by_supervised": 15899,
+        "detected": 15899,
+        "detection_rate": 1.0,
+        "sampled_flows": 15899
+       },
+       "dos-slow": {
+        "by_anomaly_only": 0,
+        "by_supervised": 4481,
+        "detected": 4481,
+        "detection_rate": 1.0,
+        "sampled_flows": 4481
+       },
+       "heartbleed": {
+        "by_anomaly_only": 0,
+        "by_supervised": 11,
+        "detected": 11,
+        "detection_rate": 1.0,
+        "sampled_flows": 11
+       },
+       "infiltration": {
+        "by_anomaly_only": 0,
+        "by_supervised": 16087,
+        "detected": 16087,
+        "detection_rate": 1.0,
+        "sampled_flows": 16087
+       },
+       "portscan": {
+        "by_anomaly_only": 0,
+        "by_supervised": 15972,
+        "detected": 15972,
+        "detection_rate": 1.0,
+        "sampled_flows": 15972
+       },
+       "web-attack": {
+        "by_anomaly_only": 0,
+        "by_supervised": 25,
+        "detected": 25,
+        "detection_rate": 1.0,
+        "sampled_flows": 25
+       },
+       "web-brute-force": {
+        "by_anomaly_only": 0,
+        "by_supervised": 58,
+        "detected": 58,
+        "detection_rate": 1.0,
+        "sampled_flows": 58
+       }
+      },
+      "calibration_rows": {
+       "anomaly_fit": 29908,
+       "thresholds": 30037
+      },
+      "detection_weighted": 1.0,
+      "normal_alert_rate_weighted": 0.009366718406233059,
+      "sampled": {
+       "FP": 2238,
+       "TP": 80757,
+       "attack": 80757,
+       "normal": 240055
+      },
+      "thresholds": {
+       "anomaly": 0.6254882661128751,
+       "supervised": 5.634131404159502e-07
+      }
+     }
+    }
+   },
+   "mean_held_out_detection": 0.1994093426966698
+  }
+ ],
+ "learning_curve": {
+  "0.1": {
+   "cic2017": {
+    "held_out_detection": 0.5171420265072354,
+    "training_rows": 76401
+   },
+   "cic2018": {
+    "held_out_detection": 0.010603585820584361,
+    "training_rows": 39999
+   }
+  },
+  "0.3": {
+   "cic2017": {
+    "held_out_detection": 0.4935028884622223,
+    "training_rows": 229983
+   },
+   "cic2018": {
+    "held_out_detection": 0.010732043114302928,
+    "training_rows": 119647
+   }
+  },
+  "1.0": {
+   "cic2017": {
+    "held_out_detection": 0.40839498482655173,
+    "training_rows": 768773
+   },
+   "cic2018": {
+    "held_out_detection": 0.00944715578293692,
+    "training_rows": 400950
+   }
+  }
+ },
+ "networks": {
+  "cic2017": {
+   "columns": {
+    "ack_flags": "ACK Flag Count",
+    "active_max_us": "Active Max",
+    "active_mean_us": "Active Mean",
+    "active_min_us": "Active Min",
+    "active_std_us": "Active Std",
+    "bwd_header_bytes": "Bwd Header Length",
+    "bwd_iat_max_us": "Bwd IAT Max",
+    "bwd_iat_mean_us": "Bwd IAT Mean",
+    "bwd_iat_min_us": "Bwd IAT Min",
+    "bwd_iat_std_us": "Bwd IAT Std",
+    "bwd_iat_total_us": "Bwd IAT Total",
+    "bwd_init_window": "Bwd Init Win Bytes",
+    "bwd_packets": "Total Bwd packets",
+    "bwd_packets_per_s": "Bwd Packets/s",
+    "bwd_payload_max": "Bwd Packet Length Max",
+    "bwd_payload_mean": "Bwd Packet Length Mean",
+    "bwd_payload_min": "Bwd Packet Length Min",
+    "bwd_payload_std": "Bwd Packet Length Std",
+    "bwd_payload_total": "Total Length of Bwd Packet",
+    "bwd_psh_flags": "Bwd PSH Flags",
+    "bwd_urg_flags": "Bwd URG Flags",
+    "down_up_ratio": "Down/Up Ratio",
+    "duration_us": "Flow Duration",
+    "fin_flags": "FIN Flag Count",
+    "flow_iat_max_us": "Flow IAT Max",
+    "flow_iat_mean_us": "Flow IAT Mean",
+    "flow_iat_min_us": "Flow IAT Min",
+    "flow_iat_std_us": "Flow IAT Std",
+    "flow_packets_per_s": "Flow Packets/s",
+    "flow_payload_bytes_per_s": "Flow Bytes/s",
+    "fwd_data_packets": "Fwd Act Data Pkts",
+    "fwd_header_bytes": "Fwd Header Length",
+    "fwd_iat_max_us": "Fwd IAT Max",
+    "fwd_iat_mean_us": "Fwd IAT Mean",
+    "fwd_iat_min_us": "Fwd IAT Min",
+    "fwd_iat_std_us": "Fwd IAT Std",
+    "fwd_iat_total_us": "Fwd IAT Total",
+    "fwd_init_window": "FWD Init Win Bytes",
+    "fwd_packets": "Total Fwd Packet",
+    "fwd_packets_per_s": "Fwd Packets/s",
+    "fwd_payload_max": "Fwd Packet Length Max",
+    "fwd_payload_mean": "Fwd Packet Length Mean",
+    "fwd_payload_min": "Fwd Packet Length Min",
+    "fwd_payload_std": "Fwd Packet Length Std",
+    "fwd_payload_total": "Total Length of Fwd Packet",
+    "fwd_psh_flags": "Fwd PSH Flags",
+    "fwd_urg_flags": "Fwd URG Flags",
+    "idle_max_us": "Idle Max",
+    "idle_mean_us": "Idle Mean",
+    "idle_min_us": "Idle Min",
+    "idle_std_us": "Idle Std",
+    "payload_max": "Packet Length Max",
+    "payload_mean": "Packet Length Mean",
+    "payload_min": "Packet Length Min",
+    "payload_std": "Packet Length Std",
+    "rst_flags": "RST Flag Count",
+    "syn_flags": "SYN Flag Count"
+   },
+   "labels": {
+    "BENIGN": 1582566,
+    "Botnet": 736,
+    "Botnet - Attempted": 4067,
+    "DDoS": 95144,
+    "DoS GoldenEye": 7567,
+    "DoS GoldenEye - Attempted": 80,
+    "DoS Hulk": 158468,
+    "DoS Hulk - Attempted": 581,
+    "DoS Slowhttptest": 1740,
+    "DoS Slowhttptest - Attempted": 3368,
+    "DoS Slowloris": 3859,
+    "DoS Slowloris - Attempted": 1847,
+    "FTP-Patator": 3972,
+    "FTP-Patator - Attempted": 12,
+    "Heartbleed": 11,
+    "Infiltration": 36,
+    "Infiltration - Attempted": 45,
+    "Infiltration - Portscan": 71767,
+    "Portscan": 159066,
+    "SSH-Patator": 2961,
+    "SSH-Patator - Attempted": 27,
+    "Web Attack - Brute Force": 73,
+    "Web Attack - Brute Force - Attempted": 1292,
+    "Web Attack - SQL Injection": 13,
+    "Web Attack - SQL Injection - Attempted": 5,
+    "Web Attack - XSS": 18,
+    "Web Attack - XSS - Attempted": 655
+   },
+   "rows_by_key": {
+    "friday.csv|benign": 292611,
+    "friday.csv|botnet": 736,
+    "friday.csv|ddos": 95144,
+    "friday.csv|portscan": 159066,
+    "monday.csv|benign": 371624,
+    "thursday.csv|benign": 290169,
+    "thursday.csv|infiltration": 71803,
+    "thursday.csv|web-attack": 31,
+    "thursday.csv|web-brute-force": 73,
+    "tuesday.csv|benign": 315145,
+    "tuesday.csv|brute-force-ftp": 3972,
+    "tuesday.csv|brute-force-ssh": 2961,
+    "wednesday.csv|benign": 324996,
+    "wednesday.csv|dos-goldeneye": 7567,
+    "wednesday.csv|dos-hulk": 158468,
+    "wednesday.csv|dos-slow": 5599,
+    "wednesday.csv|heartbleed": 11
+   },
+   "sampled_attack_rows": 100950,
+   "sampled_rows": 400950
+  },
+  "cic2018": {
+   "columns": {
+    "ack_flags": "ACK Flag Count",
+    "active_max_us": "Active Max",
+    "active_mean_us": "Active Mean",
+    "active_min_us": "Active Min",
+    "active_std_us": "Active Std",
+    "bwd_header_bytes": "Bwd Header Length",
+    "bwd_iat_max_us": "Bwd IAT Max",
+    "bwd_iat_mean_us": "Bwd IAT Mean",
+    "bwd_iat_min_us": "Bwd IAT Min",
+    "bwd_iat_std_us": "Bwd IAT Std",
+    "bwd_iat_total_us": "Bwd IAT Total",
+    "bwd_init_window": "Bwd Init Win Bytes",
+    "bwd_packets": "Total Bwd packets",
+    "bwd_packets_per_s": "Bwd Packets/s",
+    "bwd_payload_max": "Bwd Packet Length Max",
+    "bwd_payload_mean": "Bwd Packet Length Mean",
+    "bwd_payload_min": "Bwd Packet Length Min",
+    "bwd_payload_std": "Bwd Packet Length Std",
+    "bwd_payload_total": "Total Length of Bwd Packet",
+    "bwd_psh_flags": "Bwd PSH Flags",
+    "bwd_urg_flags": "Bwd URG Flags",
+    "down_up_ratio": "Down/Up Ratio",
+    "duration_us": "Flow Duration",
+    "fin_flags": "FIN Flag Count",
+    "flow_iat_max_us": "Flow IAT Max",
+    "flow_iat_mean_us": "Flow IAT Mean",
+    "flow_iat_min_us": "Flow IAT Min",
+    "flow_iat_std_us": "Flow IAT Std",
+    "flow_packets_per_s": "Flow Packets/s",
+    "flow_payload_bytes_per_s": "Flow Bytes/s",
+    "fwd_data_packets": "Fwd Act Data Pkts",
+    "fwd_header_bytes": "Fwd Header Length",
+    "fwd_iat_max_us": "Fwd IAT Max",
+    "fwd_iat_mean_us": "Fwd IAT Mean",
+    "fwd_iat_min_us": "Fwd IAT Min",
+    "fwd_iat_std_us": "Fwd IAT Std",
+    "fwd_iat_total_us": "Fwd IAT Total",
+    "fwd_init_window": "FWD Init Win Bytes",
+    "fwd_packets": "Total Fwd Packet",
+    "fwd_packets_per_s": "Fwd Packets/s",
+    "fwd_payload_max": "Fwd Packet Length Max",
+    "fwd_payload_mean": "Fwd Packet Length Mean",
+    "fwd_payload_min": "Fwd Packet Length Min",
+    "fwd_payload_std": "Fwd Packet Length Std",
+    "fwd_payload_total": "Total Length of Fwd Packet",
+    "fwd_psh_flags": "Fwd PSH Flags",
+    "fwd_urg_flags": "Fwd URG Flags",
+    "idle_max_us": "Idle Max",
+    "idle_mean_us": "Idle Mean",
+    "idle_min_us": "Idle Min",
+    "idle_std_us": "Idle Std",
+    "payload_max": "Packet Length Max",
+    "payload_mean": "Packet Length Mean",
+    "payload_min": "Packet Length Min",
+    "payload_std": "Packet Length Std",
+    "rst_flags": "RST Flag Count",
+    "syn_flags": "SYN Flag Count"
+   },
+   "labels": {
+    "BENIGN": 59353486,
+    "Botnet Ares": 142921,
+    "Botnet Ares - Attempted": 262,
+    "DDoS-HOIC": 1082293,
+    "DDoS-LOIC-HTTP": 289328,
+    "DDoS-LOIC-UDP": 2527,
+    "DDoS-LOIC-UDP - Attempted": 251,
+    "DoS GoldenEye": 22560,
+    "DoS GoldenEye - Attempted": 4301,
+    "DoS Hulk": 1803160,
+    "DoS Hulk - Attempted": 86,
+    "DoS Slowloris": 8490,
+    "DoS Slowloris - Attempted": 2280,
+    "FTP-BruteForce - Attempted": 298874,
+    "Infiltration - Communication Victim Attacker": 204,
+    "Infiltration - Dropbox Download": 85,
+    "Infiltration - Dropbox Download - Attempted": 28,
+    "Infiltration - NMAP Portscan": 89374,
+    "SSH-BruteForce": 94197,
+    "Web Attack - Brute Force": 131,
+    "Web Attack - Brute Force - Attempted": 137,
+    "Web Attack - SQL": 39,
+    "Web Attack - SQL - Attempted": 14,
+    "Web Attack - XSS": 113,
+    "Web Attack - XSS - Attempted": 4
+   },
+   "rows_by_key": {
+    "Friday-02-03-2018.csv|benign": 6168450,
+    "Friday-02-03-2018.csv|botnet": 142921,
+    "Friday-16-02-2018.csv|benign": 5587106,
+    "Friday-16-02-2018.csv|dos-hulk": 1803160,
+    "Friday-23-02-2018.csv|benign": 5976323,
+    "Friday-23-02-2018.csv|web-attack": 96,
+    "Friday-23-02-2018.csv|web-brute-force": 62,
+    "Thursday-01-03-2018.csv|benign": 6511567,
+    "Thursday-01-03-2018.csv|infiltration": 39834,
+    "Thursday-15-02-2018.csv|benign": 5379052,
+    "Thursday-15-02-2018.csv|dos-goldeneye": 22560,
+    "Thursday-15-02-2018.csv|dos-slow": 8490,
+    "Thursday-22-02-2018.csv|benign": 6071028,
+    "Thursday-22-02-2018.csv|web-attack": 56,
+    "Thursday-22-02-2018.csv|web-brute-force": 69,
+    "Tuesday-20-02-2018.csv|benign": 5764577,
+    "Tuesday-20-02-2018.csv|ddos": 290125,
+    "Wednesday-14-02-2018.csv|benign": 5804153,
+    "Wednesday-14-02-2018.csv|brute-force-ssh": 94197,
+    "Wednesday-21-02-2018.csv|benign": 5878570,
+    "Wednesday-21-02-2018.csv|ddos": 1084023,
+    "Wednesday-28-02-2018.csv|benign": 6518897,
+    "Wednesday-28-02-2018.csv|infiltration": 49829
+   },
+   "sampled_attack_rows": 168773,
+   "sampled_rows": 768773
+  }
+ },
+ "schema": "predict-shield/cic-flow-v3-development/1"
+}
