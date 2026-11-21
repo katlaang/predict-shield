@@ -1,5 +1,13 @@
 # Development changelog
 
+## 2026-11-20 (2): Mechanism-lab preregistration lock, controls and verifier scoring
+
+- `PREREGISTRATION.json` fixes the scored campaign's questions, ground truth, VERIFIED scope, metrics, cost matrix, controls, exclusions, rerun and stopping rules. `prereg_gate.py` hashes it with the plan and the campaign code; `campaign.py --scored` refuses to start unless locked and unchanged, and CI fails on any unrecorded change after locking (`DEVIATIONS.md`).
+- Rerun rule in `campaign.py`: one rerun per infrastructure failure, then exclusion, counted across invocations and logged.
+- `controls.py`: positive controls per fault mode (inject, no action, 18 s of oracle reads) with self-heal rates, and a no-fault negative control. Runs as its own CI job.
+- `verifier_scoring.py`: verifier sensitivity, specificity and abstain rate against oracle truth per fault mode and action, single-evidence and dual-evidence (scope plus post-action operator telemetry, abstain on disagreement). The pilot now records post-action operator telemetry.
+- The preregistration is not locked yet: it locks after the controls pass on this code.
+
 ## 2026-11-19: Learned flow detector measured across two networks
 
 - `experiment-b/cic-flow/`: supervised gradient boosting plus a benign-only Isolation Forest over flow statistics, traffic type and causal 60-second context. No hand-written rules. Protocol, features, thresholds and a 1% benign alert budget fixed before any result was read; both archives pinned by SHA-256.

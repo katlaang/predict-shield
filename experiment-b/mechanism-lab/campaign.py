@@ -13,6 +13,13 @@ Usage, inside experiment-b/mechanism-lab:
       --execute-lab --start 0 --max-trials 4
   python campaign.py --plan plans/mechanism --records results/mechanism \
       --execute-lab --resume --max-trials 4
+  python campaign.py ... --execute-lab --scored   # requires the locked preregistration
+
+Rerun rule (PREREGISTRATION.json): a trial that fails for an infrastructure
+reason is rerun once after the lab is ready again; a second failure excludes
+it. Reruns and exclusions are appended to reruns.jsonl and excluded.jsonl in
+the records directory and reported. A pilot directory and a scored directory
+can never be mixed (campaign-kind file).
 
 This module does not run in the background. It never uploads oracle data to
 GitHub or interprets a successful action acknowledgment as verification.
@@ -22,6 +29,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+from collections import Counter
 from contextlib import contextmanager
 from datetime import datetime, timezone
 from pathlib import Path
@@ -31,6 +39,14 @@ from collect import load_plan, separate_records, source_commit, write_trial_reco
 from pilot import run_case, wait_ready
 
 FINGERPRINT = "registered-plan.sha256"
+KIND_FILE = "campaign-kind"
+RERUNS = "reruns.jsonl"
+EXCLUDED = "excluded.jsonl"
+MAX_RERUNS = 1
+MAX_EXCLUDED_SHARE = 0.05
+# Failures the lab raises when its infrastructure is not in the registered
+# state. Registration and validation errors (ValueError) are never rerun.
+INFRA_ERRORS = (RuntimeError, OSError, TimeoutError)
 SOURCE_REVISION = "registered-source.sha"
 LOCK_NAME = ".campaign.lock"
 
@@ -97,6 +113,63 @@ def register_source(root: Path, revision: str) -> None:
             output.write(revision + "\n")
 
 
+def register_kind(root: Path, kind: str) -> None:
+    """Keep pilot and scored records in separate directories."""
+    file = root / KIND_FILE
+    if file.exists():
+        if file.read_text(encoding="ascii").strip() != kind:
+            raise ValueError("Records directory belongs to a different campaign kind")
+    else:
+        fd = os.open(file, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
+        with os.fdopen(fd, "w", encoding="ascii") as handle:
+            handle.write(kind + "\n")
+
+
+def read_jsonl(root: Path, name: str) -> list[dict]:
+    file = root / name
+    if not file.exists():
+        return []
+    return [json.loads(line) for line in file.read_text(encoding="utf-8").splitlines() if line.strip()]
+
+
+def append_jsonl(root: Path, name: str, row: dict) -> None:
+    with (root / name).open("a", encoding="utf-8") as handle:
+        handle.write(json.dumps(row, sort_keys=True) + "\n")
+
+
+def infra_history(root: Path) -> tuple[Counter, set]:
+    """Reruns used per run_id, and run_ids already excluded."""
+    reruns = Counter(row["run_id"] for row in read_jsonl(root, RERUNS))
+    excluded = {row["run_id"] for row in read_jsonl(root, EXCLUDED)}
+    return reruns, excluded
+
+
+def execute_with_rerun_rule(trial: dict, root: Path, attempt, ready) -> dict | None:
+    """Run one trial under the preregistered rerun rule.
+
+    Returns the observation, or None when the trial is excluded. The rerun
+    budget is counted across invocations, so a crash between attempts
+    cannot buy a trial extra attempts."""
+    reruns, excluded = infra_history(root)
+    if trial["run_id"] in excluded:
+        return None
+    used = reruns[trial["run_id"]]
+    while True:
+        try:
+            return attempt()
+        except INFRA_ERRORS as exc:
+            stamp = datetime.now(timezone.utc).isoformat()
+            if used >= MAX_RERUNS:
+                append_jsonl(root, EXCLUDED, {"run_id": trial["run_id"], "at": stamp,
+                                               "status": "EXCLUDED_INFRA",
+                                               "error": type(exc).__name__ + ": " + str(exc)[:300]})
+                return None
+            used += 1
+            append_jsonl(root, RERUNS, {"run_id": trial["run_id"], "at": stamp, "rerun": used,
+                                         "error": type(exc).__name__ + ": " + str(exc)[:300]})
+            ready()
+
+
 def next_trials(trials: list[dict], records: Path, *, start: int = 0,
                 max_trials: int = 4, resume: bool = False) -> list[dict]:
     """Choose a limited set of missing runs without accepting partial records.
@@ -109,7 +182,10 @@ def next_trials(trials: list[dict], records: Path, *, start: int = 0,
     if not 0 <= start < len(trials) or not 1 <= max_trials <= 12:
         raise ValueError("Invalid registered start index or per-invocation bound")
     selected = []
+    _, excluded = infra_history(records)
     for trial in trials[start:]:
+        if trial["run_id"] in excluded:
+            continue
         status, reason = inspect_trial(trial, records)
         if status in ("partial", "invalid"):
             raise RuntimeError(f"Cannot continue at {trial['run_id']}: {reason}")
@@ -126,7 +202,7 @@ def next_trials(trials: list[dict], records: Path, *, start: int = 0,
 def run_batch(configs: list[dict], trials: list[dict], records: Path,
               control_token: str, oracle_token: str, *,
               start: int = 0, max_trials: int = 4,
-              resume: bool = False) -> dict:
+              resume: bool = False, kind: str = "pilot") -> dict:
     """Execute and immediately validate each bounded Kafka/JVM replay.
 
     The same plan and output directory are locked before a test starts.
@@ -138,6 +214,7 @@ def run_batch(configs: list[dict], trials: list[dict], records: Path,
     with exclusive_lock(records):
         digest = register_plan(records, configs, trials)
         register_source(records, source_commit())
+        register_kind(records, kind)
         audit = audit_campaign(configs, trials, records)
         if (audit["partial"] or audit["invalid"] or audit["unexpected_files"]
                 or not audit["single_source_revision"]):
@@ -145,12 +222,12 @@ def run_batch(configs: list[dict], trials: list[dict], records: Path,
         work = next_trials(trials, records, start=start,
                            max_trials=max_trials, resume=resume)
         by_id = {cfg["configuration_id"]: cfg for cfg in configs}
-        completed = []
+        completed, excluded_now = [], []
         if work:
             wait_ready()
         for trial in work:
             cfg = by_id[trial["configuration_id"]]
-            observation = run_case(
+            observation = execute_with_rerun_rule(trial, records, lambda cfg=cfg, trial=trial: run_case(
                 trial["action_id"], control_token, oracle_token,
                 ttl_ms=cfg["cache_ttl_ms"], rps=cfg["requested_rps"],
                 fault_mode=cfg["fault_mode"], fault_target=cfg["fault_target"],
@@ -160,7 +237,13 @@ def run_batch(configs: list[dict], trials: list[dict], records: Path,
                 routing_profile=cfg.get("routing_profile", "balanced"),
                 complexity_stratum=cfg.get("complexity_stratum", "SIMPLE"),
                 node_service_latency_ms=tuple(cfg["node_service_latency_ms"]),
-            )
+            ), wait_ready)
+            if observation is None:
+                excluded_now.append(trial["run_id"])
+                _, all_excluded = infra_history(records)
+                if len(all_excluded) > MAX_EXCLUDED_SHARE * len(trials):
+                    raise RuntimeError("Stopping rule: excluded trials exceed 5% of the plan")
+                continue
             records_by_stream = separate_records(cfg, trial, observation)
             write_trial_records(records, records_by_stream)
             status, explanation = inspect_trial(trial, records)
@@ -168,7 +251,12 @@ def run_batch(configs: list[dict], trials: list[dict], records: Path,
                 raise RuntimeError("Written run failed independent audit: " + explanation)
             completed.append(trial["run_id"])
         after = audit_campaign(configs, trials, records)
+        reruns, excluded = infra_history(records)
         return {
+            "campaign_kind": kind,
+            "reruns_total": sum(reruns.values()),
+            "excluded_total": len(excluded),
+            "newly_excluded": excluded_now,
             "plan_sha256": digest,
             "newly_executed_trials": len(completed),
             "new_run_ids": completed,
@@ -192,6 +280,8 @@ def main() -> None:
     parser.add_argument("--resume", action="store_true")
     parser.add_argument("--start", type=int, default=0)
     parser.add_argument("--max-trials", type=int, default=4)
+    parser.add_argument("--scored", action="store_true",
+                        help="Scored campaign: requires the locked preregistration")
     args = parser.parse_args()
     configs, trials = load_plan(args.plan)
     if args.audit and args.execute_lab:
@@ -205,9 +295,16 @@ def main() -> None:
     )]
     if not all(credentials) or len(set(credentials)) != len(credentials):
         parser.error("Require three distinct nonempty disposable lab credentials")
+    kind = "pilot"
+    if args.scored:
+        from prereg_gate import check, current_state
+        ok, reason = check(scored=True)
+        if not ok:
+            parser.error("Preregistration gate: " + reason)
+        kind = "scored:" + current_state()["lock_sha256"]
     result = run_batch(configs, trials, args.records, credentials[0],
                        credentials[1], start=args.start,
-                       max_trials=args.max_trials, resume=args.resume)
+                       max_trials=args.max_trials, resume=args.resume, kind=kind)
     print(json.dumps(result, indent=2))
 
 

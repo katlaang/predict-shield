@@ -223,7 +223,8 @@ def setup_fault(control_token: str, *, ttl_ms: int, delay_ms: int,
         time.sleep(1.5)
     if fault_target not in ENFORCERS:
         raise ValueError("Unexpected fault target")
-    if fault_mode not in {"loss", "delay", "duplicate", "reorder", "consumer_paused"}:
+    # "none" exists only for the preregistered negative control (controls.py).
+    if fault_mode not in {"none", "loss", "delay", "duplicate", "reorder", "consumer_paused"}:
         raise ValueError("Unsupported Kafka fault mode")
     if fault_mode == "consumer_paused":
         # v3.1 ONLY: pause the actual Spring Kafka listener container
@@ -571,6 +572,9 @@ def run_case(action: str, control_token: str, oracle_token: str,
     # measured concurrent service-health outcomes.
     after_probes = gateway_probes(count=8)
     after_scope = gateway_scope_evidence(control_token, after_probes)
+    # Second, independent kind of verifier evidence (operator endpoint, not
+    # the oracle), read before the oracle so it cannot be influenced by it.
+    after_operator_telemetry = operator_telemetry(control_token)
     after_truth = oracle_snapshot(oracle_token)
     return {
         "case": "experiment-b-kafka-revocation",
@@ -591,6 +595,7 @@ def run_case(action: str, control_token: str, oracle_token: str,
                    "verifier_scope": before_scope,
                    "oracle": before_truth},
         "after": {"verifier_gateway_probes": after_probes,
+                  "operator_telemetry": after_operator_telemetry,
                   "verifier_scope": after_scope,
                   "oracle": after_truth},
         "operations": {**operations, "post_window_recovery_wait_seconds": recovery_wait_seconds},

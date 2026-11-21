@@ -153,6 +153,7 @@ def separate_records(config: dict, trial: dict, observed: dict) -> dict[str, dic
             "reason": reason,
             "observations": after["verifier_gateway_probes"],
             "scope_evidence": scope_assessment,
+            "operator_observations_after": after.get("operator_telemetry"),
             "path_exposure_observed": any(
                 x.get("http_status") == 200
                 for x in after["verifier_gateway_probes"]

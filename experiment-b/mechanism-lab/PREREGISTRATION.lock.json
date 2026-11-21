@@ -1,0 +1,4 @@
+{
+ "status": "UNLOCKED",
+ "note": "Lock with `python prereg_gate.py lock` after the controls pass on this code, then commit this file and tag the commit mechanism-prereg-v1. A scored campaign refuses to start while this says UNLOCKED."
+}

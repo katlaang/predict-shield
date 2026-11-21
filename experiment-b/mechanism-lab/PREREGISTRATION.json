@@ -1,0 +1,125 @@
+{
+ "schema": "predict-shield/mechanism-preregistration/1",
+ "campaign": "Experiment B mechanism-lab scored campaign",
+ "status_note": "This file is fixed before the scored campaign. prereg_gate.py hashes it together with the plan fingerprint and the campaign code; PREREGISTRATION.lock.json records that hash when the campaign is locked. Any change after locking needs a DEVIATIONS.md entry.",
+ "plan": {
+  "generator": "plan.py create_plan(seed=20261110)",
+  "configurations": 100,
+  "actions": [
+   "resync_policy",
+   "restart_enforcer",
+   "gateway_restrict",
+   "monitor_only"
+  ],
+  "repeats": 3,
+  "planned_trials": 1200,
+  "partitions": {
+   "train": 60,
+   "calibration": 20,
+   "test": 20
+  },
+  "fault_modes": [
+   "loss",
+   "delay",
+   "duplicate",
+   "reorder"
+  ]
+ },
+ "questions": [
+  "Q1. For each fault mode, how often does each action leave every revoked access denied, judged by injected ground truth (the oracle's direct cache read plus direct target probe)?",
+  "Q2. For each fault mode and action, how much protected access stays exposed during the measured window (exposure-seconds, lower and upper bounds) and how many legitimate requests fail?",
+  "Q3. How accurate is the verifier against injected ground truth: sensitivity, specificity and abstain rate per fault mode and action, for the single-evidence verdict and for the dual-evidence verdict?",
+  "Q4. On the test partition, how well calibrated are the action-outcome estimator's predicted per-action outcomes against measured outcomes?"
+ ],
+ "excluded_analyses": [
+  "No comparison between the action-outcome estimator and any deterministic rule is run or reported."
+ ],
+ "ground_truth": {
+  "label": "oracle.actual_revoked_access_denied after the action",
+  "source": "separate oracle process: direct cache state plus direct target probe, collected after the verifier and never read by it",
+  "verifier_role": "measured quantity, never the evaluation label"
+ },
+ "verified_scope": {
+  "VERIFIED_means": "Every enforcement process declared in the Compose inventory is routed by the gateway and each gateway probe after the action was denied (scope.verify_reconciled_scope).",
+  "probes": "8 gateway probes after the action, plus post-action operator telemetry from every enforcement process",
+  "window": "the probes taken after the measurement window and any restart readiness wait",
+  "valid_until": "the moment of the last probe; no claim about later times",
+  "dual_evidence_rule": {
+   "VERIFIED": "scope VERIFIED and operator telemetry consistent (all four processes observed, one applied revision, no failed refresh, no pending callback)",
+   "NOT_VERIFIED": "scope NOT VERIFIED and telemetry not consistent, or scope NOT VERIFIED with telemetry unavailable",
+   "ABSTAIN": "scope INDETERMINATE, or the two kinds of evidence disagree, or scope VERIFIED with telemetry unavailable"
+  }
+ },
+ "metrics": {
+  "per_trial": [
+   "oracle remediation (true/false)",
+   "exposure_seconds lower and upper bound",
+   "failed legitimate requests",
+   "verifier verdict",
+   "dual-evidence verdict"
+  ],
+  "error_counts_per_arm": [
+   "unnecessary action: an action other than monitor_only on a fault mode the positive controls classify as self-healing or not exercised",
+   "missed fix: oracle reports access not denied after the action",
+   "late fix: oracle denied but exposure_seconds_upper_bound above 50% of the window",
+   "abstention: verifier INDETERMINATE or dual ABSTAIN",
+   "disruption: failed legitimate requests above absolute_error_budget_requests"
+  ],
+  "intervals": "Wilson 95% intervals; trials within a configuration share a seed and are not independent, so intervals are also reported at configuration level"
+ },
+ "cost_matrix": {
+  "missed_fix": 20,
+  "late_fix": 5,
+  "disruption": 5,
+  "unnecessary_action": 1,
+  "abstention": 2,
+  "sensitivity_ratios_unnecessary_to_missed": [
+   "1:1",
+   "1:5",
+   "1:20"
+  ],
+  "robustness_rule": "A finding is reported as robust only if it holds at all three ratios; otherwise the ratios where it holds are stated."
+ },
+ "controls": {
+  "positive": "For each fault mode (loss, delay, duplicate, reorder) on enforcer-b: inject the fault, publish the revocation, take no action, and read the oracle every second for the control window. Grid: cache TTL 2500 and 15000 ms crossed with event delay 0 and 2500 ms (the ends of the plan's ranges), two runs per cell, eight runs per fault mode.",
+  "negative": "No fault (mode none): the same revocation, grid and schedule. Eight runs.",
+  "campaign_window_seconds": 6,
+  "control_window_seconds": 18,
+  "persist_min_runs": 7,
+  "outcomes": "Positive runs are NOT_EXERCISED (access already denied at the first read), PERSISTED (still exposed at the end of the campaign window) or SELF_HEALED. Negative runs are HEALTHY or FALSE_FAILURE.",
+  "self_heal_rule": "A fault mode with fewer than 7 of 8 positive runs PERSISTED is reported as self-healing or not exercised, with its per-cell outcomes and heal times. Its trials stay in the data, monitor_only is treated as a legitimate outcome for it, and it is excluded from conclusions that an action repaired the fault.",
+  "negative_rule": "Any negative-control FALSE_FAILURE invalidates the campaign until the cause is found and recorded in DEVIATIONS.md.",
+  "requirement": "Controls run on the code covered by the lock before the first scored trial; the controls report is committed with the campaign results."
+ },
+ "unobservable_fault_classes": [
+  {
+   "class": "network partition between processes",
+   "reason": "single Docker bridge network; no partition injection exists"
+  },
+  {
+   "class": "broker outage",
+   "reason": "not injected; Kafka availability is a lab precondition"
+  },
+  {
+   "class": "authority outage",
+   "reason": "the oracle cannot know desired policy while the authority is down (authority_truth_available=false); handled by separate witness experiments"
+  },
+  {
+   "class": "more than four enforcement processes",
+   "reason": "fixed four-JVM topology"
+  },
+  {
+   "class": "process crash under load",
+   "reason": "only planned restarts and listener pauses are exercised"
+  }
+ ],
+ "exclusion_rules": [
+  "A trial with no complete oracle snapshot after its reruns is excluded and counted as EXCLUDED_INFRA.",
+  "A trial whose records fail the four-stream integrity audit is excluded and counted as INVALID.",
+  "No other exclusion is allowed."
+ ],
+ "rerun_rule": "A trial that fails for an infrastructure reason (lab not ready, setup convergence failure, oracle unavailable, Docker error) is rerun once, after waiting for lab readiness. A second failure excludes it. Every rerun and exclusion is written to reruns.jsonl and excluded.jsonl and reported. A trial with complete records is never rerun.",
+ "stopping_rule": "The campaign stops when every planned trial is complete or excluded, or when excluded trials exceed 5% of planned trials, in which case it is reported as incomplete.",
+ "analysis_isolation": "Analysis and scoring code is written and tested on synthetic records and on the CI pilot records only, and is hashed into the lock before scored results exist. Automated steps (code written or tuned by an AI assistant) are listed in DEVIATIONS.md when they touch analysis after locking.",
+ "null_results": "Every question is reported whatever the outcome, including when no action repairs a fault mode or the verifier is unreliable."
+}
