@@ -247,6 +247,8 @@ jobs:
           assert d["complete"] == 16 and d["partial"] == d["invalid"] == d["unexpected_files"] == 0, d
           PY
           python verifier_scoring.py --records results/ci-v31 --output reports/ci-v31-verifier-scoring.json
+          python outcome_report.py --plan plans/ci-v31 --records results/ci-v31 --output reports/ci-v31-outcomes.json
+          python prereg_gate.py check --scored
           rm -rf results/ci-v31 plans/ci-v31
       - if: always()
         uses: actions/upload-artifact@v4
@@ -257,6 +259,7 @@ jobs:
             experiment-b/mechanism-lab/reports/controls-verifier-scoring.json
             experiment-b/mechanism-lab/reports/ci-v31-audit.json
             experiment-b/mechanism-lab/reports/ci-v31-verifier-scoring.json
+            experiment-b/mechanism-lab/reports/ci-v31-outcomes.json
           if-no-files-found: ignore
       - name: Shutdown and diagnostics
         if: always()
