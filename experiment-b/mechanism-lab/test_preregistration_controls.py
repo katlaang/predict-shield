@@ -180,3 +180,44 @@ class VerifierScoringTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class OutcomeReportTests(unittest.TestCase):
+    """Synthetic records only: written before any scored result existed."""
+
+    def record(self, action, remediated, upper, failed, outcome="NOT VERIFIED"):
+        return {
+            "verification": {"run_id": "r-" + action + str(upper), "action_id": action, "outcome": outcome,
+                             "operator_observations_after": None,
+                             "timed_gateway_exposure": {"window_seconds": 4.0,
+                                                        "exposure_seconds_lower_bound": upper / 2,
+                                                        "exposure_seconds_upper_bound": upper}},
+            "oracle": {"actual_revoked_access_denied": remediated},
+            "operations": {"failed_requests": failed, "observed_requests": 100},
+        }
+
+    def test_errors_costs_and_ratio_robustness(self):
+        import outcome_report as orp
+        cfg = {"configuration_id": "c1", "partition": "test", "fault_mode": "loss",
+               "control_class": "persistent", "restart_permitted": True, "absolute_error_budget_requests": 25}
+        rows = [orp.trial_row(cfg, self.record("restart_enforcer", True, 1.0, 30)),
+                orp.trial_row(cfg, self.record("monitor_only", False, 4.0, 0)),
+                orp.trial_row(cfg, self.record("resync_policy", True, 3.0, 0))]
+        self.assertEqual([r["errors"]["disruption"] for r in rows], [True, False, False])
+        self.assertTrue(rows[1]["errors"]["missed_fix"])
+        self.assertTrue(rows[2]["errors"]["late_fix"])
+        # NOT VERIFIED with no telemetry is a negative verdict, not an abstention:
+        # restart costs disruption 5, monitor the missed-fix weight, resync late fix 5.
+        self.assertFalse(rows[1]["errors"]["abstention"])
+        self.assertEqual(orp.trial_cost(rows[1], 20), 20)
+        report = orp.build_report(rows)["loss/persistent"]
+        self.assertEqual(report["lowest_cost_actions"]["1:1"], ["monitor_only"])
+        self.assertEqual(report["lowest_cost_actions"]["1:20"], ["restart_enforcer", "resync_policy"])
+        self.assertFalse(report["robust_across_ratios"])
+
+    def test_unnecessary_action_only_on_self_healing(self):
+        import outcome_report as orp
+        cfg = {"configuration_id": "c2", "partition": "train", "fault_mode": "delay",
+               "control_class": "self_healing"}
+        self.assertTrue(orp.trial_row(cfg, self.record("gateway_restrict", True, 0.5, 0))["errors"]["unnecessary_action"])
+        self.assertFalse(orp.trial_row(cfg, self.record("monitor_only", True, 0.5, 0))["errors"]["unnecessary_action"])

@@ -28,6 +28,7 @@ DEVIATIONS_FILE = "DEVIATIONS.md"
 COVERED_FILES = (
     "PREREGISTRATION.json", "plan.py", "pilot.py", "collect.py", "campaign.py",
     "audit.py", "scope.py", "controls.py", "verifier_scoring.py", "prereg_gate.py",
+    "outcome_report.py",
 )
 TAG = "mechanism-prereg-v1"
 PLAN_VERSION = "v3.1"

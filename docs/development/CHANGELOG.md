@@ -9,6 +9,7 @@
 - First control run: no-fault control healthy (8 of 8). Without action, duplicate and reorder never exposed access, delay healed in about 2 s, and loss persisted past the 6 s window only at TTL 15 s (healing at about 14 s). The verifier made no false VERIFIED on 40 control runs or 40 pilot trials, and abstained on 16 of the 40 pilot trials.
 - Plan v3.1 replaces v3 for the scored campaign: 70 persistent configurations (loss and paused listener, TTL 10-30 s) and 30 self-healing ones (delay; loss with TTL 2.5-4 s). Controls now check each registered cell's class. A 16-trial v3.1 pilot runs in CI.
 - Second control run confirmed 9 of 10 cells; a 1 s delay was delivered before the first read, so the delay range moved to 2-3 s. The third run confirmed all 10 cells, and the preregistration was locked on that code (tag `mechanism-prereg-v1`).
+- After locking, before any scored trial: `outcome_report.py` (Q1, Q2, per-arm errors and the cost comparison at 1:1, 1:5 and 1:20) added to the lock through the first `DEVIATIONS.md` entry. New `mechanism-scored-campaign.yml` runs the controls and then the 1,200 scored trials behind the gate, commits aggregate reports to a results branch, and keeps the full records as an artifact.
 
 ## 2026-11-19: Learned flow detector measured across two networks
 
