@@ -30,6 +30,7 @@ COVERED_FILES = (
     "audit.py", "scope.py", "controls.py", "verifier_scoring.py", "prereg_gate.py",
 )
 TAG = "mechanism-prereg-v1"
+PLAN_VERSION = "v3.1"
 
 
 def file_sha256(path: Path) -> str:
@@ -41,7 +42,7 @@ def current_state(directory: Path = HERE) -> dict:
     sys.path.insert(0, str(directory))
     from audit import plan_fingerprint
     from plan import create_plan
-    configs, trials = create_plan()
+    configs, trials = create_plan(version=PLAN_VERSION)
     state = {
         "files": {name: file_sha256(directory / name) for name in COVERED_FILES},
         "plan_fingerprint": plan_fingerprint(configs, trials),

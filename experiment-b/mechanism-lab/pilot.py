@@ -122,6 +122,18 @@ def setup_fault(control_token: str, *, ttl_ms: int, delay_ms: int,
     status, _, _ = request("gateway", "/admin/restore", method="POST", token=control_token)
     if status != 200:
         raise RuntimeError("Gateway restore failed")
+    # A previous consumer_paused trial or control leaves its listener paused.
+    # Resume every listener and confirm it runs before the clean reset.
+    for node in ENFORCERS:
+        status, _, _ = request(node, "/admin/consumer/resume", method="POST", token=control_token)
+        if status != 200:
+            raise RuntimeError("Could not resume the Kafka listener on " + node)
+    deadline = time.monotonic() + 12
+    while any(request(node, "/admin/consumer/status", token=control_token)[1].get("container_paused")
+              is not False for node in ENFORCERS):
+        if time.monotonic() > deadline:
+            raise RuntimeError("A Kafka listener did not resume before the trial")
+        time.sleep(0.25)
     routing = "/admin/include-hidden" if gateway_includes_hidden else "/admin/omit-hidden"
     route_status, _, _ = request("gateway", routing, method="POST", token=control_token)
     if route_status != 200:

@@ -1,8 +1,19 @@
 # Preregistration, controls and verifier scoring
 
 This page covers the safeguards that must be in place before the scored
-mechanism-lab campaign runs. The campaign plan is 100 configurations × 4
-actions × 3 repeats = 1,200 trials.
+mechanism-lab campaign runs. The campaign uses plan v3.1: 100 configurations ×
+4 actions × 3 repeats = 1,200 trials.
+
+Plan v3.1 replaced v3 before locking. The first control run
+(`CONTROLS_RESULT_2026_11_21.md`) showed that most v3 faults healed by
+themselves. v3.1 is made of:
+
+- 70 configurations whose fault persists past the 6 s window: 35 loss and
+  35 physically paused listener, each with cache TTL 10 to 30 s.
+- 30 self-healing configurations: 15 delay and 15 loss with TTL 2.5 to 4 s.
+  For these, `monitor_only` is a legitimate outcome.
+
+v3 stays available for the CI pilot.
 
 ## 1. Protocol lock
 
@@ -35,17 +46,15 @@ actions × 3 repeats = 1,200 trials.
 
 ## 2. Testbed controls (`controls.py`)
 
-- **Positive controls:** each fault mode (loss, delay, duplicate, reorder) is
-  injected on `enforcer-b`. The revocation is published and no action is
-  taken. The oracle is read every second for 18 s, three times the 6 s
-  campaign window.
-  - The grid crosses cache TTL 2500 and 15000 ms with event delay 0 and
-    2500 ms (the ends of the plan's ranges), with two runs per cell.
-  - Each run is NOT_EXERCISED, PERSISTED or SELF_HEALED. The self-heal rate is
-    reported per fault mode with a Wilson interval, along with heal times.
-  - A fault mode needs at least 7 of 8 runs PERSISTED to count as persistent.
-    Otherwise `monitor_only` is a legitimate outcome for that mode, and no
-    "the action repaired it" conclusion is drawn from it.
+- **Positive controls:** ten registered cells, four runs each. Every cell sits
+  at an end of a plan class's range.
+  - Each run injects the fault on `enforcer-b`, publishes the revocation, and
+    takes no action. The oracle is read every second for 36 s, long enough
+    to see a 30 s cache expire.
+  - Each run is NOT_EXERCISED, PERSISTED (still exposed at 6 s) or
+    SELF_HEALED. Self-heal rate and heal times are reported.
+  - A cell's plan class is confirmed only if all of its runs match. An
+    unconfirmed cell blocks locking.
 - **Negative control:** no fault, the same schedule. Any exposure seen by the
   oracle or the gateway verifier invalidates the campaign until the cause is
   recorded.

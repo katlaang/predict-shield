@@ -3,7 +3,8 @@
  "campaign": "Experiment B mechanism-lab scored campaign",
  "status_note": "This file is fixed before the scored campaign. prereg_gate.py hashes it together with the plan fingerprint and the campaign code; PREREGISTRATION.lock.json records that hash when the campaign is locked. Any change after locking needs a DEVIATIONS.md entry.",
  "plan": {
-  "generator": "plan.py create_plan(seed=20261110)",
+  "generator": "plan.py create_plan(version='v3.1', seed=20261121)",
+  "version": "v3.1",
   "configurations": 100,
   "actions": [
    "resync_policy",
@@ -20,10 +21,14 @@
   },
   "fault_modes": [
    "loss",
-   "delay",
-   "duplicate",
-   "reorder"
-  ]
+   "consumer_paused",
+   "delay"
+  ],
+  "composition": {
+   "persistent": "35 loss and 35 consumer_paused configurations, cache TTL 10-30 s",
+   "self_healing": "15 delay (1-2.5 s, TTL 10-30 s) and 15 loss with TTL 2.5-4 s; 30% of configurations, where monitor_only is a legitimate outcome"
+  },
+  "revision_reason": "Plan v3 was revised before locking after the first control run (CONTROLS_RESULT_2026_11_21.md): duplicate and reorder never exposed revoked access without action, delay healed in about 2 s, and loss persisted past the window only when TTL exceeded it. The control results were seen; no scored trial had run."
  },
  "questions": [
   "Q1. For each fault mode, how often does each action leave every revoked access denied, judged by injected ground truth (the oracle's direct cache read plus direct target probe)?",
@@ -59,7 +64,7 @@
    "dual-evidence verdict"
   ],
   "error_counts_per_arm": [
-   "unnecessary action: an action other than monitor_only on a fault mode the positive controls classify as self-healing or not exercised",
+   "unnecessary action: an action other than monitor_only on a self_healing configuration",
    "missed fix: oracle reports access not denied after the action",
    "late fix: oracle denied but exposure_seconds_upper_bound above 50% of the window",
    "abstention: verifier INDETERMINATE or dual ABSTAIN",
@@ -81,15 +86,86 @@
   "robustness_rule": "A finding is reported as robust only if it holds at all three ratios; otherwise the ratios where it holds are stated."
  },
  "controls": {
-  "positive": "For each fault mode (loss, delay, duplicate, reorder) on enforcer-b: inject the fault, publish the revocation, take no action, and read the oracle every second for the control window. Grid: cache TTL 2500 and 15000 ms crossed with event delay 0 and 2500 ms (the ends of the plan's ranges), two runs per cell, eight runs per fault mode.",
-  "negative": "No fault (mode none): the same revocation, grid and schedule. Eight runs.",
+  "positive": "Each registered cell: inject the fault on enforcer-b, publish the revocation, take no action, read the oracle every second for the control window.",
+  "negative": "No fault (mode none), same schedule, at TTL 10 s and 30 s.",
   "campaign_window_seconds": 6,
-  "control_window_seconds": 18,
-  "persist_min_runs": 7,
-  "outcomes": "Positive runs are NOT_EXERCISED (access already denied at the first read), PERSISTED (still exposed at the end of the campaign window) or SELF_HEALED. Negative runs are HEALTHY or FALSE_FAILURE.",
-  "self_heal_rule": "A fault mode with fewer than 7 of 8 positive runs PERSISTED is reported as self-healing or not exercised, with its per-cell outcomes and heal times. Its trials stay in the data, monitor_only is treated as a legitimate outcome for it, and it is excluded from conclusions that an action repaired the fault.",
+  "control_window_seconds": 36,
+  "outcomes": "Positive runs are NOT_EXERCISED (access already denied at the first read), PERSISTED (still exposed at the end of the 6 s campaign window) or SELF_HEALED. Negative runs are HEALTHY or FALSE_FAILURE.",
+  "self_heal_rule": "Each cell's plan class (persistent or self_healing) is confirmed only if all of its runs show the matching outcome. An unconfirmed cell blocks locking; if found after locking, it is recorded in DEVIATIONS.md and the affected configurations are reported by their observed class.",
   "negative_rule": "Any negative-control FALSE_FAILURE invalidates the campaign until the cause is found and recorded in DEVIATIONS.md.",
-  "requirement": "Controls run on the code covered by the lock before the first scored trial; the controls report is committed with the campaign results."
+  "requirement": "Controls run on the code covered by the lock before the first scored trial; the controls report is committed with the campaign results.",
+  "cells": [
+   [
+    "none",
+    10000,
+    0,
+    "healthy",
+    4
+   ],
+   [
+    "none",
+    30000,
+    0,
+    "healthy",
+    4
+   ],
+   [
+    "loss",
+    10000,
+    0,
+    "persistent",
+    4
+   ],
+   [
+    "loss",
+    30000,
+    0,
+    "persistent",
+    4
+   ],
+   [
+    "loss",
+    2500,
+    0,
+    "self_healing",
+    4
+   ],
+   [
+    "loss",
+    4000,
+    0,
+    "self_healing",
+    4
+   ],
+   [
+    "consumer_paused",
+    10000,
+    0,
+    "persistent",
+    4
+   ],
+   [
+    "consumer_paused",
+    30000,
+    0,
+    "persistent",
+    4
+   ],
+   [
+    "delay",
+    10000,
+    1000,
+    "self_healing",
+    4
+   ],
+   [
+    "delay",
+    10000,
+    2500,
+    "self_healing",
+    4
+   ]
+  ]
  },
  "unobservable_fault_classes": [
   {

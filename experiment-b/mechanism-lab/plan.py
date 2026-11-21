@@ -25,13 +25,53 @@ CONFIG_COUNT = 100
 SEED = 20261110
 SCHEMA = "predict-shield/mechanism-experiment-plan/1"
 
+# Version 3.1, revised after the first control run (CONTROLS_RESULT_2026_11_21.md):
+# duplicate and reorder never exposed revoked access without action, delay
+# healed in about 2 s, and loss persisted past the 6 s window only when the
+# cache TTL was longer than the window. Version 3.1 uses two fault modes that
+# persist past the window (loss and a physically paused Kafka listener, each
+# with TTL 10-30 s) in 70 configurations, and keeps 30 configurations whose
+# fault heals within the window (delay 1-2.5 s; loss with TTL 2.5-4 s), where
+# doing nothing is a legitimate outcome.
+SCHEMA_V31 = "predict-shield/mechanism-experiment-plan/3.1"
+FAULTS_V31 = ("loss", "consumer_paused", "delay")
+SEED_V31 = 20261121
+# 20-configuration cycle: 7 persistent loss, 7 persistent listener pause,
+# 3 self-healing delay, 3 self-healing short-TTL loss.
+V31_CYCLE = (("loss", "persistent"), ("consumer_paused", "persistent"),
+             ("loss", "persistent"), ("consumer_paused", "persistent"),
+             ("delay", "self_healing"), ("loss", "persistent"),
+             ("consumer_paused", "persistent"), ("loss", "self_healing"),
+             ("loss", "persistent"), ("consumer_paused", "persistent"),
+             ("loss", "persistent"), ("consumer_paused", "persistent"),
+             ("delay", "self_healing"), ("loss", "persistent"),
+             ("consumer_paused", "persistent"), ("loss", "self_healing"),
+             ("loss", "persistent"), ("consumer_paused", "persistent"),
+             ("delay", "self_healing"), ("loss", "self_healing"))
+
 
 def digest(*parts: object) -> str:
     """Derive stable manifest IDs without dependence on Python hash seeds."""
     return hashlib.sha256("|".join(map(str, parts)).encode("utf-8")).hexdigest()[:16]
 
 
-def create_plan(seed: int = SEED) -> tuple[list[dict], list[dict]]:
+def v31_fault_settings(i: int, seed: int) -> dict:
+    """Fault mode, control class, TTL and delay for version 3.1 configuration i.
+
+    Drawn from a separate generator so the version 3 plan stays byte-identical."""
+    mode, control_class = V31_CYCLE[i % len(V31_CYCLE)]
+    rng = random.Random(int(digest("v3.1", seed, i), 16))
+    if control_class == "persistent":
+        ttl, delay = rng.randint(10000, 30000), 0
+    elif mode == "delay":
+        ttl, delay = rng.randint(10000, 30000), rng.randint(1000, 2500)
+    else:
+        ttl, delay = rng.randint(2500, 4000), 0
+    return {"fault_mode": mode, "control_class": control_class,
+            "cache_ttl_ms": ttl, "event_delay_ms": delay}
+
+
+def create_plan(seed: int | None = None, version: str = "v3") -> tuple[list[dict], list[dict]]:
     """Generate precisely 100 disjoint cases and 1,200 paired action replays.
 
     Inputs are constrained to the operational envelope of the existing three
@@ -40,6 +80,10 @@ def create_plan(seed: int = SEED) -> tuple[list[dict], list[dict]]:
     measured throughput value. Each configuration/repeat uses one shared seed
     for all four action replays.
     """
+    if version not in ("v3", "v3.1"):
+        raise ValueError("Unknown plan version")
+    if seed is None:
+        seed = SEED if version == "v3" else SEED_V31
     rng = random.Random(seed)
     splits = [label for label, count in PARTITIONS.items() for _ in range(count)]
     rng.shuffle(splits)
@@ -92,6 +136,9 @@ def create_plan(seed: int = SEED) -> tuple[list[dict], list[dict]]:
             "oracle_inventory_processes": 4,
             "scenario_seed": rng.getrandbits(63),
         }
+        if version == "v3.1":
+            conf.update(v31_fault_settings(i, seed))
+            conf["schema"] = SCHEMA_V31
         configs.append(conf)
         for repeat in range(REPEATS):
             seed_for_repeat = int(digest(seed, i, repeat), 16)
@@ -102,7 +149,7 @@ def create_plan(seed: int = SEED) -> tuple[list[dict], list[dict]]:
             random.Random(seed_for_repeat).shuffle(order)
             for action in order:
                 trials.append({
-                    "schema": SCHEMA,
+                    "schema": conf["schema"],
                     "run_id": "mechanism-run-" + digest(seed, i, repeat, action),
                     "configuration_id": conf["configuration_id"],
                     "partition": conf["partition"],
@@ -129,7 +176,8 @@ def validate_plan(configs: list[dict], trials: list[dict]) -> None:
         conf = config_by_id.get(t["configuration_id"])
         if conf is None or t["partition"] != conf["partition"]:
             raise ValueError("Unknown or cross-partition experiment")
-        if t["action_id"] not in ACTIONS or conf["fault_mode"] not in FAULTS:
+        allowed = FAULTS_V31 if conf.get("schema") == SCHEMA_V31 else FAULTS
+        if t["action_id"] not in ACTIONS or conf["fault_mode"] not in allowed:
             raise ValueError("Unsupported action/fault")
         if t["execution_status"] != "PLANNED_NOT_EXECUTED":
             raise ValueError("Manifests must not claim completed experiments")
@@ -143,16 +191,18 @@ def validate_plan(configs: list[dict], trials: list[dict]) -> None:
             raise ValueError("Paired conditions must share a seed")
 
 
-def save_plan(folder: Path, seed: int = SEED) -> None:
+def save_plan(folder: Path, seed: int | None = None, version: str = "v3") -> None:
     """Write reproducible JSON Lines without producing any training labels."""
-    configs, trials = create_plan(seed)
+    configs, trials = create_plan(seed, version)
+    if seed is None:
+        seed = SEED if version == "v3" else SEED_V31
     folder.mkdir(parents=True, exist_ok=True)
     for name, rows in (("configurations.jsonl", configs), ("trials.jsonl", trials)):
         with (folder / name).open("w", encoding="utf-8") as file:
             for item in rows:
                 file.write(json.dumps(item, sort_keys=True) + "\n")
     (folder / "protocol.json").write_text(json.dumps({
-        "schema": SCHEMA, "configurations": 100, "planned_trials": 1200,
+        "schema": configs[0]["schema"], "version": version, "configurations": 100, "planned_trials": 1200,
         "splits": PARTITIONS, "seed": seed, "repeats": REPEATS,
         "physical_enforcers": 4, "gateway_visible_enforcers": "3_or_4_by_scenario",
         "outcomes_collected": False, "model_trained": False,
@@ -169,9 +219,10 @@ def main() -> None:
     """Expose an idempotent, local-only manifest-generation CLI."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, default=Path("plans/mechanism"))
-    parser.add_argument("--seed", type=int, default=SEED)
+    parser.add_argument("--seed", type=int, default=None)
+    parser.add_argument("--version", choices=("v3", "v3.1"), default="v3")
     args = parser.parse_args()
-    save_plan(args.output, args.seed)
+    save_plan(args.output, args.seed, args.version)
     print("Generated 100 grouped configurations and 1,200 PLANNED mechanism replays")
 
 

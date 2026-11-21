@@ -6,7 +6,9 @@
 - Rerun rule in `campaign.py`: one rerun per infrastructure failure, then exclusion, counted across invocations and logged.
 - `controls.py`: positive controls per fault mode (inject, no action, 18 s of oracle reads) with self-heal rates, and a no-fault negative control. Runs as its own CI job.
 - `verifier_scoring.py`: verifier sensitivity, specificity and abstain rate against oracle truth per fault mode and action, single-evidence and dual-evidence (scope plus post-action operator telemetry, abstain on disagreement). The pilot now records post-action operator telemetry.
-- The preregistration is not locked yet: it locks after the controls pass on this code.
+- First control run: no-fault control healthy (8 of 8). Without action, duplicate and reorder never exposed access, delay healed in about 2 s, and loss persisted past the 6 s window only at TTL 15 s (healing at about 14 s). The verifier made no false VERIFIED on 40 control runs or 40 pilot trials, and abstained on 16 of the 40 pilot trials.
+- Plan v3.1 replaces v3 for the scored campaign: 70 persistent configurations (loss and paused listener, TTL 10-30 s) and 30 self-healing ones (delay; loss with TTL 2.5-4 s). Controls now check each registered cell's class. A 16-trial v3.1 pilot runs in CI.
+- The preregistration is not locked yet: it locks after the v3.1 controls confirm every cell.
 
 ## 2026-11-19: Learned flow detector measured across two networks
 

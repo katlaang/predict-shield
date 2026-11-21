@@ -195,7 +195,7 @@ jobs:
   controls:
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
-    timeout-minutes: 45
+    timeout-minutes: 70
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -211,7 +211,7 @@ jobs:
       - name: Start Kafka and separate enforcement JVMs
         working-directory: experiment-b/mechanism-lab
         run: docker compose up --build -d
-      - name: 'Positive and negative controls: 4 fault modes and no fault, 8 runs each, no action'
+      - name: 'Positive and negative controls for plan v3.1: 10 registered cells, 4 runs each, no action'
         working-directory: experiment-b/mechanism-lab
         run: python controls.py --execute-lab --output reports/controls.json
       - name: Check the controls and score the verifier on them
@@ -224,8 +224,30 @@ jobs:
           s=r["summary"]
           print(json.dumps({m: {k: v for k, v in e.items() if k != "by_cell"} for m, e in s.items()}, indent=1))
           assert s["none"]["verdict"] == "VALID", "negative control reported exposed access"
+          print("plan classes confirmed:", r["plan_classes_confirmed"])
           PY
           python verifier_scoring.py --controls reports/controls.json --output reports/controls-verifier-scoring.json
+      - name: 'Plan v3.1 pilot: one repeat of a persistent loss, a listener pause, a delay and a short-TTL loss configuration'
+        working-directory: experiment-b/mechanism-lab
+        run: |
+          python plan.py --version v3.1 --output plans/ci-v31
+          python - <<'PY'
+          import json
+          c=[json.loads(l) for l in open("plans/ci-v31/configurations.jsonl")]
+          assert [(x["fault_mode"], x["control_class"]) for x in c[:8]][:2] == [("loss","persistent"),("consumer_paused","persistent")]
+          assert (c[4]["fault_mode"], c[7]["fault_mode"], c[7]["control_class"]) == ("delay","loss","self_healing")
+          PY
+          for start in 0 12 48 84; do
+            python campaign.py --execute-lab --plan plans/ci-v31 --records results/ci-v31 --start "$start" --max-trials 4
+          done
+          python campaign.py --audit --plan plans/ci-v31 --records results/ci-v31 > reports/ci-v31-audit.json
+          python - <<'PY'
+          import json
+          d=json.load(open("reports/ci-v31-audit.json"))
+          assert d["complete"] == 16 and d["partial"] == d["invalid"] == d["unexpected_files"] == 0, d
+          PY
+          python verifier_scoring.py --records results/ci-v31 --output reports/ci-v31-verifier-scoring.json
+          rm -rf results/ci-v31 plans/ci-v31
       - if: always()
         uses: actions/upload-artifact@v4
         with:
@@ -233,6 +255,8 @@ jobs:
           path: |
             experiment-b/mechanism-lab/reports/controls.json
             experiment-b/mechanism-lab/reports/controls-verifier-scoring.json
+            experiment-b/mechanism-lab/reports/ci-v31-audit.json
+            experiment-b/mechanism-lab/reports/ci-v31-verifier-scoring.json
           if-no-files-found: ignore
       - name: Shutdown and diagnostics
         if: always()

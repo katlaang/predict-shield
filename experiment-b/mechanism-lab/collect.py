@@ -129,9 +129,12 @@ def separate_records(config: dict, trial: dict, observed: dict) -> dict[str, dic
                 "cache_ttl_ms", "requested_rps", "measurement_seconds",
                 "visible_enforcement_processes", "oracle_inventory_processes",
             )},
-            "experimental_conditions": {k: config[k] for k in (
-                "fault_mode", "fault_target", "event_delay_ms",
-            )},
+            "experimental_conditions": {
+                **{k: config[k] for k in ("fault_mode", "fault_target", "event_delay_ms")},
+                # Evaluation metadata from the positive controls (plan v3.1);
+                # never a model feature.
+                "control_class": config.get("control_class"),
+            },
             "gateway_includes_hidden": config.get("gateway_includes_hidden", True),
             "routing_profile": config.get("routing_profile", "balanced"),
             "complexity_stratum": config.get("complexity_stratum", "SIMPLE"),

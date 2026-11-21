@@ -34,22 +34,21 @@ PREREG = json.loads((Path(__file__).resolve().parent / "PREREGISTRATION.json").r
 CONTROLS = PREREG["controls"]
 CAMPAIGN_WINDOW = CONTROLS["campaign_window_seconds"]
 CONTROL_WINDOW = CONTROLS["control_window_seconds"]
-FAULT_MODES = ("loss", "delay", "duplicate", "reorder")
-GRID = tuple((ttl, delay) for ttl in (2500, 15000) for delay in (0, 2500))
-RUNS_PER_CELL = 2
-PERSIST_MIN = CONTROLS["persist_min_runs"]
 TARGET = "enforcer-b"
+# Registered cells for plan v3.1: (fault mode, TTL ms, delay ms, expected
+# class, runs). Each cell sits at an end of the plan's range for its class.
+CELLS = tuple(tuple(c) for c in CONTROLS["cells"])
+FAULT_MODES = tuple(dict.fromkeys(c[0] for c in CELLS if c[0] != "none"))
 
 
 def schedule() -> list[dict]:
     """The fixed list of control runs, in execution order."""
     runs = []
-    for mode in ("none",) + FAULT_MODES:
-        for ttl, delay in GRID:
-            for r in range(RUNS_PER_CELL):
-                runs.append({"control_id": f"{mode}-ttl{ttl}-d{delay}-{r}", "fault_mode": mode,
-                             "kind": "negative" if mode == "none" else "positive",
-                             "cache_ttl_ms": ttl, "event_delay_ms": delay})
+    for mode, ttl, delay, expected, count in CELLS:
+        for r in range(count):
+            runs.append({"control_id": f"{mode}-ttl{ttl}-d{delay}-{r}", "fault_mode": mode,
+                         "kind": "negative" if mode == "none" else "positive",
+                         "expected": expected, "cache_ttl_ms": ttl, "event_delay_ms": delay})
     return runs
 
 
@@ -93,10 +92,18 @@ def summarise(runs: list[dict]) -> dict:
         for m in members:
             outcomes[m["outcome"]] += 1
         cells = defaultdict(lambda: defaultdict(int))
+        expected = {}
         for m in members:
-            cells[f"ttl{m['cache_ttl_ms']}-d{m['event_delay_ms']}"][m["outcome"]] += 1
+            key = f"ttl{m['cache_ttl_ms']}-d{m['event_delay_ms']}"
+            cells[key][m["outcome"]] += 1
+            expected[key] = m.get("expected")
+        wanted = {"persistent": "PERSISTED", "self_healing": "SELF_HEALED", "healthy": "HEALTHY"}
+        confirmed = {k: (set(v) == {wanted[expected[k]]}) if expected[k] in wanted else None
+                     for k, v in cells.items()}
         entry = {"runs": len(members), "outcomes": dict(outcomes),
-                 "by_cell": {k: dict(v) for k, v in sorted(cells.items())}}
+                 "by_cell": {k: dict(v) for k, v in sorted(cells.items())},
+                 "expected_by_cell": dict(sorted(expected.items())),
+                 "cell_class_confirmed": dict(sorted(confirmed.items()))}
         if mode == "none":
             entry["verdict"] = "VALID" if outcomes["FALSE_FAILURE"] == 0 else "INVALIDATES_CAMPAIGN"
         else:
@@ -105,8 +112,8 @@ def summarise(runs: list[dict]) -> dict:
             entry["self_heal_wilson_95"] = wilson(outcomes["SELF_HEALED"], exercised)
             entry["heal_seconds_within_control_window"] = sorted(
                 t for t in (heal_time(m) for m in members) if t is not None)
-            entry["verdict"] = ("PERSISTENT" if outcomes["PERSISTED"] >= PERSIST_MIN
-                                else "SELF_HEALING_OR_NOT_EXERCISED")
+            entry["verdict"] = ("CONFIRMED" if all(v is True for v in confirmed.values())
+                                else "PLAN_CLASS_NOT_CONFIRMED")
         out[mode] = entry
     return out
 
@@ -163,7 +170,8 @@ def main() -> None:
         "campaign_window_seconds": CAMPAIGN_WINDOW,
         "control_window_seconds": CONTROL_WINDOW,
         "fault_target": TARGET,
-        "grid": [{"cache_ttl_ms": t, "event_delay_ms": d} for t, d in GRID],
+        "cells": [list(c) for c in CELLS],
+        "plan_classes_confirmed": all(e["verdict"] in ("CONFIRMED", "VALID") for e in summarise(runs).values()),
         "summary": summarise(runs),
         "runs": runs,
     }

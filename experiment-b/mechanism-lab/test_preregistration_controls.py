@@ -121,14 +121,33 @@ class ControlTests(unittest.TestCase):
         self.assertEqual(controls.classify(self.run_of("negative", [True] * 19,
                                                        {"gateway_exposure_observed": True})), "FALSE_FAILURE")
 
-    def test_schedule_and_persistence_rule(self):
+    def test_schedule_and_cell_class_rule(self):
         runs = controls.schedule()
-        self.assertEqual(len(runs), 5 * 8)
-        positive = [dict(r, outcome="PERSISTED", oracle_reads=[]) for r in runs if r["fault_mode"] == "loss"]
-        positive[0]["outcome"] = positive[1]["outcome"] = "SELF_HEALED"
-        summary = controls.summarise(positive)
-        self.assertEqual(summary["loss"]["verdict"], "SELF_HEALING_OR_NOT_EXERCISED")
-        self.assertAlmostEqual(summary["loss"]["self_heal_rate_when_exercised"], 0.25)
+        self.assertEqual(len(runs), 40)
+        self.assertEqual({r["fault_mode"] for r in runs}, {"none", "loss", "consumer_paused", "delay"})
+        wanted = {"persistent": "PERSISTED", "self_healing": "SELF_HEALED", "healthy": "HEALTHY"}
+        loss = [dict(r, outcome=wanted[r["expected"]], oracle_reads=[]) for r in runs if r["fault_mode"] == "loss"]
+        self.assertEqual(controls.summarise(loss)["loss"]["verdict"], "CONFIRMED")
+        loss[0]["outcome"] = "SELF_HEALED" if loss[0]["expected"] == "persistent" else "PERSISTED"
+        self.assertEqual(controls.summarise(loss)["loss"]["verdict"], "PLAN_CLASS_NOT_CONFIRMED")
+
+
+class PlanV31Tests(unittest.TestCase):
+    def test_composition_and_v3_unchanged(self):
+        from collections import Counter
+        from plan import create_plan, validate_plan
+        configs, trials = create_plan(version="v3.1")
+        validate_plan(configs, trials)
+        self.assertEqual(len(trials), 1200)
+        mix = Counter((c["fault_mode"], c["control_class"]) for c in configs)
+        self.assertEqual(mix, Counter({("loss", "persistent"): 35, ("consumer_paused", "persistent"): 35,
+                                       ("delay", "self_healing"): 15, ("loss", "self_healing"): 15}))
+        self.assertTrue(all(c["cache_ttl_ms"] >= 10000 for c in configs if c["control_class"] == "persistent"))
+        self.assertTrue(all(c["cache_ttl_ms"] <= 4000 for c in configs
+                            if c["control_class"] == "self_healing" and c["fault_mode"] == "loss"))
+        v3, _ = create_plan()
+        self.assertEqual({c["fault_mode"] for c in v3}, {"loss", "delay", "duplicate", "reorder"})
+        self.assertNotIn("control_class", v3[0])
 
 
 class VerifierScoringTests(unittest.TestCase):
