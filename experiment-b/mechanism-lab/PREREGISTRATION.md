@@ -78,7 +78,9 @@ v3 stays available for the CI pilot.
 
 - **Do-nothing share:** a minimum share of cases where doing nothing is the
   right answer is not set yet.
-- **Cost reporting:** the cost-weighted report is not built yet; the cost
-  matrix itself is fixed in the preregistration.
+- **Q4 calibration:** no analysis for it was locked. The cost-weighted
+  report (`outcome_report.py`) joined the lock through deviation 1. The
+  scored result is in
+  `docs/evidence/MEASURED_MECHANISM_LAB_SCORED_CAMPAIGN_2026_11_21.md`.
 - **No AI-versus-rule comparison:** the campaign makes no comparison between
   the action-outcome estimator and any deterministic rule.
