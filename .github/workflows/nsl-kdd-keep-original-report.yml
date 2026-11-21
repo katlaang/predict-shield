@@ -1,0 +1,35 @@
+name: NSL-KDD keep the original report
+
+# Copies the original measurement artifact of run 44648143458 into the
+# repository before its retention ends, so the evidence does not depend on it.
+
+on:
+  push:
+    branches: [chore/nsl-kdd-original-report]
+    paths: ['.github/workflows/nsl-kdd-keep-original-report.yml']
+
+permissions:
+  contents: write
+  actions: read
+
+jobs:
+  keep:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Download the original artifact and commit it unchanged
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          d=experiment-b/nsl-kdd-anomaly/original-report
+          test ! -d "$d"
+          gh run download 44648143458 --repo "$GITHUB_REPOSITORY" --name nsl-kdd-historical-learned-anomaly-metrics --dir "$d"
+          ( cd "$d" && find . -type f -print0 | sort -z | xargs -0 sha256sum ) | tee "$RUNNER_TEMP/sums.txt"
+          { echo "Original artifact nsl-kdd-historical-learned-anomaly-metrics (artifact 14588404511, run 44648143458),"
+            echo "copied unchanged by run ${{ github.run_id }}. SHA-256 of each file:"; echo; cat "$RUNNER_TEMP/sums.txt"; } > "$d/PROVENANCE.txt"
+          git config user.name katlaang
+          git config user.email katlaang@users.noreply.github.com
+          git add "$d"
+          git commit -m "nsl-kdd: keep the original measurement artifact of run 44648143458 in the repository"
+          git push origin HEAD:${{ github.ref_name }}
