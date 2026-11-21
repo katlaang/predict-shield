@@ -1,7 +1,7 @@
 name: Public training data probe
 
-# Reachability and size only: HEAD requests and directory listings. Downloads
-# nothing larger than a listing.
+# Reachability, listings and API metadata only. Downloads nothing larger than
+# a page or a script.
 
 on:
   push:
@@ -16,21 +16,12 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
-      - name: Probe UQ RDM bundle
+      - name: Probe UQ RDM download chunk and API
         run: |
-          curl -sSL -m 60 https://rdm.uq.edu.au/files/abd2f5d8-e268-4ff0-84fb-f2f7b3ca3e8f -o page.html
-          js=$(grep -o 'src="[^"]*\.js"' page.html | head -1 | sed 's/src="//;s/"$//'); curl -sSL -m 60 "https://rdm.uq.edu.au$js" -o b.js; wc -c b.js
-          for pat in '/api' 'download' 'baseURL' 'files/' 'apiUrl' 'https://[a-z0-9.-]*uq\.edu\.au[^"`'"'"' ]*'; do
-            echo "=== $pat"; grep -o -E ".{0,90}$pat.{0,120}" b.js | sort -u | head -25
+          for c in download-DFRITavk.js openFileDownload-uFmIzgZv.js view-DLsVmOBp.js; do
+            curl -sSL -m 60 "https://rdm.uq.edu.au/assets/$c" -o c.js; echo "=== $c $(wc -c < c.js)"
+            grep -o -E '.{0,160}(`/[a-z][^`]*`|api\.rdm).{0,200}' c.js | head -20 || true
           done
-      - name: Probe CIC-UNSW-NB15 (listing, headers, first 3 KB of each CSV)
-        run: |
-          base=http://cicresearch.ca/CICDataset/CIC-UNSW/
-          curl -sSL -m 60 "$base" | sed -e 's/<[^>]*>/ /g' | tr -s ' ' | grep -v '^ *$' | head -40 || true
-          for f in Readme.txt CICFlowMeter_out.csv Data.csv Label.csv; do
-            for u in "$base$f" "${base}Dataset/$f"; do
-              echo "=== $u"; curl -sSIL -m 40 "$u" | grep -i -E '^HTTP/|content-length|last-modified|etag' | tail -4 || true
-            done
+          for path in files/abd2f5d8-e268-4ff0-84fb-f2f7b3ca3e8f files/abd2f5d8-e268-4ff0-84fb-f2f7b3ca3e8f/download datasetfiles/abd2f5d8-e268-4ff0-84fb-f2f7b3ca3e8f v1/files/abd2f5d8-e268-4ff0-84fb-f2f7b3ca3e8f; do
+            echo "=== api $path"; curl -sS -m 40 -o r.bin -w "%{http_code} %{size_download} %{content_type}\n" "https://api.rdm.uq.edu.au/$path" || true; head -c 600 r.bin; echo
           done
-          echo "=== Readme"; curl -sSL -m 60 "${base}Readme.txt" | head -60 || true
-          for f in CICFlowMeter_out.csv Data.csv Label.csv; do echo "=== head $f"; curl -sSL -m 60 -r 0-3000 "$base$f" | head -c 3000; echo; done
