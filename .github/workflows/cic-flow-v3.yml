@@ -1,0 +1,143 @@
+name: Cross-dataset flow detector v3
+
+# Develop on CIC-IDS2017 and CSE-CIC-IDS2018 (improved), freeze, then score
+# HIKARI-2021 once. See experiment-b/cic-flow-v3/protocol_v3.json.
+#   stage=develop  samples both development networks, runs the
+#                  leave-one-network-out grid, fits the chosen model on both,
+#                  and commits the frozen bundle and development report to
+#                  the branch. Never downloads the test archive.
+#   stage=test     verifies the committed freeze against the hash given as
+#                  input, downloads HIKARI-2021, checks its pin, scores it
+#                  once and commits the report.
+
+on:
+  push:
+    branches: [feat/cross-dataset-flow-detector-v3]
+    paths: ['experiment-b/cic-flow-v3/**', '.github/workflows/cic-flow-v3.yml']
+  pull_request:
+    paths: ['experiment-b/cic-flow-v3/**', '.github/workflows/cic-flow-v3.yml']
+  workflow_dispatch:
+    inputs:
+      stage:
+        description: 'develop or test'
+        required: true
+        default: 'develop'
+      freeze_sha256:
+        description: 'test stage only: the freeze hash in experiment-b/cic-flow-v3/frozen/freeze.json'
+        default: ''
+
+permissions:
+  contents: read
+
+jobs:
+  unit-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install 'scikit-learn==1.7.2' 'pandas==2.3.3' 'numpy==2.3.4'
+      - working-directory: experiment-b/cic-flow-v3
+        run: python -m unittest test_cic_flow_v3 -v
+
+  develop:
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.stage == 'develop'
+    needs: unit-tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 360
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install 'scikit-learn==1.7.2' 'pandas==2.3.3' 'numpy==2.3.4'
+      - name: Refuse if a freeze is already committed
+        run: test ! -f experiment-b/cic-flow-v3/frozen/freeze.json
+      - name: Download both development archives
+        run: |
+          df -h "$RUNNER_TEMP" | cat
+          for key in cic2017 cic2018; do
+            url=$(python -c "import json;print(json.load(open('experiment-b/cic-flow-v3/protocol_v3.json'))['sources']['development']['$key']['url'])")
+            curl -fSL --retry 8 --retry-all-errors --continue-at - -m 7000 -o "$RUNNER_TEMP/$key.zip" "$url"
+            ls -l "$RUNNER_TEMP/$key.zip"
+          done
+      - name: Sample, run the leave-one-network-out grid, choose, fit on both, freeze
+        working-directory: experiment-b/cic-flow-v3
+        run: |
+          python train_dev_v3.py --archive-2017 "$RUNNER_TEMP/cic2017.zip" --archive-2018 "$RUNNER_TEMP/cic2018.zip" \
+            --out-dir "$RUNNER_TEMP/frozen"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: cic-flow-v3-frozen
+          path: ${{ runner.temp }}/frozen/
+          retention-days: 90
+      - name: Commit the freeze before any test flow is read
+        run: |
+          mkdir -p experiment-b/cic-flow-v3/frozen
+          cp "$RUNNER_TEMP"/frozen/* experiment-b/cic-flow-v3/frozen/
+          git config user.name katlaang
+          git config user.email katlaang@users.noreply.github.com
+          git add experiment-b/cic-flow-v3/frozen
+          git commit -m "cic-flow-v3: record the freeze from develop run ${{ github.run_id }} before the test archive is read"
+          git push origin HEAD:${{ github.ref_name }}
+
+  test:
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.stage == 'test'
+    needs: unit-tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install 'scikit-learn==1.7.2' 'pandas==2.3.3' 'numpy==2.3.4'
+      - name: Refuse if a test report is already committed
+        run: test ! -f experiment-b/cic-flow-v3/frozen/test-report.json
+      - name: Download the test archive and check its pin
+        run: |
+          url=$(python -c "import json;print(json.load(open('experiment-b/cic-flow-v3/protocol_v3.json'))['sources']['test']['url'])")
+          curl -fSL --retry 8 --retry-all-errors -m 1800 -o "$RUNNER_TEMP/test.zip" "$url"
+          got=$(sha256sum "$RUNNER_TEMP/test.zip" | cut -d' ' -f1)
+          want=$(python -c "import json;print(json.load(open('experiment-b/cic-flow-v3/protocol_v3.json'))['sources']['test']['sha256'])")
+          echo "downloaded $got"; echo "pinned     $want"
+          test "$got" = "$want"
+      - name: Score every test flow once
+        working-directory: experiment-b/cic-flow-v3
+        run: |
+          python score_test_v3.py --archive "$RUNNER_TEMP/test.zip" --frozen-dir frozen \
+            --expected-freeze-sha256 "${{ github.event.inputs.freeze_sha256 }}" --output "$RUNNER_TEMP/test-report.json"
+      - name: Check the accounting
+        run: |
+          python - <<'PY'
+          import json, os
+          r = json.load(open(os.environ["RUNNER_TEMP"] + "/test-report.json"))
+          assert r["rows_in_file"] == 555278, r["rows_in_file"]
+          assert r["flows"] == r["TP"] + r["FP"] + r["FN"] + r["TN"]
+          cats = r["by_category"]
+          assert sum(c["flows"] for c in cats.values()) == r["flows"]
+          assert sum(c["alerts"] for c in cats.values() if c["attack"]) == r["TP"]
+          assert sum(c["alerts"] for c in cats.values() if not c["attack"]) == r["FP"]
+          print("accounting reconciles; passed =", r["passed"])
+          PY
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: cic-flow-v3-test-report
+          path: ${{ runner.temp }}/test-report.json
+          if-no-files-found: warn
+          retention-days: 90
+      - name: Commit the test report
+        run: |
+          cp "$RUNNER_TEMP/test-report.json" experiment-b/cic-flow-v3/frozen/test-report.json
+          git config user.name katlaang
+          git config user.email katlaang@users.noreply.github.com
+          git add experiment-b/cic-flow-v3/frozen/test-report.json
+          git commit -m "cic-flow-v3: record the single HIKARI-2021 test report (run ${{ github.run_id }})"
+          git push origin HEAD:${{ github.ref_name }}
