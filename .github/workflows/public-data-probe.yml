@@ -16,6 +16,18 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
+      - name: Probe UQ RDM download route
+        run: |
+          u=https://rdm.uq.edu.au/files/abd2f5d8-e268-4ff0-84fb-f2f7b3ca3e8f
+          curl -sSL -m 60 "$u" -o page.html; wc -c page.html; head -c 2500 page.html; echo
+          for js in $(grep -o 'src="[^"]*\.js[^"]*"' page.html | sed 's/src="//;s/"$//'); do
+            case "$js" in http*) url=$js;; /*) url=https://rdm.uq.edu.au$js;; *) url=https://rdm.uq.edu.au/$js;; esac
+            echo "=== $url"; curl -sSL -m 60 "$url" -o b.js; wc -c b.js
+            grep -o -E '"[^"]{0,60}(api|download)[^"]{0,80}"' b.js | sort -u | head -60
+          done
+          for path in api/v1/files/abd2f5d8-e268-4ff0-84fb-f2f7b3ca3e8f api/files/abd2f5d8-e268-4ff0-84fb-f2f7b3ca3e8f api/v1/datasetfiles/abd2f5d8-e268-4ff0-84fb-f2f7b3ca3e8f files/abd2f5d8-e268-4ff0-84fb-f2f7b3ca3e8f/download api/v1/files/abd2f5d8-e268-4ff0-84fb-f2f7b3ca3e8f/download; do
+            echo "=== $path"; curl -sS -m 40 -o r.bin -w "%{http_code} %{size_download} %{content_type}\n" "https://rdm.uq.edu.au/$path"; head -c 400 r.bin; echo
+          done
       - name: Probe CIC-UNSW-NB15 (listing, headers, first 3 KB of each CSV)
         run: |
           base=http://cicresearch.ca/CICDataset/CIC-UNSW/
