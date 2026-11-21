@@ -21,6 +21,7 @@ jobs:
           curl -sSL -m 60 https://zenodo.org/api/records/6463389 | python3 -c "import json,sys;d=json.load(sys.stdin);print(d['metadata'].get('license'),d['metadata'].get('version'));[print(f['key'],f['size'],f['checksum'],f['links']['self']) for f in d['files']]"
           url=$(curl -sSL -m 60 https://zenodo.org/api/records/6463389 | python3 -c "import json,sys;d=json.load(sys.stdin);print([f['links']['self'] for f in d['files'] if f['key']=='ALLFLOWMETER_HIKARI2021.csv.zip'][0])")
           curl -fsSL --retry 5 -m 900 -o h.zip "$url"; ls -l h.zip; sha256sum h.zip
+          pip install -q pandas
           python3 - <<'PY'
           import zipfile, pandas as pd
           z = zipfile.ZipFile("h.zip"); print([ (i.filename, i.file_size) for i in z.infolist()])
