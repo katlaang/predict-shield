@@ -1,0 +1,283 @@
+{
+ "campaign": {
+  "arms": {
+   "persistent": {
+    "gateway_restrict": {
+     "configurations": 70,
+     "configurations_remediated_in_majority_of_repeats": 0,
+     "error_counts": {
+      "abstention": 210,
+      "disruption": 105,
+      "late_fix": 0,
+      "missed_fix": 210,
+      "unnecessary_action": 0
+     },
+     "exposure_seconds_lower_mean": 0.24732253612855098,
+     "exposure_seconds_upper_mean": 0.2502096777809194,
+     "failed_requests_mean": 25.49047619047619,
+     "mean_cost_by_missed_weight": {
+      "1": 5.5,
+      "20": 24.5,
+      "5": 9.5
+     },
+     "remediated": 0,
+     "trials": 210
+    },
+    "monitor_only": {
+     "configurations": 70,
+     "configurations_remediated_in_majority_of_repeats": 0,
+     "error_counts": {
+      "abstention": 43,
+      "disruption": 0,
+      "late_fix": 0,
+      "missed_fix": 210,
+      "unnecessary_action": 0
+     },
+     "exposure_seconds_lower_mean": 0.9011512603428974,
+     "exposure_seconds_upper_mean": 0.9040774434429013,
+     "failed_requests_mean": 0,
+     "mean_cost_by_missed_weight": {
+      "1": 1.4095238095238096,
+      "20": 20.409523809523808,
+      "5": 5.40952380952381
+     },
+     "remediated": 0,
+     "trials": 210
+    },
+    "restart_enforcer": {
+     "configurations": 70,
+     "configurations_remediated_in_majority_of_repeats": 70,
+     "error_counts": {
+      "abstention": 134,
+      "disruption": 47,
+      "late_fix": 31,
+      "missed_fix": 0,
+      "unnecessary_action": 0
+     },
+     "exposure_seconds_lower_mean": 0.37909461136185396,
+     "exposure_seconds_upper_mean": 0.8694987533904341,
+     "failed_requests_mean": 17.64761904761905,
+     "mean_cost_by_missed_weight": {
+      "1": 3.1333333333333333,
+      "20": 3.1333333333333333,
+      "5": 3.1333333333333333
+     },
+     "remediated": 210,
+     "trials": 210
+    },
+    "resync_policy": {
+     "configurations": 70,
+     "configurations_remediated_in_majority_of_repeats": 0,
+     "error_counts": {
+      "abstention": 43,
+      "disruption": 0,
+      "late_fix": 0,
+      "missed_fix": 210,
+      "unnecessary_action": 0
+     },
+     "exposure_seconds_lower_mean": 0.825242172238152,
+     "exposure_seconds_upper_mean": 0.8281559843571672,
+     "failed_requests_mean": 0,
+     "mean_cost_by_missed_weight": {
+      "1": 1.4095238095238096,
+      "20": 20.409523809523808,
+      "5": 5.40952380952381
+     },
+     "remediated": 0,
+     "trials": 210
+    }
+   },
+   "self_healing": {
+    "gateway_restrict": {
+     "configurations": 30,
+     "configurations_remediated_in_majority_of_repeats": 30,
+     "error_counts": {
+      "abstention": 90,
+      "disruption": 48,
+      "late_fix": 0,
+      "missed_fix": 0,
+      "unnecessary_action": 90
+     },
+     "exposure_seconds_lower_mean": 0.21428835734444268,
+     "exposure_seconds_upper_mean": 0.21725819002217578,
+     "failed_requests_mean": 27.033333333333335,
+     "mean_cost_by_missed_weight": {
+      "1": 5.666666666666667,
+      "20": 5.666666666666667,
+      "5": 5.666666666666667
+     },
+     "remediated": 90,
+     "trials": 90
+    },
+    "monitor_only": {
+     "configurations": 30,
+     "configurations_remediated_in_majority_of_repeats": 30,
+     "error_counts": {
+      "abstention": 77,
+      "disruption": 0,
+      "late_fix": 0,
+      "missed_fix": 0,
+      "unnecessary_action": 0
+     },
+     "exposure_seconds_lower_mean": 0.32876452231107073,
+     "exposure_seconds_upper_mean": 0.3315933054222266,
+     "failed_requests_mean": 0,
+     "mean_cost_by_missed_weight": {
+      "1": 1.711111111111111,
+      "20": 1.711111111111111,
+      "5": 1.711111111111111
+     },
+     "remediated": 90,
+     "trials": 90
+    },
+    "restart_enforcer": {
+     "configurations": 30,
+     "configurations_remediated_in_majority_of_repeats": 30,
+     "error_counts": {
+      "abstention": 68,
+      "disruption": 23,
+      "late_fix": 6,
+      "missed_fix": 0,
+      "unnecessary_action": 90
+     },
+     "exposure_seconds_lower_mean": 0.29995180639999086,
+     "exposure_seconds_upper_mean": 0.6986959355223209,
+     "failed_requests_mean": 16.7,
+     "mean_cost_by_missed_weight": {
+      "1": 4.122222222222222,
+      "20": 4.122222222222222,
+      "5": 4.122222222222222
+     },
+     "remediated": 90,
+     "trials": 90
+    },
+    "resync_policy": {
+     "configurations": 30,
+     "configurations_remediated_in_majority_of_repeats": 30,
+     "error_counts": {
+      "abstention": 79,
+      "disruption": 0,
+      "late_fix": 0,
+      "missed_fix": 0,
+      "unnecessary_action": 90
+     },
+     "exposure_seconds_lower_mean": 0.32045569972215665,
+     "exposure_seconds_upper_mean": 0.32337411267775074,
+     "failed_requests_mean": 0,
+     "mean_cost_by_missed_weight": {
+      "1": 2.7555555555555555,
+      "20": 2.7555555555555555,
+      "5": 2.7555555555555555
+     },
+     "remediated": 90,
+     "trials": 90
+    }
+   }
+  },
+  "controls_confirmed": true,
+  "costs": {
+   "persistent": {
+    "lowest": {
+     "1:1": [
+      "monitor_only",
+      "resync_policy"
+     ],
+     "1:20": [
+      "restart_enforcer"
+     ],
+     "1:5": [
+      "restart_enforcer"
+     ]
+    },
+    "robust": false
+   },
+   "self_healing": {
+    "lowest": {
+     "1:1": [
+      "monitor_only"
+     ],
+     "1:20": [
+      "monitor_only"
+     ],
+     "1:5": [
+      "monitor_only"
+     ]
+    },
+    "robust": true
+   }
+  },
+  "lock": "9422667f129b2da8d1d121387f2f8dc0a2b0f40777d6f4b7c635bf39243f973b",
+  "missing": 0,
+  "planned": 1200,
+  "run": "https://github.com/katlaang/predict-shield/actions/runs/44879497946",
+  "source": "https://github.com/katlaang/predict-shield/blob/master/docs/evidence/MEASURED_MECHANISM_LAB_SCORED_CAMPAIGN_2026_11_21.md",
+  "trials": 1200,
+  "verifier": {
+   "dual_evidence": {
+    "FN": 0,
+    "TN": 334,
+    "TP": 122,
+    "abstain_truly_denied": 448,
+    "abstain_truly_exposed": 296,
+    "cases": 1200,
+    "false_VERIFIED": 0
+   },
+   "single_evidence": {
+    "FN": 0,
+    "TN": 334,
+    "TP": 173,
+    "abstain_truly_denied": 397,
+    "abstain_truly_exposed": 296,
+    "cases": 1200,
+    "false_VERIFIED": 0
+   }
+  }
+ },
+ "exploit": {
+  "cves": 39924,
+  "exploited": 161,
+  "roc_auc": 0.8756174589098795,
+  "source": "https://github.com/katlaang/predict-shield/blob/master/docs/evidence/MEASURED_EXPLOIT_LIKELIHOOD_2026_11_20.md",
+  "top": {
+   "top_10pct": {
+    "positives_found": 99,
+    "recall": 0.6149068322981367,
+    "rows": 3992
+   },
+   "top_1pct": {
+    "positives_found": 53,
+    "recall": 0.32919254658385094,
+    "rows": 399
+   },
+   "top_5pct": {
+    "positives_found": 83,
+    "recall": 0.515527950310559,
+    "rows": 1996
+   }
+  }
+ },
+ "misses": [
+  {
+   "detection": 16,
+   "false_alarm_rate": 0.030138876908479256,
+   "name": "Substation GOOSE detector",
+   "scenarios": 16,
+   "source": "https://github.com/katlaang/predict-shield/blob/master/docs/evidence/MEASURED_POWERDUCK_GOOSE_DETECTOR_2026_11_21.md",
+   "target": "False alarms at most 1% and at least 12 of 16 scenarios caught"
+  },
+  {
+   "detection_rate": 0.00832348945506324,
+   "false_alarm_rate": 0.005487473254855533,
+   "name": "Network-flow detector v2",
+   "source": "https://github.com/katlaang/predict-shield/blob/master/docs/evidence/MEASURED_CROSS_DATASET_FLOW_DETECTOR_V2_2026_11_20.md",
+   "target": "False alarms at most 1%"
+  },
+  {
+   "detection_rate": 0.0013919268244183733,
+   "false_alarm_rate": 0.013605245046546166,
+   "name": "Network-flow detector v3",
+   "source": "https://github.com/katlaang/predict-shield/blob/master/docs/evidence/MEASURED_CROSS_DATASET_FLOW_DETECTOR_V3_2026_11_23.md",
+   "target": "False alarms at most 1% and at least 50% detection"
+  }
+ ]
+}

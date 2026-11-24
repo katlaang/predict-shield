@@ -1,0 +1,56 @@
+name: Showcase data export
+
+# Builds the showcase site's data files from recorded results and commits them:
+#  * one compact row per scored mechanism-lab trial, from run 44879497946's
+#    record artifact (also keeps those records in the repository past the
+#    artifact's 90-day retention, in compact form);
+#  * exploitation ranks for CVEs published since 2025, from the frozen model.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: read
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install 'scikit-learn==1.7.2' 'pandas==2.3.3' 'numpy==2.3.4' 'scipy==1.16.3'
+      - name: Trial table from the scored campaign records
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh run download 44879497946 --repo "$GITHUB_REPOSITORY" --name mechanism-scored-records --dir "$RUNNER_TEMP/records"
+          find "$RUNNER_TEMP/records" -maxdepth 3 -type d | head -20
+          rec=$(dirname "$(find "$RUNNER_TEMP/records" -type d -name verification | head -1)")
+          echo "records at $rec"
+          (cd experiment-b/mechanism-lab && python plan.py --version v3.1 --output "$RUNNER_TEMP/plans/v31")
+          python showcase/scripts/export_trials.py --plan "$RUNNER_TEMP/plans/v31" --records "$rec" \
+            --output showcase/public/data/trials.json
+      - name: CVE ranks from the frozen exploitation model
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          d=experiment-b/exploit-likelihood/frozen
+          tag=$(python -c "import json;print(json.load(open('$d/cve-source.json'))['cvelistV5_release'])")
+          asset=$(python -c "import json;print(json.load(open('$d/cve-source.json'))['asset'])")
+          gh release download "$tag" --repo CVEProject/cvelistV5 --pattern "$asset" --dir "$RUNNER_TEMP"
+          got=$(sha256sum "$RUNNER_TEMP/$asset" | cut -d' ' -f1); want=$(head -1 $d/pins.txt | cut -d' ' -f1)
+          test "$got" = "$want"
+          (cd experiment-b/exploit-likelihood && python run_model.py build --cve-zip "$RUNNER_TEMP/$asset" --output "$RUNNER_TEMP/records.jsonl.gz")
+          python showcase/scripts/export_cve_ranks.py --records "$RUNNER_TEMP/records.jsonl.gz" --out-dir showcase/public/data
+          ls -la showcase/public/data
+      - name: Commit the data
+        run: |
+          git config user.name katlaang
+          git config user.email katlaang@users.noreply.github.com
+          git add showcase/public/data
+          git commit -m "showcase: data export from recorded results (run ${{ github.run_id }})"
+          git push origin HEAD:${{ github.ref_name }}
