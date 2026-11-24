@@ -270,7 +270,7 @@
    "false_alarm_rate": 0.005487473254855533,
    "name": "Network-flow detector v2",
    "source": "https://github.com/katlaang/predict-shield/blob/master/docs/evidence/MEASURED_CROSS_DATASET_FLOW_DETECTOR_V2_2026_11_20.md",
-   "target": "False alarms at most 1%"
+   "target": "False alarms at most 1% (met). No detection floor was set, and detection was under 1%"
   },
   {
    "detection_rate": 0.0013919268244183733,

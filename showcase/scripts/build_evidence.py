@@ -64,7 +64,7 @@ def main() -> None:
              "detection": pd["scenarios_detected"], "scenarios": pd["scenarios_total"],
              "false_alarm_rate": pd["non_malicious_alert_rate"]},
             {"name": "Network-flow detector v2", "source": REPO + "docs/evidence/MEASURED_CROSS_DATASET_FLOW_DETECTOR_V2_2026_11_20.md",
-             "target": "False alarms at most 1%", "detection_rate": v2_det,
+             "target": "False alarms at most 1% (met). No detection floor was set, and detection was under 1%", "detection_rate": v2_det,
              "false_alarm_rate": v2.get("benign_alert_rate") or v2.get("pooled", {}).get("benign_alert_rate")},
             {"name": "Network-flow detector v3", "source": REPO + "docs/evidence/MEASURED_CROSS_DATASET_FLOW_DETECTOR_V3_2026_11_23.md",
              "target": "False alarms at most 1% and at least 50% detection",
