@@ -1,0 +1,37 @@
+{
+ "archive_sha256": "38c5e779e10d2cc5c4232ff966ba09c1e11affb296a0fdd7bad4be5b088ac58b",
+ "code_sha256": {
+  "detector_v3.py": "25f2fbde3e5123c4846307e1b9bb97ab1ad9944897aed8dbc83f2489c102d9eb",
+  "gated_history.py": "7747356c18285da8ebe35399b64918e3ec11ac3d978889c67c68c12afb619c04",
+  "goose_features.py": "b73fb66a29d73594bbcb00937197524485d88f3dcea6b4afb172d5b74f16068e",
+  "protocol_v3.json": "c6f04193f3ed224f84a8ef35043916f6e340bf0dd85cc02ee7a1d4d7cd1829e8"
+ },
+ "fit_rows": 18884,
+ "freeze_sha256": "93e14a4cb7b0d5bef9d7b4953ae7f145b7439e7c210b2479d8bb27b73414baec",
+ "held_out_normal": {
+  "false_incidents_per_hour": 57.91128837389518,
+  "hours": 1.036067434946696,
+  "incidents": 60
+ },
+ "known_streams": [
+  "b4b15a0e843b>010ccd010000",
+  "b4b15a0e843b>010ccd010001",
+  "b4b15a0e843b>010ccd010002",
+  "b4b15a0e8444>010ccd010003",
+  "b4b15a0e8444>010ccd010004",
+  "b4b15a0e8444>010ccd010005",
+  "b4b15a0e844a>010ccd010006",
+  "b4b15a0e844a>010ccd010007",
+  "b4b15a0e844a>010ccd010008"
+ ],
+ "model_sha256": "4a8a86ae2adc130c81716585880d052e60c87406ddb98928fe6bda559a2089e7",
+ "schema": "predict-shield/powerduck-v3-freeze/1",
+ "sklearn": "1.7.2",
+ "threshold": 0.6277187910046249,
+ "threshold_rounds": [
+  0.6269937285759767,
+  0.6277187910046249,
+  0.6277187910046249
+ ],
+ "threshold_rows": 8096
+}

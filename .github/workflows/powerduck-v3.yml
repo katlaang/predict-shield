@@ -1,0 +1,122 @@
+name: PowerDuck GOOSE detector v3
+
+# Learned anomaly detector for IEC 61850 GOOSE on the PowerDuck captures.
+# See experiment-b/powerduck-v3/protocol_v3.json.
+#   stage=develop  normal captures only: leave-one-capture-out report, fit,
+#                  threshold, freeze; commits the freeze to the branch.
+#   stage=test     verifies the committed freeze against the input hash and
+#                  scores all 16 attack captures once; commits the report.
+
+on:
+  push:
+    branches: [feat/powerduck-v3]
+    paths: ['experiment-b/powerduck-v3/**', '.github/workflows/powerduck-v3.yml']
+  pull_request:
+    paths: ['experiment-b/powerduck-v3/**', '.github/workflows/powerduck-v3.yml']
+  workflow_dispatch:
+    inputs:
+      stage:
+        description: 'develop or test'
+        default: 'develop'
+      freeze_sha256:
+        description: 'test stage only: the freeze hash in experiment-b/powerduck-v3/frozen/freeze.json'
+        default: ''
+
+permissions:
+  contents: read
+
+jobs:
+  unit-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install 'scikit-learn==1.7.2' 'numpy==2.3.4'
+      - working-directory: experiment-b/powerduck-v3
+        run: PYTHONPATH=../powerduck python -m unittest test_powerduck_v3 test_corrected_incident_accounting -v
+
+  run:
+    if: github.event_name == 'workflow_dispatch'
+    needs: unit-tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install 'scikit-learn==1.7.2' 'numpy==2.3.4'
+      - name: Download the archive from Zenodo
+        run: |
+          for attempt in 1 2 3 4 5; do
+            curl -sSL -m 60 -H 'Accept: application/json' -A 'predict-shield-ci' \
+              "$(python -c "import json;print(json.load(open('experiment-b/powerduck-v3/protocol_v3.json'))['source']['record'])")" -o rec.json || true
+            python3 -c "import json;json.load(open('rec.json'))" 2>/dev/null && break
+            sleep $((attempt * 15))
+          done
+          url=$(python3 -c "import json;print(json.load(open('rec.json'))['files'][0]['links']['self'])")
+          curl -fsSL --retry 5 --retry-all-errors -m 300 -A 'predict-shield-ci' -o "$RUNNER_TEMP/powerduck.zip" "$url"
+          sha256sum "$RUNNER_TEMP/powerduck.zip"
+      - name: Develop on normal captures and freeze
+        if: github.event.inputs.stage == 'develop'
+        working-directory: experiment-b/powerduck-v3
+        run: |
+          test ! -f frozen/freeze.json
+          python detector_v3.py develop --archive "$RUNNER_TEMP/powerduck.zip" --out-dir frozen
+          git config user.name katlaang
+          git config user.email katlaang@users.noreply.github.com
+          git add frozen
+          git commit -m "powerduck-v3: record the freeze from develop run ${{ github.run_id }} before version 3 reads any attack capture"
+          git push origin HEAD:${{ github.ref_name }}
+      - name: Score the 16 attack captures once
+        if: github.event.inputs.stage == 'test'
+        working-directory: experiment-b/powerduck-v3
+        run: |
+          test ! -f frozen/test-report.json
+          python detector_v3.py test --archive "$RUNNER_TEMP/powerduck.zip" --frozen-dir frozen \
+            --expected-freeze-sha256 "${{ github.event.inputs.freeze_sha256 }}" --output frozen/test-report.json
+          git config user.name katlaang
+          git config user.email katlaang@users.noreply.github.com
+          git add frozen/test-report.json
+          git commit -m "powerduck-v3: record the third attack-capture measurement (run ${{ github.run_id }})"
+          git push origin HEAD:${{ github.ref_name }}
+
+  retrospective-incident-audit:
+    if: github.event_name == 'pull_request'
+    needs: unit-tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install 'scikit-learn==1.7.2' 'numpy==2.3.4'
+      - name: Download and pin original PowerDuck capture archive
+        run: |
+          for attempt in 1 2 3 4 5; do
+            curl -sSL -m 60 -H 'Accept: application/json' -A 'predict-shield-ci' \
+              "$(python -c "import json;print(json.load(open('experiment-b/powerduck-v3/protocol_v3.json'))['source']['record'])")" -o rec.json || true
+            python3 -c "import json;json.load(open('rec.json'))" 2>/dev/null && break
+            sleep $((attempt * 15))
+          done
+          url=$(python3 -c "import json;print(json.load(open('rec.json'))['files'][0]['links']['self'])")
+          curl -fsSL --retry 5 --retry-all-errors -m 300 -A 'predict-shield-ci' -o "$RUNNER_TEMP/powerduck.zip" "$url"
+      - name: Correct incident truth accounting without modifying frozen scorer
+        run: |
+          python experiment-b/powerduck-v3/corrected_incident_accounting.py \
+            --archive "$RUNNER_TEMP/powerduck.zip" \
+            --frozen-dir experiment-b/powerduck-v3/frozen \
+            --output "$RUNNER_TEMP/powerduck-v3-retrospective-accounting.json"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: powerduck-v3-retrospective-corrected-incidents
+          path: ${{ runner.temp }}/powerduck-v3-retrospective-accounting.json
+          if-no-files-found: error
