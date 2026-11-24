@@ -1,0 +1,39 @@
+{
+ "code_sha256": {
+  "features_v3.py": "8a64d45fe7187c5de3097aa07874af5456d285271b9ff463b68391781d57a5b9",
+  "protocol_v3.json": "f4d84ad3a4b38153ac77d4f4cd277afd7db890cd8c8b347a991d82016a3ada39",
+  "score_test_v3.py": "409506b35e5083981843c14b24f8a572516e246a71452be520ea331cb3d3748c",
+  "train_dev_v3.py": "963684aa71062c7c645ae9219ea6190ae152218ca8478aaf38dc77b5cf9a8e9b"
+ },
+ "config": {
+  "feature_set": "flow+service",
+  "max_iter": 100,
+  "max_leaf_nodes": 15
+ },
+ "development_archives_sha256": {
+  "cic2017": "97fdb91d339e2d8cf5627f981b831e5e7e400b981c58181c451a38fd03c48883",
+  "cic2018": "7f7b6f8065a88527bcb6e1579f088e1d0480a49903c5fd7e4e907ab238344f6e"
+ },
+ "development_families": [
+  "botnet",
+  "brute-force-ftp",
+  "brute-force-ssh",
+  "ddos",
+  "dos-goldeneye",
+  "dos-hulk",
+  "dos-slow",
+  "heartbleed",
+  "infiltration",
+  "portscan",
+  "web-attack",
+  "web-brute-force"
+ ],
+ "freeze_sha256": "36f81ceace5c5428af01366efe987f8449e5abd4a6b1e385c0a227b638bfecaf",
+ "numpy": "2.3.4",
+ "pandas": "2.3.3",
+ "schema": "predict-shield/cic-flow-v3-freeze/1",
+ "sklearn": "1.7.2",
+ "supervised_sha256": "a5bcd9aacefdb6c75dc23c2deeaf95164b85f188069af89e9bff254c85c30989",
+ "test_pin": "ba09d35269566fd2f269871043b24e7d8e372bc4a47e9c2027729e5ff2e660e0",
+ "training_rows": 1169723
+}

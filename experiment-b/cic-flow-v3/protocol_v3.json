@@ -1,0 +1,67 @@
+{
+ "name": "cross-dataset flow detector, version 3: CIC-IDS2017 and CSE-CIC-IDS2018 to HIKARI-2021",
+ "registered": "2026-11-21, before any version 3 code read a HIKARI-2021 flow",
+ "relation_to_earlier_versions": "Versions 1 and 2 read every CIC-IDS2017 and CSE-CIC-IDS2018 label, so both are development data here. HIKARI-2021 is a third network, captured with a different flow meter (Zeek flowmeter). Before this protocol its column list, label counts and every field of its first three rows were seen once, when its schema was probed; no other value was read.",
+ "changes_from_version_2": {
+  "verified_normal_calibration": "The anomaly model and both thresholds use only flows marked normal on the network being calibrated, so known attacks cannot be absorbed into them. Code asserts that no attack row enters a verified-normal set. Version 2 set its thresholds on an unlabelled day that held brute-force attacks.",
+  "detection_floor": "The pass condition adds a detection floor to the false-alarm ceiling.",
+  "training_fit_and_capacity": "Training fit is reported beside held-out results. Model size and feature set are chosen on development data only, by a rule fixed here, with a learning curve.",
+  "more_varied_training": "The final model is trained on both development networks, so it sees more than one capture per family."
+ },
+ "sources": {
+  "development": {
+   "cic2017": {
+    "dataset": "CIC-IDS2017, improved version by Engelen, Rimmer and Joosen (CNS 2022)",
+    "url": "https://intrusion-detection.distrinet-research.be/CNS2022/Datasets/CICIDS2017_improved.zip",
+    "sha256": "97fdb91d339e2d8cf5627f981b831e5e7e400b981c58181c451a38fd03c48883",
+    "bytes": 343549013
+   },
+   "cic2018": {
+    "dataset": "CSE-CIC-IDS2018, improved version by the same authors",
+    "url": "https://intrusion-detection.distrinet-research.be/CNS2022/Datasets/CSECICIDS2018_improved.zip",
+    "sha256": "7f7b6f8065a88527bcb6e1579f088e1d0480a49903c5fd7e4e907ab238344f6e",
+    "bytes": 10426851729
+   }
+  },
+  "test": {
+   "dataset": "HIKARI-2021 (Ferriyan, Thamrin, Takeda and Murai, Applied Sciences 2021), Zenodo record 6463389 version 1.4.0, CC BY 4.0",
+   "url": "https://zenodo.org/api/records/6463389/files/ALLFLOWMETER_HIKARI2021.csv.zip/content",
+   "sha256": "ba09d35269566fd2f269871043b24e7d8e372bc4a47e9c2027729e5ff2e660e0",
+   "bytes": 68403081,
+   "member": "ALLFLOWMETER_HIKARI2021.csv",
+   "rows": 555278,
+   "pinned_by": "workflow 'Public data probe' run 44864392582: download hash, header and label counts"
+  }
+ },
+ "feature_space": "features_v3.FEATURES: 57 flow statistics defined once with their CICFlowMeter and Zeek flowmeter names, Zeek values converted to CICFlowMeter units (flow_duration seconds to microseconds; inter-arrival, active and idle times already microseconds in both), signed-log transformed. Optional destination-service bucket. No protocol, timestamp context, subflow, bulk, CWR or ECE fields; no addresses, flow ids or labels.",
+ "labels": {
+  "development": "BENIGN and every label containing 'Attempted' are normal; every other label is an attack, grouped by features_v3.FAMILY_PATTERNS.",
+  "test": "Label 1 is an attack; Benign and Background are normal. A traffic_category that disagrees with Label stops the run. Probing maps to portscan, Bruteforce and Bruteforce-XML to web-brute-force; XMRIGCC CryptoMiner has no development counterpart and is reported as cryptominer."
+ },
+ "development": {
+  "k_benign": 60000,
+  "k_attack": 20000,
+  "sampling": "For every (CSV file, family) the rows with the k smallest SHA-256 priorities of (network/file, id); each kept row carries the weight rows seen / rows kept for that key. Split bucket from a second, independent part of the same digest.",
+  "grid": {
+   "feature_sets": ["flow", "flow+service"],
+   "max_leaf_nodes": [15, 31, 63],
+   "max_iter": [100, 300]
+  },
+  "supervised": "sklearn HistGradientBoostingClassifier(learning_rate=0.1, class_weight='balanced', early_stopping=False, random_state=20261121) with the grid's max_leaf_nodes and max_iter",
+  "anomaly": "sklearn IsolationForest(n_estimators=200, max_samples=1024, random_state=20261121) fitted on at most 200,000 verified-normal flows; score = -score_samples",
+  "alert": "supervised attack probability > t_s OR anomaly score > t_a; each threshold at 0.5% of verified-normal flows (features_v3.normal_threshold)",
+  "folds": "leave one network out: train on one development network, calibrate on the other's verified-normal flows (bucket 0 fits the anomaly model, bucket 1 sets thresholds), evaluate on its buckets 2-9 with weights. Training fit uses the same steps on the training network itself.",
+  "selection_rule": "highest mean held-out weighted detection over the two folds among configurations with held-out normal alert rate at most 1% on both folds; ties to the smaller max_leaf_nodes x max_iter, then the smaller feature set",
+  "learning_curve_fractions": [0.1, 0.3, 1.0],
+  "final_model": "the chosen configuration fitted on both networks' samples"
+ },
+ "freeze": "supervised model bytes SHA-256, chosen configuration, SHA-256 of features_v3.py, train_dev_v3.py, score_test_v3.py and this file, both development pins and the test pin. The test stage refuses to run on any mismatch.",
+ "test": {
+  "split": "SHA-256 of 'hikari2021' and the flow uid, ten buckets",
+  "calibration": "buckets 0 and 1; traffic_category read only to keep Benign flows. Bucket 0 Benign fits the anomaly model, bucket 1 Benign sets both thresholds. Background is not used for calibration. Nothing in buckets 0 and 1 is scored.",
+  "scored": "every flow in buckets 2 to 9, once",
+  "reporting": "TP, FP, FN, TN; detection and normal alert rate with Wilson 95% intervals; precision; per traffic_category, which part fired, and whether the family appears in development",
+  "pass_condition": "normal alert rate at most 1% pooled and for Benign and Background separately, AND detection at least 50% of attack flows pooled"
+ },
+ "not_claimed": "Performance on networks other than these three lab captures; attack kinds absent from development (the cryptominer is reported separately); real-time operation; that the CIC captures are unseen (they are development data)."
+}

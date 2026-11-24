@@ -1,5 +1,11 @@
 # Development changelog
 
+## 2026-11-23: Cross-dataset flow detector v3, single HIKARI-2021 test
+
+- Developed on CIC-IDS2017 and CSE-CIC-IDS2018 with verified-normal calibration, a detection floor and a fixed model-selection rule, then tested once on HIKARI-2021 (Zeek flowmeter captures). Development run 44914414336; test run 45314301123.
+- Failed both parts of the condition. It detected 0.14% of attack flows (42 of 30,174) against a 50% floor, and alerted on 1.36% of normal flows against a 1% ceiling (Benign 0.57%, Background 2.97%).
+- Development had already shown under 1.2% detection with 2018 held out. Evidence: `docs/evidence/MEASURED_CROSS_DATASET_FLOW_DETECTOR_V3_2026_11_23.md`.
+
 ## 2026-11-21: Exploitation rank drives the quarantine decision
 
 - `engine/predict_shield/exploit_scoring.py` loads the frozen exploitation model after checking the model bytes, the feature code, the scikit-learn version and the reference file against the freeze, and scores a CVE JSON 5 record (CNA container only).
@@ -22,6 +28,8 @@
 - Single locked run (freeze `793d315f`, run 44782232012): benign alert rate 0.55%, every day under 1%, so the pre-stated condition was met. Detection was 0.83% (28,643 of 3,441,225 attack flows), so this version is not usable as a detector.
 - Cause: the calibration day contained brute-force traffic, which pushed the supervised threshold to 0.99999997 and taught the anomaly model attacks as normal. Version 3 calibrates on verified-normal traffic and adds a detection floor to the pass condition.
 - Disclosed: attempt 1 was stopped by a runner shutdown after one day's result was printed; the placeholder test pin in the first freeze; the 2018 files are not stored in time order (context is computed after sorting).
+
+
 
 ## 2026-11-20: Learned exploitation likelihood for CVEs
 

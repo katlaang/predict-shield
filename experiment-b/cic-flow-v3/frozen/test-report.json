@@ -1,0 +1,133 @@
+{
+ "FN": 30132,
+ "FP": 5634,
+ "TN": 408471,
+ "TP": 42,
+ "by_category": {
+  "Background": {
+   "alerts": 4040,
+   "attack": false,
+   "by_anomaly_only": 3826,
+   "by_supervised": 214,
+   "flows": 136112,
+   "rate": 0.029681438815093452,
+   "wilson_95": [
+    0.028793056991249972,
+    0.030596367283244285
+   ]
+  },
+  "Benign": {
+   "alerts": 1594,
+   "attack": false,
+   "by_anomaly_only": 1344,
+   "by_supervised": 250,
+   "flows": 277993,
+   "rate": 0.005733957329860824,
+   "wilson_95": [
+    0.005460027270426873,
+    0.0060215472759997755
+   ]
+  },
+  "Bruteforce": {
+   "alerts": 0,
+   "attack": true,
+   "by_anomaly_only": 0,
+   "by_supervised": 0,
+   "family": "web-brute-force",
+   "family_in_development": true,
+   "flows": 4687,
+   "rate": 0.0,
+   "wilson_95": [
+    0.0,
+    0.0008189274600238008
+   ]
+  },
+  "Bruteforce-XML": {
+   "alerts": 0,
+   "attack": true,
+   "by_anomaly_only": 0,
+   "by_supervised": 0,
+   "family": "web-brute-force",
+   "family_in_development": true,
+   "flows": 4164,
+   "rate": 0.0,
+   "wilson_95": [
+    0.0,
+    0.0009216902608207892
+   ]
+  },
+  "Probing": {
+   "alerts": 41,
+   "attack": true,
+   "by_anomaly_only": 41,
+   "by_supervised": 0,
+   "family": "portscan",
+   "family_in_development": true,
+   "flows": 18666,
+   "rate": 0.0021965070181077895,
+   "wilson_95": [
+    0.001619635470915732,
+    0.0029782321151778264
+   ]
+  },
+  "XMRIGCC CryptoMiner": {
+   "alerts": 1,
+   "attack": true,
+   "by_anomaly_only": 1,
+   "by_supervised": 0,
+   "family": "cryptominer",
+   "family_in_development": false,
+   "flows": 2657,
+   "rate": 0.0003763643206624012,
+   "wilson_95": [
+    6.644063317563786e-05,
+    0.0021289020700878403
+   ]
+  }
+ },
+ "calibration": {
+  "anomaly_fit_rows": 34624,
+  "threshold_rows": 34814,
+  "thresholds": {
+   "anomaly": 0.6354050486772219,
+   "supervised": 0.9974431158219389
+  },
+  "unused_calibration_share_rows": 41561
+ },
+ "code_sha256": {
+  "features_v3.py": "8a64d45fe7187c5de3097aa07874af5456d285271b9ff463b68391781d57a5b9",
+  "protocol_v3.json": "f4d84ad3a4b38153ac77d4f4cd277afd7db890cd8c8b347a991d82016a3ada39",
+  "score_test_v3.py": "409506b35e5083981843c14b24f8a572516e246a71452be520ea331cb3d3748c",
+  "train_dev_v3.py": "963684aa71062c7c645ae9219ea6190ae152218ca8478aaf38dc77b5cf9a8e9b"
+ },
+ "config": {
+  "feature_set": "flow+service",
+  "max_iter": 100,
+  "max_leaf_nodes": 15
+ },
+ "detection_rate": 0.0013919268244183733,
+ "detection_wilson_95": [
+  0.0010299959486849697,
+  0.0018807973564287854
+ ],
+ "flows": 444279,
+ "freeze_sha256": "36f81ceace5c5428af01366efe987f8449e5abd4a6b1e385c0a227b638bfecaf",
+ "member": "ALLFLOWMETER_HIKARI2021.csv",
+ "normal_alert_rate": 0.013605245046546166,
+ "normal_alert_rate_by_category": {
+  "Background": 0.029681438815093452,
+  "Benign": 0.005733957329860824
+ },
+ "normal_alert_wilson_95": [
+  0.013256895045262581,
+  0.013962619078539401
+ ],
+ "note": "Flows within one capture are dependent; Wilson intervals understate uncertainty.",
+ "pass_condition": "normal alert rate at most 1% pooled and for Benign and Background separately, and attack detection at least 50% pooled",
+ "passed": false,
+ "precision": 0.007399577167019027,
+ "rows_in_file": 555278,
+ "schema": "predict-shield/cic-flow-v3-test/1",
+ "supervised_sha256": "a5bcd9aacefdb6c75dc23c2deeaf95164b85f188069af89e9bff254c85c30989",
+ "test_archive_sha256": "ba09d35269566fd2f269871043b24e7d8e372bc4a47e9c2027729e5ff2e660e0"
+}
