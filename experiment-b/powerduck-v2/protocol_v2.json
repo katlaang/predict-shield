@@ -1,0 +1,30 @@
+{
+ "name": "learned GOOSE anomaly detector, version 2: stream history and incident grouping, PowerDuck substation captures",
+ "registered": "2026-11-24, before version 2 code read any PowerDuck record",
+ "relation_to_version_1": "Version 1 (experiment-b/powerduck) was tested once on these 16 attack captures: all 16 flagged, 14 at their first message, but 3.0% of non-malicious messages alerted against a 1% ceiling, and only 15.1% of malicious messages outside the floods were detected. Those results and the per-scenario figures have been seen. This is a second measurement on the same captures, made after the changes its evidence named; it is not an unseen test.",
+ "changes_from_version_1": {
+  "history": "Each message is also compared with its stream's last 20 messages (history_features.py): robust distance of timing, values, length and rate from their recent median, and counts of recent state-number jumps and sequence-number breaks.",
+  "threshold": "The alert threshold is set at 0.5% of held-out normal messages (version 1 used 1%, and its held-out normal captures alerted at 1.1% to 1.8%).",
+  "incidents": "Alerts no more than 2 s apart are grouped into one incident; incidents with no malicious message are false incidents, reported per hour of capture."
+ },
+ "source": {
+  "dataset": "PowerDuck: GOOSE data set of cyberattacks in substations (Zemanek, Hacker, Wolsing, Kaufmann, Klapperich, Henze, 2022), Zenodo record 6724225",
+  "record": "https://zenodo.org/api/records/6724225",
+  "sha256": "38c5e779e10d2cc5c4232ff966ba09c1e11affb296a0fdd7bad4be5b088ac58b",
+  "bytes": 8652738,
+  "normal_members": [
+   "dataset/ipal/Normal/01-normal-1.ipal.gz",
+   "dataset/ipal/Normal/02-normal-2.ipal.gz",
+   "dataset/ipal/Normal/03-normal-3.ipal.gz",
+   "dataset/ipal/Normal/04-normal-4.ipal.gz"
+  ],
+  "attack_members": "every dataset/ipal/Attack/*.ipal.gz (16 scenarios)"
+ },
+ "labels": "A message is malicious when its IPAL 'malicious' field is truthy. Labels are read only in the test stage.",
+ "model": "sklearn IsolationForest(n_estimators=300, max_samples=2048, random_state=20261124) fitted on normal messages only, on version 1 features plus the history features and the stream one-hot.",
+ "fit_and_threshold": "Each normal capture split in time: first 70% fits, last 30% sets the threshold at 0.5% of those messages. No hyperparameter is chosen.",
+ "development_reporting": "Leave one normal capture out: message alert rate and incidents per hour on the held-out capture. Reported, not used to change anything.",
+ "freeze": "SHA-256 of the model bundle, of history_features.py, detector_v2.py, this file and version 1's goose_features.py, and the archive pin.",
+ "pass_condition": "Same as version 1: non-malicious message alert rate at most 1% pooled over the 16 attack captures AND at least 12 of 16 scenarios with a malicious message alerted. False incidents per hour and per-scenario detection are reported alongside.",
+ "not_claimed": "An unseen test (the captures were seen in version 1); behaviour in other substations."
+}
