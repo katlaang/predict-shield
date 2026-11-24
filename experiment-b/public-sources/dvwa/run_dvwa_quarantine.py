@@ -60,6 +60,7 @@ OTHER_PAGES = ("/index.php", "/about.php", "/instructions.php", "/vulnerabilitie
                "/vulnerabilities/exec/")
 NGINX = shutil.which("nginx") or "/usr/sbin/nginx"
 STABLE_READS = 6
+MAX_READS = 40
 
 
 class Front:
@@ -123,16 +124,23 @@ class ThroughFront(chain.DvwaServer):
 
 
 def observe(front: Front, client: ThroughFront, baseline: dict) -> dict:
-    """Read STABLE_READS times so an old nginx worker cannot answer the check."""
+    """Read until STABLE_READS consecutive reads agree, or MAX_READS are taken.
+
+    After a reload an old nginx worker can still answer for a moment, so the
+    first reads may disagree. Verification passes only on a run of identical
+    reads; if none forms within MAX_READS the result is reported as unstable.
+    """
     reads = []
-    for _ in range(STABLE_READS):
+    for _ in range(MAX_READS):
         reads.append({"route_status": front.status(ROUTE + "?id=1&Submit=Submit"),
                       "other_pages": {p: front.status(p) for p in OTHER_PAGES},
                       "injection": chain.injection_results(client, baseline)})
+        tail = reads[-STABLE_READS:]
+        if len(tail) == STABLE_READS and all(
+                json.dumps(r, sort_keys=True) == json.dumps(tail[-1], sort_keys=True) for r in tail):
+            return dict(tail[-1], stable_over_reads=True, reads_taken=len(reads))
         time.sleep(0.3)
-    last = reads[-1]
-    stable = all(json.dumps(r, sort_keys=True) == json.dumps(last, sort_keys=True) for r in reads)
-    return dict(last, stable_over_reads=stable)
+    return dict(reads[-1], stable_over_reads=False, reads_taken=len(reads))
 
 
 def run_change(*, name, decision: Decision, paths, front, client, baseline, log, approver, expect_route_blocked):
@@ -152,7 +160,7 @@ def run_change(*, name, decision: Decision, paths, front, client, baseline, log,
         reasons = [r for ok, r in ((payloads_fail, "an injection payload still succeeds"),
                                    (others_ok, "a page outside the quarantine stopped working"),
                                    (route_ok, "the route status is not the expected one"),
-                                   (seen["stable_over_reads"], "reads disagreed after reload")) if not ok]
+                                   (seen["stable_over_reads"], "reads did not settle after reload")) if not ok]
         return Verification(Outcome.VERIFIED if passed else Outcome.NOT_VERIFIED,
                             "; ".join(reasons) or "verified", seen)
 
