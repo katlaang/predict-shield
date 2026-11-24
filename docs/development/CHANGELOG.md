@@ -5,7 +5,7 @@
 - Version 3 builds each stream's history only from messages the detector did not alert on. False incidents per hour are part of the pass condition. Development run 45337132344; test run 45338172898.
 - **Failed** 3 of 4 checks:
   - Non-malicious alert rate was 1.65% (limit 1%).
-  - False incidents ran at 80 per hour in the attack captures and 58 per hour in held-out normal captures (limit 2).
+  - The original report recorded 80 false incidents per hour in attack captures (later found to be potentially undercounted by the truth predicate); held-out normal captures recorded 58 per hour (limit 2). Corrected retrospective accounting is performed separately.
   - 15 of 16 scenarios detected (passed).
 - Flood detection recovered from under 0.1% to 62% and 99.99%. Detection outside the floods stayed at 9.8%.
 - Next: physical-consistency checks across streams, not another message-level forest. Evidence: `docs/evidence/MEASURED_POWERDUCK_GOOSE_DETECTOR_V3_2026_11_24.md`.
