@@ -1,0 +1,30 @@
+{
+ "name": "learned GOOSE anomaly detector, version 3: stream history built only from messages judged normal, PowerDuck substation captures",
+ "registered": "2026-11-25, before version 3 code read any PowerDuck record",
+ "relation_to_earlier_versions": "Versions 1 and 2 were each measured once on these 16 attack captures and failed. Version 2 halved false alarms (1.48% of non-malicious messages against a 1% ceiling) but its history window took in attack messages, so sustained attacks became the reference and detection inside the floods fell to 0.09%. Those results have been seen. This is a third measurement on the same captures, made after the change version 2's evidence named; it is not an unseen test.",
+ "changes_from_version_2": {
+  "gated_history": "A message enters its stream's 20-message history only when the detector did not alert on it (gated_history.py). Messages are scored in time order against the history admitted by the detector's own earlier decisions.",
+  "threshold": "Set at 0.5% of the last 30% of each normal capture, first on ungated scores and then twice more on gated scores, each round using the previous round's threshold for gating. The final round's value is frozen.",
+  "incidents_in_the_pass_condition": "False incidents per hour are now part of the pass condition, on held-out normal captures (development) and on the attack captures."
+ },
+ "unchanged_from_version_2": "Version 1 message features, the seven history features, the stream one-hot, IsolationForest(n_estimators=300, max_samples=2048), 70/30 time split, 0.5% budget, 2 s incident gap.",
+ "known_risk": "Gating can lock a stream's history: after a legitimate lasting change, messages may keep alerting because the history never takes them in. This is measured, not mitigated, in version 3.",
+ "source": {
+  "dataset": "PowerDuck: GOOSE data set of cyberattacks in substations (Zemanek, Hacker, Wolsing, Kaufmann, Klapperich, Henze, 2022), Zenodo record 6724225",
+  "record": "https://zenodo.org/api/records/6724225",
+  "sha256": "38c5e779e10d2cc5c4232ff966ba09c1e11affb296a0fdd7bad4be5b088ac58b",
+  "bytes": 8652738,
+  "normal_members": [
+   "dataset/ipal/Normal/01-normal-1.ipal.gz",
+   "dataset/ipal/Normal/02-normal-2.ipal.gz",
+   "dataset/ipal/Normal/03-normal-3.ipal.gz",
+   "dataset/ipal/Normal/04-normal-4.ipal.gz"
+  ],
+  "attack_members": "every dataset/ipal/Attack/*.ipal.gz (16 scenarios)"
+ },
+ "labels": "A message is malicious when its IPAL 'malicious' field is truthy. Labels are read only in the test stage.",
+ "development_reporting": "Leave one normal capture out: fit on three, score the fourth with gating. Pooled false incidents per hour over the four held-out captures is recorded in the freeze and counts toward the pass condition.",
+ "freeze": "SHA-256 of the model bundle, of gated_history.py, detector_v3.py, this file and version 1's goose_features.py, and the archive pin.",
+ "pass_condition": "All four: (1) non-malicious message alert rate at most 1% pooled over the 16 attack captures; (2) at least 12 of 16 scenarios with a malicious message alerted; (3) at most 2 false incidents per hour of capture pooled over the attack captures; (4) at most 2 false incidents per hour pooled over the held-out normal captures in development. Two per hour is what one analyst can triage at one site alongside other work.",
+ "not_claimed": "An unseen test (the captures were seen in versions 1 and 2); behaviour in other substations."
+}
