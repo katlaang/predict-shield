@@ -23,7 +23,7 @@ Versions 1 and 2 had already read these captures, so this is a third measurement
 | Scenarios with a malicious message alerted | 15 of 16 | 15 of 16 | at least 12 |
 | Detection in flood scenario 15 | under 0.1% | 62.1% | |
 | Detection in flood scenario 16 | under 0.1% | 99.99% | |
-| Malicious messages detected outside the floods | 10.0% | 9.6% (454 of 4,644) | |
+| Malicious messages detected outside the floods | 10.0% | 9.8% (454 of 4,644) | |
 | False incidents per hour, attack captures | 54 | 80 | at most 2 |
 | False incidents per hour, held-out normal captures | 17 to 90 (per capture) | 58 (pooled) | at most 2 |
 

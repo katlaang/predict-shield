@@ -7,7 +7,7 @@
   - Non-malicious alert rate was 1.65% (limit 1%).
   - False incidents ran at 80 per hour in the attack captures and 58 per hour in held-out normal captures (limit 2).
   - 15 of 16 scenarios detected (passed).
-- Flood detection recovered from under 0.1% to 62% and 99.99%. Detection outside the floods stayed at 9.6%.
+- Flood detection recovered from under 0.1% to 62% and 99.99%. Detection outside the floods stayed at 9.8%.
 - Next: physical-consistency checks across streams, not another message-level forest. Evidence: `docs/evidence/MEASURED_POWERDUCK_GOOSE_DETECTOR_V3_2026_11_24.md`.
 
 ## 2026-11-21: Mechanism-lab scored campaign
