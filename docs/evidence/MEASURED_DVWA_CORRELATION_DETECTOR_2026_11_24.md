@@ -36,7 +36,7 @@ Checks: benign rate at most 1% **passed**. At least 90% of successful attacks **
 - **The host signals were blind because of the model.** An isolation forest only splits within the range of values it saw in training.
   - The "unseen program / endpoint / file" counts were zero on every training row by construction, since the vocabulary came from those same rows. The forest never split on them, so a command injection that started `id` or a file inclusion that opened `/etc/passwd` scored like any benign request.
   - The same holds for counts above the training range. Three programs started is scored like two.
-- **The telemetry itself carried the signal.** Every successful command injection started a program never seen in development. Every file inclusion of a system file opened a file never seen in development. The data was there and the model could not use it.
+- **The telemetry itself carried the signal.** Development saw only two programs started, `sh` and `ping`, so every successful command injection started a program outside that vocabulary. File inclusions of system files opened files benign traffic never opened. The `php://filter` variant is the exception: it read a page file that benign traffic also reads. The data was there, and the model could not use it.
 - **SQL injection is invisible to host telemetry.** The process, connection and file records of a successful SQL injection match a benign lookup. Only the request and the response can show it.
 - **Request features alone over-alert.** They alerted on 18 of 43 failed attempts, and on 1.3% of benign requests (over the ceiling).
 
