@@ -1,0 +1,10 @@
+{
+ "develop_run": 44657282908,
+ "develop_commit": "3769e4e",
+ "artifact": "cic-flow-frozen",
+ "artifact_digest": "sha256:3f5771e966f87e42a56e5dcc5989430ba1e965bfd5ef720da90956b9cd65f7ec",
+ "model_sha256": "aeb53fb9ab8ccdaaa4682bd132e223706e62ae10b8bc298a8c3276c44adc6833",
+ "freeze_sha256": "d2355cb36c4b5756e751913f99048e2d7e812d4176fbdffbaed49c922e581f6e",
+ "thresholds": {"supervised": 3.7429564796185303e-06, "anomaly": 0.6327899692386822},
+ "recorded": "2026-11-19, before the test archive was opened by any scoring code"
+}
