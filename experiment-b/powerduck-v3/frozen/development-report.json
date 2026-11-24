@@ -1,0 +1,87 @@
+{
+ "freeze_sha256": "93e14a4cb7b0d5bef9d7b4953ae7f145b7439e7c210b2479d8bb27b73414baec",
+ "held_out_normal": {
+  "false_incidents_per_hour": 57.91128837389518,
+  "hours": 1.036067434946696,
+  "incidents": 60
+ },
+ "leave_one_capture_out": {
+  "dataset/ipal/Normal/01-normal-1.ipal.gz": {
+   "alert_rate": 0.002077009106886084,
+   "alert_wilson_95": [
+    0.00121425543802694,
+    0.003550587976455158
+   ],
+   "alerts": 13,
+   "fit_rows": 14503,
+   "hours": 0.2370979850159751,
+   "incidents": 4,
+   "incidents_per_hour": 16.870662143039677,
+   "messages": 6259,
+   "threshold_rounds": [
+    0.6518485647915556,
+    0.6478841333758054,
+    0.6478841333758054
+   ],
+   "threshold_rows": 6218
+  },
+  "dataset/ipal/Normal/02-normal-2.ipal.gz": {
+   "alert_rate": 0.006211951795254069,
+   "alert_wilson_95": [
+    0.004715345568724376,
+    0.008179662908907034
+   ],
+   "alerts": 50,
+   "fit_rows": 13250,
+   "hours": 0.3071256171994739,
+   "incidents": 19,
+   "incidents_per_hour": 61.86393754207666,
+   "messages": 8049,
+   "threshold_rounds": [
+    0.6284853176069333,
+    0.6310944451575662,
+    0.6304350448159645
+   ],
+   "threshold_rows": 5681
+  },
+  "dataset/ipal/Normal/03-normal-3.ipal.gz": {
+   "alert_rate": 0.013750793314998943,
+   "alert_wilson_95": [
+    0.01080376633586867,
+    0.01748749221603925
+   ],
+   "alerts": 65,
+   "fit_rows": 15576,
+   "hours": 0.2105390822225147,
+   "incidents": 17,
+   "incidents_per_hour": 80.74510357194883,
+   "messages": 4727,
+   "threshold_rounds": [
+    0.6287201715068751,
+    0.6287221790548484,
+    0.6287221790548484
+   ],
+   "threshold_rows": 6677
+  },
+  "dataset/ipal/Normal/04-normal-4.ipal.gz": {
+   "alert_rate": 0.008307111390811832,
+   "alert_wilson_95": [
+    0.006535326467945059,
+    0.010554139913287061
+   ],
+   "alerts": 66,
+   "fit_rows": 13323,
+   "hours": 0.28130475050873227,
+   "incidents": 20,
+   "incidents_per_hour": 71.09727071380958,
+   "messages": 7945,
+   "threshold_rounds": [
+    0.6349421591956578,
+    0.6329926225632576,
+    0.6329926225632576
+   ],
+   "threshold_rows": 5712
+  }
+ },
+ "schema": "predict-shield/powerduck-v3-development/1"
+}
