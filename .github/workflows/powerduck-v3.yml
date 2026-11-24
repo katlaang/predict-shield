@@ -11,6 +11,8 @@ on:
   push:
     branches: [feat/powerduck-v3]
     paths: ['experiment-b/powerduck-v3/**', '.github/workflows/powerduck-v3.yml']
+  pull_request:
+    paths: ['experiment-b/powerduck-v3/**', '.github/workflows/powerduck-v3.yml']
   workflow_dispatch:
     inputs:
       stage:
