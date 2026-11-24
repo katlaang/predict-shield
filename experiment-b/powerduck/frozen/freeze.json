@@ -1,0 +1,26 @@
+{
+ "archive_sha256": "38c5e779e10d2cc5c4232ff966ba09c1e11affb296a0fdd7bad4be5b088ac58b",
+ "code_sha256": {
+  "detector.py": "eef1a55a3c13ab790b27cd1fe2c1c157e32e841c20b9c0f092c1c88ffdaee098",
+  "goose_features.py": "b73fb66a29d73594bbcb00937197524485d88f3dcea6b4afb172d5b74f16068e",
+  "protocol.json": "07e861edac961e1bf53ee51a71e515a9c46b67e87633c8c9f298d27953c8da95"
+ },
+ "fit_rows": 18884,
+ "freeze_sha256": "615315af282a6e913d59c960772d294fa43f42743d9cd3c6b086956a6d9252a7",
+ "known_streams": [
+  "b4b15a0e843b>010ccd010000",
+  "b4b15a0e843b>010ccd010001",
+  "b4b15a0e843b>010ccd010002",
+  "b4b15a0e8444>010ccd010003",
+  "b4b15a0e8444>010ccd010004",
+  "b4b15a0e8444>010ccd010005",
+  "b4b15a0e844a>010ccd010006",
+  "b4b15a0e844a>010ccd010007",
+  "b4b15a0e844a>010ccd010008"
+ ],
+ "model_sha256": "5fe50aec93baef0d729d098959d778a52cbd095c9f8b5eae1d0c4ed56865a7d8",
+ "schema": "predict-shield/powerduck-freeze/1",
+ "sklearn": "1.7.2",
+ "threshold": 0.6117457199151863,
+ "threshold_rows": 8096
+}
