@@ -130,8 +130,8 @@ def main() -> None:
     report["steps"]["hijack"]["hijack_effective"] = observer.hijacked(hj)
 
     run = bgp_filter.docker_runner("clab-isp-net-pe2")
-    received = bgp_filter.received_prefixes(run, CUSTOMER_NEIGHBOR)
-    findings = route_monitor.unauthorized(received, REGISTRY["65200"])
+    received = bgp_filter.received_routes(run, CUSTOMER_NEIGHBOR)
+    findings = route_monitor.unauthorized(received, REGISTRY["65200"], own_as=ISP_AS)
     report["steps"]["detect"] = {"received_from_customer": received, "unauthorized": findings}
     if not findings:
         raise SystemExit("the hijack was not detected; nothing to respond to")
@@ -141,7 +141,7 @@ def main() -> None:
     proper = route_monitor.filter_for(REGISTRY["65200"])
     report["steps"]["filter"] = run_change("filter", proper, log, key, pub)
     report["steps"]["withdraw_check"] = {
-        "still_announced_by_customer": bgp_filter.received_prefixes(run, CUSTOMER_NEIGHBOR),
+        "still_announced_by_customer": bgp_filter.received_routes(run, CUSTOMER_NEIGHBOR),
         "observed": observer.observe()}
 
     report["audit_log_chain_intact"] = log.verify_chain()

@@ -83,6 +83,12 @@ class MonitorTests(unittest.TestCase):
         got = route_monitor.unauthorized(["198.51.100.0/24", "198.51.100.128/25", "203.0.113.0/25"], reg)
         self.assertEqual(got, ["203.0.113.0/25"])
 
+    def test_echoed_routes_with_our_as_are_not_findings(self):
+        received = {"100.64.0.0/24": [65200, 65100], "203.0.113.0/24": [65200, 65100, 65000],
+                    "198.51.100.0/24": [65200], "203.0.113.0/25": [65200], "203.0.113.128/25": [65200]}
+        self.assertEqual(route_monitor.unauthorized(received, ["198.51.100.0/24"], own_as=65100),
+                         ["203.0.113.0/25", "203.0.113.128/25"])
+
     def test_filter_for_registry(self):
         self.assertEqual(route_monitor.filter_for(["198.51.100.0/24"]),
                          "ip prefix-list CUST-IN seq 10 permit 198.51.100.0/24 le 24\n")

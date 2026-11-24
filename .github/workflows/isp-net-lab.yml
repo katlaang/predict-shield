@@ -54,7 +54,7 @@ jobs:
           assert r["audit_log_chain_intact"] is True
           assert s["baseline_content_answer"] == "content"
           assert s["hijack_effective"] is True, "the attack must work before the response"
-          assert s["unauthorized_detected"], "the hijack must be detected"
+          assert s["unauthorized_detected"] == ["203.0.113.0/25", "203.0.113.128/25"], s["unauthorized_detected"]
           assert s["overbroad"]["without_approval"] == "REFUSED" and s["overbroad"]["final_status"] == "ROLLED_BACK", s["overbroad"]
           assert s["filter"]["without_approval"] == "REFUSED" and s["filter"]["final_status"] == "APPLIED_VERIFIED", s["filter"]
           assert s["after_content_answer"] == "content" and s["after_customer_answer"] == "customer"

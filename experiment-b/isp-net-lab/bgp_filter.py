@@ -111,9 +111,21 @@ class FrrInboundFilterAdapter:
         self.run(["vtysh", "-c", f"clear bgp ipv4 unicast {self.neighbor} soft in"])
 
 
-def received_prefixes(run: Runner, neighbor: str) -> list[str]:
-    """Prefixes the neighbor is announcing, before inbound policy (needs soft-reconfiguration inbound)."""
+def received_routes(run: Runner, neighbor: str) -> dict[str, list[int]]:
+    """Prefix -> AS path for what the neighbor announces, before inbound policy
+    (needs soft-reconfiguration inbound). Paths BGP will discard as loops are kept,
+    so the caller can tell them apart."""
     import json
     out = run(["vtysh", "-c", f"show bgp ipv4 unicast neighbors {neighbor} received-routes json"])
     data = json.loads(out or "{}")
-    return sorted((data.get("receivedRoutes") or {}).keys())
+    routes = {}
+    for prefix, info in (data.get("receivedRoutes") or {}).items():
+        path = info.get("path") if isinstance(info, dict) else None
+        if path is None and isinstance(info, dict):
+            path = (info.get("aspath") or {}).get("string", "")
+        routes[prefix] = [int(a) for a in str(path or "").split() if a.isdigit()]
+    return dict(sorted(routes.items()))
+
+
+def received_prefixes(run: Runner, neighbor: str) -> list[str]:
+    return list(received_routes(run, neighbor))

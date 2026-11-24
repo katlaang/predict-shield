@@ -15,8 +15,16 @@ def authorized(prefix: str, registry: list[str]) -> bool:
     return any(net.subnet_of(ipaddress.ip_network(r)) for r in registry)
 
 
-def unauthorized(received: list[str], registry: list[str]) -> list[str]:
-    return sorted(p for p in received if not authorized(p, registry))
+def unauthorized(received, registry: list[str], own_as: int | None = None) -> list[str]:
+    """Announced prefixes the customer may not originate.
+
+    `received` is a list of prefixes or a dict prefix -> AS path. Routes whose
+    path already contains our own AS are echoes of our announcements; BGP
+    drops them as loops, so they are not findings.
+    """
+    items = received.items() if isinstance(received, dict) else ((p, []) for p in received)
+    return sorted(p for p, path in items
+                  if not (own_as is not None and own_as in path) and not authorized(p, registry))
 
 
 def filter_for(registry: list[str]) -> str:
