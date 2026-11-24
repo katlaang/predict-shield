@@ -4,9 +4,11 @@ name: Cross-dataset flow detector
 # once. See experiment-b/cic-flow/protocol.json.
 #   stage=develop  fits, sets thresholds, reports development results and
 #                  uploads the frozen bundle. Never downloads the test archive.
-#   stage=test     scores the test archive once with the bundle committed in
-#                  experiment-b/cic-flow/frozen/, refusing any mismatch with
-#                  the freeze hash given as input.
+#   stage=test     fetches the bundle from the develop run named in
+#                  experiment-b/cic-flow/frozen/FREEZE_RECORD.json, refuses any
+#                  mismatch with the hashes recorded there, scores the test
+#                  archive once, then commits the bundle, both reports and the
+#                  freeze record to the branch so they outlive artifact expiry.
 
 on:
   push:
@@ -69,24 +71,36 @@ jobs:
     needs: unit-tests
     runs-on: ubuntu-latest
     timeout-minutes: 360
+    permissions:
+      contents: write
+      actions: read
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
       - run: pip install 'scikit-learn==1.7.2' 'pandas==2.3.3' 'numpy==2.3.4'
-      - name: Refuse to start unless the committed freeze matches the input
+      - name: Fetch the frozen bundle from the recorded develop run
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          run=$(python -c "import json;print(json.load(open('experiment-b/cic-flow/frozen/FREEZE_RECORD.json'))['develop_run'])")
+          gh run download "$run" --repo "$GITHUB_REPOSITORY" --name cic-flow-frozen --dir "$RUNNER_TEMP/frozen"
+          ls -l "$RUNNER_TEMP/frozen"
+      - name: Refuse to start unless the bundle matches the recorded freeze and the input
         working-directory: experiment-b/cic-flow
         env:
           WANT: ${{ github.event.inputs.freeze_sha256 }}
         run: |
           python - <<'PY'
           import hashlib, json, os
-          f = json.load(open("frozen/freeze.json"))
+          d = os.environ["RUNNER_TEMP"] + "/frozen/"
+          record = json.load(open("frozen/FREEZE_RECORD.json"))
+          f = json.load(open(d + "freeze.json"))
           rec = f.pop("freeze_sha256")
-          assert rec == os.environ["WANT"], "freeze input does not match the committed freeze"
+          assert rec == os.environ["WANT"] == record["freeze_sha256"], "freeze hash mismatch"
           assert hashlib.sha256(json.dumps(f, sort_keys=True).encode()).hexdigest() == rec
-          assert hashlib.sha256(open("frozen/model.pkl", "rb").read()).hexdigest() == f["model_sha256"]
+          assert hashlib.sha256(open(d + "model.pkl", "rb").read()).hexdigest() == f["model_sha256"] == record["model_sha256"]
           assert hashlib.sha256(open("protocol.json", "rb").read()).hexdigest() == f["protocol_sha256"]
           print("freeze verified", rec)
           PY
@@ -98,14 +112,14 @@ jobs:
       - name: Score every test flow once
         working-directory: experiment-b/cic-flow
         run: |
-          python score_test.py --archive "$RUNNER_TEMP/test.zip" --frozen-dir frozen \
+          python score_test.py --archive "$RUNNER_TEMP/test.zip" --frozen-dir "$RUNNER_TEMP/frozen" \
             --expected-freeze-sha256 "${{ github.event.inputs.freeze_sha256 }}" --output "$RUNNER_TEMP/test-report.json"
       - name: Check the accounting
         run: |
           python - <<'PY'
           import json, os
           r = json.load(open(os.environ["RUNNER_TEMP"] + "/test-report.json"))
-          assert r["flows"] == r["TP"] + r["FP"] + r["FN"] + r["TN"] > 0
+          assert r["flows"] == r["TP"] + r["FP"] + r["FN"] + r["TN"] == 63195145, r["flows"]
           fam = r["by_family"]
           assert sum(v["flows"] for k, v in fam.items() if k != "benign") == r["TP"] + r["FN"]
           assert sum(v["detected"] for k, v in fam.items() if k != "benign") == r["TP"]
@@ -120,3 +134,12 @@ jobs:
           path: ${{ runner.temp }}/test-report.json
           if-no-files-found: warn
           retention-days: 90
+      - name: Commit the bundle, both reports and the freeze to the branch
+        run: |
+          cp "$RUNNER_TEMP"/frozen/model.pkl "$RUNNER_TEMP"/frozen/freeze.json "$RUNNER_TEMP"/frozen/development-report.json experiment-b/cic-flow/frozen/
+          cp "$RUNNER_TEMP/test-report.json" experiment-b/cic-flow/frozen/test-report.json
+          git config user.name katlaang
+          git config user.email katlaang@users.noreply.github.com
+          git add experiment-b/cic-flow/frozen
+          git commit -m "cic-flow: record the frozen bundle, development report and single test report (run ${{ github.run_id }})"
+          git push origin HEAD:${{ github.ref_name }}

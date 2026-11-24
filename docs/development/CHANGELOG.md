@@ -7,6 +7,30 @@
 - Cause: the calibration day contained brute-force traffic, which pushed the supervised threshold to 0.99999997 and taught the anomaly model attacks as normal. Version 3 calibrates on verified-normal traffic and adds a detection floor to the pass condition.
 - Disclosed: attempt 1 was stopped by a runner shutdown after one day's result was printed; the placeholder test pin in the first freeze; the 2018 files are not stored in time order (context is computed after sorting).
 
+## 2026-11-21 (b): Learned GOOSE anomaly detector on PowerDuck
+
+- `experiment-b/powerduck/`: an Isolation Forest fitted on normal GOOSE messages only, using per-stream timing, state and sequence numbers, length, values and rates. The protocol and freeze were fixed before any attack capture was read; the 16 attack captures were scored once.
+- Failed its stated condition. The first malicious message raised an alert in 14 of 16 scenarios, and all 16 scenarios were flagged, but 3.0% of non-malicious messages alerted against a 1% ceiling. Outside the two floods, 15.1% of malicious messages were detected. Development on held-out normal captures had already shown 1.1% to 1.8% alert rates.
+- Evidence and the next version's changes: `docs/evidence/MEASURED_POWERDUCK_GOOSE_DETECTOR_2026_11_21.md`.
+
+## 2026-11-20 (2): Mechanism-lab preregistration lock, controls and verifier scoring
+
+- `PREREGISTRATION.json` fixes the scored campaign's questions, ground truth, VERIFIED scope, metrics, cost matrix, controls, exclusions, rerun and stopping rules. `prereg_gate.py` hashes it with the plan and the campaign code; `campaign.py --scored` refuses to start unless locked and unchanged, and CI fails on any unrecorded change after locking (`DEVIATIONS.md`).
+- Rerun rule in `campaign.py`: one rerun per infrastructure failure, then exclusion, counted across invocations and logged.
+- `controls.py`: positive controls per fault mode (inject, no action, 18 s of oracle reads) with self-heal rates, and a no-fault negative control. Runs as its own CI job.
+- `verifier_scoring.py`: verifier sensitivity, specificity and abstain rate against oracle truth per fault mode and action, single-evidence and dual-evidence (scope plus post-action operator telemetry, abstain on disagreement). The pilot now records post-action operator telemetry.
+- First control run: no-fault control healthy (8 of 8). Without action, duplicate and reorder never exposed access, delay healed in about 2 s, and loss persisted past the 6 s window only at TTL 15 s (healing at about 14 s). The verifier made no false VERIFIED on 40 control runs or 40 pilot trials, and abstained on 16 of the 40 pilot trials.
+- Plan v3.1 replaces v3 for the scored campaign: 70 persistent configurations (loss and paused listener, TTL 10-30 s) and 30 self-healing ones (delay; loss with TTL 2.5-4 s). Controls now check each registered cell's class. A 16-trial v3.1 pilot runs in CI.
+- Second control run confirmed 9 of 10 cells; a 1 s delay was delivered before the first read, so the delay range moved to 2-3 s. The third run confirmed all 10 cells, and the preregistration was locked on that code (tag `mechanism-prereg-v1`).
+- After locking, before any scored trial: `outcome_report.py` (Q1, Q2, per-arm errors and the cost comparison at 1:1, 1:5 and 1:20) added to the lock through the first `DEVIATIONS.md` entry. New `mechanism-scored-campaign.yml` runs the controls and then the 1,200 scored trials behind the gate, commits aggregate reports to a results branch, and keeps the full records as an artifact.
+
+## 2026-11-19: Learned flow detector measured across two networks
+
+- `experiment-b/cic-flow/`: supervised gradient boosting plus a benign-only Isolation Forest over flow statistics, traffic type and causal 60-second context. No hand-written rules. Protocol, features, thresholds and a 1% benign alert budget fixed before any result was read; both archives pinned by SHA-256.
+- Developed on CIC-IDS2017 (corrected version), frozen (model `aeb53fb9`, freeze `d2355cb3`), then scored once on all 63,195,145 CSE-CIC-IDS2018 flows.
+- Result: 99.97% of attack flows detected, but 30.85% of benign flows alerted (20.9% to 40.3% per day), against the 1% budget. Precision 16.11%. The threshold set on 2017 benign traffic did not carry over. Recorded as a failed budget in `docs/evidence/MEASURED_CROSS_DATASET_FLOW_DETECTOR_2026_11_19.md`.
+- The bundle and both reports are committed in `experiment-b/cic-flow/frozen/` so the evidence does not depend on artifact retention.
+
 ## 2026-11-18 (9): Endpoint rules v2 on a pre-registered second-publisher held-out set
 
 - Reworded the detection results as integration behavior and labelled the endpoint rules as deterministic, not AI; held-out 2 of 5 carries its Wilson interval.

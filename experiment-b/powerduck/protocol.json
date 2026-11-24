@@ -1,0 +1,23 @@
+{
+ "name": "learned GOOSE anomaly detector, PowerDuck substation captures",
+ "registered": "2026-11-21, before any attack capture's records were read",
+ "seen_before_registration": "Archive layout (file names and sizes), the type of the malicious/ index (a list of objects; no field values), and the first three records of normal captures 03 and 02, printed by the inspect stage (run 44775591881). No attack capture record was read.",
+ "source": {
+  "dataset": "PowerDuck: GOOSE data set of cyberattacks in substations (Zemanek, Hacker, Wolsing, Kaufmann, Klapperich, Henze, 2022), Zenodo record 6724225",
+  "record": "https://zenodo.org/api/records/6724225",
+  "sha256": "38c5e779e10d2cc5c4232ff966ba09c1e11affb296a0fdd7bad4be5b088ac58b",
+  "bytes": 8652738,
+  "normal_members": ["dataset/ipal/Normal/01-normal-1.ipal.gz", "dataset/ipal/Normal/02-normal-2.ipal.gz",
+                     "dataset/ipal/Normal/03-normal-3.ipal.gz", "dataset/ipal/Normal/04-normal-4.ipal.gz"],
+  "attack_members": "every dataset/ipal/Attack/*.ipal.gz (16 scenarios)"
+ },
+ "labels": "A message is malicious when its IPAL 'malicious' field is truthy. Labels are read only in the test stage.",
+ "inputs": "goose_features.capture_features: per-message timing relative to its stream and to all traffic, stNum and sqNum deltas, frame length and its change, data field counts and whether the field set changed, size and relative change of numeric values, count of changed text values, messages in the last second (stream and all). Plus a one-hot of the stream (source>destination) among streams seen in training, with an 'unseen' column. Never inputs: record id, malicious field, file name, absolute time.",
+ "model": "sklearn IsolationForest(n_estimators=300, max_samples=2048, random_state=20261121) fitted on normal messages only; score = -score_samples. No attack message is used to fit, scale or threshold anything.",
+ "fit_and_threshold": "Each normal capture is split in time: the first 70% of its messages fit the model, the last 30% set the alert threshold at 1% of those messages (goose_features.normal_threshold). Fixed settings; no hyperparameter is chosen.",
+ "development_reporting": "Leave one normal capture out: fit and threshold on the other three exactly as above, report the alert rate on the whole held-out capture. Normal data only; reported, not used to change anything.",
+ "freeze": "SHA-256 of the pickled model bundle (model, threshold, known streams), of goose_features.py, detector.py and this file, and the archive pin. The test stage refuses any mismatch.",
+ "test_reporting": "All 16 attack captures scored once. Per scenario: malicious and non-malicious message counts, detected malicious messages, false alarms, whether any malicious message alerted, delay from the first malicious message to the first alert on a malicious message. Pooled: detection and non-malicious alert rate with Wilson 95% intervals, precision.",
+ "pass_condition": "non-malicious alert rate at most 1% pooled over the attack captures AND at least 12 of the 16 scenarios with at least one malicious message alerted",
+ "not_claimed": "Behaviour in other substations or with other GOOSE publishers; attacks absent from the 16 scenarios; that per-message alerts are the right operator unit (alerts are not grouped)."
+}

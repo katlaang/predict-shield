@@ -1,0 +1,54 @@
+{
+ "freeze_sha256": "615315af282a6e913d59c960772d294fa43f42743d9cd3c6b086956a6d9252a7",
+ "leave_one_capture_out": {
+  "dataset/ipal/Normal/01-normal-1.ipal.gz": {
+   "alert_rate": 0.010864355328327208,
+   "alert_wilson_95": [
+    0.008579514646501855,
+    0.013749241366152385
+   ],
+   "alerts": 68,
+   "fit_rows": 14503,
+   "messages": 6259,
+   "threshold_rows": 6218,
+   "unseen_stream_messages": 0
+  },
+  "dataset/ipal/Normal/02-normal-2.ipal.gz": {
+   "alert_rate": 0.012796620698223382,
+   "alert_wilson_95": [
+    0.010563207565861162,
+    0.015494856529001483
+   ],
+   "alerts": 103,
+   "fit_rows": 13250,
+   "messages": 8049,
+   "threshold_rows": 5681,
+   "unseen_stream_messages": 0
+  },
+  "dataset/ipal/Normal/03-normal-3.ipal.gz": {
+   "alert_rate": 0.010789083985614555,
+   "alert_wilson_95": [
+    0.008215794368879656,
+    0.014156855359763831
+   ],
+   "alerts": 51,
+   "fit_rows": 15576,
+   "messages": 4727,
+   "threshold_rows": 6677,
+   "unseen_stream_messages": 0
+  },
+  "dataset/ipal/Normal/04-normal-4.ipal.gz": {
+   "alert_rate": 0.01787287602265576,
+   "alert_wilson_95": [
+    0.015183994244295479,
+    0.021027755652878365
+   ],
+   "alerts": 142,
+   "fit_rows": 13323,
+   "messages": 7945,
+   "threshold_rows": 5712,
+   "unseen_stream_messages": 0
+  }
+ },
+ "schema": "predict-shield/powerduck-development/1"
+}

@@ -21,7 +21,29 @@ that AI attack detection worked**. See the
 A prompt/schema revision has since been merged, but additional use of
 those already-scored recordings is **exploratory**, not fresh held-out
 evidence. AI-driven detection performance on independently labeled
-attacks and benign traffic remains unproven.
+attacks and benign traffic remains unproven **for modern operational
+environments and prospective field use**.
+
+A separate learned, normal-only Isolation Forest detector has now been
+evaluated on the historical NSL-KDD benchmark. The independently audited
+GitHub Actions run [44648143458](https://github.com/katlaang/predict-shield/actions/runs/44648143458)
+counted **8,580 true positives, 4,253 false negatives, 274 false
+positives and 9,437 true negatives** on **22,544** held-out benchmark
+rows (attack recall **66.86%**, benign false-positive rate **2.82%**).
+For attack-type names absent from the dataset's published training
+labels, **2,759 of 3,750** test attack rows were flagged (**73.57%**),
+while **991** were missed. Several subsets had **zero recall**, including
+`snmpguess` (0/331), `snmpgetattack` (0/178) and `sendmail` (0/14).
+See [the measured evidence PR](https://github.com/katlaang/predict-shield/pull/138)
+and [the benchmark implementation PR](https://github.com/katlaang/predict-shield/pull/137).
+
+This is **historical benchmark detection**, not a real-world zero-day
+result, current operator attack detection, or proof of effectiveness at a
+U.S. critical-infrastructure site. The mirror has not been independently
+authenticated against the original publisher files; benchmark rows are
+not independent operator incidents. The learned detector is **read-only**
+and cannot authorize or apply defensive changes. The separate negative
+rule-generation experiment above remains a negative result.
 
 ## How it works
 
