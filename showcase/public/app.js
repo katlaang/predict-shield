@@ -80,7 +80,7 @@ function rankCard(row) {
   return `<div class="rank-card">
     <p class="meta">${esc(cve)} · published ${esc(published)}${vendor ? ` · ${esc(vendor)}${product ? ` ${esc(product)}` : ""}` : ""}${cvss ? ` · CVSS ${esc(cvss)}` : ""}${cwe ? ` · ${esc(cwe)}` : ""}</p>
     <div class="rank">Top ${shown}% most likely to be exploited</div>
-    <div class="meter" aria-hidden="true"><div class="pin" style="left:calc(${Math.min(100, share * 100)}% - 2px)"></div></div>
+    <div class="meter" aria-hidden="true"><div class="pin" data-pin-percent="${Math.min(100, share * 100)}"></div></div>
     <div class="scale"><span>Most likely</span><span>Least likely</span></div>
     <p>${verdict}</p>
   </div>`;
@@ -92,12 +92,14 @@ async function lookup(e) {
   const id = $("#cve-input").value.trim().toUpperCase();
   const m = /^CVE-(\d{4})-\d{4,}$/.exec(id);
   if (!m) { out.innerHTML = `<p class="msg err">Enter an identifier like CVE-2025-1974.</p>`; return; }
-  if (!cveMeta || !cveMeta.years[m[1]]) { out.innerHTML = `<p class="msg err">The lookup covers CVEs published from 2025 onward. Try a CVE from 2025 or 2026.</p>`; return; }
+  if (!cveMeta || !Object.keys(cveMeta.years || {}).length) { out.innerHTML = `<p class="msg err">The lookup covers CVEs published from 2025 onward. Try a CVE from 2025 or 2026.</p>`; return; }
   out.innerHTML = `<p class="msg">Checking ${esc(id)}…</p>`;
   try {
-    let row = (await loadYear(m[1])).find((r) => r[0] === id);
+    let row = cveMeta.years[m[1]] ? (await loadYear(m[1])).find((r) => r[0] === id) : null;
     if (!row) for (const y of Object.keys(cveMeta.years)) { if (y !== m[1]) { row = (await loadYear(y)).find((r) => r[0] === id); if (row) break; } }
     out.innerHTML = row ? rankCard(row) : `<p class="msg err">${esc(id)} isn't in the current snapshot. It may be newer, unpublished or rejected.</p>`;
+    const pin = out.querySelector(".pin[data-pin-percent]");
+    if (pin) pin.style.left = `calc(${Number(pin.dataset.pinPercent)}% - 2px)`;
   } catch (err) {
     out.innerHTML = `<p class="msg err">The ranking data didn't load. Reload the page and try again.</p>`;
   }
