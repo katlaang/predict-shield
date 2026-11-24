@@ -3,81 +3,153 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>PREDICT-SHIELD Evidence</title>
-<meta name="description" content="PREDICT-SHIELD prioritizes vulnerabilities, applies responses under policy and checks independently that each fix worked. Every result here links to its public test record.">
+<title>PREDICT-SHIELD</title>
+<meta name="description" content="PREDICT-SHIELD finds the security issues that matter, fixes or contains them with your approval, and proves each fix worked. For ISPs, telecom operators and businesses with websites.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect x='1' y='1' width='6' height='6' fill='%230E7C66'/%3E%3Crect x='9' y='1' width='6' height='6' fill='%238C96A3'/%3E%3Crect x='1' y='9' width='6' height='6' fill='%23B8432F'/%3E%3Crect x='9' y='9' width='6' height='6' fill='%230E7C66'/%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M16 2 4 7v8c0 7.5 5.1 13.4 12 15 6.9-1.6 12-7.5 12-15V7z' fill='%230F3D3E'/%3E%3Cpath d='m10.5 16.5 4 4 7.5-8' stroke='%233DDC97' stroke-width='3' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
 </head>
 <body>
-<header class="top">
-  <a class="brand" href="#">PREDICT-SHIELD</a>
-  <nav aria-label="Sections">
-    <a href="#trials">Trials</a>
-    <a href="#actions">Actions</a>
-    <a href="#ranker">CVE ranker</a>
-    <a href="#misses">Shortfalls</a>
-    <a href="https://github.com/katlaang/predict-shield">Code</a>
+<header class="nav">
+  <a class="logo" href="#top" aria-label="PREDICT-SHIELD home">
+    <svg viewBox="0 0 32 32" aria-hidden="true"><path d="M16 2 4 7v8c0 7.5 5.1 13.4 12 15 6.9-1.6 12-7.5 12-15V7z"/><path class="tick" d="m10.5 16.5 4 4 7.5-8"/></svg>
+    PREDICT-SHIELD
+  </a>
+  <nav aria-label="Main">
+    <a href="#how">How it works</a>
+    <a href="#who">Who it's for</a>
+    <a href="#proof">Results</a>
+    <a href="#try">Try it</a>
   </nav>
+  <a class="btn btn-small" href="#pilot">Request a pilot</a>
 </header>
 
-<main>
-  <section class="hero" id="trials" aria-labelledby="hero-title">
-    <h1 id="hero-title">A fix is only done when someone else can see it is done.</h1>
-    <p class="lede">PREDICT-SHIELD ranks vulnerabilities, applies a response under policy, and then checks the result with evidence the response step cannot influence. Below are all 1,200 trials of its sealed verification test. In none of them did it report a fix that had not happened.</p>
-
-    <div class="grid-controls" role="group" aria-label="What the grid shows">
-      <button type="button" class="seg" aria-pressed="true" data-view="verifier">What the verifier said</button>
-      <button type="button" class="seg" aria-pressed="false" data-view="oracle">What was actually true</button>
+<main id="top">
+  <section class="hero">
+    <div class="hero-copy">
+      <h1>Fix what matters.<br>Prove it's fixed.</h1>
+      <p>PREDICT-SHIELD finds the security issues most likely to be exploited, fixes or contains them with your approval, and then checks independently that the problem is really gone. When it can't confirm a fix, it tells you.</p>
+      <div class="cta-row">
+        <a class="btn" href="#pilot">Request a free pilot</a>
+        <a class="btn btn-ghost" href="#how">See how it works</a>
+      </div>
     </div>
+    <figure class="hero-demo" aria-label="Animated example: a route hijack on an ISP network is detected, contained and verified">
+      <svg id="netviz" viewBox="0 0 520 380" role="img">
+        <title>A provider network under a route hijack, then contained and verified</title>
+        <g class="links">
+          <line x1="90" y1="70" x2="230" y2="120"/>
+          <line x1="230" y1="120" x2="380" y2="120"/>
+          <line x1="380" y1="120" x2="450" y2="250"/>
+          <line x1="230" y1="120" x2="140" y2="280"/>
+          <line x1="450" y1="250" x2="330" y2="320"/>
+        </g>
+        <path id="flow-good" class="flow good" d="M140 280 L230 120 L90 70"/>
+        <path id="flow-bad" class="flow bad" d="M140 280 L230 120 L380 120 L450 250 L330 320"/>
+        <g class="node"><circle cx="90" cy="70" r="22"/><text x="90" y="112">Content</text></g>
+        <g class="node router"><rect x="208" y="98" width="44" height="44" rx="10"/><text x="230" y="168">Edge</text></g>
+        <g class="node router"><rect x="358" y="98" width="44" height="44" rx="10"/><text x="380" y="168">Core</text></g>
+        <g class="node router" id="pe"><rect x="428" y="228" width="44" height="44" rx="10"/><text x="450" y="296">Edge</text></g>
+        <g class="node user"><circle cx="140" cy="280" r="20"/><text x="140" y="320">Subscriber</text></g>
+        <g class="node threat" id="attacker"><circle cx="330" cy="320" r="20"/><text x="330" y="360">Customer router</text></g>
+        <g id="shield" class="shield"><path d="M450 214 l-14 6v9c0 9 6 16 14 18 8-2 14-9 14-18v-9z"/></g>
+        <g id="check" class="check"><circle cx="90" cy="70" r="30"/></g>
+      </svg>
+      <figcaption>
+        <ol class="steps" id="viz-steps">
+          <li data-step="0"><b>Normal</b> Traffic reaches the real content.</li>
+          <li data-step="1"><b>Attack</b> A customer announces routes it doesn't own. Traffic is hijacked.</li>
+          <li data-step="2"><b>Detect and contain</b> The routes are flagged; a filter is applied after approval.</li>
+          <li data-step="3"><b>Verify</b> An independent check confirms traffic reaches the real content again.</li>
+        </ol>
+      </figcaption>
+    </figure>
+  </section>
 
-    <div class="grid-scroll">
-      <div id="grid" class="grid" role="grid" aria-label="1,200 trials: 100 fault configurations across, 4 responses by 3 repeats down"></div>
-    </div>
-    <ul class="legend" id="legend"></ul>
-
-    <div class="replay" id="replay" aria-live="polite">
-      <p class="replay-empty">Select any cell to replay that trial.</p>
+  <section class="problem">
+    <p class="problem-lead">Most security tools stop at "patched". The issue is often still there: a cache that never refreshed, a server the scanner couldn't reach, a fix applied to the wrong place.</p>
+    <div class="stats" id="stats">
+      <div><strong>0</strong><span>times it reported a fix that hadn't happened, across 1,200 sealed test runs</span></div>
+      <div><strong>52%</strong><span>of later-exploited 2024 vulnerabilities were in its top 5%</span></div>
+      <div><strong>2 of 2</strong><span>over-broad changes in lab tests caught by the independent check and rolled back automatically</span></div>
     </div>
   </section>
 
-  <section class="block" id="actions" aria-labelledby="actions-title">
-    <h2 id="actions-title">Which response actually fixed the fault</h2>
-    <p>Each of the 100 fault configurations was run with all four responses, three times, and judged by an independent observer that reads every service directly.</p>
-    <div class="table-scroll"><table class="data" id="q1"></table></div>
-    <p class="note">For lasting faults only a restart worked. For faults that clear on their own, any response ended fixed, so doing nothing was the cheapest choice under every cost assumption tested.</p>
-    <h3>Cost of each response, by how much a missed fix is assumed to cost</h3>
-    <div class="costs" id="costs"></div>
+  <section class="section" id="how">
+    <h2>How it works</h2>
+    <p class="intro">Four steps, with a person approving every change that touches your network.</p>
+    <ol class="how">
+      <li><h3>Prioritize</h3><p>Ranks every known vulnerability by how likely it is to be exploited, using a model tested on a full year of real vulnerability data, so your team starts with the few that matter.</p></li>
+      <li><h3>Decide</h3><p>Chooses fix, mitigate, quarantine, escalate or monitor under rules you set, and explains why. Nothing is changed without a signed approval.</p></li>
+      <li><h3>Act</h3><p>Applies the approved change through a controlled path that validates it first and can put everything back exactly as it was.</p></li>
+      <li><h3>Verify</h3><p>Confirms the result with evidence the change itself can't influence. If the check fails, the change is rolled back. If it can't see enough, it says "cannot confirm" instead of guessing.</p></li>
+    </ol>
   </section>
 
-  <section class="block" id="ranker" aria-labelledby="ranker-title">
-    <h2 id="ranker-title">Where a CVE ranks for exploitation</h2>
-    <p id="ranker-intro">A model trained on 2017 to 2023 data and tested once on every CVE published in 2024: the top 5% it flagged held 52% of the CVEs later confirmed as exploited. Look up any CVE published since 2025 to see its rank among 2025 CVEs.</p>
+  <section class="section" id="who">
+    <h2>Who it's for</h2>
+    <div class="audiences">
+      <article>
+        <h3>Internet service providers</h3>
+        <p>Detects route announcements a customer isn't entitled to make, applies a prefix filter with approval, and confirms traffic is back on the right path for every router.</p>
+        <p class="proof">Tested on a routed lab network with real routing software: a hijack was detected, contained and verified, and an over-broad filter was caught and rolled back.</p>
+      </article>
+      <article>
+        <h3>Telecom operators</h3>
+        <p>Builds the network map from what devices and switches actually report, and flags equipment and traffic missing from your inventory before it becomes a blind spot.</p>
+        <p class="proof">Tested with SNMPv3 and gNMI over mutual TLS, and on live switch traffic, where it found a host left out of the declared inventory.</p>
+      </article>
+      <article>
+        <h3>Businesses with websites</h3>
+        <p>Tells you which of your vulnerabilities to fix first. When no fix exists yet, it can block just the vulnerable page and keep the rest of your site running.</p>
+        <p class="proof">Tested on a deliberately vulnerable web app: the vulnerable page was blocked, attacks failed, every other page kept working, and the block was lifted once the code was fixed.</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="section" id="proof">
+    <h2>Tested before we ask you to trust it</h2>
+    <p class="intro">Every test had its success criteria fixed before it ran, and was scored against an independent observer the system could not see. Results that fell short are published too.</p>
+    <div class="table-scroll"><table class="results" id="results"></table></div>
+    <p class="fine">All results come from laboratory networks and public datasets. PREDICT-SHIELD is ready for pilots and has not yet run in production. Full reports, code and test records are public on <a href="https://github.com/katlaang/predict-shield">GitHub</a>.</p>
+  </section>
+
+  <section class="section try" id="try">
+    <h2>Try it: how urgent is a vulnerability?</h2>
+    <p class="intro">Enter any CVE published since 2025 to see where it ranks for likelihood of exploitation.</p>
     <form class="lookup" id="lookup">
       <label for="cve-input">CVE identifier</label>
       <div class="lookup-row">
-        <input id="cve-input" name="cve" placeholder="CVE-2026-12345" autocomplete="off" spellcheck="false" inputmode="text">
-        <button type="submit">Look up rank</button>
+        <input id="cve-input" name="cve" placeholder="CVE-2025-1974" autocomplete="off" spellcheck="false">
+        <button class="btn" type="submit">Check rank</button>
       </div>
     </form>
     <div id="cve-result" aria-live="polite"></div>
-    <h3 id="top-title">Highest-ranked CVEs published in 2026</h3>
-    <div class="table-scroll"><table class="data" id="top-cves"></table></div>
-    <p class="note">A low rank is not evidence that a CVE is safe. Ranks inform a human decision; they do not replace it.</p>
+    <p class="fine">Ranks support a person's decision; they don't replace it. A low rank is not proof that a vulnerability is safe to ignore.</p>
   </section>
 
-  <section class="block" id="misses" aria-labelledby="misses-title">
-    <h2 id="misses-title">Detectors that fell short</h2>
-    <p>Every limit below was fixed before its test data was read, and each test ran once. These results are published with the same weight as the ones that worked.</p>
-    <div class="table-scroll"><table class="data" id="miss-table"></table></div>
+  <section class="pilot" id="pilot">
+    <div>
+      <h2>Run a free pilot</h2>
+      <p>We're looking for a small number of ISPs, telecom operators and businesses to try PREDICT-SHIELD on a limited scope, such as one network segment, a test environment or a public website.</p>
+      <ul class="pilot-list">
+        <li>A prioritized list of your vulnerabilities, with the reasons</li>
+        <li>Recommended responses, applied only with your approval</li>
+        <li>An independent check of every change, with a full audit trail</li>
+      </ul>
+    </div>
+    <div class="pilot-cta">
+      <a class="btn btn-light" id="contact-link" href="#pilot">Request a pilot</a>
+      <p>Built by Eunice Kamau, IEEE Senior Member, with 14+ years in telecommunications and cloud security.</p>
+    </div>
   </section>
 </main>
 
-<footer class="foot">
-  <p>All results come from laboratory test beds and public datasets; PREDICT-SHIELD has not run in a production environment. Each figure links to its report in the <a href="https://github.com/katlaang/predict-shield">public repository</a> (Apache-2.0).</p>
-  <p>© 2026 Eunice Kamau</p>
+<footer class="footer">
+  <span>© 2026 Eunice Kamau. PREDICT-SHIELD is open source under the Apache-2.0 license.</span>
+  <a href="https://github.com/katlaang/predict-shield">Source code and test reports</a>
 </footer>
 <script src="app.js" defer></script>
 </body>
