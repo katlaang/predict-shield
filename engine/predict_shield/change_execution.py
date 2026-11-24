@@ -233,7 +233,7 @@ def render_csp(policy: dict) -> str:
         if not isinstance(sources, (list, tuple)) or not sources:
             raise ValueError("each CSP directive needs at least one source")
         for source in sources:
-            if not isinstance(source, str) or not _CSP_SOURCE.match(source):
+            if not isinstance(source, str) or not _CSP_SOURCE.fullmatch(source):
                 raise ValueError("unsupported CSP source " + repr(source))
         parts.append(directive + " " + " ".join(sources))
     return "; ".join(parts)

@@ -16,6 +16,7 @@ on:
       - 'engine/predict_shield/change_execution.py'
       - 'engine/predict_shield/sast_findings.py'
       - 'engine/predict_shield/script_integrity.py'
+      - 'engine/predict_shield/vulnerability_response.py'
       - '.github/workflows/public-sources.yml'
   pull_request:
     paths:
@@ -26,6 +27,7 @@ on:
       - 'engine/predict_shield/change_execution.py'
       - 'engine/predict_shield/sast_findings.py'
       - 'engine/predict_shield/script_integrity.py'
+      - 'engine/predict_shield/vulnerability_response.py'
       - '.github/workflows/public-sources.yml'
   schedule:
     - cron: '17 9 * * 1'
@@ -234,5 +236,68 @@ jobs:
         with:
           name: public-sources-dvwa-sast-chain
           path: /tmp/ps-dvwa.json
+          if-no-files-found: warn
+          retention-days: 90
+
+  dvwa-quarantine:
+    # A route with no fix is quarantined behind nginx through the gated change
+    # path, verified, rolled back when too broad, and lifted after a fix.
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install PHP, nginx, Semgrep and the signature library
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y php-cli php-mysql nginx-light
+          sudo systemctl stop nginx || true
+          pip install 'cryptography>=42' semgrep==1.185.0
+          nginx -v
+      - name: Unit tests
+        run: PYTHONPATH=engine:engine/tests python -m unittest test_vulnerability_response test_change_execution -v
+      - name: Start a disposable MariaDB on loopback
+        run: |
+          docker run -d --name ps-dvwa-db -p 127.0.0.1:3306:3306 \
+            -e MARIADB_ROOT_PASSWORD=ps-lab-root -e MARIADB_DATABASE=dvwa \
+            -e MARIADB_USER=dvwa -e MARIADB_PASSWORD='p@ssw0rd' mariadb:11
+          for attempt in $(seq 1 60); do
+            if docker exec ps-dvwa-db mariadb-admin ping -h 127.0.0.1 -uroot -pps-lab-root --silent; then exit 0; fi
+            sleep 2
+          done
+          docker logs ps-dvwa-db; exit 1
+      - name: Quarantine, over-broad rollback, lift after fix
+        working-directory: experiment-b/public-sources/dvwa
+        run: python run_dvwa_quarantine.py --db-port 3306 --output /tmp/ps-dvwa-quarantine.json
+      - name: Check the results
+        run: |
+          python - <<'PY'
+          import json
+          r = json.load(open("/tmp/ps-dvwa-quarantine.json"))
+          s = r["summary"]
+          assert r["audit_log_chain_intact"] is True
+          assert r["decision"]["action"] == "QUARANTINE"
+          assert any(v["injection_succeeded"] for v in r["before"]["injection"].values()), "injection must work before"
+          for n in s:
+              assert s[n]["without_approval"] == "REFUSED", (n, s[n])
+          q = s["quarantine-sqli"]
+          assert q["final_status"] == "APPLIED_VERIFIED", r["incidents"]["quarantine-sqli"]["verification_reason"]
+          assert q["include_after"] == ["/vulnerabilities/sqli/"] and q["route_status_after"] == 403
+          assert q["payloads_refused_after"] and set(q["other_pages_after"].values()) == {200}
+          o = s["overbroad-quarantine"]
+          assert o["final_status"] == "ROLLED_BACK" and o["include_after"] == [], o
+          l = s["lift-after-fix"]
+          assert l["final_status"] == "APPLIED_VERIFIED" and l["include_after"] == [] and l["route_status_after"] == 200, l
+          assert l["payloads_refused_after"]
+          print(json.dumps(s, indent=1, sort_keys=True))
+          PY
+      - name: Retain the report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: public-sources-dvwa-quarantine
+          path: /tmp/ps-dvwa-quarantine.json
           if-no-files-found: warn
           retention-days: 90

@@ -6,12 +6,36 @@
 - Failed both parts of the condition. It detected 0.14% of attack flows (42 of 30,174) against a 50% floor, and alerted on 1.36% of normal flows against a 1% ceiling (Benign 0.57%, Background 2.97%).
 - Development had already shown under 1.2% detection with 2018 held out. Evidence: `docs/evidence/MEASURED_CROSS_DATASET_FLOW_DETECTOR_V3_2026_11_23.md`.
 
+## 2026-11-21: Exploitation rank drives the quarantine decision
+
+- `engine/predict_shield/exploit_scoring.py` loads the frozen exploitation model after checking the model bytes, the feature code, the scikit-learn version and the reference file against the freeze, and scores a CVE JSON 5 record (CNA container only).
+- The model was trained with balanced class weights, so its score orders CVEs but is not a probability. `reference.py` scored all 48,150 CVEs published in 2025 (after every year used to fit, choose or test; KEV not read, run 44914856897). A CVE's rank is the share of those scoring at least as high. Top 1%, 5% and 10% sit at scores 0.342, 0.039 and 0.013.
+- `decide()` now takes that rank (`exploit_top_share`) and quarantines an unfixable finding in the top 5% (the share that held 51.6% of later-exploited 2024 CVEs), or one listed in KEV. A low rank is reported as not evidence of safety. `finding_for_cve()` builds a finding from a record; an unscorable record escalates.
+
+## 2026-11-20 (a): Vulnerability response: fix, mitigate, quarantine, escalate or monitor
+
+## 2026-11-20: Vulnerability response: fix, mitigate, quarantine, escalate or monitor
+
+- `vulnerability_response.decide()` chooses the response for a finding, with reasons. Quarantine blocks the vulnerable route with an nginx include from a closed grammar, through `change_execution` (signed approval, `nginx -t`, reload, verification, rollback).
+- DVWA lab (run 44777352174): over-broad quarantine rolled back by verification; quarantine of the SQL injection route verified (route 403, payloads refused, five other pages 200); quarantine lifted after the source fix, verified.
+- Fixed: `render_csp` accepted a source ending in a line break. Evidence: `docs/evidence/VULNERABILITY_QUARANTINE_DVWA_2026_11_20.md`.
+
+## 2026-11-20 (b): Learned exploitation likelihood for CVEs
+
 ## 2026-11-20 (1): Cross-dataset flow detector v2 measured on CSE-CIC-IDS2018
 
 - Thresholds and the anomaly model calibrated on the first 2018 day with its labels unread; per-source context removed; the freeze now covers the code as well as the model.
 - Single locked run (freeze `793d315f`, run 44782232012): benign alert rate 0.55%, every day under 1%, so the pre-stated condition was met. Detection was 0.83% (28,643 of 3,441,225 attack flows), so this version is not usable as a detector.
 - Cause: the calibration day contained brute-force traffic, which pushed the supervised threshold to 0.99999997 and taught the anomaly model attacks as normal. Version 3 calibrates on verified-normal traffic and adds a detection floor to the pass condition.
 - Disclosed: attempt 1 was stopped by a runner shutdown after one day's result was printed; the placeholder test pin in the first freeze; the 2018 files are not stored in time order (context is computed after sorting).
+
+
+
+## 2026-11-20: Learned exploitation likelihood for CVEs
+
+- `experiment-b/exploit-likelihood/`: CVE records (CNA container only) with CISA KEV as labels; train 2017 to 2022, choose on 2023 H1, freeze, score 2024 once (run 44777279550).
+- Test: 39,924 CVEs, 161 in KEV. Top 1% by score held 53 of them (32.9%), top 10% held 99 (61.5%); 33 of the top 100 were in KEV; ROC AUC 0.876.
+- Training fit is reported beside validation for all eight candidates: structured-field-only models underfit, the largest text model overfits, and the learning curve was still rising. Evidence: `docs/evidence/MEASURED_EXPLOIT_LIKELIHOOD_2026_11_20.md`.
 
 ## 2026-11-21 (b): Learned GOOSE anomaly detector on PowerDuck
 

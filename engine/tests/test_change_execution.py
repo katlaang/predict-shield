@@ -201,5 +201,13 @@ class RenderingTests(unittest.TestCase):
             adapter.validate(pinned.replace("/own.js", "/evil.js"))
 
 
+
+class CspTrailingNewlineTests(unittest.TestCase):
+    def test_a_source_with_a_trailing_newline_is_refused(self):
+        from predict_shield.change_execution import render_csp
+        with self.assertRaises(ValueError):
+            render_csp({"script-src": ["'self'\n"]})
+
+
 if __name__ == "__main__":
     unittest.main()
