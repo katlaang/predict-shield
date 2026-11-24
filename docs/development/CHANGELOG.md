@@ -1,5 +1,17 @@
 # Development changelog
 
+## 2026-11-21: Mechanism-lab scored campaign
+
+- **Run:** 1,200 of 1,200 trials, run under lock `9422667f` (CI run 44879497946), with no reruns and no exclusions. Controls passed on the same code first. Aggregate reports are in `docs/evidence/mechanism-scored-campaign/run-44879497946/`.
+- **Lasting faults** (loss and paused listener, 70 configurations): restart_enforcer fixed 70 of 70. Resync, gateway restriction and doing nothing each fixed 0 of 70. In the 34 lasting-fault configurations where the plan forbids restarts, no permitted action fixed the fault.
+- **Self-healing faults** (30 configurations): every action ended fixed. Doing nothing had the lowest cost at all three cost ratios, which is the robust finding. For lasting faults, restart had the lowest cost at 1:5 and 1:20, but not at 1:1.
+- **Verifier:**
+  - No false VERIFIED in 1,200 trials. Specificity was 334 of 334 and sensitivity 173 of 173 when it answered.
+  - It abstained on 57.8% of trials.
+  - The dual-evidence rule only added abstentions (62.0%).
+- **Exposure-seconds** are gateway-sampled and understate oracle exposure. Q4 (estimator calibration) is not reported, because its analysis was never locked.
+- Full write-up: `docs/evidence/MEASURED_MECHANISM_LAB_SCORED_CAMPAIGN_2026_11_21.md`.
+
 ## 2026-11-23: Cross-dataset flow detector v3, single HIKARI-2021 test
 
 - Developed on CIC-IDS2017 and CSE-CIC-IDS2018 with verified-normal calibration, a detection floor and a fixed model-selection rule, then tested once on HIKARI-2021 (Zeek flowmeter captures). Development run 44914414336; test run 45314301123.

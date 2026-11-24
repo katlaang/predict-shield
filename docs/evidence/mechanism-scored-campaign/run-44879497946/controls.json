@@ -1,0 +1,8840 @@
+{
+ "campaign_window_seconds": 6,
+ "cells": [
+  [
+   "none",
+   10000,
+   0,
+   "healthy",
+   4
+  ],
+  [
+   "none",
+   30000,
+   0,
+   "healthy",
+   4
+  ],
+  [
+   "loss",
+   10000,
+   0,
+   "persistent",
+   4
+  ],
+  [
+   "loss",
+   30000,
+   0,
+   "persistent",
+   4
+  ],
+  [
+   "loss",
+   2500,
+   0,
+   "self_healing",
+   4
+  ],
+  [
+   "loss",
+   4000,
+   0,
+   "self_healing",
+   4
+  ],
+  [
+   "consumer_paused",
+   10000,
+   0,
+   "persistent",
+   4
+  ],
+  [
+   "consumer_paused",
+   30000,
+   0,
+   "persistent",
+   4
+  ],
+  [
+   "delay",
+   10000,
+   2000,
+   "self_healing",
+   4
+  ],
+  [
+   "delay",
+   10000,
+   3000,
+   "self_healing",
+   4
+  ]
+ ],
+ "control_window_seconds": 36,
+ "fault_target": "enforcer-b",
+ "lock_state_sha256": "9422667f129b2da8d1d121387f2f8dc0a2b0f40777d6f4b7c635bf39243f973b",
+ "plan_classes_confirmed": true,
+ "runs": [
+  {
+   "cache_ttl_ms": 10000,
+   "control_id": "none-ttl10000-d0-0",
+   "end_of_campaign_window": {
+    "gateway_exposure_observed": false,
+    "operator_telemetry": [
+     {
+      "applied_revision": 2,
+      "cache_age_ms": 7288,
+      "cache_ttl_ms": 10000,
+      "handled_events": 3,
+      "latency_ms": 3.6779619999833812,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-a",
+      "observed": true,
+      "observed_at_monotonic": 292.660136214,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 2,
+      "cache_age_ms": 7294,
+      "cache_ttl_ms": 10000,
+      "handled_events": 3,
+      "latency_ms": 3.7442629999873134,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-b",
+      "observed": true,
+      "observed_at_monotonic": 292.663893434,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 2,
+      "cache_age_ms": 7299,
+      "cache_ttl_ms": 10000,
+      "handled_events": 3,
+      "latency_ms": 4.0510219999987385,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-c",
+      "observed": true,
+      "observed_at_monotonic": 292.667955591,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 2,
+      "cache_age_ms": 7301,
+      "cache_ttl_ms": 10000,
+      "handled_events": 3,
+      "latency_ms": 8.178343999986737,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-hidden",
+      "observed": true,
+      "observed_at_monotonic": 292.676144526,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     }
+    ],
+    "oracle_denied": true,
+    "t": 6.139,
+    "verifier_scope": "VERIFIED"
+   },
+   "event_delay_ms": 0,
+   "expected": "healthy",
+   "fault_mode": "none",
+   "kind": "negative",
+   "oracle_reads": [
+    {
+     "denied": true,
+     "t": 0.027
+    },
+    {
+     "denied": true,
+     "t": 1.053
+    },
+    {
+     "denied": true,
+     "t": 2.03
+    },
+    {
+     "denied": true,
+     "t": 3.056
+    },
+    {
+     "denied": true,
+     "t": 4.034
+    },
+    {
+     "denied": true,
+     "t": 5.061
+    },
+    {
+     "denied": true,
+     "t": 6.159
+    },
+    {
+     "denied": true,
+     "t": 7.036
+    },
+    {
+     "denied": true,
+     "t": 8.062
+    },
+    {
+     "denied": true,
+     "t": 9.426
+    },
+    {
+     "denied": true,
+     "t": 10.053
+    },
+    {
+     "denied": true,
+     "t": 11.03
+    },
+    {
+     "denied": true,
+     "t": 12.057
+    },
+    {
+     "denied": true,
+     "t": 13.033
+    },
+    {
+     "denied": true,
+     "t": 14.059
+    },
+    {
+     "denied": true,
+     "t": 15.037
+    },
+    {
+     "denied": true,
+     "t": 16.063
+    },
+    {
+     "denied": true,
+     "t": 17.04
+    },
+    {
+     "denied": true,
+     "t": 18.066
+    },
+    {
+     "denied": true,
+     "t": 19.042
+    },
+    {
+     "denied": true,
+     "t": 20.081
+    },
+    {
+     "denied": true,
+     "t": 21.057
+    },
+    {
+     "denied": true,
+     "t": 22.032
+    },
+    {
+     "denied": true,
+     "t": 23.061
+    },
+    {
+     "denied": true,
+     "t": 24.037
+    },
+    {
+     "denied": true,
+     "t": 25.062
+    },
+    {
+     "denied": true,
+     "t": 26.04
+    },
+    {
+     "denied": true,
+     "t": 27.065
+    },
+    {
+     "denied": true,
+     "t": 28.041
+    },
+    {
+     "denied": true,
+     "t": 29.067
+    },
+    {
+     "denied": true,
+     "t": 30.042
+    },
+    {
+     "denied": true,
+     "t": 31.08
+    },
+    {
+     "denied": true,
+     "t": 32.055
+    },
+    {
+     "denied": true,
+     "t": 33.031
+    },
+    {
+     "denied": true,
+     "t": 34.057
+    },
+    {
+     "denied": true,
+     "t": 35.031
+    }
+   ],
+   "outcome": "HEALTHY"
+  },
+  {
+   "cache_ttl_ms": 10000,
+   "control_id": "none-ttl10000-d0-1",
+   "end_of_campaign_window": {
+    "gateway_exposure_observed": false,
+    "operator_telemetry": [
+     {
+      "applied_revision": 4,
+      "cache_age_ms": 7312,
+      "cache_ttl_ms": 10000,
+      "handled_events": 3,
+      "latency_ms": 2.6849629999787794,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-a",
+      "observed": true,
+      "observed_at_monotonic": 329.998582743,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 4,
+      "cache_age_ms": 7314,
+      "cache_ttl_ms": 10000,
+      "handled_events": 3,
+      "latency_ms": 2.562188000013066,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-b",
+      "observed": true,
+      "observed_at_monotonic": 330.001155849,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 4,
+      "cache_age_ms": 7318,
+      "cache_ttl_ms": 10000,
+      "handled_events": 3,
+      "latency_ms": 2.640177000046151,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-c",
+      "observed": true,
+      "observed_at_monotonic": 330.003804429,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 4,
+      "cache_age_ms": 7321,
+      "cache_ttl_ms": 10000,
+      "handled_events": 3,
+      "latency_ms": 2.4249449999729222,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-hidden",
+      "observed": true,
+      "observed_at_monotonic": 330.006238072,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     }
+    ],
+    "oracle_denied": true,
+    "t": 6.147,
+    "verifier_scope": "VERIFIED"
+   },
+   "event_delay_ms": 0,
+   "expected": "healthy",
+   "fault_mode": "none",
+   "kind": "negative",
+   "oracle_reads": [
+    {
+     "denied": true,
+     "t": 0.022
+    },
+    {
+     "denied": true,
+     "t": 1.047
+    },
+    {
+     "denied": true,
+     "t": 2.072
+    },
+    {
+     "denied": true,
+     "t": 3.047
+    },
+    {
+     "denied": true,
+     "t": 4.071
+    },
+    {
+     "denied": true,
+     "t": 5.046
+    },
+    {
+     "denied": true,
+     "t": 6.163
+    },
+    {
+     "denied": true,
+     "t": 7.037
+    },
+    {
+     "denied": true,
+     "t": 8.061
+    },
+    {
+     "denied": true,
+     "t": 9.048
+    },
+    {
+     "denied": true,
+     "t": 10.024
+    },
+    {
+     "denied": true,
+     "t": 11.049
+    },
+    {
+     "denied": true,
+     "t": 12.025
+    },
+    {
+     "denied": true,
+     "t": 13.052
+    },
+    {
+     "denied": true,
+     "t": 14.027
+    },
+    {
+     "denied": true,
+     "t": 15.055
+    },
+    {
+     "denied": true,
+     "t": 16.03
+    },
+    {
+     "denied": true,
+     "t": 17.054
+    },
+    {
+     "denied": true,
+     "t": 18.028
+    },
+    {
+     "denied": true,
+     "t": 19.064
+    },
+    {
+     "denied": true,
+     "t": 20.041
+    },
+    {
+     "denied": true,
+     "t": 21.063
+    },
+    {
+     "denied": true,
+     "t": 22.04
+    },
+    {
+     "denied": true,
+     "t": 23.064
+    },
+    {
+     "denied": true,
+     "t": 24.038
+    },
+    {
+     "denied": true,
+     "t": 25.062
+    },
+    {
+     "denied": true,
+     "t": 26.036
+    },
+    {
+     "denied": true,
+     "t": 27.06
+    },
+    {
+     "denied": true,
+     "t": 28.034
+    },
+    {
+     "denied": true,
+     "t": 29.073
+    },
+    {
+     "denied": true,
+     "t": 30.046
+    },
+    {
+     "denied": true,
+     "t": 31.069
+    },
+    {
+     "denied": true,
+     "t": 32.042
+    },
+    {
+     "denied": true,
+     "t": 33.066
+    },
+    {
+     "denied": true,
+     "t": 34.041
+    },
+    {
+     "denied": true,
+     "t": 35.064
+    }
+   ],
+   "outcome": "HEALTHY"
+  },
+  {
+   "cache_ttl_ms": 10000,
+   "control_id": "none-ttl10000-d0-2",
+   "end_of_campaign_window": {
+    "gateway_exposure_observed": false,
+    "operator_telemetry": [
+     {
+      "applied_revision": 6,
+      "cache_age_ms": 7318,
+      "cache_ttl_ms": 10000,
+      "handled_events": 3,
+      "latency_ms": 2.233165999996345,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-a",
+      "observed": true,
+      "observed_at_monotonic": 367.29668579,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 6,
+      "cache_age_ms": 7320,
+      "cache_ttl_ms": 10000,
+      "handled_events": 3,
+      "latency_ms": 1.9471159999966403,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-b",
+      "observed": true,
+      "observed_at_monotonic": 367.298640767,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 6,
+      "cache_age_ms": 7322,
+      "cache_ttl_ms": 10000,
+      "handled_events": 3,
+      "latency_ms": 1.896120000026258,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-c",
+      "observed": true,
+      "observed_at_monotonic": 367.300545018,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 6,
+      "cache_age_ms": 7324,
+      "cache_ttl_ms": 10000,
+      "handled_events": 3,
+      "latency_ms": 1.954168999986905,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-hidden",
+      "observed": true,
+      "observed_at_monotonic": 367.302506849,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     }
+    ],
+    "oracle_denied": true,
+    "t": 6.148,
+    "verifier_scope": "VERIFIED"
+   },
+   "event_delay_ms": 0,
+   "expected": "healthy",
+   "fault_mode": "none",
+   "kind": "negative",
+   "oracle_reads": [
+    {
+     "denied": true,
+     "t": 0.021
+    },
+    {
+     "denied": true,
+     "t": 1.045
+    },
+    {
+     "denied": true,
+     "t": 2.068
+    },
+    {
+     "denied": true,
+     "t": 3.041
+    },
+    {
+     "denied": true,
+     "t": 4.064
+    },
+    {
+     "denied": true,
+     "t": 5.04
+    },
+    {
+     "denied": true,
+     "t": 6.161
+    },
+    {
+     "denied": true,
+     "t": 7.035
+    },
+    {
+     "denied": true,
+     "t": 8.058
+    },
+    {
+     "denied": true,
+     "t": 9.046
+    },
+    {
+     "denied": true,
+     "t": 10.07
+    },
+    {
+     "denied": true,
+     "t": 11.044
+    },
+    {
+     "denied": true,
+     "t": 12.066
+    },
+    {
+     "denied": true,
+     "t": 13.039
+    },
+    {
+     "denied": true,
+     "t": 14.061
+    },
+    {
+     "denied": true,
+     "t": 15.032
+    },
+    {
+     "denied": true,
+     "t": 16.054
+    },
+    {
+     "denied": true,
+     "t": 17.03
+    },
+    {
+     "denied": true,
+     "t": 18.052
+    },
+    {
+     "denied": true,
+     "t": 19.024
+    },
+    {
+     "denied": true,
+     "t": 20.063
+    },
+    {
+     "denied": true,
+     "t": 21.036
+    },
+    {
+     "denied": true,
+     "t": 22.058
+    },
+    {
+     "denied": true,
+     "t": 23.031
+    },
+    {
+     "denied": true,
+     "t": 24.054
+    },
+    {
+     "denied": true,
+     "t": 25.026
+    },
+    {
+     "denied": true,
+     "t": 26.048
+    },
+    {
+     "denied": true,
+     "t": 27.021
+    },
+    {
+     "denied": true,
+     "t": 28.045
+    },
+    {
+     "denied": true,
+     "t": 29.067
+    },
+    {
+     "denied": true,
+     "t": 30.041
+    },
+    {
+     "denied": true,
+     "t": 31.075
+    },
+    {
+     "denied": true,
+     "t": 32.048
+    },
+    {
+     "denied": true,
+     "t": 33.022
+    },
+    {
+     "denied": true,
+     "t": 34.045
+    },
+    {
+     "denied": true,
+     "t": 35.069
+    }
+   ],
+   "outcome": "HEALTHY"
+  },
+  {
+   "cache_ttl_ms": 10000,
+   "control_id": "none-ttl10000-d0-3",
+   "end_of_campaign_window": {
+    "gateway_exposure_observed": false,
+    "operator_telemetry": [
+     {
+      "applied_revision": 8,
+      "cache_age_ms": 7299,
+      "cache_ttl_ms": 10000,
+      "handled_events": 3,
+      "latency_ms": 1.6566240000202015,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-a",
+      "observed": true,
+      "observed_at_monotonic": 404.570954671,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 8,
+      "cache_age_ms": 7301,
+      "cache_ttl_ms": 10000,
+      "handled_events": 3,
+      "latency_ms": 1.7987490000450634,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-b",
+      "observed": true,
+      "observed_at_monotonic": 404.572762842,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 8,
+      "cache_age_ms": 7303,
+      "cache_ttl_ms": 10000,
+      "handled_events": 3,
+      "latency_ms": 1.7768660000001546,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-c",
+      "observed": true,
+      "observed_at_monotonic": 404.57454852,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 8,
+      "cache_age_ms": 7305,
+      "cache_ttl_ms": 10000,
+      "handled_events": 3,
+      "latency_ms": 1.7799780000018472,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-hidden",
+      "observed": true,
+      "observed_at_monotonic": 404.576336967,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     }
+    ],
+    "oracle_denied": true,
+    "t": 6.127,
+    "verifier_scope": "VERIFIED"
+   },
+   "event_delay_ms": 0,
+   "expected": "healthy",
+   "fault_mode": "none",
+   "kind": "negative",
+   "oracle_reads": [
+    {
+     "denied": true,
+     "t": 0.022
+    },
+    {
+     "denied": true,
+     "t": 1.045
+    },
+    {
+     "denied": true,
+     "t": 2.067
+    },
+    {
+     "denied": true,
+     "t": 3.039
+    },
+    {
+     "denied": true,
+     "t": 4.061
+    },
+    {
+     "denied": true,
+     "t": 5.036
+    },
+    {
+     "denied": true,
+     "t": 6.14
+    },
+    {
+     "denied": true,
+     "t": 7.061
+    },
+    {
+     "denied": true,
+     "t": 8.033
+    },
+    {
+     "denied": true,
+     "t": 9.072
+    },
+    {
+     "denied": true,
+     "t": 10.051
+    },
+    {
+     "denied": true,
+     "t": 11.024
+    },
+    {
+     "denied": true,
+     "t": 12.047
+    },
+    {
+     "denied": true,
+     "t": 13.071
+    },
+    {
+     "denied": true,
+     "t": 14.043
+    },
+    {
+     "denied": true,
+     "t": 15.065
+    },
+    {
+     "denied": true,
+     "t": 16.036
+    },
+    {
+     "denied": true,
+     "t": 17.058
+    },
+    {
+     "denied": true,
+     "t": 18.03
+    },
+    {
+     "denied": true,
+     "t": 19.052
+    },
+    {
+     "denied": true,
+     "t": 20.038
+    },
+    {
+     "denied": true,
+     "t": 21.059
+    },
+    {
+     "denied": true,
+     "t": 22.031
+    },
+    {
+     "denied": true,
+     "t": 23.052
+    },
+    {
+     "denied": true,
+     "t": 24.023
+    },
+    {
+     "denied": true,
+     "t": 25.046
+    },
+    {
+     "denied": true,
+     "t": 26.068
+    },
+    {
+     "denied": true,
+     "t": 27.041
+    },
+    {
+     "denied": true,
+     "t": 28.062
+    },
+    {
+     "denied": true,
+     "t": 29.033
+    },
+    {
+     "denied": true,
+     "t": 30.07
+    },
+    {
+     "denied": true,
+     "t": 31.041
+    },
+    {
+     "denied": true,
+     "t": 32.062
+    },
+    {
+     "denied": true,
+     "t": 33.034
+    },
+    {
+     "denied": true,
+     "t": 34.054
+    },
+    {
+     "denied": true,
+     "t": 35.025
+    }
+   ],
+   "outcome": "HEALTHY"
+  },
+  {
+   "cache_ttl_ms": 30000,
+   "control_id": "none-ttl30000-d0-0",
+   "end_of_campaign_window": {
+    "gateway_exposure_observed": false,
+    "operator_telemetry": [
+     {
+      "applied_revision": 10,
+      "cache_age_ms": 7285,
+      "cache_ttl_ms": 30000,
+      "handled_events": 3,
+      "latency_ms": 1.9042010000021037,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-a",
+      "observed": true,
+      "observed_at_monotonic": 441.851591355,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 10,
+      "cache_age_ms": 7287,
+      "cache_ttl_ms": 30000,
+      "handled_events": 3,
+      "latency_ms": 2.153647000000092,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-b",
+      "observed": true,
+      "observed_at_monotonic": 441.853754847,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 10,
+      "cache_age_ms": 7290,
+      "cache_ttl_ms": 30000,
+      "handled_events": 3,
+      "latency_ms": 2.873465000050146,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-c",
+      "observed": true,
+      "observed_at_monotonic": 441.856638014,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 10,
+      "cache_age_ms": 7291,
+      "cache_ttl_ms": 30000,
+      "handled_events": 3,
+      "latency_ms": 2.049211999974432,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-hidden",
+      "observed": true,
+      "observed_at_monotonic": 441.858695389,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     }
+    ],
+    "oracle_denied": true,
+    "t": 6.115,
+    "verifier_scope": "VERIFIED"
+   },
+   "event_delay_ms": 0,
+   "expected": "healthy",
+   "fault_mode": "none",
+   "kind": "negative",
+   "oracle_reads": [
+    {
+     "denied": true,
+     "t": 0.018
+    },
+    {
+     "denied": true,
+     "t": 1.039
+    },
+    {
+     "denied": true,
+     "t": 2.059
+    },
+    {
+     "denied": true,
+     "t": 3.03
+    },
+    {
+     "denied": true,
+     "t": 4.052
+    },
+    {
+     "denied": true,
+     "t": 5.022
+    },
+    {
+     "denied": true,
+     "t": 6.129
+    },
+    {
+     "denied": true,
+     "t": 7.05
+    },
+    {
+     "denied": true,
+     "t": 8.021
+    },
+    {
+     "denied": true,
+     "t": 9.041
+    },
+    {
+     "denied": true,
+     "t": 10.062
+    },
+    {
+     "denied": true,
+     "t": 11.034
+    },
+    {
+     "denied": true,
+     "t": 12.055
+    },
+    {
+     "denied": true,
+     "t": 13.029
+    },
+    {
+     "denied": true,
+     "t": 14.051
+    },
+    {
+     "denied": true,
+     "t": 15.022
+    },
+    {
+     "denied": true,
+     "t": 16.042
+    },
+    {
+     "denied": true,
+     "t": 17.062
+    },
+    {
+     "denied": true,
+     "t": 18.033
+    },
+    {
+     "denied": true,
+     "t": 19.053
+    },
+    {
+     "denied": true,
+     "t": 20.024
+    },
+    {
+     "denied": true,
+     "t": 21.045
+    },
+    {
+     "denied": true,
+     "t": 22.065
+    },
+    {
+     "denied": true,
+     "t": 23.037
+    },
+    {
+     "denied": true,
+     "t": 24.06
+    },
+    {
+     "denied": true,
+     "t": 25.031
+    },
+    {
+     "denied": true,
+     "t": 26.051
+    },
+    {
+     "denied": true,
+     "t": 27.022
+    },
+    {
+     "denied": true,
+     "t": 28.042
+    },
+    {
+     "denied": true,
+     "t": 29.079
+    },
+    {
+     "denied": true,
+     "t": 30.049
+    },
+    {
+     "denied": true,
+     "t": 31.02
+    },
+    {
+     "denied": true,
+     "t": 32.042
+    },
+    {
+     "denied": true,
+     "t": 33.063
+    },
+    {
+     "denied": true,
+     "t": 34.034
+    },
+    {
+     "denied": true,
+     "t": 35.055
+    }
+   ],
+   "outcome": "HEALTHY"
+  },
+  {
+   "cache_ttl_ms": 30000,
+   "control_id": "none-ttl30000-d0-1",
+   "end_of_campaign_window": {
+    "gateway_exposure_observed": false,
+    "operator_telemetry": [
+     {
+      "applied_revision": 12,
+      "cache_age_ms": 7283,
+      "cache_ttl_ms": 30000,
+      "handled_events": 3,
+      "latency_ms": 1.4933329999848866,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-a",
+      "observed": true,
+      "observed_at_monotonic": 479.125447878,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 12,
+      "cache_age_ms": 7286,
+      "cache_ttl_ms": 30000,
+      "handled_events": 3,
+      "latency_ms": 1.393996999979663,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-b",
+      "observed": true,
+      "observed_at_monotonic": 479.126849458,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 12,
+      "cache_age_ms": 7287,
+      "cache_ttl_ms": 30000,
+      "handled_events": 3,
+      "latency_ms": 1.5679690000069968,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-c",
+      "observed": true,
+      "observed_at_monotonic": 479.128425592,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 12,
+      "cache_age_ms": 7288,
+      "cache_ttl_ms": 30000,
+      "handled_events": 2,
+      "latency_ms": 1.475990000017191,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-hidden",
+      "observed": true,
+      "observed_at_monotonic": 479.129908473,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     }
+    ],
+    "oracle_denied": true,
+    "t": 6.109,
+    "verifier_scope": "VERIFIED"
+   },
+   "event_delay_ms": 0,
+   "expected": "healthy",
+   "fault_mode": "none",
+   "kind": "negative",
+   "oracle_reads": [
+    {
+     "denied": true,
+     "t": 0.019
+    },
+    {
+     "denied": true,
+     "t": 1.039
+    },
+    {
+     "denied": true,
+     "t": 2.06
+    },
+    {
+     "denied": true,
+     "t": 3.032
+    },
+    {
+     "denied": true,
+     "t": 4.051
+    },
+    {
+     "denied": true,
+     "t": 5.023
+    },
+    {
+     "denied": true,
+     "t": 6.121
+    },
+    {
+     "denied": true,
+     "t": 7.041
+    },
+    {
+     "denied": true,
+     "t": 8.061
+    },
+    {
+     "denied": true,
+     "t": 9.031
+    },
+    {
+     "denied": true,
+     "t": 10.053
+    },
+    {
+     "denied": true,
+     "t": 11.023
+    },
+    {
+     "denied": true,
+     "t": 12.044
+    },
+    {
+     "denied": true,
+     "t": 13.064
+    },
+    {
+     "denied": true,
+     "t": 14.035
+    },
+    {
+     "denied": true,
+     "t": 15.055
+    },
+    {
+     "denied": true,
+     "t": 16.025
+    },
+    {
+     "denied": true,
+     "t": 17.044
+    },
+    {
+     "denied": true,
+     "t": 18.063
+    },
+    {
+     "denied": true,
+     "t": 19.033
+    },
+    {
+     "denied": true,
+     "t": 20.053
+    },
+    {
+     "denied": true,
+     "t": 21.024
+    },
+    {
+     "denied": true,
+     "t": 22.043
+    },
+    {
+     "denied": true,
+     "t": 23.062
+    },
+    {
+     "denied": true,
+     "t": 24.033
+    },
+    {
+     "denied": true,
+     "t": 25.053
+    },
+    {
+     "denied": true,
+     "t": 26.023
+    },
+    {
+     "denied": true,
+     "t": 27.043
+    },
+    {
+     "denied": true,
+     "t": 28.063
+    },
+    {
+     "denied": true,
+     "t": 29.049
+    },
+    {
+     "denied": true,
+     "t": 30.019
+    },
+    {
+     "denied": true,
+     "t": 31.04
+    },
+    {
+     "denied": true,
+     "t": 32.062
+    },
+    {
+     "denied": true,
+     "t": 33.033
+    },
+    {
+     "denied": true,
+     "t": 34.052
+    },
+    {
+     "denied": true,
+     "t": 35.029
+    }
+   ],
+   "outcome": "HEALTHY"
+  },
+  {
+   "cache_ttl_ms": 30000,
+   "control_id": "none-ttl30000-d0-2",
+   "end_of_campaign_window": {
+    "gateway_exposure_observed": false,
+    "operator_telemetry": [
+     {
+      "applied_revision": 14,
+      "cache_age_ms": 7279,
+      "cache_ttl_ms": 30000,
+      "handled_events": 3,
+      "latency_ms": 1.8813389999650099,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-a",
+      "observed": true,
+      "observed_at_monotonic": 516.412940331,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 14,
+      "cache_age_ms": 7281,
+      "cache_ttl_ms": 30000,
+      "handled_events": 3,
+      "latency_ms": 1.746378999996523,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-b",
+      "observed": true,
+      "observed_at_monotonic": 516.414696269,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 14,
+      "cache_age_ms": 7282,
+      "cache_ttl_ms": 30000,
+      "handled_events": 3,
+      "latency_ms": 1.698714000099244,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-c",
+      "observed": true,
+      "observed_at_monotonic": 516.416404374,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 14,
+      "cache_age_ms": 7284,
+      "cache_ttl_ms": 30000,
+      "handled_events": 3,
+      "latency_ms": 1.7325339999842981,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-hidden",
+      "observed": true,
+      "observed_at_monotonic": 516.418145474,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     }
+    ],
+    "oracle_denied": true,
+    "t": 6.105,
+    "verifier_scope": "VERIFIED"
+   },
+   "event_delay_ms": 0,
+   "expected": "healthy",
+   "fault_mode": "none",
+   "kind": "negative",
+   "oracle_reads": [
+    {
+     "denied": true,
+     "t": 0.018
+    },
+    {
+     "denied": true,
+     "t": 1.038
+    },
+    {
+     "denied": true,
+     "t": 2.057
+    },
+    {
+     "denied": true,
+     "t": 3.027
+    },
+    {
+     "denied": true,
+     "t": 4.047
+    },
+    {
+     "denied": true,
+     "t": 5.066
+    },
+    {
+     "denied": true,
+     "t": 6.117
+    },
+    {
+     "denied": true,
+     "t": 7.036
+    },
+    {
+     "denied": true,
+     "t": 8.056
+    },
+    {
+     "denied": true,
+     "t": 9.026
+    },
+    {
+     "denied": true,
+     "t": 10.047
+    },
+    {
+     "denied": true,
+     "t": 11.067
+    },
+    {
+     "denied": true,
+     "t": 12.037
+    },
+    {
+     "denied": true,
+     "t": 13.056
+    },
+    {
+     "denied": true,
+     "t": 14.027
+    },
+    {
+     "denied": true,
+     "t": 15.046
+    },
+    {
+     "denied": true,
+     "t": 16.066
+    },
+    {
+     "denied": true,
+     "t": 17.035
+    },
+    {
+     "denied": true,
+     "t": 18.055
+    },
+    {
+     "denied": true,
+     "t": 19.024
+    },
+    {
+     "denied": true,
+     "t": 20.043
+    },
+    {
+     "denied": true,
+     "t": 21.062
+    },
+    {
+     "denied": true,
+     "t": 22.032
+    },
+    {
+     "denied": true,
+     "t": 23.051
+    },
+    {
+     "denied": true,
+     "t": 24.022
+    },
+    {
+     "denied": true,
+     "t": 25.043
+    },
+    {
+     "denied": true,
+     "t": 26.062
+    },
+    {
+     "denied": true,
+     "t": 27.032
+    },
+    {
+     "denied": true,
+     "t": 28.052
+    },
+    {
+     "denied": true,
+     "t": 29.035
+    },
+    {
+     "denied": true,
+     "t": 30.054
+    },
+    {
+     "denied": true,
+     "t": 31.026
+    },
+    {
+     "denied": true,
+     "t": 32.046
+    },
+    {
+     "denied": true,
+     "t": 33.065
+    },
+    {
+     "denied": true,
+     "t": 34.039
+    },
+    {
+     "denied": true,
+     "t": 35.058
+    }
+   ],
+   "outcome": "HEALTHY"
+  },
+  {
+   "cache_ttl_ms": 30000,
+   "control_id": "none-ttl30000-d0-3",
+   "end_of_campaign_window": {
+    "gateway_exposure_observed": false,
+    "operator_telemetry": [
+     {
+      "applied_revision": 16,
+      "cache_age_ms": 7273,
+      "cache_ttl_ms": 30000,
+      "handled_events": 3,
+      "latency_ms": 1.9184469999800058,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-a",
+      "observed": true,
+      "observed_at_monotonic": 553.676541063,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 16,
+      "cache_age_ms": 7275,
+      "cache_ttl_ms": 30000,
+      "handled_events": 3,
+      "latency_ms": 1.7926680000073247,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-b",
+      "observed": true,
+      "observed_at_monotonic": 553.678342569,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 16,
+      "cache_age_ms": 7276,
+      "cache_ttl_ms": 30000,
+      "handled_events": 3,
+      "latency_ms": 1.8035970000482848,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-c",
+      "observed": true,
+      "observed_at_monotonic": 553.680154074,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 16,
+      "cache_age_ms": 7279,
+      "cache_ttl_ms": 30000,
+      "handled_events": 3,
+      "latency_ms": 1.687109000044984,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-hidden",
+      "observed": true,
+      "observed_at_monotonic": 553.681848832,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     }
+    ],
+    "oracle_denied": true,
+    "t": 6.099,
+    "verifier_scope": "VERIFIED"
+   },
+   "event_delay_ms": 0,
+   "expected": "healthy",
+   "fault_mode": "none",
+   "kind": "negative",
+   "oracle_reads": [
+    {
+     "denied": true,
+     "t": 0.017
+    },
+    {
+     "denied": true,
+     "t": 1.035
+    },
+    {
+     "denied": true,
+     "t": 2.054
+    },
+    {
+     "denied": true,
+     "t": 3.023
+    },
+    {
+     "denied": true,
+     "t": 4.043
+    },
+    {
+     "denied": true,
+     "t": 5.062
+    },
+    {
+     "denied": true,
+     "t": 6.111
+    },
+    {
+     "denied": true,
+     "t": 7.03
+    },
+    {
+     "denied": true,
+     "t": 8.048
+    },
+    {
+     "denied": true,
+     "t": 9.017
+    },
+    {
+     "denied": true,
+     "t": 10.038
+    },
+    {
+     "denied": true,
+     "t": 11.057
+    },
+    {
+     "denied": true,
+     "t": 12.026
+    },
+    {
+     "denied": true,
+     "t": 13.046
+    },
+    {
+     "denied": true,
+     "t": 14.067
+    },
+    {
+     "denied": true,
+     "t": 15.037
+    },
+    {
+     "denied": true,
+     "t": 16.055
+    },
+    {
+     "denied": true,
+     "t": 17.024
+    },
+    {
+     "denied": true,
+     "t": 18.043
+    },
+    {
+     "denied": true,
+     "t": 19.062
+    },
+    {
+     "denied": true,
+     "t": 20.031
+    },
+    {
+     "denied": true,
+     "t": 21.049
+    },
+    {
+     "denied": true,
+     "t": 22.018
+    },
+    {
+     "denied": true,
+     "t": 23.036
+    },
+    {
+     "denied": true,
+     "t": 24.054
+    },
+    {
+     "denied": true,
+     "t": 25.024
+    },
+    {
+     "denied": true,
+     "t": 26.043
+    },
+    {
+     "denied": true,
+     "t": 27.061
+    },
+    {
+     "denied": true,
+     "t": 28.03
+    },
+    {
+     "denied": true,
+     "t": 29.069
+    },
+    {
+     "denied": true,
+     "t": 30.039
+    },
+    {
+     "denied": true,
+     "t": 31.057
+    },
+    {
+     "denied": true,
+     "t": 32.025
+    },
+    {
+     "denied": true,
+     "t": 33.044
+    },
+    {
+     "denied": true,
+     "t": 34.063
+    },
+    {
+     "denied": true,
+     "t": 35.031
+    }
+   ],
+   "outcome": "HEALTHY"
+  },
+  {
+   "cache_ttl_ms": 10000,
+   "control_id": "loss-ttl10000-d0-0",
+   "end_of_campaign_window": {
+    "gateway_exposure_observed": true,
+    "operator_telemetry": [
+     {
+      "applied_revision": 18,
+      "cache_age_ms": 7269,
+      "cache_ttl_ms": 10000,
+      "handled_events": 3,
+      "latency_ms": 1.5917690000151197,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-a",
+      "observed": true,
+      "observed_at_monotonic": 590.965546311,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 17,
+      "cache_age_ms": 7285,
+      "cache_ttl_ms": 10000,
+      "handled_events": 3,
+      "latency_ms": 1.6037639999240128,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-b",
+      "observed": true,
+      "observed_at_monotonic": 590.967158741,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 18,
+      "cache_age_ms": 7273,
+      "cache_ttl_ms": 10000,
+      "handled_events": 3,
+      "latency_ms": 1.555191999955241,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-c",
+      "observed": true,
+      "observed_at_monotonic": 590.968721181,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 18,
+      "cache_age_ms": 7273,
+      "cache_ttl_ms": 10000,
+      "handled_events": 3,
+      "latency_ms": 1.5450140000439205,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-hidden",
+      "observed": true,
+      "observed_at_monotonic": 590.970274095,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     }
+    ],
+    "oracle_denied": false,
+    "t": 6.094,
+    "verifier_scope": "NOT VERIFIED"
+   },
+   "event_delay_ms": 0,
+   "expected": "persistent",
+   "fault_mode": "loss",
+   "kind": "positive",
+   "oracle_reads": [
+    {
+     "denied": false,
+     "t": 0.016
+    },
+    {
+     "denied": false,
+     "t": 1.035
+    },
+    {
+     "denied": false,
+     "t": 2.053
+    },
+    {
+     "denied": false,
+     "t": 3.021
+    },
+    {
+     "denied": false,
+     "t": 4.04
+    },
+    {
+     "denied": false,
+     "t": 5.058
+    },
+    {
+     "denied": false,
+     "t": 6.104
+    },
+    {
+     "denied": false,
+     "t": 7.023
+    },
+    {
+     "denied": false,
+     "t": 8.042
+    },
+    {
+     "denied": true,
+     "t": 9.074
+    },
+    {
+     "denied": true,
+     "t": 10.043
+    },
+    {
+     "denied": true,
+     "t": 11.061
+    },
+    {
+     "denied": true,
+     "t": 12.031
+    },
+    {
+     "denied": true,
+     "t": 13.05
+    },
+    {
+     "denied": true,
+     "t": 14.018
+    },
+    {
+     "denied": true,
+     "t": 15.037
+    },
+    {
+     "denied": true,
+     "t": 16.055
+    },
+    {
+     "denied": true,
+     "t": 17.023
+    },
+    {
+     "denied": true,
+     "t": 18.042
+    },
+    {
+     "denied": true,
+     "t": 19.061
+    },
+    {
+     "denied": true,
+     "t": 20.041
+    },
+    {
+     "denied": true,
+     "t": 21.06
+    },
+    {
+     "denied": true,
+     "t": 22.028
+    },
+    {
+     "denied": true,
+     "t": 23.049
+    },
+    {
+     "denied": true,
+     "t": 24.017
+    },
+    {
+     "denied": true,
+     "t": 25.035
+    },
+    {
+     "denied": true,
+     "t": 26.053
+    },
+    {
+     "denied": true,
+     "t": 27.021
+    },
+    {
+     "denied": true,
+     "t": 28.04
+    },
+    {
+     "denied": true,
+     "t": 29.057
+    },
+    {
+     "denied": true,
+     "t": 30.025
+    },
+    {
+     "denied": true,
+     "t": 31.06
+    },
+    {
+     "denied": true,
+     "t": 32.028
+    },
+    {
+     "denied": true,
+     "t": 33.047
+    },
+    {
+     "denied": true,
+     "t": 34.064
+    },
+    {
+     "denied": true,
+     "t": 35.036
+    }
+   ],
+   "outcome": "PERSISTED"
+  },
+  {
+   "cache_ttl_ms": 10000,
+   "control_id": "loss-ttl10000-d0-1",
+   "end_of_campaign_window": {
+    "gateway_exposure_observed": true,
+    "operator_telemetry": [
+     {
+      "applied_revision": 20,
+      "cache_age_ms": 7265,
+      "cache_ttl_ms": 10000,
+      "handled_events": 3,
+      "latency_ms": 2.010992000009537,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-a",
+      "observed": true,
+      "observed_at_monotonic": 628.261317634,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 19,
+      "cache_age_ms": 7283,
+      "cache_ttl_ms": 10000,
+      "handled_events": 3,
+      "latency_ms": 1.6208600000027218,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-b",
+      "observed": true,
+      "observed_at_monotonic": 628.262949192,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 20,
+      "cache_age_ms": 7268,
+      "cache_ttl_ms": 10000,
+      "handled_events": 3,
+      "latency_ms": 1.6030699999873832,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-c",
+      "observed": true,
+      "observed_at_monotonic": 628.264563321,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 20,
+      "cache_age_ms": 7270,
+      "cache_ttl_ms": 10000,
+      "handled_events": 3,
+      "latency_ms": 1.887183000008008,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-hidden",
+      "observed": true,
+      "observed_at_monotonic": 628.266459344,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     }
+    ],
+    "oracle_denied": false,
+    "t": 6.094,
+    "verifier_scope": "NOT VERIFIED"
+   },
+   "event_delay_ms": 0,
+   "expected": "persistent",
+   "fault_mode": "loss",
+   "kind": "positive",
+   "oracle_reads": [
+    {
+     "denied": false,
+     "t": 0.016
+    },
+    {
+     "denied": false,
+     "t": 1.034
+    },
+    {
+     "denied": false,
+     "t": 2.052
+    },
+    {
+     "denied": false,
+     "t": 3.019
+    },
+    {
+     "denied": false,
+     "t": 4.037
+    },
+    {
+     "denied": false,
+     "t": 5.055
+    },
+    {
+     "denied": false,
+     "t": 6.105
+    },
+    {
+     "denied": false,
+     "t": 7.023
+    },
+    {
+     "denied": false,
+     "t": 8.041
+    },
+    {
+     "denied": true,
+     "t": 9.071
+    },
+    {
+     "denied": true,
+     "t": 10.038
+    },
+    {
+     "denied": true,
+     "t": 11.057
+    },
+    {
+     "denied": true,
+     "t": 12.025
+    },
+    {
+     "denied": true,
+     "t": 13.043
+    },
+    {
+     "denied": true,
+     "t": 14.06
+    },
+    {
+     "denied": true,
+     "t": 15.029
+    },
+    {
+     "denied": true,
+     "t": 16.047
+    },
+    {
+     "denied": true,
+     "t": 17.066
+    },
+    {
+     "denied": true,
+     "t": 18.035
+    },
+    {
+     "denied": true,
+     "t": 19.053
+    },
+    {
+     "denied": true,
+     "t": 20.032
+    },
+    {
+     "denied": true,
+     "t": 21.05
+    },
+    {
+     "denied": true,
+     "t": 22.02
+    },
+    {
+     "denied": true,
+     "t": 23.039
+    },
+    {
+     "denied": true,
+     "t": 24.056
+    },
+    {
+     "denied": true,
+     "t": 25.024
+    },
+    {
+     "denied": true,
+     "t": 26.042
+    },
+    {
+     "denied": true,
+     "t": 27.06
+    },
+    {
+     "denied": true,
+     "t": 28.029
+    },
+    {
+     "denied": true,
+     "t": 29.048
+    },
+    {
+     "denied": true,
+     "t": 30.079
+    },
+    {
+     "denied": true,
+     "t": 31.049
+    },
+    {
+     "denied": true,
+     "t": 32.017
+    },
+    {
+     "denied": true,
+     "t": 33.034
+    },
+    {
+     "denied": true,
+     "t": 34.051
+    },
+    {
+     "denied": true,
+     "t": 35.02
+    }
+   ],
+   "outcome": "PERSISTED"
+  },
+  {
+   "cache_ttl_ms": 10000,
+   "control_id": "loss-ttl10000-d0-2",
+   "end_of_campaign_window": {
+    "gateway_exposure_observed": true,
+    "operator_telemetry": [
+     {
+      "applied_revision": 22,
+      "cache_age_ms": 7266,
+      "cache_ttl_ms": 10000,
+      "handled_events": 3,
+      "latency_ms": 1.7100029999710387,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-a",
+      "observed": true,
+      "observed_at_monotonic": 665.551198673,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 21,
+      "cache_age_ms": 7294,
+      "cache_ttl_ms": 10000,
+      "handled_events": 3,
+      "latency_ms": 1.5673679999963497,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-b",
+      "observed": true,
+      "observed_at_monotonic": 665.552775988,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 22,
+      "cache_age_ms": 7270,
+      "cache_ttl_ms": 10000,
+      "handled_events": 3,
+      "latency_ms": 1.4201919999550228,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-c",
+      "observed": true,
+      "observed_at_monotonic": 665.554205409,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 22,
+      "cache_age_ms": 7272,
+      "cache_ttl_ms": 10000,
+      "handled_events": 3,
+      "latency_ms": 1.499362000004112,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-hidden",
+      "observed": true,
+      "observed_at_monotonic": 665.555712372,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     }
+    ],
+    "oracle_denied": false,
+    "t": 6.091,
+    "verifier_scope": "NOT VERIFIED"
+   },
+   "event_delay_ms": 0,
+   "expected": "persistent",
+   "fault_mode": "loss",
+   "kind": "positive",
+   "oracle_reads": [
+    {
+     "denied": false,
+     "t": 0.016
+    },
+    {
+     "denied": false,
+     "t": 1.034
+    },
+    {
+     "denied": false,
+     "t": 2.053
+    },
+    {
+     "denied": false,
+     "t": 3.021
+    },
+    {
+     "denied": false,
+     "t": 4.04
+    },
+    {
+     "denied": false,
+     "t": 5.058
+    },
+    {
+     "denied": false,
+     "t": 6.103
+    },
+    {
+     "denied": false,
+     "t": 7.022
+    },
+    {
+     "denied": false,
+     "t": 8.039
+    },
+    {
+     "denied": true,
+     "t": 9.07
+    },
+    {
+     "denied": true,
+     "t": 10.038
+    },
+    {
+     "denied": true,
+     "t": 11.056
+    },
+    {
+     "denied": true,
+     "t": 12.023
+    },
+    {
+     "denied": true,
+     "t": 13.04
+    },
+    {
+     "denied": true,
+     "t": 14.06
+    },
+    {
+     "denied": true,
+     "t": 15.029
+    },
+    {
+     "denied": true,
+     "t": 16.046
+    },
+    {
+     "denied": true,
+     "t": 17.066
+    },
+    {
+     "denied": true,
+     "t": 18.033
+    },
+    {
+     "denied": true,
+     "t": 19.051
+    },
+    {
+     "denied": true,
+     "t": 20.029
+    },
+    {
+     "denied": true,
+     "t": 21.046
+    },
+    {
+     "denied": true,
+     "t": 22.063
+    },
+    {
+     "denied": true,
+     "t": 23.03
+    },
+    {
+     "denied": true,
+     "t": 24.048
+    },
+    {
+     "denied": true,
+     "t": 25.065
+    },
+    {
+     "denied": true,
+     "t": 26.032
+    },
+    {
+     "denied": true,
+     "t": 27.049
+    },
+    {
+     "denied": true,
+     "t": 28.017
+    },
+    {
+     "denied": true,
+     "t": 29.035
+    },
+    {
+     "denied": true,
+     "t": 30.066
+    },
+    {
+     "denied": true,
+     "t": 31.033
+    },
+    {
+     "denied": true,
+     "t": 32.051
+    },
+    {
+     "denied": true,
+     "t": 33.019
+    },
+    {
+     "denied": true,
+     "t": 34.036
+    },
+    {
+     "denied": true,
+     "t": 35.054
+    }
+   ],
+   "outcome": "PERSISTED"
+  },
+  {
+   "cache_ttl_ms": 10000,
+   "control_id": "loss-ttl10000-d0-3",
+   "end_of_campaign_window": {
+    "gateway_exposure_observed": true,
+    "operator_telemetry": [
+     {
+      "applied_revision": 24,
+      "cache_age_ms": 7261,
+      "cache_ttl_ms": 10000,
+      "handled_events": 3,
+      "latency_ms": 1.2465130000691715,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-a",
+      "observed": true,
+      "observed_at_monotonic": 702.820846235,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 23,
+      "cache_age_ms": 7290,
+      "cache_ttl_ms": 10000,
+      "handled_events": 3,
+      "latency_ms": 1.2740339999481876,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-b",
+      "observed": true,
+      "observed_at_monotonic": 702.822130379,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 24,
+      "cache_age_ms": 7263,
+      "cache_ttl_ms": 10000,
+      "handled_events": 3,
+      "latency_ms": 1.3343179999765198,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-c",
+      "observed": true,
+      "observed_at_monotonic": 702.823473434,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 24,
+      "cache_age_ms": 7264,
+      "cache_ttl_ms": 10000,
+      "handled_events": 3,
+      "latency_ms": 1.3022549999277544,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-hidden",
+      "observed": true,
+      "observed_at_monotonic": 702.824782627,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     }
+    ],
+    "oracle_denied": false,
+    "t": 6.083,
+    "verifier_scope": "NOT VERIFIED"
+   },
+   "event_delay_ms": 0,
+   "expected": "persistent",
+   "fault_mode": "loss",
+   "kind": "positive",
+   "oracle_reads": [
+    {
+     "denied": false,
+     "t": 0.016
+    },
+    {
+     "denied": false,
+     "t": 1.032
+    },
+    {
+     "denied": false,
+     "t": 2.049
+    },
+    {
+     "denied": false,
+     "t": 3.017
+    },
+    {
+     "denied": false,
+     "t": 4.035
+    },
+    {
+     "denied": false,
+     "t": 5.052
+    },
+    {
+     "denied": false,
+     "t": 6.092
+    },
+    {
+     "denied": false,
+     "t": 7.06
+    },
+    {
+     "denied": false,
+     "t": 8.027
+    },
+    {
+     "denied": true,
+     "t": 9.055
+    },
+    {
+     "denied": true,
+     "t": 10.023
+    },
+    {
+     "denied": true,
+     "t": 11.04
+    },
+    {
+     "denied": true,
+     "t": 12.057
+    },
+    {
+     "denied": true,
+     "t": 13.024
+    },
+    {
+     "denied": true,
+     "t": 14.042
+    },
+    {
+     "denied": true,
+     "t": 15.059
+    },
+    {
+     "denied": true,
+     "t": 16.027
+    },
+    {
+     "denied": true,
+     "t": 17.044
+    },
+    {
+     "denied": true,
+     "t": 18.061
+    },
+    {
+     "denied": true,
+     "t": 19.028
+    },
+    {
+     "denied": true,
+     "t": 20.056
+    },
+    {
+     "denied": true,
+     "t": 21.023
+    },
+    {
+     "denied": true,
+     "t": 22.041
+    },
+    {
+     "denied": true,
+     "t": 23.059
+    },
+    {
+     "denied": true,
+     "t": 24.027
+    },
+    {
+     "denied": true,
+     "t": 25.044
+    },
+    {
+     "denied": true,
+     "t": 26.061
+    },
+    {
+     "denied": true,
+     "t": 27.03
+    },
+    {
+     "denied": true,
+     "t": 28.047
+    },
+    {
+     "denied": true,
+     "t": 29.065
+    },
+    {
+     "denied": true,
+     "t": 30.032
+    },
+    {
+     "denied": true,
+     "t": 31.063
+    },
+    {
+     "denied": true,
+     "t": 32.031
+    },
+    {
+     "denied": true,
+     "t": 33.049
+    },
+    {
+     "denied": true,
+     "t": 34.016
+    },
+    {
+     "denied": true,
+     "t": 35.033
+    }
+   ],
+   "outcome": "PERSISTED"
+  },
+  {
+   "cache_ttl_ms": 30000,
+   "control_id": "loss-ttl30000-d0-0",
+   "end_of_campaign_window": {
+    "gateway_exposure_observed": true,
+    "operator_telemetry": [
+     {
+      "applied_revision": 26,
+      "cache_age_ms": 7257,
+      "cache_ttl_ms": 30000,
+      "handled_events": 3,
+      "latency_ms": 1.5323129999842422,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-a",
+      "observed": true,
+      "observed_at_monotonic": 740.123164791,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 25,
+      "cache_age_ms": 7276,
+      "cache_ttl_ms": 30000,
+      "handled_events": 3,
+      "latency_ms": 1.4615000000048894,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-b",
+      "observed": true,
+      "observed_at_monotonic": 740.124636817,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 26,
+      "cache_age_ms": 7261,
+      "cache_ttl_ms": 30000,
+      "handled_events": 3,
+      "latency_ms": 1.498318000017207,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-c",
+      "observed": true,
+      "observed_at_monotonic": 740.126145018,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 26,
+      "cache_age_ms": 7262,
+      "cache_ttl_ms": 30000,
+      "handled_events": 3,
+      "latency_ms": 1.405184999953235,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-hidden",
+      "observed": true,
+      "observed_at_monotonic": 740.127558042,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     }
+    ],
+    "oracle_denied": false,
+    "t": 6.08,
+    "verifier_scope": "NOT VERIFIED"
+   },
+   "event_delay_ms": 0,
+   "expected": "persistent",
+   "fault_mode": "loss",
+   "kind": "positive",
+   "oracle_reads": [
+    {
+     "denied": false,
+     "t": 0.015
+    },
+    {
+     "denied": false,
+     "t": 1.032
+    },
+    {
+     "denied": false,
+     "t": 2.049
+    },
+    {
+     "denied": false,
+     "t": 3.016
+    },
+    {
+     "denied": false,
+     "t": 4.033
+    },
+    {
+     "denied": false,
+     "t": 5.05
+    },
+    {
+     "denied": false,
+     "t": 6.09
+    },
+    {
+     "denied": false,
+     "t": 7.057
+    },
+    {
+     "denied": false,
+     "t": 8.024
+    },
+    {
+     "denied": false,
+     "t": 9.041
+    },
+    {
+     "denied": false,
+     "t": 10.058
+    },
+    {
+     "denied": false,
+     "t": 11.025
+    },
+    {
+     "denied": false,
+     "t": 12.044
+    },
+    {
+     "denied": false,
+     "t": 13.06
+    },
+    {
+     "denied": false,
+     "t": 14.027
+    },
+    {
+     "denied": false,
+     "t": 15.044
+    },
+    {
+     "denied": false,
+     "t": 16.062
+    },
+    {
+     "denied": false,
+     "t": 17.028
+    },
+    {
+     "denied": false,
+     "t": 18.045
+    },
+    {
+     "denied": false,
+     "t": 19.062
+    },
+    {
+     "denied": false,
+     "t": 20.03
+    },
+    {
+     "denied": false,
+     "t": 21.047
+    },
+    {
+     "denied": false,
+     "t": 22.064
+    },
+    {
+     "denied": false,
+     "t": 23.032
+    },
+    {
+     "denied": false,
+     "t": 24.049
+    },
+    {
+     "denied": false,
+     "t": 25.016
+    },
+    {
+     "denied": false,
+     "t": 26.033
+    },
+    {
+     "denied": false,
+     "t": 27.05
+    },
+    {
+     "denied": false,
+     "t": 28.017
+    },
+    {
+     "denied": true,
+     "t": 29.049
+    },
+    {
+     "denied": true,
+     "t": 30.016
+    },
+    {
+     "denied": true,
+     "t": 31.032
+    },
+    {
+     "denied": true,
+     "t": 32.049
+    },
+    {
+     "denied": true,
+     "t": 33.016
+    },
+    {
+     "denied": true,
+     "t": 34.034
+    },
+    {
+     "denied": true,
+     "t": 35.05
+    }
+   ],
+   "outcome": "PERSISTED"
+  },
+  {
+   "cache_ttl_ms": 30000,
+   "control_id": "loss-ttl30000-d0-1",
+   "end_of_campaign_window": {
+    "gateway_exposure_observed": true,
+    "operator_telemetry": [
+     {
+      "applied_revision": 28,
+      "cache_age_ms": 7256,
+      "cache_ttl_ms": 30000,
+      "handled_events": 3,
+      "latency_ms": 1.5359109999053544,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-a",
+      "observed": true,
+      "observed_at_monotonic": 777.374764312,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 27,
+      "cache_age_ms": 7273,
+      "cache_ttl_ms": 30000,
+      "handled_events": 3,
+      "latency_ms": 1.5458180000678112,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-b",
+      "observed": true,
+      "observed_at_monotonic": 777.376319749,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 28,
+      "cache_age_ms": 7260,
+      "cache_ttl_ms": 30000,
+      "handled_events": 3,
+      "latency_ms": 1.4416330000130984,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-c",
+      "observed": true,
+      "observed_at_monotonic": 777.377768831,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 28,
+      "cache_age_ms": 7261,
+      "cache_ttl_ms": 30000,
+      "handled_events": 3,
+      "latency_ms": 1.371297999980925,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-hidden",
+      "observed": true,
+      "observed_at_monotonic": 777.379147599,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     }
+    ],
+    "oracle_denied": false,
+    "t": 6.079,
+    "verifier_scope": "NOT VERIFIED"
+   },
+   "event_delay_ms": 0,
+   "expected": "persistent",
+   "fault_mode": "loss",
+   "kind": "positive",
+   "oracle_reads": [
+    {
+     "denied": false,
+     "t": 0.015
+    },
+    {
+     "denied": false,
+     "t": 1.031
+    },
+    {
+     "denied": false,
+     "t": 2.048
+    },
+    {
+     "denied": false,
+     "t": 3.016
+    },
+    {
+     "denied": false,
+     "t": 4.032
+    },
+    {
+     "denied": false,
+     "t": 5.048
+    },
+    {
+     "denied": false,
+     "t": 6.089
+    },
+    {
+     "denied": false,
+     "t": 7.055
+    },
+    {
+     "denied": false,
+     "t": 8.024
+    },
+    {
+     "denied": false,
+     "t": 9.04
+    },
+    {
+     "denied": false,
+     "t": 10.057
+    },
+    {
+     "denied": false,
+     "t": 11.024
+    },
+    {
+     "denied": false,
+     "t": 12.044
+    },
+    {
+     "denied": false,
+     "t": 13.061
+    },
+    {
+     "denied": false,
+     "t": 14.028
+    },
+    {
+     "denied": false,
+     "t": 15.048
+    },
+    {
+     "denied": false,
+     "t": 16.015
+    },
+    {
+     "denied": false,
+     "t": 17.032
+    },
+    {
+     "denied": false,
+     "t": 18.048
+    },
+    {
+     "denied": false,
+     "t": 19.016
+    },
+    {
+     "denied": false,
+     "t": 20.032
+    },
+    {
+     "denied": false,
+     "t": 21.049
+    },
+    {
+     "denied": false,
+     "t": 22.016
+    },
+    {
+     "denied": false,
+     "t": 23.032
+    },
+    {
+     "denied": false,
+     "t": 24.049
+    },
+    {
+     "denied": false,
+     "t": 25.015
+    },
+    {
+     "denied": false,
+     "t": 26.031
+    },
+    {
+     "denied": false,
+     "t": 27.047
+    },
+    {
+     "denied": false,
+     "t": 28.063
+    },
+    {
+     "denied": true,
+     "t": 29.042
+    },
+    {
+     "denied": true,
+     "t": 30.059
+    },
+    {
+     "denied": true,
+     "t": 31.025
+    },
+    {
+     "denied": true,
+     "t": 32.041
+    },
+    {
+     "denied": true,
+     "t": 33.058
+    },
+    {
+     "denied": true,
+     "t": 34.024
+    },
+    {
+     "denied": true,
+     "t": 35.04
+    }
+   ],
+   "outcome": "PERSISTED"
+  },
+  {
+   "cache_ttl_ms": 30000,
+   "control_id": "loss-ttl30000-d0-2",
+   "end_of_campaign_window": {
+    "gateway_exposure_observed": true,
+    "operator_telemetry": [
+     {
+      "applied_revision": 30,
+      "cache_age_ms": 7303,
+      "cache_ttl_ms": 30000,
+      "handled_events": 3,
+      "latency_ms": 1.2972420000778584,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-a",
+      "observed": true,
+      "observed_at_monotonic": 814.712141235,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 29,
+      "cache_age_ms": 7321,
+      "cache_ttl_ms": 30000,
+      "handled_events": 3,
+      "latency_ms": 1.1408929999561224,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-b",
+      "observed": true,
+      "observed_at_monotonic": 814.713291091,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 30,
+      "cache_age_ms": 7304,
+      "cache_ttl_ms": 30000,
+      "handled_events": 3,
+      "latency_ms": 1.0458310000558413,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-c",
+      "observed": true,
+      "observed_at_monotonic": 814.714345431,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 30,
+      "cache_age_ms": 7307,
+      "cache_ttl_ms": 30000,
+      "handled_events": 3,
+      "latency_ms": 1.2145580000151313,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-hidden",
+      "observed": true,
+      "observed_at_monotonic": 814.715567962,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     }
+    ],
+    "oracle_denied": false,
+    "t": 6.123,
+    "verifier_scope": "NOT VERIFIED"
+   },
+   "event_delay_ms": 0,
+   "expected": "persistent",
+   "fault_mode": "loss",
+   "kind": "positive",
+   "oracle_reads": [
+    {
+     "denied": false,
+     "t": 0.014
+    },
+    {
+     "denied": false,
+     "t": 1.03
+    },
+    {
+     "denied": false,
+     "t": 2.046
+    },
+    {
+     "denied": false,
+     "t": 3.062
+    },
+    {
+     "denied": false,
+     "t": 4.029
+    },
+    {
+     "denied": false,
+     "t": 5.047
+    },
+    {
+     "denied": false,
+     "t": 6.132
+    },
+    {
+     "denied": false,
+     "t": 7.049
+    },
+    {
+     "denied": false,
+     "t": 8.015
+    },
+    {
+     "denied": false,
+     "t": 9.031
+    },
+    {
+     "denied": false,
+     "t": 10.047
+    },
+    {
+     "denied": false,
+     "t": 11.063
+    },
+    {
+     "denied": false,
+     "t": 12.029
+    },
+    {
+     "denied": false,
+     "t": 13.046
+    },
+    {
+     "denied": false,
+     "t": 14.062
+    },
+    {
+     "denied": false,
+     "t": 15.029
+    },
+    {
+     "denied": false,
+     "t": 16.045
+    },
+    {
+     "denied": false,
+     "t": 17.062
+    },
+    {
+     "denied": false,
+     "t": 18.029
+    },
+    {
+     "denied": false,
+     "t": 19.045
+    },
+    {
+     "denied": false,
+     "t": 20.062
+    },
+    {
+     "denied": false,
+     "t": 21.028
+    },
+    {
+     "denied": false,
+     "t": 22.045
+    },
+    {
+     "denied": false,
+     "t": 23.061
+    },
+    {
+     "denied": false,
+     "t": 24.028
+    },
+    {
+     "denied": false,
+     "t": 25.045
+    },
+    {
+     "denied": false,
+     "t": 26.061
+    },
+    {
+     "denied": false,
+     "t": 27.029
+    },
+    {
+     "denied": false,
+     "t": 28.045
+    },
+    {
+     "denied": true,
+     "t": 29.076
+    },
+    {
+     "denied": true,
+     "t": 30.043
+    },
+    {
+     "denied": true,
+     "t": 31.06
+    },
+    {
+     "denied": true,
+     "t": 32.026
+    },
+    {
+     "denied": true,
+     "t": 33.043
+    },
+    {
+     "denied": true,
+     "t": 34.059
+    },
+    {
+     "denied": true,
+     "t": 35.025
+    }
+   ],
+   "outcome": "PERSISTED"
+  },
+  {
+   "cache_ttl_ms": 30000,
+   "control_id": "loss-ttl30000-d0-3",
+   "end_of_campaign_window": {
+    "gateway_exposure_observed": true,
+    "operator_telemetry": [
+     {
+      "applied_revision": 32,
+      "cache_age_ms": 7305,
+      "cache_ttl_ms": 30000,
+      "handled_events": 3,
+      "latency_ms": 1.886088999981439,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-a",
+      "observed": true,
+      "observed_at_monotonic": 852.004092808,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 31,
+      "cache_age_ms": 7323,
+      "cache_ttl_ms": 30000,
+      "handled_events": 3,
+      "latency_ms": 1.340614000014284,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-b",
+      "observed": true,
+      "observed_at_monotonic": 852.005441474,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 32,
+      "cache_age_ms": 7308,
+      "cache_ttl_ms": 30000,
+      "handled_events": 3,
+      "latency_ms": 1.5229950000730241,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-c",
+      "observed": true,
+      "observed_at_monotonic": 852.006971818,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 32,
+      "cache_age_ms": 7309,
+      "cache_ttl_ms": 30000,
+      "handled_events": 3,
+      "latency_ms": 1.565135000078044,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-hidden",
+      "observed": true,
+      "observed_at_monotonic": 852.008550228,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     }
+    ],
+    "oracle_denied": false,
+    "t": 6.127,
+    "verifier_scope": "NOT VERIFIED"
+   },
+   "event_delay_ms": 0,
+   "expected": "persistent",
+   "fault_mode": "loss",
+   "kind": "positive",
+   "oracle_reads": [
+    {
+     "denied": false,
+     "t": 0.014
+    },
+    {
+     "denied": false,
+     "t": 1.03
+    },
+    {
+     "denied": false,
+     "t": 2.046
+    },
+    {
+     "denied": false,
+     "t": 3.063
+    },
+    {
+     "denied": false,
+     "t": 4.029
+    },
+    {
+     "denied": false,
+     "t": 5.045
+    },
+    {
+     "denied": false,
+     "t": 6.138
+    },
+    {
+     "denied": false,
+     "t": 7.055
+    },
+    {
+     "denied": false,
+     "t": 8.021
+    },
+    {
+     "denied": false,
+     "t": 9.037
+    },
+    {
+     "denied": false,
+     "t": 10.054
+    },
+    {
+     "denied": false,
+     "t": 11.02
+    },
+    {
+     "denied": false,
+     "t": 12.037
+    },
+    {
+     "denied": false,
+     "t": 13.053
+    },
+    {
+     "denied": false,
+     "t": 14.019
+    },
+    {
+     "denied": false,
+     "t": 15.036
+    },
+    {
+     "denied": false,
+     "t": 16.052
+    },
+    {
+     "denied": false,
+     "t": 17.018
+    },
+    {
+     "denied": false,
+     "t": 18.036
+    },
+    {
+     "denied": false,
+     "t": 19.052
+    },
+    {
+     "denied": false,
+     "t": 20.018
+    },
+    {
+     "denied": false,
+     "t": 21.037
+    },
+    {
+     "denied": false,
+     "t": 22.055
+    },
+    {
+     "denied": false,
+     "t": 23.023
+    },
+    {
+     "denied": false,
+     "t": 24.039
+    },
+    {
+     "denied": false,
+     "t": 25.054
+    },
+    {
+     "denied": false,
+     "t": 26.021
+    },
+    {
+     "denied": false,
+     "t": 27.037
+    },
+    {
+     "denied": false,
+     "t": 28.052
+    },
+    {
+     "denied": true,
+     "t": 29.034
+    },
+    {
+     "denied": true,
+     "t": 30.051
+    },
+    {
+     "denied": true,
+     "t": 31.017
+    },
+    {
+     "denied": true,
+     "t": 32.034
+    },
+    {
+     "denied": true,
+     "t": 33.05
+    },
+    {
+     "denied": true,
+     "t": 34.017
+    },
+    {
+     "denied": true,
+     "t": 35.034
+    }
+   ],
+   "outcome": "PERSISTED"
+  },
+  {
+   "cache_ttl_ms": 2500,
+   "control_id": "loss-ttl2500-d0-0",
+   "end_of_campaign_window": {
+    "gateway_exposure_observed": false,
+    "operator_telemetry": [
+     {
+      "applied_revision": 34,
+      "cache_age_ms": 1028,
+      "cache_ttl_ms": 2500,
+      "handled_events": 3,
+      "latency_ms": 1.2835100000074817,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-a",
+      "observed": true,
+      "observed_at_monotonic": 889.257584213,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 34,
+      "cache_age_ms": 1025,
+      "cache_ttl_ms": 2500,
+      "handled_events": 3,
+      "latency_ms": 1.1900810000042839,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-b",
+      "observed": true,
+      "observed_at_monotonic": 889.258783673,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 34,
+      "cache_age_ms": 1021,
+      "cache_ttl_ms": 2500,
+      "handled_events": 3,
+      "latency_ms": 1.263447000042106,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-c",
+      "observed": true,
+      "observed_at_monotonic": 889.260055065,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 34,
+      "cache_age_ms": 1017,
+      "cache_ttl_ms": 2500,
+      "handled_events": 3,
+      "latency_ms": 1.1447529999486505,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-hidden",
+      "observed": true,
+      "observed_at_monotonic": 889.261206433,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     }
+    ],
+    "oracle_denied": true,
+    "t": 6.093,
+    "verifier_scope": "VERIFIED"
+   },
+   "event_delay_ms": 0,
+   "expected": "self_healing",
+   "fault_mode": "loss",
+   "kind": "positive",
+   "oracle_reads": [
+    {
+     "denied": false,
+     "t": 0.014
+    },
+    {
+     "denied": false,
+     "t": 1.03
+    },
+    {
+     "denied": true,
+     "t": 2.058
+    },
+    {
+     "denied": true,
+     "t": 3.024
+    },
+    {
+     "denied": true,
+     "t": 4.041
+    },
+    {
+     "denied": true,
+     "t": 5.067
+    },
+    {
+     "denied": true,
+     "t": 6.102
+    },
+    {
+     "denied": true,
+     "t": 7.019
+    },
+    {
+     "denied": true,
+     "t": 8.046
+    },
+    {
+     "denied": true,
+     "t": 9.062
+    },
+    {
+     "denied": true,
+     "t": 10.028
+    },
+    {
+     "denied": true,
+     "t": 11.054
+    },
+    {
+     "denied": true,
+     "t": 12.02
+    },
+    {
+     "denied": true,
+     "t": 13.036
+    },
+    {
+     "denied": true,
+     "t": 14.065
+    },
+    {
+     "denied": true,
+     "t": 15.037
+    },
+    {
+     "denied": true,
+     "t": 16.054
+    },
+    {
+     "denied": true,
+     "t": 17.03
+    },
+    {
+     "denied": true,
+     "t": 18.046
+    },
+    {
+     "denied": true,
+     "t": 19.062
+    },
+    {
+     "denied": true,
+     "t": 20.039
+    },
+    {
+     "denied": true,
+     "t": 21.054
+    },
+    {
+     "denied": true,
+     "t": 22.02
+    },
+    {
+     "denied": true,
+     "t": 23.049
+    },
+    {
+     "denied": true,
+     "t": 24.015
+    },
+    {
+     "denied": true,
+     "t": 25.031
+    },
+    {
+     "denied": true,
+     "t": 26.057
+    },
+    {
+     "denied": true,
+     "t": 27.023
+    },
+    {
+     "denied": true,
+     "t": 28.038
+    },
+    {
+     "denied": true,
+     "t": 29.064
+    },
+    {
+     "denied": true,
+     "t": 30.029
+    },
+    {
+     "denied": true,
+     "t": 31.044
+    },
+    {
+     "denied": true,
+     "t": 32.07
+    },
+    {
+     "denied": true,
+     "t": 33.036
+    },
+    {
+     "denied": true,
+     "t": 34.051
+    },
+    {
+     "denied": true,
+     "t": 35.027
+    }
+   ],
+   "outcome": "SELF_HEALED"
+  },
+  {
+   "cache_ttl_ms": 2500,
+   "control_id": "loss-ttl2500-d0-1",
+   "end_of_campaign_window": {
+    "gateway_exposure_observed": false,
+    "operator_telemetry": [
+     {
+      "applied_revision": 36,
+      "cache_age_ms": 1032,
+      "cache_ttl_ms": 2500,
+      "handled_events": 3,
+      "latency_ms": 1.7754790000026333,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-a",
+      "observed": true,
+      "observed_at_monotonic": 926.531958894,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 36,
+      "cache_age_ms": 1028,
+      "cache_ttl_ms": 2500,
+      "handled_events": 3,
+      "latency_ms": 1.4115379999566358,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-b",
+      "observed": true,
+      "observed_at_monotonic": 926.533380265,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 36,
+      "cache_age_ms": 1025,
+      "cache_ttl_ms": 2500,
+      "handled_events": 3,
+      "latency_ms": 1.3583170000401878,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-c",
+      "observed": true,
+      "observed_at_monotonic": 926.534747481,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 36,
+      "cache_age_ms": 1022,
+      "cache_ttl_ms": 2500,
+      "handled_events": 3,
+      "latency_ms": 1.4233389999844803,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-hidden",
+      "observed": true,
+      "observed_at_monotonic": 926.536178014,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     }
+    ],
+    "oracle_denied": true,
+    "t": 6.093,
+    "verifier_scope": "VERIFIED"
+   },
+   "event_delay_ms": 0,
+   "expected": "self_healing",
+   "fault_mode": "loss",
+   "kind": "positive",
+   "oracle_reads": [
+    {
+     "denied": false,
+     "t": 0.013
+    },
+    {
+     "denied": false,
+     "t": 1.028
+    },
+    {
+     "denied": true,
+     "t": 2.054
+    },
+    {
+     "denied": true,
+     "t": 3.019
+    },
+    {
+     "denied": true,
+     "t": 4.035
+    },
+    {
+     "denied": true,
+     "t": 5.061
+    },
+    {
+     "denied": true,
+     "t": 6.103
+    },
+    {
+     "denied": true,
+     "t": 7.02
+    },
+    {
+     "denied": true,
+     "t": 8.051
+    },
+    {
+     "denied": true,
+     "t": 9.017
+    },
+    {
+     "denied": true,
+     "t": 10.032
+    },
+    {
+     "denied": true,
+     "t": 11.059
+    },
+    {
+     "denied": true,
+     "t": 12.024
+    },
+    {
+     "denied": true,
+     "t": 13.041
+    },
+    {
+     "denied": true,
+     "t": 14.066
+    },
+    {
+     "denied": true,
+     "t": 15.033
+    },
+    {
+     "denied": true,
+     "t": 16.049
+    },
+    {
+     "denied": true,
+     "t": 17.026
+    },
+    {
+     "denied": true,
+     "t": 18.042
+    },
+    {
+     "denied": true,
+     "t": 19.058
+    },
+    {
+     "denied": true,
+     "t": 20.034
+    },
+    {
+     "denied": true,
+     "t": 21.05
+    },
+    {
+     "denied": true,
+     "t": 22.017
+    },
+    {
+     "denied": true,
+     "t": 23.05
+    },
+    {
+     "denied": true,
+     "t": 24.017
+    },
+    {
+     "denied": true,
+     "t": 25.033
+    },
+    {
+     "denied": true,
+     "t": 26.063
+    },
+    {
+     "denied": true,
+     "t": 27.029
+    },
+    {
+     "denied": true,
+     "t": 28.046
+    },
+    {
+     "denied": true,
+     "t": 29.072
+    },
+    {
+     "denied": true,
+     "t": 30.038
+    },
+    {
+     "denied": true,
+     "t": 31.053
+    },
+    {
+     "denied": true,
+     "t": 32.035
+    },
+    {
+     "denied": true,
+     "t": 33.052
+    },
+    {
+     "denied": true,
+     "t": 34.018
+    },
+    {
+     "denied": true,
+     "t": 35.043
+    }
+   ],
+   "outcome": "SELF_HEALED"
+  },
+  {
+   "cache_ttl_ms": 2500,
+   "control_id": "loss-ttl2500-d0-2",
+   "end_of_campaign_window": {
+    "gateway_exposure_observed": false,
+    "operator_telemetry": [
+     {
+      "applied_revision": 38,
+      "cache_age_ms": 1032,
+      "cache_ttl_ms": 2500,
+      "handled_events": 3,
+      "latency_ms": 1.7789559999528137,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-a",
+      "observed": true,
+      "observed_at_monotonic": 963.840889078,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 38,
+      "cache_age_ms": 1028,
+      "cache_ttl_ms": 2500,
+      "handled_events": 3,
+      "latency_ms": 1.6480009999213507,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-b",
+      "observed": true,
+      "observed_at_monotonic": 963.842547241,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 38,
+      "cache_age_ms": 1024,
+      "cache_ttl_ms": 2500,
+      "handled_events": 3,
+      "latency_ms": 1.2659479999683754,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-c",
+      "observed": true,
+      "observed_at_monotonic": 963.84382234,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 38,
+      "cache_age_ms": 1021,
+      "cache_ttl_ms": 2500,
+      "handled_events": 3,
+      "latency_ms": 1.4368719999993118,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-hidden",
+      "observed": true,
+      "observed_at_monotonic": 963.845268954,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     }
+    ],
+    "oracle_denied": true,
+    "t": 6.098,
+    "verifier_scope": "VERIFIED"
+   },
+   "event_delay_ms": 0,
+   "expected": "self_healing",
+   "fault_mode": "loss",
+   "kind": "positive",
+   "oracle_reads": [
+    {
+     "denied": false,
+     "t": 0.016
+    },
+    {
+     "denied": false,
+     "t": 1.032
+    },
+    {
+     "denied": true,
+     "t": 2.058
+    },
+    {
+     "denied": true,
+     "t": 3.023
+    },
+    {
+     "denied": true,
+     "t": 4.039
+    },
+    {
+     "denied": true,
+     "t": 5.066
+    },
+    {
+     "denied": true,
+     "t": 6.108
+    },
+    {
+     "denied": true,
+     "t": 7.024
+    },
+    {
+     "denied": true,
+     "t": 8.051
+    },
+    {
+     "denied": true,
+     "t": 9.017
+    },
+    {
+     "denied": true,
+     "t": 10.032
+    },
+    {
+     "denied": true,
+     "t": 11.059
+    },
+    {
+     "denied": true,
+     "t": 12.025
+    },
+    {
+     "denied": true,
+     "t": 13.04
+    },
+    {
+     "denied": true,
+     "t": 14.066
+    },
+    {
+     "denied": true,
+     "t": 15.032
+    },
+    {
+     "denied": true,
+     "t": 16.05
+    },
+    {
+     "denied": true,
+     "t": 17.026
+    },
+    {
+     "denied": true,
+     "t": 18.042
+    },
+    {
+     "denied": true,
+     "t": 19.057
+    },
+    {
+     "denied": true,
+     "t": 20.031
+    },
+    {
+     "denied": true,
+     "t": 21.046
+    },
+    {
+     "denied": true,
+     "t": 22.062
+    },
+    {
+     "denied": true,
+     "t": 23.038
+    },
+    {
+     "denied": true,
+     "t": 24.053
+    },
+    {
+     "denied": true,
+     "t": 25.018
+    },
+    {
+     "denied": true,
+     "t": 26.043
+    },
+    {
+     "denied": true,
+     "t": 27.058
+    },
+    {
+     "denied": true,
+     "t": 28.024
+    },
+    {
+     "denied": true,
+     "t": 29.048
+    },
+    {
+     "denied": true,
+     "t": 30.013
+    },
+    {
+     "denied": true,
+     "t": 31.028
+    },
+    {
+     "denied": true,
+     "t": 32.055
+    },
+    {
+     "denied": true,
+     "t": 33.021
+    },
+    {
+     "denied": true,
+     "t": 34.036
+    },
+    {
+     "denied": true,
+     "t": 35.072
+    }
+   ],
+   "outcome": "SELF_HEALED"
+  },
+  {
+   "cache_ttl_ms": 2500,
+   "control_id": "loss-ttl2500-d0-3",
+   "end_of_campaign_window": {
+    "gateway_exposure_observed": false,
+    "operator_telemetry": [
+     {
+      "applied_revision": 40,
+      "cache_age_ms": 1030,
+      "cache_ttl_ms": 2500,
+      "handled_events": 3,
+      "latency_ms": 1.5784460000531908,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-a",
+      "observed": true,
+      "observed_at_monotonic": 1001.106795576,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 40,
+      "cache_age_ms": 1026,
+      "cache_ttl_ms": 2500,
+      "handled_events": 3,
+      "latency_ms": 1.429198999971959,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-b",
+      "observed": true,
+      "observed_at_monotonic": 1001.108234995,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 40,
+      "cache_age_ms": 1022,
+      "cache_ttl_ms": 2500,
+      "handled_events": 3,
+      "latency_ms": 1.3637289999905988,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-c",
+      "observed": true,
+      "observed_at_monotonic": 1001.10960824,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 40,
+      "cache_age_ms": 1019,
+      "cache_ttl_ms": 2500,
+      "handled_events": 3,
+      "latency_ms": 1.2555769999380573,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-hidden",
+      "observed": true,
+      "observed_at_monotonic": 1001.110872985,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     }
+    ],
+    "oracle_denied": true,
+    "t": 6.09,
+    "verifier_scope": "VERIFIED"
+   },
+   "event_delay_ms": 0,
+   "expected": "self_healing",
+   "fault_mode": "loss",
+   "kind": "positive",
+   "oracle_reads": [
+    {
+     "denied": false,
+     "t": 0.013
+    },
+    {
+     "denied": false,
+     "t": 1.028
+    },
+    {
+     "denied": true,
+     "t": 2.054
+    },
+    {
+     "denied": true,
+     "t": 3.02
+    },
+    {
+     "denied": true,
+     "t": 4.035
+    },
+    {
+     "denied": true,
+     "t": 5.061
+    },
+    {
+     "denied": true,
+     "t": 6.101
+    },
+    {
+     "denied": true,
+     "t": 7.016
+    },
+    {
+     "denied": true,
+     "t": 8.041
+    },
+    {
+     "denied": true,
+     "t": 9.056
+    },
+    {
+     "denied": true,
+     "t": 10.022
+    },
+    {
+     "denied": true,
+     "t": 11.047
+    },
+    {
+     "denied": true,
+     "t": 12.062
+    },
+    {
+     "denied": true,
+     "t": 13.028
+    },
+    {
+     "denied": true,
+     "t": 14.054
+    },
+    {
+     "denied": true,
+     "t": 15.019
+    },
+    {
+     "denied": true,
+     "t": 16.035
+    },
+    {
+     "denied": true,
+     "t": 17.06
+    },
+    {
+     "denied": true,
+     "t": 18.026
+    },
+    {
+     "denied": true,
+     "t": 19.041
+    },
+    {
+     "denied": true,
+     "t": 20.065
+    },
+    {
+     "denied": true,
+     "t": 21.03
+    },
+    {
+     "denied": true,
+     "t": 22.045
+    },
+    {
+     "denied": true,
+     "t": 23.075
+    },
+    {
+     "denied": true,
+     "t": 24.041
+    },
+    {
+     "denied": true,
+     "t": 25.056
+    },
+    {
+     "denied": true,
+     "t": 26.03
+    },
+    {
+     "denied": true,
+     "t": 27.046
+    },
+    {
+     "denied": true,
+     "t": 28.061
+    },
+    {
+     "denied": true,
+     "t": 29.036
+    },
+    {
+     "denied": true,
+     "t": 30.051
+    },
+    {
+     "denied": true,
+     "t": 31.015
+    },
+    {
+     "denied": true,
+     "t": 32.039
+    },
+    {
+     "denied": true,
+     "t": 33.054
+    },
+    {
+     "denied": true,
+     "t": 34.019
+    },
+    {
+     "denied": true,
+     "t": 35.043
+    }
+   ],
+   "outcome": "SELF_HEALED"
+  },
+  {
+   "cache_ttl_ms": 4000,
+   "control_id": "loss-ttl4000-d0-0",
+   "end_of_campaign_window": {
+    "gateway_exposure_observed": false,
+    "operator_telemetry": [
+     {
+      "applied_revision": 42,
+      "cache_age_ms": 3065,
+      "cache_ttl_ms": 4000,
+      "handled_events": 3,
+      "latency_ms": 1.5230090000386554,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-a",
+      "observed": true,
+      "observed_at_monotonic": 1038.445077748,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 42,
+      "cache_age_ms": 3061,
+      "cache_ttl_ms": 4000,
+      "handled_events": 3,
+      "latency_ms": 1.2185180000869877,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-b",
+      "observed": true,
+      "observed_at_monotonic": 1038.446306388,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 42,
+      "cache_age_ms": 3057,
+      "cache_ttl_ms": 4000,
+      "handled_events": 3,
+      "latency_ms": 1.2153939999279828,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-c",
+      "observed": true,
+      "observed_at_monotonic": 1038.44753048,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 42,
+      "cache_age_ms": 3054,
+      "cache_ttl_ms": 4000,
+      "handled_events": 3,
+      "latency_ms": 1.3019590001022152,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-hidden",
+      "observed": true,
+      "observed_at_monotonic": 1038.448841092,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     }
+    ],
+    "oracle_denied": true,
+    "t": 6.13,
+    "verifier_scope": "VERIFIED"
+   },
+   "event_delay_ms": 0,
+   "expected": "self_healing",
+   "fault_mode": "loss",
+   "kind": "positive",
+   "oracle_reads": [
+    {
+     "denied": false,
+     "t": 0.013
+    },
+    {
+     "denied": false,
+     "t": 1.027
+    },
+    {
+     "denied": false,
+     "t": 2.041
+    },
+    {
+     "denied": true,
+     "t": 3.067
+    },
+    {
+     "denied": true,
+     "t": 4.032
+    },
+    {
+     "denied": true,
+     "t": 5.046
+    },
+    {
+     "denied": true,
+     "t": 6.139
+    },
+    {
+     "denied": true,
+     "t": 7.054
+    },
+    {
+     "denied": true,
+     "t": 8.029
+    },
+    {
+     "denied": true,
+     "t": 9.043
+    },
+    {
+     "denied": true,
+     "t": 10.059
+    },
+    {
+     "denied": true,
+     "t": 11.024
+    },
+    {
+     "denied": true,
+     "t": 12.049
+    },
+    {
+     "denied": true,
+     "t": 13.014
+    },
+    {
+     "denied": true,
+     "t": 14.029
+    },
+    {
+     "denied": true,
+     "t": 15.043
+    },
+    {
+     "denied": true,
+     "t": 16.069
+    },
+    {
+     "denied": true,
+     "t": 17.033
+    },
+    {
+     "denied": true,
+     "t": 18.048
+    },
+    {
+     "denied": true,
+     "t": 19.062
+    },
+    {
+     "denied": true,
+     "t": 20.027
+    },
+    {
+     "denied": true,
+     "t": 21.051
+    },
+    {
+     "denied": true,
+     "t": 22.016
+    },
+    {
+     "denied": true,
+     "t": 23.03
+    },
+    {
+     "denied": true,
+     "t": 24.046
+    },
+    {
+     "denied": true,
+     "t": 25.074
+    },
+    {
+     "denied": true,
+     "t": 26.04
+    },
+    {
+     "denied": true,
+     "t": 27.06
+    },
+    {
+     "denied": true,
+     "t": 28.025
+    },
+    {
+     "denied": true,
+     "t": 29.039
+    },
+    {
+     "denied": true,
+     "t": 30.064
+    },
+    {
+     "denied": true,
+     "t": 31.028
+    },
+    {
+     "denied": true,
+     "t": 32.043
+    },
+    {
+     "denied": true,
+     "t": 33.057
+    },
+    {
+     "denied": true,
+     "t": 34.022
+    },
+    {
+     "denied": true,
+     "t": 35.048
+    }
+   ],
+   "outcome": "SELF_HEALED"
+  },
+  {
+   "cache_ttl_ms": 4000,
+   "control_id": "loss-ttl4000-d0-1",
+   "end_of_campaign_window": {
+    "gateway_exposure_observed": false,
+    "operator_telemetry": [
+     {
+      "applied_revision": 44,
+      "cache_age_ms": 3060,
+      "cache_ttl_ms": 4000,
+      "handled_events": 3,
+      "latency_ms": 1.5287280000393366,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-a",
+      "observed": true,
+      "observed_at_monotonic": 1075.709101549,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 44,
+      "cache_age_ms": 3056,
+      "cache_ttl_ms": 4000,
+      "handled_events": 3,
+      "latency_ms": 1.3651530000515777,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-b",
+      "observed": true,
+      "observed_at_monotonic": 1075.710477165,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 44,
+      "cache_age_ms": 3054,
+      "cache_ttl_ms": 4000,
+      "handled_events": 3,
+      "latency_ms": 1.397334000103001,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-c",
+      "observed": true,
+      "observed_at_monotonic": 1075.711885075,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 44,
+      "cache_age_ms": 3049,
+      "cache_ttl_ms": 4000,
+      "handled_events": 3,
+      "latency_ms": 1.3386000000537024,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-hidden",
+      "observed": true,
+      "observed_at_monotonic": 1075.713238656,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     }
+    ],
+    "oracle_denied": true,
+    "t": 6.127,
+    "verifier_scope": "VERIFIED"
+   },
+   "event_delay_ms": 0,
+   "expected": "self_healing",
+   "fault_mode": "loss",
+   "kind": "positive",
+   "oracle_reads": [
+    {
+     "denied": false,
+     "t": 0.013
+    },
+    {
+     "denied": false,
+     "t": 1.027
+    },
+    {
+     "denied": false,
+     "t": 2.042
+    },
+    {
+     "denied": true,
+     "t": 3.068
+    },
+    {
+     "denied": true,
+     "t": 4.033
+    },
+    {
+     "denied": true,
+     "t": 5.047
+    },
+    {
+     "denied": true,
+     "t": 6.137
+    },
+    {
+     "denied": true,
+     "t": 7.051
+    },
+    {
+     "denied": true,
+     "t": 8.025
+    },
+    {
+     "denied": true,
+     "t": 9.04
+    },
+    {
+     "denied": true,
+     "t": 10.055
+    },
+    {
+     "denied": true,
+     "t": 11.02
+    },
+    {
+     "denied": true,
+     "t": 12.044
+    },
+    {
+     "denied": true,
+     "t": 13.06
+    },
+    {
+     "denied": true,
+     "t": 14.024
+    },
+    {
+     "denied": true,
+     "t": 15.039
+    },
+    {
+     "denied": true,
+     "t": 16.064
+    },
+    {
+     "denied": true,
+     "t": 17.029
+    },
+    {
+     "denied": true,
+     "t": 18.043
+    },
+    {
+     "denied": true,
+     "t": 19.057
+    },
+    {
+     "denied": true,
+     "t": 20.022
+    },
+    {
+     "denied": true,
+     "t": 21.046
+    },
+    {
+     "denied": true,
+     "t": 22.06
+    },
+    {
+     "denied": true,
+     "t": 23.024
+    },
+    {
+     "denied": true,
+     "t": 24.04
+    },
+    {
+     "denied": true,
+     "t": 25.063
+    },
+    {
+     "denied": true,
+     "t": 26.028
+    },
+    {
+     "denied": true,
+     "t": 27.043
+    },
+    {
+     "denied": true,
+     "t": 28.056
+    },
+    {
+     "denied": true,
+     "t": 29.021
+    },
+    {
+     "denied": true,
+     "t": 30.046
+    },
+    {
+     "denied": true,
+     "t": 31.061
+    },
+    {
+     "denied": true,
+     "t": 32.026
+    },
+    {
+     "denied": true,
+     "t": 33.04
+    },
+    {
+     "denied": true,
+     "t": 34.064
+    },
+    {
+     "denied": true,
+     "t": 35.029
+    }
+   ],
+   "outcome": "SELF_HEALED"
+  },
+  {
+   "cache_ttl_ms": 4000,
+   "control_id": "loss-ttl4000-d0-2",
+   "end_of_campaign_window": {
+    "gateway_exposure_observed": false,
+    "operator_telemetry": [
+     {
+      "applied_revision": 46,
+      "cache_age_ms": 3055,
+      "cache_ttl_ms": 4000,
+      "handled_events": 3,
+      "latency_ms": 1.3032540000494919,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-a",
+      "observed": true,
+      "observed_at_monotonic": 1112.989367491,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 46,
+      "cache_age_ms": 3053,
+      "cache_ttl_ms": 4000,
+      "handled_events": 3,
+      "latency_ms": 1.1312889998862374,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-b",
+      "observed": true,
+      "observed_at_monotonic": 1112.990508414,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 46,
+      "cache_age_ms": 3049,
+      "cache_ttl_ms": 4000,
+      "handled_events": 3,
+      "latency_ms": 1.1061830000471673,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-c",
+      "observed": true,
+      "observed_at_monotonic": 1112.991623583,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 46,
+      "cache_age_ms": 3046,
+      "cache_ttl_ms": 4000,
+      "handled_events": 3,
+      "latency_ms": 1.0493889999452222,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-hidden",
+      "observed": true,
+      "observed_at_monotonic": 1112.992680341,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     }
+    ],
+    "oracle_denied": true,
+    "t": 6.118,
+    "verifier_scope": "VERIFIED"
+   },
+   "event_delay_ms": 0,
+   "expected": "self_healing",
+   "fault_mode": "loss",
+   "kind": "positive",
+   "oracle_reads": [
+    {
+     "denied": false,
+     "t": 0.013
+    },
+    {
+     "denied": false,
+     "t": 1.027
+    },
+    {
+     "denied": false,
+     "t": 2.041
+    },
+    {
+     "denied": true,
+     "t": 3.064
+    },
+    {
+     "denied": true,
+     "t": 4.029
+    },
+    {
+     "denied": true,
+     "t": 5.043
+    },
+    {
+     "denied": true,
+     "t": 6.126
+    },
+    {
+     "denied": true,
+     "t": 7.04
+    },
+    {
+     "denied": true,
+     "t": 8.064
+    },
+    {
+     "denied": true,
+     "t": 9.029
+    },
+    {
+     "denied": true,
+     "t": 10.043
+    },
+    {
+     "denied": true,
+     "t": 11.057
+    },
+    {
+     "denied": true,
+     "t": 12.022
+    },
+    {
+     "denied": true,
+     "t": 13.045
+    },
+    {
+     "denied": true,
+     "t": 14.06
+    },
+    {
+     "denied": true,
+     "t": 15.025
+    },
+    {
+     "denied": true,
+     "t": 16.04
+    },
+    {
+     "denied": true,
+     "t": 17.063
+    },
+    {
+     "denied": true,
+     "t": 18.028
+    },
+    {
+     "denied": true,
+     "t": 19.042
+    },
+    {
+     "denied": true,
+     "t": 20.057
+    },
+    {
+     "denied": true,
+     "t": 21.021
+    },
+    {
+     "denied": true,
+     "t": 22.045
+    },
+    {
+     "denied": true,
+     "t": 23.06
+    },
+    {
+     "denied": true,
+     "t": 24.024
+    },
+    {
+     "denied": true,
+     "t": 25.039
+    },
+    {
+     "denied": true,
+     "t": 26.064
+    },
+    {
+     "denied": true,
+     "t": 27.029
+    },
+    {
+     "denied": true,
+     "t": 28.044
+    },
+    {
+     "denied": true,
+     "t": 29.058
+    },
+    {
+     "denied": true,
+     "t": 30.023
+    },
+    {
+     "denied": true,
+     "t": 31.046
+    },
+    {
+     "denied": true,
+     "t": 32.06
+    },
+    {
+     "denied": true,
+     "t": 33.025
+    },
+    {
+     "denied": true,
+     "t": 34.039
+    },
+    {
+     "denied": true,
+     "t": 35.065
+    }
+   ],
+   "outcome": "SELF_HEALED"
+  },
+  {
+   "cache_ttl_ms": 4000,
+   "control_id": "loss-ttl4000-d0-3",
+   "end_of_campaign_window": {
+    "gateway_exposure_observed": false,
+    "operator_telemetry": [
+     {
+      "applied_revision": 48,
+      "cache_age_ms": 3055,
+      "cache_ttl_ms": 4000,
+      "handled_events": 3,
+      "latency_ms": 1.1805500000718894,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-a",
+      "observed": true,
+      "observed_at_monotonic": 1150.250335589,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 48,
+      "cache_age_ms": 3052,
+      "cache_ttl_ms": 4000,
+      "handled_events": 3,
+      "latency_ms": 1.1051090000364638,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-b",
+      "observed": true,
+      "observed_at_monotonic": 1150.251450392,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 48,
+      "cache_age_ms": 3050,
+      "cache_ttl_ms": 4000,
+      "handled_events": 3,
+      "latency_ms": 1.0445630000504025,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-c",
+      "observed": true,
+      "observed_at_monotonic": 1150.252503869,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 48,
+      "cache_age_ms": 3046,
+      "cache_ttl_ms": 4000,
+      "handled_events": 3,
+      "latency_ms": 0.9645150000778813,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-hidden",
+      "observed": true,
+      "observed_at_monotonic": 1150.253475499,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     }
+    ],
+    "oracle_denied": true,
+    "t": 6.118,
+    "verifier_scope": "VERIFIED"
+   },
+   "event_delay_ms": 0,
+   "expected": "self_healing",
+   "fault_mode": "loss",
+   "kind": "positive",
+   "oracle_reads": [
+    {
+     "denied": false,
+     "t": 0.012
+    },
+    {
+     "denied": false,
+     "t": 1.026
+    },
+    {
+     "denied": false,
+     "t": 2.04
+    },
+    {
+     "denied": true,
+     "t": 3.064
+    },
+    {
+     "denied": true,
+     "t": 4.029
+    },
+    {
+     "denied": true,
+     "t": 5.043
+    },
+    {
+     "denied": true,
+     "t": 6.128
+    },
+    {
+     "denied": true,
+     "t": 7.043
+    },
+    {
+     "denied": true,
+     "t": 8.066
+    },
+    {
+     "denied": true,
+     "t": 9.03
+    },
+    {
+     "denied": true,
+     "t": 10.044
+    },
+    {
+     "denied": true,
+     "t": 11.059
+    },
+    {
+     "denied": true,
+     "t": 12.023
+    },
+    {
+     "denied": true,
+     "t": 13.046
+    },
+    {
+     "denied": true,
+     "t": 14.061
+    },
+    {
+     "denied": true,
+     "t": 15.025
+    },
+    {
+     "denied": true,
+     "t": 16.04
+    },
+    {
+     "denied": true,
+     "t": 17.064
+    },
+    {
+     "denied": true,
+     "t": 18.029
+    },
+    {
+     "denied": true,
+     "t": 19.044
+    },
+    {
+     "denied": true,
+     "t": 20.058
+    },
+    {
+     "denied": true,
+     "t": 21.023
+    },
+    {
+     "denied": true,
+     "t": 22.049
+    },
+    {
+     "denied": true,
+     "t": 23.014
+    },
+    {
+     "denied": true,
+     "t": 24.029
+    },
+    {
+     "denied": true,
+     "t": 25.043
+    },
+    {
+     "denied": true,
+     "t": 26.066
+    },
+    {
+     "denied": true,
+     "t": 27.031
+    },
+    {
+     "denied": true,
+     "t": 28.047
+    },
+    {
+     "denied": true,
+     "t": 29.061
+    },
+    {
+     "denied": true,
+     "t": 30.026
+    },
+    {
+     "denied": true,
+     "t": 31.049
+    },
+    {
+     "denied": true,
+     "t": 32.013
+    },
+    {
+     "denied": true,
+     "t": 33.027
+    },
+    {
+     "denied": true,
+     "t": 34.042
+    },
+    {
+     "denied": true,
+     "t": 35.065
+    }
+   ],
+   "outcome": "SELF_HEALED"
+  },
+  {
+   "cache_ttl_ms": 10000,
+   "control_id": "consumer_paused-ttl10000-d0-0",
+   "end_of_campaign_window": {
+    "gateway_exposure_observed": true,
+    "operator_telemetry": [
+     {
+      "applied_revision": 50,
+      "cache_age_ms": 7288,
+      "cache_ttl_ms": 10000,
+      "handled_events": 3,
+      "latency_ms": 1.6313890000674292,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-a",
+      "observed": true,
+      "observed_at_monotonic": 1187.51703426,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 49,
+      "cache_age_ms": 7311,
+      "cache_ttl_ms": 10000,
+      "handled_events": 2,
+      "latency_ms": 1.2139049999859708,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-b",
+      "observed": true,
+      "observed_at_monotonic": 1187.518257274,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 50,
+      "cache_age_ms": 7290,
+      "cache_ttl_ms": 10000,
+      "handled_events": 3,
+      "latency_ms": 1.2820550000469666,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-c",
+      "observed": true,
+      "observed_at_monotonic": 1187.519548421,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 50,
+      "cache_age_ms": 7293,
+      "cache_ttl_ms": 10000,
+      "handled_events": 3,
+      "latency_ms": 1.3355470000533387,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-hidden",
+      "observed": true,
+      "observed_at_monotonic": 1187.520892633,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     }
+    ],
+    "oracle_denied": false,
+    "t": 6.11,
+    "verifier_scope": "NOT VERIFIED"
+   },
+   "event_delay_ms": 0,
+   "expected": "persistent",
+   "fault_mode": "consumer_paused",
+   "kind": "positive",
+   "oracle_reads": [
+    {
+     "denied": false,
+     "t": 0.012
+    },
+    {
+     "denied": false,
+     "t": 1.026
+    },
+    {
+     "denied": false,
+     "t": 2.04
+    },
+    {
+     "denied": false,
+     "t": 3.055
+    },
+    {
+     "denied": false,
+     "t": 4.019
+    },
+    {
+     "denied": false,
+     "t": 5.033
+    },
+    {
+     "denied": false,
+     "t": 6.119
+    },
+    {
+     "denied": false,
+     "t": 7.033
+    },
+    {
+     "denied": false,
+     "t": 8.048
+    },
+    {
+     "denied": true,
+     "t": 9.024
+    },
+    {
+     "denied": true,
+     "t": 10.039
+    },
+    {
+     "denied": true,
+     "t": 11.054
+    },
+    {
+     "denied": true,
+     "t": 12.018
+    },
+    {
+     "denied": true,
+     "t": 13.033
+    },
+    {
+     "denied": true,
+     "t": 14.048
+    },
+    {
+     "denied": true,
+     "t": 15.013
+    },
+    {
+     "denied": true,
+     "t": 16.027
+    },
+    {
+     "denied": true,
+     "t": 17.041
+    },
+    {
+     "denied": true,
+     "t": 18.056
+    },
+    {
+     "denied": true,
+     "t": 19.031
+    },
+    {
+     "denied": true,
+     "t": 20.044
+    },
+    {
+     "denied": true,
+     "t": 21.059
+    },
+    {
+     "denied": true,
+     "t": 22.023
+    },
+    {
+     "denied": true,
+     "t": 23.038
+    },
+    {
+     "denied": true,
+     "t": 24.053
+    },
+    {
+     "denied": true,
+     "t": 25.018
+    },
+    {
+     "denied": true,
+     "t": 26.033
+    },
+    {
+     "denied": true,
+     "t": 27.046
+    },
+    {
+     "denied": true,
+     "t": 28.061
+    },
+    {
+     "denied": true,
+     "t": 29.038
+    },
+    {
+     "denied": true,
+     "t": 30.053
+    },
+    {
+     "denied": true,
+     "t": 31.018
+    },
+    {
+     "denied": true,
+     "t": 32.032
+    },
+    {
+     "denied": true,
+     "t": 33.047
+    },
+    {
+     "denied": true,
+     "t": 34.061
+    },
+    {
+     "denied": true,
+     "t": 35.026
+    }
+   ],
+   "outcome": "PERSISTED"
+  },
+  {
+   "cache_ttl_ms": 10000,
+   "control_id": "consumer_paused-ttl10000-d0-1",
+   "end_of_campaign_window": {
+    "gateway_exposure_observed": true,
+    "operator_telemetry": [
+     {
+      "applied_revision": 52,
+      "cache_age_ms": 7290,
+      "cache_ttl_ms": 10000,
+      "handled_events": 3,
+      "latency_ms": 1.2511910001649085,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-a",
+      "observed": true,
+      "observed_at_monotonic": 1224.807501281,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 51,
+      "cache_age_ms": 7318,
+      "cache_ttl_ms": 10000,
+      "handled_events": 2,
+      "latency_ms": 1.0439110001243534,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-b",
+      "observed": true,
+      "observed_at_monotonic": 1224.808553829,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 52,
+      "cache_age_ms": 7293,
+      "cache_ttl_ms": 10000,
+      "handled_events": 3,
+      "latency_ms": 1.1174730000220734,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-c",
+      "observed": true,
+      "observed_at_monotonic": 1224.809680276,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 52,
+      "cache_age_ms": 7294,
+      "cache_ttl_ms": 10000,
+      "handled_events": 3,
+      "latency_ms": 1.1207699999431497,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-hidden",
+      "observed": true,
+      "observed_at_monotonic": 1224.810808201,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     }
+    ],
+    "oracle_denied": false,
+    "t": 6.11,
+    "verifier_scope": "NOT VERIFIED"
+   },
+   "event_delay_ms": 0,
+   "expected": "persistent",
+   "fault_mode": "consumer_paused",
+   "kind": "positive",
+   "oracle_reads": [
+    {
+     "denied": false,
+     "t": 0.013
+    },
+    {
+     "denied": false,
+     "t": 1.027
+    },
+    {
+     "denied": false,
+     "t": 2.04
+    },
+    {
+     "denied": false,
+     "t": 3.054
+    },
+    {
+     "denied": false,
+     "t": 4.019
+    },
+    {
+     "denied": false,
+     "t": 5.034
+    },
+    {
+     "denied": false,
+     "t": 6.118
+    },
+    {
+     "denied": false,
+     "t": 7.033
+    },
+    {
+     "denied": false,
+     "t": 8.047
+    },
+    {
+     "denied": true,
+     "t": 9.073
+    },
+    {
+     "denied": true,
+     "t": 10.037
+    },
+    {
+     "denied": true,
+     "t": 11.052
+    },
+    {
+     "denied": true,
+     "t": 12.016
+    },
+    {
+     "denied": true,
+     "t": 13.031
+    },
+    {
+     "denied": true,
+     "t": 14.045
+    },
+    {
+     "denied": true,
+     "t": 15.06
+    },
+    {
+     "denied": true,
+     "t": 16.024
+    },
+    {
+     "denied": true,
+     "t": 17.039
+    },
+    {
+     "denied": true,
+     "t": 18.054
+    },
+    {
+     "denied": true,
+     "t": 19.018
+    },
+    {
+     "denied": true,
+     "t": 20.043
+    },
+    {
+     "denied": true,
+     "t": 21.057
+    },
+    {
+     "denied": true,
+     "t": 22.023
+    },
+    {
+     "denied": true,
+     "t": 23.037
+    },
+    {
+     "denied": true,
+     "t": 24.051
+    },
+    {
+     "denied": true,
+     "t": 25.017
+    },
+    {
+     "denied": true,
+     "t": 26.031
+    },
+    {
+     "denied": true,
+     "t": 27.045
+    },
+    {
+     "denied": true,
+     "t": 28.06
+    },
+    {
+     "denied": true,
+     "t": 29.024
+    },
+    {
+     "denied": true,
+     "t": 30.047
+    },
+    {
+     "denied": true,
+     "t": 31.063
+    },
+    {
+     "denied": true,
+     "t": 32.027
+    },
+    {
+     "denied": true,
+     "t": 33.042
+    },
+    {
+     "denied": true,
+     "t": 34.057
+    },
+    {
+     "denied": true,
+     "t": 35.021
+    }
+   ],
+   "outcome": "PERSISTED"
+  },
+  {
+   "cache_ttl_ms": 10000,
+   "control_id": "consumer_paused-ttl10000-d0-2",
+   "end_of_campaign_window": {
+    "gateway_exposure_observed": true,
+    "operator_telemetry": [
+     {
+      "applied_revision": 54,
+      "cache_age_ms": 7290,
+      "cache_ttl_ms": 10000,
+      "handled_events": 3,
+      "latency_ms": 1.4228229999844189,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-a",
+      "observed": true,
+      "observed_at_monotonic": 1262.096952572,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 53,
+      "cache_age_ms": 7318,
+      "cache_ttl_ms": 10000,
+      "handled_events": 2,
+      "latency_ms": 1.2524870001016097,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-b",
+      "observed": true,
+      "observed_at_monotonic": 1262.098214983,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 54,
+      "cache_age_ms": 7291,
+      "cache_ttl_ms": 10000,
+      "handled_events": 3,
+      "latency_ms": 1.1923629999728291,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-c",
+      "observed": true,
+      "observed_at_monotonic": 1262.099415487,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 54,
+      "cache_age_ms": 7294,
+      "cache_ttl_ms": 10000,
+      "handled_events": 3,
+      "latency_ms": 1.1887649998243432,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-hidden",
+      "observed": true,
+      "observed_at_monotonic": 1262.10061244,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     }
+    ],
+    "oracle_denied": false,
+    "t": 6.11,
+    "verifier_scope": "NOT VERIFIED"
+   },
+   "event_delay_ms": 0,
+   "expected": "persistent",
+   "fault_mode": "consumer_paused",
+   "kind": "positive",
+   "oracle_reads": [
+    {
+     "denied": false,
+     "t": 0.012
+    },
+    {
+     "denied": false,
+     "t": 1.026
+    },
+    {
+     "denied": false,
+     "t": 2.04
+    },
+    {
+     "denied": false,
+     "t": 3.055
+    },
+    {
+     "denied": false,
+     "t": 4.02
+    },
+    {
+     "denied": false,
+     "t": 5.033
+    },
+    {
+     "denied": false,
+     "t": 6.119
+    },
+    {
+     "denied": false,
+     "t": 7.034
+    },
+    {
+     "denied": false,
+     "t": 8.048
+    },
+    {
+     "denied": true,
+     "t": 9.022
+    },
+    {
+     "denied": true,
+     "t": 10.036
+    },
+    {
+     "denied": true,
+     "t": 11.05
+    },
+    {
+     "denied": true,
+     "t": 12.014
+    },
+    {
+     "denied": true,
+     "t": 13.03
+    },
+    {
+     "denied": true,
+     "t": 14.045
+    },
+    {
+     "denied": true,
+     "t": 15.059
+    },
+    {
+     "denied": true,
+     "t": 16.024
+    },
+    {
+     "denied": true,
+     "t": 17.038
+    },
+    {
+     "denied": true,
+     "t": 18.052
+    },
+    {
+     "denied": true,
+     "t": 19.027
+    },
+    {
+     "denied": true,
+     "t": 20.041
+    },
+    {
+     "denied": true,
+     "t": 21.056
+    },
+    {
+     "denied": true,
+     "t": 22.02
+    },
+    {
+     "denied": true,
+     "t": 23.034
+    },
+    {
+     "denied": true,
+     "t": 24.048
+    },
+    {
+     "denied": true,
+     "t": 25.012
+    },
+    {
+     "denied": true,
+     "t": 26.027
+    },
+    {
+     "denied": true,
+     "t": 27.041
+    },
+    {
+     "denied": true,
+     "t": 28.055
+    },
+    {
+     "denied": true,
+     "t": 29.026
+    },
+    {
+     "denied": true,
+     "t": 30.044
+    },
+    {
+     "denied": true,
+     "t": 31.059
+    },
+    {
+     "denied": true,
+     "t": 32.024
+    },
+    {
+     "denied": true,
+     "t": 33.038
+    },
+    {
+     "denied": true,
+     "t": 34.052
+    },
+    {
+     "denied": true,
+     "t": 35.017
+    }
+   ],
+   "outcome": "PERSISTED"
+  },
+  {
+   "cache_ttl_ms": 10000,
+   "control_id": "consumer_paused-ttl10000-d0-3",
+   "end_of_campaign_window": {
+    "gateway_exposure_observed": true,
+    "operator_telemetry": [
+     {
+      "applied_revision": 56,
+      "cache_age_ms": 7292,
+      "cache_ttl_ms": 10000,
+      "handled_events": 3,
+      "latency_ms": 1.3491270001395606,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-a",
+      "observed": true,
+      "observed_at_monotonic": 1299.365246543,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 55,
+      "cache_age_ms": 7313,
+      "cache_ttl_ms": 10000,
+      "handled_events": 2,
+      "latency_ms": 1.3090489999285637,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-b",
+      "observed": true,
+      "observed_at_monotonic": 1299.366564751,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 56,
+      "cache_age_ms": 7295,
+      "cache_ttl_ms": 10000,
+      "handled_events": 3,
+      "latency_ms": 1.2707749999663065,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-c",
+      "observed": true,
+      "observed_at_monotonic": 1299.36784545,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 56,
+      "cache_age_ms": 7294,
+      "cache_ttl_ms": 10000,
+      "handled_events": 3,
+      "latency_ms": 1.1684310002237908,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-hidden",
+      "observed": true,
+      "observed_at_monotonic": 1299.369023154,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     }
+    ],
+    "oracle_denied": false,
+    "t": 6.112,
+    "verifier_scope": "NOT VERIFIED"
+   },
+   "event_delay_ms": 0,
+   "expected": "persistent",
+   "fault_mode": "consumer_paused",
+   "kind": "positive",
+   "oracle_reads": [
+    {
+     "denied": false,
+     "t": 0.012
+    },
+    {
+     "denied": false,
+     "t": 1.026
+    },
+    {
+     "denied": false,
+     "t": 2.04
+    },
+    {
+     "denied": false,
+     "t": 3.055
+    },
+    {
+     "denied": false,
+     "t": 4.019
+    },
+    {
+     "denied": false,
+     "t": 5.035
+    },
+    {
+     "denied": false,
+     "t": 6.121
+    },
+    {
+     "denied": false,
+     "t": 7.036
+    },
+    {
+     "denied": false,
+     "t": 8.05
+    },
+    {
+     "denied": true,
+     "t": 9.023
+    },
+    {
+     "denied": true,
+     "t": 10.038
+    },
+    {
+     "denied": true,
+     "t": 11.053
+    },
+    {
+     "denied": true,
+     "t": 12.017
+    },
+    {
+     "denied": true,
+     "t": 13.032
+    },
+    {
+     "denied": true,
+     "t": 14.046
+    },
+    {
+     "denied": true,
+     "t": 15.061
+    },
+    {
+     "denied": true,
+     "t": 16.025
+    },
+    {
+     "denied": true,
+     "t": 17.039
+    },
+    {
+     "denied": true,
+     "t": 18.054
+    },
+    {
+     "denied": true,
+     "t": 19.03
+    },
+    {
+     "denied": true,
+     "t": 20.044
+    },
+    {
+     "denied": true,
+     "t": 21.059
+    },
+    {
+     "denied": true,
+     "t": 22.023
+    },
+    {
+     "denied": true,
+     "t": 23.037
+    },
+    {
+     "denied": true,
+     "t": 24.051
+    },
+    {
+     "denied": true,
+     "t": 25.016
+    },
+    {
+     "denied": true,
+     "t": 26.029
+    },
+    {
+     "denied": true,
+     "t": 27.045
+    },
+    {
+     "denied": true,
+     "t": 28.059
+    },
+    {
+     "denied": true,
+     "t": 29.032
+    },
+    {
+     "denied": true,
+     "t": 30.046
+    },
+    {
+     "denied": true,
+     "t": 31.06
+    },
+    {
+     "denied": true,
+     "t": 32.024
+    },
+    {
+     "denied": true,
+     "t": 33.038
+    },
+    {
+     "denied": true,
+     "t": 34.053
+    },
+    {
+     "denied": true,
+     "t": 35.017
+    }
+   ],
+   "outcome": "PERSISTED"
+  },
+  {
+   "cache_ttl_ms": 30000,
+   "control_id": "consumer_paused-ttl30000-d0-0",
+   "end_of_campaign_window": {
+    "gateway_exposure_observed": true,
+    "operator_telemetry": [
+     {
+      "applied_revision": 58,
+      "cache_age_ms": 7291,
+      "cache_ttl_ms": 30000,
+      "handled_events": 3,
+      "latency_ms": 1.5284539999811386,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-a",
+      "observed": true,
+      "observed_at_monotonic": 1336.637828892,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 57,
+      "cache_age_ms": 7310,
+      "cache_ttl_ms": 30000,
+      "handled_events": 2,
+      "latency_ms": 1.1523850000685343,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-b",
+      "observed": true,
+      "observed_at_monotonic": 1336.6389903,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 58,
+      "cache_age_ms": 7293,
+      "cache_ttl_ms": 30000,
+      "handled_events": 3,
+      "latency_ms": 1.3426760001493676,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-c",
+      "observed": true,
+      "observed_at_monotonic": 1336.640341598,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 58,
+      "cache_age_ms": 7295,
+      "cache_ttl_ms": 30000,
+      "handled_events": 3,
+      "latency_ms": 1.309451999986777,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-hidden",
+      "observed": true,
+      "observed_at_monotonic": 1336.641660148,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     }
+    ],
+    "oracle_denied": false,
+    "t": 6.112,
+    "verifier_scope": "NOT VERIFIED"
+   },
+   "event_delay_ms": 0,
+   "expected": "persistent",
+   "fault_mode": "consumer_paused",
+   "kind": "positive",
+   "oracle_reads": [
+    {
+     "denied": false,
+     "t": 0.012
+    },
+    {
+     "denied": false,
+     "t": 1.026
+    },
+    {
+     "denied": false,
+     "t": 2.04
+    },
+    {
+     "denied": false,
+     "t": 3.055
+    },
+    {
+     "denied": false,
+     "t": 4.02
+    },
+    {
+     "denied": false,
+     "t": 5.034
+    },
+    {
+     "denied": false,
+     "t": 6.12
+    },
+    {
+     "denied": false,
+     "t": 7.034
+    },
+    {
+     "denied": false,
+     "t": 8.049
+    },
+    {
+     "denied": false,
+     "t": 9.013
+    },
+    {
+     "denied": false,
+     "t": 10.028
+    },
+    {
+     "denied": false,
+     "t": 11.042
+    },
+    {
+     "denied": false,
+     "t": 12.056
+    },
+    {
+     "denied": false,
+     "t": 13.021
+    },
+    {
+     "denied": false,
+     "t": 14.037
+    },
+    {
+     "denied": false,
+     "t": 15.051
+    },
+    {
+     "denied": false,
+     "t": 16.017
+    },
+    {
+     "denied": false,
+     "t": 17.031
+    },
+    {
+     "denied": false,
+     "t": 18.045
+    },
+    {
+     "denied": false,
+     "t": 19.059
+    },
+    {
+     "denied": false,
+     "t": 20.024
+    },
+    {
+     "denied": false,
+     "t": 21.038
+    },
+    {
+     "denied": false,
+     "t": 22.053
+    },
+    {
+     "denied": false,
+     "t": 23.017
+    },
+    {
+     "denied": false,
+     "t": 24.031
+    },
+    {
+     "denied": false,
+     "t": 25.044
+    },
+    {
+     "denied": false,
+     "t": 26.058
+    },
+    {
+     "denied": false,
+     "t": 27.022
+    },
+    {
+     "denied": false,
+     "t": 28.037
+    },
+    {
+     "denied": true,
+     "t": 29.062
+    },
+    {
+     "denied": true,
+     "t": 30.026
+    },
+    {
+     "denied": true,
+     "t": 31.04
+    },
+    {
+     "denied": true,
+     "t": 32.056
+    },
+    {
+     "denied": true,
+     "t": 33.021
+    },
+    {
+     "denied": true,
+     "t": 34.035
+    },
+    {
+     "denied": true,
+     "t": 35.048
+    }
+   ],
+   "outcome": "PERSISTED"
+  },
+  {
+   "cache_ttl_ms": 30000,
+   "control_id": "consumer_paused-ttl30000-d0-1",
+   "end_of_campaign_window": {
+    "gateway_exposure_observed": true,
+    "operator_telemetry": [
+     {
+      "applied_revision": 60,
+      "cache_age_ms": 7289,
+      "cache_ttl_ms": 30000,
+      "handled_events": 3,
+      "latency_ms": 1.2263599999187136,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-a",
+      "observed": true,
+      "observed_at_monotonic": 1373.891767278,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 59,
+      "cache_age_ms": 7313,
+      "cache_ttl_ms": 30000,
+      "handled_events": 2,
+      "latency_ms": 1.0891430001720437,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-b",
+      "observed": true,
+      "observed_at_monotonic": 1373.892866859,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 60,
+      "cache_age_ms": 7293,
+      "cache_ttl_ms": 30000,
+      "handled_events": 3,
+      "latency_ms": 1.0775359999115608,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-c",
+      "observed": true,
+      "observed_at_monotonic": 1373.893953644,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 60,
+      "cache_age_ms": 7294,
+      "cache_ttl_ms": 30000,
+      "handled_events": 3,
+      "latency_ms": 1.1145000000851724,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-hidden",
+      "observed": true,
+      "observed_at_monotonic": 1373.895076296,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     }
+    ],
+    "oracle_denied": false,
+    "t": 6.114,
+    "verifier_scope": "NOT VERIFIED"
+   },
+   "event_delay_ms": 0,
+   "expected": "persistent",
+   "fault_mode": "consumer_paused",
+   "kind": "positive",
+   "oracle_reads": [
+    {
+     "denied": false,
+     "t": 0.012
+    },
+    {
+     "denied": false,
+     "t": 1.026
+    },
+    {
+     "denied": false,
+     "t": 2.04
+    },
+    {
+     "denied": false,
+     "t": 3.054
+    },
+    {
+     "denied": false,
+     "t": 4.018
+    },
+    {
+     "denied": false,
+     "t": 5.032
+    },
+    {
+     "denied": false,
+     "t": 6.125
+    },
+    {
+     "denied": false,
+     "t": 7.039
+    },
+    {
+     "denied": false,
+     "t": 8.053
+    },
+    {
+     "denied": false,
+     "t": 9.017
+    },
+    {
+     "denied": false,
+     "t": 10.031
+    },
+    {
+     "denied": false,
+     "t": 11.045
+    },
+    {
+     "denied": false,
+     "t": 12.059
+    },
+    {
+     "denied": false,
+     "t": 13.023
+    },
+    {
+     "denied": false,
+     "t": 14.037
+    },
+    {
+     "denied": false,
+     "t": 15.053
+    },
+    {
+     "denied": false,
+     "t": 16.017
+    },
+    {
+     "denied": false,
+     "t": 17.031
+    },
+    {
+     "denied": false,
+     "t": 18.045
+    },
+    {
+     "denied": false,
+     "t": 19.059
+    },
+    {
+     "denied": false,
+     "t": 20.023
+    },
+    {
+     "denied": false,
+     "t": 21.037
+    },
+    {
+     "denied": false,
+     "t": 22.052
+    },
+    {
+     "denied": false,
+     "t": 23.016
+    },
+    {
+     "denied": false,
+     "t": 24.029
+    },
+    {
+     "denied": false,
+     "t": 25.044
+    },
+    {
+     "denied": false,
+     "t": 26.058
+    },
+    {
+     "denied": false,
+     "t": 27.022
+    },
+    {
+     "denied": false,
+     "t": 28.037
+    },
+    {
+     "denied": true,
+     "t": 29.068
+    },
+    {
+     "denied": true,
+     "t": 30.032
+    },
+    {
+     "denied": true,
+     "t": 31.046
+    },
+    {
+     "denied": true,
+     "t": 32.06
+    },
+    {
+     "denied": true,
+     "t": 33.024
+    },
+    {
+     "denied": true,
+     "t": 34.037
+    },
+    {
+     "denied": true,
+     "t": 35.052
+    }
+   ],
+   "outcome": "PERSISTED"
+  },
+  {
+   "cache_ttl_ms": 30000,
+   "control_id": "consumer_paused-ttl30000-d0-2",
+   "end_of_campaign_window": {
+    "gateway_exposure_observed": true,
+    "operator_telemetry": [
+     {
+      "applied_revision": 62,
+      "cache_age_ms": 7289,
+      "cache_ttl_ms": 30000,
+      "handled_events": 3,
+      "latency_ms": 1.367552999909094,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-a",
+      "observed": true,
+      "observed_at_monotonic": 1411.165192068,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 61,
+      "cache_age_ms": 7321,
+      "cache_ttl_ms": 30000,
+      "handled_events": 2,
+      "latency_ms": 1.2576960000387771,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-b",
+      "observed": true,
+      "observed_at_monotonic": 1411.166460478,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 62,
+      "cache_age_ms": 7292,
+      "cache_ttl_ms": 30000,
+      "handled_events": 3,
+      "latency_ms": 1.283487000137029,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-c",
+      "observed": true,
+      "observed_at_monotonic": 1411.167754182,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 62,
+      "cache_age_ms": 7293,
+      "cache_ttl_ms": 30000,
+      "handled_events": 3,
+      "latency_ms": 1.123498999959338,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-hidden",
+      "observed": true,
+      "observed_at_monotonic": 1411.168886508,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     }
+    ],
+    "oracle_denied": false,
+    "t": 6.109,
+    "verifier_scope": "NOT VERIFIED"
+   },
+   "event_delay_ms": 0,
+   "expected": "persistent",
+   "fault_mode": "consumer_paused",
+   "kind": "positive",
+   "oracle_reads": [
+    {
+     "denied": false,
+     "t": 0.011
+    },
+    {
+     "denied": false,
+     "t": 1.026
+    },
+    {
+     "denied": false,
+     "t": 2.04
+    },
+    {
+     "denied": false,
+     "t": 3.053
+    },
+    {
+     "denied": false,
+     "t": 4.017
+    },
+    {
+     "denied": false,
+     "t": 5.031
+    },
+    {
+     "denied": false,
+     "t": 6.121
+    },
+    {
+     "denied": false,
+     "t": 7.035
+    },
+    {
+     "denied": false,
+     "t": 8.048
+    },
+    {
+     "denied": false,
+     "t": 9.013
+    },
+    {
+     "denied": false,
+     "t": 10.026
+    },
+    {
+     "denied": false,
+     "t": 11.041
+    },
+    {
+     "denied": false,
+     "t": 12.054
+    },
+    {
+     "denied": false,
+     "t": 13.018
+    },
+    {
+     "denied": false,
+     "t": 14.032
+    },
+    {
+     "denied": false,
+     "t": 15.046
+    },
+    {
+     "denied": false,
+     "t": 16.061
+    },
+    {
+     "denied": false,
+     "t": 17.025
+    },
+    {
+     "denied": false,
+     "t": 18.043
+    },
+    {
+     "denied": false,
+     "t": 19.057
+    },
+    {
+     "denied": false,
+     "t": 20.021
+    },
+    {
+     "denied": false,
+     "t": 21.035
+    },
+    {
+     "denied": false,
+     "t": 22.048
+    },
+    {
+     "denied": false,
+     "t": 23.012
+    },
+    {
+     "denied": false,
+     "t": 24.026
+    },
+    {
+     "denied": false,
+     "t": 25.039
+    },
+    {
+     "denied": false,
+     "t": 26.053
+    },
+    {
+     "denied": false,
+     "t": 27.017
+    },
+    {
+     "denied": false,
+     "t": 28.033
+    },
+    {
+     "denied": true,
+     "t": 29.06
+    },
+    {
+     "denied": true,
+     "t": 30.024
+    },
+    {
+     "denied": true,
+     "t": 31.038
+    },
+    {
+     "denied": true,
+     "t": 32.053
+    },
+    {
+     "denied": true,
+     "t": 33.016
+    },
+    {
+     "denied": true,
+     "t": 34.03
+    },
+    {
+     "denied": true,
+     "t": 35.044
+    }
+   ],
+   "outcome": "PERSISTED"
+  },
+  {
+   "cache_ttl_ms": 30000,
+   "control_id": "consumer_paused-ttl30000-d0-3",
+   "end_of_campaign_window": {
+    "gateway_exposure_observed": true,
+    "operator_telemetry": [
+     {
+      "applied_revision": 64,
+      "cache_age_ms": 7286,
+      "cache_ttl_ms": 30000,
+      "handled_events": 3,
+      "latency_ms": 1.202553999974043,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-a",
+      "observed": true,
+      "observed_at_monotonic": 1448.451330118,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 63,
+      "cache_age_ms": 7304,
+      "cache_ttl_ms": 30000,
+      "handled_events": 2,
+      "latency_ms": 1.0218959998837818,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-b",
+      "observed": true,
+      "observed_at_monotonic": 1448.452360966,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 64,
+      "cache_age_ms": 7287,
+      "cache_ttl_ms": 30000,
+      "handled_events": 3,
+      "latency_ms": 1.0933989999557525,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-c",
+      "observed": true,
+      "observed_at_monotonic": 1448.453463323,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 64,
+      "cache_age_ms": 7290,
+      "cache_ttl_ms": 30000,
+      "handled_events": 3,
+      "latency_ms": 1.029031000143732,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-hidden",
+      "observed": true,
+      "observed_at_monotonic": 1448.454501017,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     }
+    ],
+    "oracle_denied": false,
+    "t": 6.107,
+    "verifier_scope": "NOT VERIFIED"
+   },
+   "event_delay_ms": 0,
+   "expected": "persistent",
+   "fault_mode": "consumer_paused",
+   "kind": "positive",
+   "oracle_reads": [
+    {
+     "denied": false,
+     "t": 0.012
+    },
+    {
+     "denied": false,
+     "t": 1.026
+    },
+    {
+     "denied": false,
+     "t": 2.04
+    },
+    {
+     "denied": false,
+     "t": 3.053
+    },
+    {
+     "denied": false,
+     "t": 4.018
+    },
+    {
+     "denied": false,
+     "t": 5.031
+    },
+    {
+     "denied": false,
+     "t": 6.118
+    },
+    {
+     "denied": false,
+     "t": 7.031
+    },
+    {
+     "denied": false,
+     "t": 8.044
+    },
+    {
+     "denied": false,
+     "t": 9.057
+    },
+    {
+     "denied": false,
+     "t": 10.021
+    },
+    {
+     "denied": false,
+     "t": 11.034
+    },
+    {
+     "denied": false,
+     "t": 12.048
+    },
+    {
+     "denied": false,
+     "t": 13.062
+    },
+    {
+     "denied": false,
+     "t": 14.024
+    },
+    {
+     "denied": false,
+     "t": 15.038
+    },
+    {
+     "denied": false,
+     "t": 16.05
+    },
+    {
+     "denied": false,
+     "t": 17.015
+    },
+    {
+     "denied": false,
+     "t": 18.03
+    },
+    {
+     "denied": false,
+     "t": 19.043
+    },
+    {
+     "denied": false,
+     "t": 20.057
+    },
+    {
+     "denied": false,
+     "t": 21.021
+    },
+    {
+     "denied": false,
+     "t": 22.035
+    },
+    {
+     "denied": false,
+     "t": 23.049
+    },
+    {
+     "denied": false,
+     "t": 24.013
+    },
+    {
+     "denied": false,
+     "t": 25.027
+    },
+    {
+     "denied": false,
+     "t": 26.04
+    },
+    {
+     "denied": false,
+     "t": 27.054
+    },
+    {
+     "denied": false,
+     "t": 28.018
+    },
+    {
+     "denied": true,
+     "t": 29.047
+    },
+    {
+     "denied": true,
+     "t": 30.06
+    },
+    {
+     "denied": true,
+     "t": 31.023
+    },
+    {
+     "denied": true,
+     "t": 32.036
+    },
+    {
+     "denied": true,
+     "t": 33.05
+    },
+    {
+     "denied": true,
+     "t": 34.013
+    },
+    {
+     "denied": true,
+     "t": 35.026
+    }
+   ],
+   "outcome": "PERSISTED"
+  },
+  {
+   "cache_ttl_ms": 10000,
+   "control_id": "delay-ttl10000-d2000-0",
+   "end_of_campaign_window": {
+    "gateway_exposure_observed": false,
+    "operator_telemetry": [
+     {
+      "applied_revision": 66,
+      "cache_age_ms": 7282,
+      "cache_ttl_ms": 10000,
+      "handled_events": 3,
+      "latency_ms": 0.984337999852869,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-a",
+      "observed": true,
+      "observed_at_monotonic": 1485.719321566,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 66,
+      "cache_age_ms": 5236,
+      "cache_ttl_ms": 10000,
+      "handled_events": 3,
+      "latency_ms": 0.9983080001347844,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-b",
+      "observed": true,
+      "observed_at_monotonic": 1485.720328287,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 66,
+      "cache_age_ms": 7285,
+      "cache_ttl_ms": 10000,
+      "handled_events": 3,
+      "latency_ms": 0.9224429998084815,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-c",
+      "observed": true,
+      "observed_at_monotonic": 1485.721259021,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 66,
+      "cache_age_ms": 7286,
+      "cache_ttl_ms": 10000,
+      "handled_events": 3,
+      "latency_ms": 0.9183590000247932,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-hidden",
+      "observed": true,
+      "observed_at_monotonic": 1485.722184036,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     }
+    ],
+    "oracle_denied": true,
+    "t": 6.102,
+    "verifier_scope": "VERIFIED"
+   },
+   "event_delay_ms": 2000,
+   "expected": "self_healing",
+   "fault_mode": "delay",
+   "kind": "positive",
+   "oracle_reads": [
+    {
+     "denied": false,
+     "t": 0.012
+    },
+    {
+     "denied": true,
+     "t": 1.025
+    },
+    {
+     "denied": true,
+     "t": 2.038
+    },
+    {
+     "denied": true,
+     "t": 3.051
+    },
+    {
+     "denied": true,
+     "t": 4.015
+    },
+    {
+     "denied": true,
+     "t": 5.029
+    },
+    {
+     "denied": true,
+     "t": 6.11
+    },
+    {
+     "denied": true,
+     "t": 7.023
+    },
+    {
+     "denied": true,
+     "t": 8.038
+    },
+    {
+     "denied": true,
+     "t": 9.058
+    },
+    {
+     "denied": true,
+     "t": 10.021
+    },
+    {
+     "denied": true,
+     "t": 11.037
+    },
+    {
+     "denied": true,
+     "t": 12.05
+    },
+    {
+     "denied": true,
+     "t": 13.014
+    },
+    {
+     "denied": true,
+     "t": 14.028
+    },
+    {
+     "denied": true,
+     "t": 15.041
+    },
+    {
+     "denied": true,
+     "t": 16.055
+    },
+    {
+     "denied": true,
+     "t": 17.018
+    },
+    {
+     "denied": true,
+     "t": 18.031
+    },
+    {
+     "denied": true,
+     "t": 19.045
+    },
+    {
+     "denied": true,
+     "t": 20.064
+    },
+    {
+     "denied": true,
+     "t": 21.028
+    },
+    {
+     "denied": true,
+     "t": 22.044
+    },
+    {
+     "denied": true,
+     "t": 23.057
+    },
+    {
+     "denied": true,
+     "t": 24.021
+    },
+    {
+     "denied": true,
+     "t": 25.034
+    },
+    {
+     "denied": true,
+     "t": 26.048
+    },
+    {
+     "denied": true,
+     "t": 27.061
+    },
+    {
+     "denied": true,
+     "t": 28.024
+    },
+    {
+     "denied": true,
+     "t": 29.038
+    },
+    {
+     "denied": true,
+     "t": 30.051
+    },
+    {
+     "denied": true,
+     "t": 31.021
+    },
+    {
+     "denied": true,
+     "t": 32.034
+    },
+    {
+     "denied": true,
+     "t": 33.049
+    },
+    {
+     "denied": true,
+     "t": 34.014
+    },
+    {
+     "denied": true,
+     "t": 35.027
+    }
+   ],
+   "outcome": "SELF_HEALED"
+  },
+  {
+   "cache_ttl_ms": 10000,
+   "control_id": "delay-ttl10000-d2000-1",
+   "end_of_campaign_window": {
+    "gateway_exposure_observed": false,
+    "operator_telemetry": [
+     {
+      "applied_revision": 68,
+      "cache_age_ms": 7282,
+      "cache_ttl_ms": 10000,
+      "handled_events": 3,
+      "latency_ms": 0.9829660000377771,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-a",
+      "observed": true,
+      "observed_at_monotonic": 1522.987906449,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 68,
+      "cache_age_ms": 5237,
+      "cache_ttl_ms": 10000,
+      "handled_events": 3,
+      "latency_ms": 0.8049900000060006,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-b",
+      "observed": true,
+      "observed_at_monotonic": 1522.988718738,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 68,
+      "cache_age_ms": 7283,
+      "cache_ttl_ms": 10000,
+      "handled_events": 3,
+      "latency_ms": 0.8398850000048697,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-c",
+      "observed": true,
+      "observed_at_monotonic": 1522.989567199,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 68,
+      "cache_age_ms": 7285,
+      "cache_ttl_ms": 10000,
+      "handled_events": 3,
+      "latency_ms": 0.8621060001132719,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-hidden",
+      "observed": true,
+      "observed_at_monotonic": 1522.990436502,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     }
+    ],
+    "oracle_denied": true,
+    "t": 6.1,
+    "verifier_scope": "VERIFIED"
+   },
+   "event_delay_ms": 2000,
+   "expected": "self_healing",
+   "fault_mode": "delay",
+   "kind": "positive",
+   "oracle_reads": [
+    {
+     "denied": false,
+     "t": 0.012
+    },
+    {
+     "denied": true,
+     "t": 1.025
+    },
+    {
+     "denied": true,
+     "t": 2.038
+    },
+    {
+     "denied": true,
+     "t": 3.051
+    },
+    {
+     "denied": true,
+     "t": 4.014
+    },
+    {
+     "denied": true,
+     "t": 5.027
+    },
+    {
+     "denied": true,
+     "t": 6.107
+    },
+    {
+     "denied": true,
+     "t": 7.02
+    },
+    {
+     "denied": true,
+     "t": 8.033
+    },
+    {
+     "denied": true,
+     "t": 9.052
+    },
+    {
+     "denied": true,
+     "t": 10.016
+    },
+    {
+     "denied": true,
+     "t": 11.031
+    },
+    {
+     "denied": true,
+     "t": 12.044
+    },
+    {
+     "denied": true,
+     "t": 13.058
+    },
+    {
+     "denied": true,
+     "t": 14.021
+    },
+    {
+     "denied": true,
+     "t": 15.034
+    },
+    {
+     "denied": true,
+     "t": 16.047
+    },
+    {
+     "denied": true,
+     "t": 17.06
+    },
+    {
+     "denied": true,
+     "t": 18.023
+    },
+    {
+     "denied": true,
+     "t": 19.037
+    },
+    {
+     "denied": true,
+     "t": 20.057
+    },
+    {
+     "denied": true,
+     "t": 21.02
+    },
+    {
+     "denied": true,
+     "t": 22.035
+    },
+    {
+     "denied": true,
+     "t": 23.048
+    },
+    {
+     "denied": true,
+     "t": 24.011
+    },
+    {
+     "denied": true,
+     "t": 25.024
+    },
+    {
+     "denied": true,
+     "t": 26.039
+    },
+    {
+     "denied": true,
+     "t": 27.052
+    },
+    {
+     "denied": true,
+     "t": 28.016
+    },
+    {
+     "denied": true,
+     "t": 29.03
+    },
+    {
+     "denied": true,
+     "t": 30.042
+    },
+    {
+     "denied": true,
+     "t": 31.062
+    },
+    {
+     "denied": true,
+     "t": 32.026
+    },
+    {
+     "denied": true,
+     "t": 33.04
+    },
+    {
+     "denied": true,
+     "t": 34.054
+    },
+    {
+     "denied": true,
+     "t": 35.017
+    }
+   ],
+   "outcome": "SELF_HEALED"
+  },
+  {
+   "cache_ttl_ms": 10000,
+   "control_id": "delay-ttl10000-d2000-2",
+   "end_of_campaign_window": {
+    "gateway_exposure_observed": false,
+    "operator_telemetry": [
+     {
+      "applied_revision": 70,
+      "cache_age_ms": 7282,
+      "cache_ttl_ms": 10000,
+      "handled_events": 3,
+      "latency_ms": 0.9569419999024831,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-a",
+      "observed": true,
+      "observed_at_monotonic": 1560.248643935,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 70,
+      "cache_age_ms": 5210,
+      "cache_ttl_ms": 10000,
+      "handled_events": 3,
+      "latency_ms": 0.9509229998911906,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-b",
+      "observed": true,
+      "observed_at_monotonic": 1560.249603915,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 70,
+      "cache_age_ms": 7281,
+      "cache_ttl_ms": 10000,
+      "handled_events": 3,
+      "latency_ms": 0.985109000112061,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-c",
+      "observed": true,
+      "observed_at_monotonic": 1560.250597654,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 70,
+      "cache_age_ms": 7283,
+      "cache_ttl_ms": 10000,
+      "handled_events": 3,
+      "latency_ms": 0.9387899999637739,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-hidden",
+      "observed": true,
+      "observed_at_monotonic": 1560.251544731,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     }
+    ],
+    "oracle_denied": true,
+    "t": 6.099,
+    "verifier_scope": "VERIFIED"
+   },
+   "event_delay_ms": 2000,
+   "expected": "self_healing",
+   "fault_mode": "delay",
+   "kind": "positive",
+   "oracle_reads": [
+    {
+     "denied": false,
+     "t": 0.011
+    },
+    {
+     "denied": true,
+     "t": 1.025
+    },
+    {
+     "denied": true,
+     "t": 2.038
+    },
+    {
+     "denied": true,
+     "t": 3.051
+    },
+    {
+     "denied": true,
+     "t": 4.015
+    },
+    {
+     "denied": true,
+     "t": 5.027
+    },
+    {
+     "denied": true,
+     "t": 6.107
+    },
+    {
+     "denied": true,
+     "t": 7.02
+    },
+    {
+     "denied": true,
+     "t": 8.033
+    },
+    {
+     "denied": true,
+     "t": 9.054
+    },
+    {
+     "denied": true,
+     "t": 10.018
+    },
+    {
+     "denied": true,
+     "t": 11.033
+    },
+    {
+     "denied": true,
+     "t": 12.046
+    },
+    {
+     "denied": true,
+     "t": 13.059
+    },
+    {
+     "denied": true,
+     "t": 14.024
+    },
+    {
+     "denied": true,
+     "t": 15.037
+    },
+    {
+     "denied": true,
+     "t": 16.051
+    },
+    {
+     "denied": true,
+     "t": 17.014
+    },
+    {
+     "denied": true,
+     "t": 18.027
+    },
+    {
+     "denied": true,
+     "t": 19.04
+    },
+    {
+     "denied": true,
+     "t": 20.059
+    },
+    {
+     "denied": true,
+     "t": 21.022
+    },
+    {
+     "denied": true,
+     "t": 22.037
+    },
+    {
+     "denied": true,
+     "t": 23.05
+    },
+    {
+     "denied": true,
+     "t": 24.014
+    },
+    {
+     "denied": true,
+     "t": 25.027
+    },
+    {
+     "denied": true,
+     "t": 26.04
+    },
+    {
+     "denied": true,
+     "t": 27.054
+    },
+    {
+     "denied": true,
+     "t": 28.016
+    },
+    {
+     "denied": true,
+     "t": 29.029
+    },
+    {
+     "denied": true,
+     "t": 30.043
+    },
+    {
+     "denied": true,
+     "t": 31.065
+    },
+    {
+     "denied": true,
+     "t": 32.029
+    },
+    {
+     "denied": true,
+     "t": 33.045
+    },
+    {
+     "denied": true,
+     "t": 34.058
+    },
+    {
+     "denied": true,
+     "t": 35.021
+    }
+   ],
+   "outcome": "SELF_HEALED"
+  },
+  {
+   "cache_ttl_ms": 10000,
+   "control_id": "delay-ttl10000-d2000-3",
+   "end_of_campaign_window": {
+    "gateway_exposure_observed": false,
+    "operator_telemetry": [
+     {
+      "applied_revision": 72,
+      "cache_age_ms": 7282,
+      "cache_ttl_ms": 10000,
+      "handled_events": 3,
+      "latency_ms": 0.8950909998475254,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-a",
+      "observed": true,
+      "observed_at_monotonic": 1597.512975268,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 72,
+      "cache_age_ms": 5234,
+      "cache_ttl_ms": 10000,
+      "handled_events": 3,
+      "latency_ms": 0.9027309999964928,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-b",
+      "observed": true,
+      "observed_at_monotonic": 1597.513885568,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 72,
+      "cache_age_ms": 7283,
+      "cache_ttl_ms": 10000,
+      "handled_events": 3,
+      "latency_ms": 0.9224780001204635,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-c",
+      "observed": true,
+      "observed_at_monotonic": 1597.514816555,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 72,
+      "cache_age_ms": 7285,
+      "cache_ttl_ms": 10000,
+      "handled_events": 3,
+      "latency_ms": 0.8663749999868742,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-hidden",
+      "observed": true,
+      "observed_at_monotonic": 1597.515690935,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     }
+    ],
+    "oracle_denied": true,
+    "t": 6.1,
+    "verifier_scope": "VERIFIED"
+   },
+   "event_delay_ms": 2000,
+   "expected": "self_healing",
+   "fault_mode": "delay",
+   "kind": "positive",
+   "oracle_reads": [
+    {
+     "denied": false,
+     "t": 0.012
+    },
+    {
+     "denied": true,
+     "t": 1.025
+    },
+    {
+     "denied": true,
+     "t": 2.038
+    },
+    {
+     "denied": true,
+     "t": 3.051
+    },
+    {
+     "denied": true,
+     "t": 4.015
+    },
+    {
+     "denied": true,
+     "t": 5.028
+    },
+    {
+     "denied": true,
+     "t": 6.108
+    },
+    {
+     "denied": true,
+     "t": 7.021
+    },
+    {
+     "denied": true,
+     "t": 8.034
+    },
+    {
+     "denied": true,
+     "t": 9.053
+    },
+    {
+     "denied": true,
+     "t": 10.017
+    },
+    {
+     "denied": true,
+     "t": 11.032
+    },
+    {
+     "denied": true,
+     "t": 12.045
+    },
+    {
+     "denied": true,
+     "t": 13.058
+    },
+    {
+     "denied": true,
+     "t": 14.021
+    },
+    {
+     "denied": true,
+     "t": 15.035
+    },
+    {
+     "denied": true,
+     "t": 16.048
+    },
+    {
+     "denied": true,
+     "t": 17.012
+    },
+    {
+     "denied": true,
+     "t": 18.026
+    },
+    {
+     "denied": true,
+     "t": 19.039
+    },
+    {
+     "denied": true,
+     "t": 20.058
+    },
+    {
+     "denied": true,
+     "t": 21.022
+    },
+    {
+     "denied": true,
+     "t": 22.037
+    },
+    {
+     "denied": true,
+     "t": 23.05
+    },
+    {
+     "denied": true,
+     "t": 24.014
+    },
+    {
+     "denied": true,
+     "t": 25.026
+    },
+    {
+     "denied": true,
+     "t": 26.039
+    },
+    {
+     "denied": true,
+     "t": 27.052
+    },
+    {
+     "denied": true,
+     "t": 28.016
+    },
+    {
+     "denied": true,
+     "t": 29.028
+    },
+    {
+     "denied": true,
+     "t": 30.041
+    },
+    {
+     "denied": true,
+     "t": 31.061
+    },
+    {
+     "denied": true,
+     "t": 32.025
+    },
+    {
+     "denied": true,
+     "t": 33.04
+    },
+    {
+     "denied": true,
+     "t": 34.053
+    },
+    {
+     "denied": true,
+     "t": 35.017
+    }
+   ],
+   "outcome": "SELF_HEALED"
+  },
+  {
+   "cache_ttl_ms": 10000,
+   "control_id": "delay-ttl10000-d3000-0",
+   "end_of_campaign_window": {
+    "gateway_exposure_observed": false,
+    "operator_telemetry": [
+     {
+      "applied_revision": 74,
+      "cache_age_ms": 7280,
+      "cache_ttl_ms": 10000,
+      "handled_events": 3,
+      "latency_ms": 0.8947789999638189,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-a",
+      "observed": true,
+      "observed_at_monotonic": 1634.771741138,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 74,
+      "cache_age_ms": 4231,
+      "cache_ttl_ms": 10000,
+      "handled_events": 3,
+      "latency_ms": 0.7903349999196507,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-b",
+      "observed": true,
+      "observed_at_monotonic": 1634.772540538,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 74,
+      "cache_age_ms": 7282,
+      "cache_ttl_ms": 10000,
+      "handled_events": 3,
+      "latency_ms": 0.8521639999798936,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-c",
+      "observed": true,
+      "observed_at_monotonic": 1634.773402111,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 74,
+      "cache_age_ms": 7283,
+      "cache_ttl_ms": 10000,
+      "handled_events": 3,
+      "latency_ms": 0.8163320001131069,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-hidden",
+      "observed": true,
+      "observed_at_monotonic": 1634.774226088,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     }
+    ],
+    "oracle_denied": true,
+    "t": 6.098,
+    "verifier_scope": "VERIFIED"
+   },
+   "event_delay_ms": 3000,
+   "expected": "self_healing",
+   "fault_mode": "delay",
+   "kind": "positive",
+   "oracle_reads": [
+    {
+     "denied": false,
+     "t": 0.011
+    },
+    {
+     "denied": false,
+     "t": 1.025
+    },
+    {
+     "denied": true,
+     "t": 2.038
+    },
+    {
+     "denied": true,
+     "t": 3.05
+    },
+    {
+     "denied": true,
+     "t": 4.014
+    },
+    {
+     "denied": true,
+     "t": 5.027
+    },
+    {
+     "denied": true,
+     "t": 6.106
+    },
+    {
+     "denied": true,
+     "t": 7.019
+    },
+    {
+     "denied": true,
+     "t": 8.031
+    },
+    {
+     "denied": true,
+     "t": 9.05
+    },
+    {
+     "denied": true,
+     "t": 10.013
+    },
+    {
+     "denied": true,
+     "t": 11.026
+    },
+    {
+     "denied": true,
+     "t": 12.041
+    },
+    {
+     "denied": true,
+     "t": 13.054
+    },
+    {
+     "denied": true,
+     "t": 14.018
+    },
+    {
+     "denied": true,
+     "t": 15.031
+    },
+    {
+     "denied": true,
+     "t": 16.044
+    },
+    {
+     "denied": true,
+     "t": 17.058
+    },
+    {
+     "denied": true,
+     "t": 18.021
+    },
+    {
+     "denied": true,
+     "t": 19.034
+    },
+    {
+     "denied": true,
+     "t": 20.053
+    },
+    {
+     "denied": true,
+     "t": 21.016
+    },
+    {
+     "denied": true,
+     "t": 22.03
+    },
+    {
+     "denied": true,
+     "t": 23.045
+    },
+    {
+     "denied": true,
+     "t": 24.058
+    },
+    {
+     "denied": true,
+     "t": 25.022
+    },
+    {
+     "denied": true,
+     "t": 26.035
+    },
+    {
+     "denied": true,
+     "t": 27.048
+    },
+    {
+     "denied": true,
+     "t": 28.011
+    },
+    {
+     "denied": true,
+     "t": 29.024
+    },
+    {
+     "denied": true,
+     "t": 30.038
+    },
+    {
+     "denied": true,
+     "t": 31.058
+    },
+    {
+     "denied": true,
+     "t": 32.021
+    },
+    {
+     "denied": true,
+     "t": 33.034
+    },
+    {
+     "denied": true,
+     "t": 34.049
+    },
+    {
+     "denied": true,
+     "t": 35.012
+    }
+   ],
+   "outcome": "SELF_HEALED"
+  },
+  {
+   "cache_ttl_ms": 10000,
+   "control_id": "delay-ttl10000-d3000-1",
+   "end_of_campaign_window": {
+    "gateway_exposure_observed": false,
+    "operator_telemetry": [
+     {
+      "applied_revision": 76,
+      "cache_age_ms": 7283,
+      "cache_ttl_ms": 10000,
+      "handled_events": 3,
+      "latency_ms": 1.0688899999422574,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-a",
+      "observed": true,
+      "observed_at_monotonic": 1672.03388738,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 76,
+      "cache_age_ms": 4216,
+      "cache_ttl_ms": 10000,
+      "handled_events": 3,
+      "latency_ms": 0.9011299998746836,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-b",
+      "observed": true,
+      "observed_at_monotonic": 1672.034797834,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 76,
+      "cache_age_ms": 7284,
+      "cache_ttl_ms": 10000,
+      "handled_events": 3,
+      "latency_ms": 0.9274139999888575,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-c",
+      "observed": true,
+      "observed_at_monotonic": 1672.035733363,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 76,
+      "cache_age_ms": 7286,
+      "cache_ttl_ms": 10000,
+      "handled_events": 3,
+      "latency_ms": 1.0224630000266188,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-hidden",
+      "observed": true,
+      "observed_at_monotonic": 1672.036763775,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     }
+    ],
+    "oracle_denied": true,
+    "t": 6.1,
+    "verifier_scope": "VERIFIED"
+   },
+   "event_delay_ms": 3000,
+   "expected": "self_healing",
+   "fault_mode": "delay",
+   "kind": "positive",
+   "oracle_reads": [
+    {
+     "denied": false,
+     "t": 0.011
+    },
+    {
+     "denied": false,
+     "t": 1.025
+    },
+    {
+     "denied": true,
+     "t": 2.038
+    },
+    {
+     "denied": true,
+     "t": 3.051
+    },
+    {
+     "denied": true,
+     "t": 4.015
+    },
+    {
+     "denied": true,
+     "t": 5.028
+    },
+    {
+     "denied": true,
+     "t": 6.108
+    },
+    {
+     "denied": true,
+     "t": 7.021
+    },
+    {
+     "denied": true,
+     "t": 8.035
+    },
+    {
+     "denied": true,
+     "t": 9.054
+    },
+    {
+     "denied": true,
+     "t": 10.018
+    },
+    {
+     "denied": true,
+     "t": 11.031
+    },
+    {
+     "denied": true,
+     "t": 12.047
+    },
+    {
+     "denied": true,
+     "t": 13.062
+    },
+    {
+     "denied": true,
+     "t": 14.025
+    },
+    {
+     "denied": true,
+     "t": 15.039
+    },
+    {
+     "denied": true,
+     "t": 16.052
+    },
+    {
+     "denied": true,
+     "t": 17.016
+    },
+    {
+     "denied": true,
+     "t": 18.029
+    },
+    {
+     "denied": true,
+     "t": 19.042
+    },
+    {
+     "denied": true,
+     "t": 20.062
+    },
+    {
+     "denied": true,
+     "t": 21.026
+    },
+    {
+     "denied": true,
+     "t": 22.04
+    },
+    {
+     "denied": true,
+     "t": 23.056
+    },
+    {
+     "denied": true,
+     "t": 24.019
+    },
+    {
+     "denied": true,
+     "t": 25.033
+    },
+    {
+     "denied": true,
+     "t": 26.05
+    },
+    {
+     "denied": true,
+     "t": 27.014
+    },
+    {
+     "denied": true,
+     "t": 28.028
+    },
+    {
+     "denied": true,
+     "t": 29.041
+    },
+    {
+     "denied": true,
+     "t": 30.055
+    },
+    {
+     "denied": true,
+     "t": 31.026
+    },
+    {
+     "denied": true,
+     "t": 32.04
+    },
+    {
+     "denied": true,
+     "t": 33.054
+    },
+    {
+     "denied": true,
+     "t": 34.02
+    },
+    {
+     "denied": true,
+     "t": 35.033
+    }
+   ],
+   "outcome": "SELF_HEALED"
+  },
+  {
+   "cache_ttl_ms": 10000,
+   "control_id": "delay-ttl10000-d3000-2",
+   "end_of_campaign_window": {
+    "gateway_exposure_observed": false,
+    "operator_telemetry": [
+     {
+      "applied_revision": 78,
+      "cache_age_ms": 7281,
+      "cache_ttl_ms": 10000,
+      "handled_events": 3,
+      "latency_ms": 0.9152840000297147,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-a",
+      "observed": true,
+      "observed_at_monotonic": 1709.30812827,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 78,
+      "cache_age_ms": 4221,
+      "cache_ttl_ms": 10000,
+      "handled_events": 3,
+      "latency_ms": 0.7584879999740224,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-b",
+      "observed": true,
+      "observed_at_monotonic": 1709.308893974,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 78,
+      "cache_age_ms": 7283,
+      "cache_ttl_ms": 10000,
+      "handled_events": 3,
+      "latency_ms": 0.7737280000128521,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-c",
+      "observed": true,
+      "observed_at_monotonic": 1709.309675849,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 78,
+      "cache_age_ms": 7284,
+      "cache_ttl_ms": 10000,
+      "handled_events": 3,
+      "latency_ms": 0.7925159998194431,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-hidden",
+      "observed": true,
+      "observed_at_monotonic": 1709.310475713,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     }
+    ],
+    "oracle_denied": true,
+    "t": 6.098,
+    "verifier_scope": "VERIFIED"
+   },
+   "event_delay_ms": 3000,
+   "expected": "self_healing",
+   "fault_mode": "delay",
+   "kind": "positive",
+   "oracle_reads": [
+    {
+     "denied": false,
+     "t": 0.011
+    },
+    {
+     "denied": false,
+     "t": 1.025
+    },
+    {
+     "denied": true,
+     "t": 2.038
+    },
+    {
+     "denied": true,
+     "t": 3.051
+    },
+    {
+     "denied": true,
+     "t": 4.014
+    },
+    {
+     "denied": true,
+     "t": 5.028
+    },
+    {
+     "denied": true,
+     "t": 6.106
+    },
+    {
+     "denied": true,
+     "t": 7.019
+    },
+    {
+     "denied": true,
+     "t": 8.032
+    },
+    {
+     "denied": true,
+     "t": 9.055
+    },
+    {
+     "denied": true,
+     "t": 10.018
+    },
+    {
+     "denied": true,
+     "t": 11.031
+    },
+    {
+     "denied": true,
+     "t": 12.046
+    },
+    {
+     "denied": true,
+     "t": 13.061
+    },
+    {
+     "denied": true,
+     "t": 14.03
+    },
+    {
+     "denied": true,
+     "t": 15.05
+    },
+    {
+     "denied": true,
+     "t": 16.014
+    },
+    {
+     "denied": true,
+     "t": 17.028
+    },
+    {
+     "denied": true,
+     "t": 18.041
+    },
+    {
+     "denied": true,
+     "t": 19.061
+    },
+    {
+     "denied": true,
+     "t": 20.024
+    },
+    {
+     "denied": true,
+     "t": 21.037
+    },
+    {
+     "denied": true,
+     "t": 22.054
+    },
+    {
+     "denied": true,
+     "t": 23.017
+    },
+    {
+     "denied": true,
+     "t": 24.03
+    },
+    {
+     "denied": true,
+     "t": 25.044
+    },
+    {
+     "denied": true,
+     "t": 26.057
+    },
+    {
+     "denied": true,
+     "t": 27.02
+    },
+    {
+     "denied": true,
+     "t": 28.033
+    },
+    {
+     "denied": true,
+     "t": 29.046
+    },
+    {
+     "denied": true,
+     "t": 30.066
+    },
+    {
+     "denied": true,
+     "t": 31.029
+    },
+    {
+     "denied": true,
+     "t": 32.042
+    },
+    {
+     "denied": true,
+     "t": 33.058
+    },
+    {
+     "denied": true,
+     "t": 34.021
+    },
+    {
+     "denied": true,
+     "t": 35.034
+    }
+   ],
+   "outcome": "SELF_HEALED"
+  },
+  {
+   "cache_ttl_ms": 10000,
+   "control_id": "delay-ttl10000-d3000-3",
+   "end_of_campaign_window": {
+    "gateway_exposure_observed": false,
+    "operator_telemetry": [
+     {
+      "applied_revision": 80,
+      "cache_age_ms": 7282,
+      "cache_ttl_ms": 10000,
+      "handled_events": 3,
+      "latency_ms": 0.9255469999516208,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-a",
+      "observed": true,
+      "observed_at_monotonic": 1746.583381909,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 80,
+      "cache_age_ms": 4266,
+      "cache_ttl_ms": 10000,
+      "handled_events": 3,
+      "latency_ms": 0.8148990000336198,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-b",
+      "observed": true,
+      "observed_at_monotonic": 1746.584204351,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 80,
+      "cache_age_ms": 7284,
+      "cache_ttl_ms": 10000,
+      "handled_events": 3,
+      "latency_ms": 0.8340219999354304,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-c",
+      "observed": true,
+      "observed_at_monotonic": 1746.585045949,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     },
+     {
+      "applied_revision": 80,
+      "cache_age_ms": 7285,
+      "cache_ttl_ms": 10000,
+      "handled_events": 3,
+      "latency_ms": 0.8259409999027412,
+      "legitimate_service_latency_ms": 15,
+      "node": "enforcer-hidden",
+      "observed": true,
+      "observed_at_monotonic": 1746.585879847,
+      "refresh_failed": false,
+      "scheduled_callbacks_pending": 0
+     }
+    ],
+    "oracle_denied": true,
+    "t": 6.1,
+    "verifier_scope": "VERIFIED"
+   },
+   "event_delay_ms": 3000,
+   "expected": "self_healing",
+   "fault_mode": "delay",
+   "kind": "positive",
+   "oracle_reads": [
+    {
+     "denied": false,
+     "t": 0.013
+    },
+    {
+     "denied": false,
+     "t": 1.026
+    },
+    {
+     "denied": true,
+     "t": 2.039
+    },
+    {
+     "denied": true,
+     "t": 3.052
+    },
+    {
+     "denied": true,
+     "t": 4.015
+    },
+    {
+     "denied": true,
+     "t": 5.028
+    },
+    {
+     "denied": true,
+     "t": 6.107
+    },
+    {
+     "denied": true,
+     "t": 7.02
+    },
+    {
+     "denied": true,
+     "t": 8.033
+    },
+    {
+     "denied": true,
+     "t": 9.052
+    },
+    {
+     "denied": true,
+     "t": 10.015
+    },
+    {
+     "denied": true,
+     "t": 11.028
+    },
+    {
+     "denied": true,
+     "t": 12.043
+    },
+    {
+     "denied": true,
+     "t": 13.056
+    },
+    {
+     "denied": true,
+     "t": 14.019
+    },
+    {
+     "denied": true,
+     "t": 15.032
+    },
+    {
+     "denied": true,
+     "t": 16.045
+    },
+    {
+     "denied": true,
+     "t": 17.058
+    },
+    {
+     "denied": true,
+     "t": 18.022
+    },
+    {
+     "denied": true,
+     "t": 19.035
+    },
+    {
+     "denied": true,
+     "t": 20.053
+    },
+    {
+     "denied": true,
+     "t": 21.016
+    },
+    {
+     "denied": true,
+     "t": 22.029
+    },
+    {
+     "denied": true,
+     "t": 23.044
+    },
+    {
+     "denied": true,
+     "t": 24.057
+    },
+    {
+     "denied": true,
+     "t": 25.022
+    },
+    {
+     "denied": true,
+     "t": 26.036
+    },
+    {
+     "denied": true,
+     "t": 27.049
+    },
+    {
+     "denied": true,
+     "t": 28.011
+    },
+    {
+     "denied": true,
+     "t": 29.024
+    },
+    {
+     "denied": true,
+     "t": 30.037
+    },
+    {
+     "denied": true,
+     "t": 31.057
+    },
+    {
+     "denied": true,
+     "t": 32.02
+    },
+    {
+     "denied": true,
+     "t": 33.033
+    },
+    {
+     "denied": true,
+     "t": 34.048
+    },
+    {
+     "denied": true,
+     "t": 35.061
+    }
+   ],
+   "outcome": "SELF_HEALED"
+  }
+ ],
+ "schema": "predict-shield/mechanism-controls/1",
+ "summary": {
+  "consumer_paused": {
+   "by_cell": {
+    "ttl10000-d0": {
+     "PERSISTED": 4
+    },
+    "ttl30000-d0": {
+     "PERSISTED": 4
+    }
+   },
+   "cell_class_confirmed": {
+    "ttl10000-d0": true,
+    "ttl30000-d0": true
+   },
+   "expected_by_cell": {
+    "ttl10000-d0": "persistent",
+    "ttl30000-d0": "persistent"
+   },
+   "heal_seconds_within_control_window": [
+    9.022,
+    9.023,
+    9.024,
+    9.073,
+    29.047,
+    29.06,
+    29.062,
+    29.068
+   ],
+   "outcomes": {
+    "PERSISTED": 8
+   },
+   "runs": 8,
+   "self_heal_rate_when_exercised": 0.0,
+   "self_heal_wilson_95": [
+    0.0,
+    0.32440756488388023
+   ],
+   "verdict": "CONFIRMED"
+  },
+  "delay": {
+   "by_cell": {
+    "ttl10000-d2000": {
+     "SELF_HEALED": 4
+    },
+    "ttl10000-d3000": {
+     "SELF_HEALED": 4
+    }
+   },
+   "cell_class_confirmed": {
+    "ttl10000-d2000": true,
+    "ttl10000-d3000": true
+   },
+   "expected_by_cell": {
+    "ttl10000-d2000": "self_healing",
+    "ttl10000-d3000": "self_healing"
+   },
+   "heal_seconds_within_control_window": [
+    1.025,
+    1.025,
+    1.025,
+    1.025,
+    2.038,
+    2.038,
+    2.038,
+    2.039
+   ],
+   "outcomes": {
+    "SELF_HEALED": 8
+   },
+   "runs": 8,
+   "self_heal_rate_when_exercised": 1.0,
+   "self_heal_wilson_95": [
+    0.6755924351161198,
+    1.0
+   ],
+   "verdict": "CONFIRMED"
+  },
+  "loss": {
+   "by_cell": {
+    "ttl10000-d0": {
+     "PERSISTED": 4
+    },
+    "ttl2500-d0": {
+     "SELF_HEALED": 4
+    },
+    "ttl30000-d0": {
+     "PERSISTED": 4
+    },
+    "ttl4000-d0": {
+     "SELF_HEALED": 4
+    }
+   },
+   "cell_class_confirmed": {
+    "ttl10000-d0": true,
+    "ttl2500-d0": true,
+    "ttl30000-d0": true,
+    "ttl4000-d0": true
+   },
+   "expected_by_cell": {
+    "ttl10000-d0": "persistent",
+    "ttl2500-d0": "self_healing",
+    "ttl30000-d0": "persistent",
+    "ttl4000-d0": "self_healing"
+   },
+   "heal_seconds_within_control_window": [
+    2.054,
+    2.054,
+    2.058,
+    2.058,
+    3.064,
+    3.064,
+    3.067,
+    3.068,
+    9.055,
+    9.07,
+    9.071,
+    9.074,
+    29.034,
+    29.042,
+    29.049,
+    29.076
+   ],
+   "outcomes": {
+    "PERSISTED": 8,
+    "SELF_HEALED": 8
+   },
+   "runs": 16,
+   "self_heal_rate_when_exercised": 0.5,
+   "self_heal_wilson_95": [
+    0.27999563610326017,
+    0.7200043638967398
+   ],
+   "verdict": "CONFIRMED"
+  },
+  "none": {
+   "by_cell": {
+    "ttl10000-d0": {
+     "HEALTHY": 4
+    },
+    "ttl30000-d0": {
+     "HEALTHY": 4
+    }
+   },
+   "cell_class_confirmed": {
+    "ttl10000-d0": true,
+    "ttl30000-d0": true
+   },
+   "expected_by_cell": {
+    "ttl10000-d0": "healthy",
+    "ttl30000-d0": "healthy"
+   },
+   "outcomes": {
+    "HEALTHY": 8
+   },
+   "runs": 8,
+   "verdict": "VALID"
+  }
+ }
+}
