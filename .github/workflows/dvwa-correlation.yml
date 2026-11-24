@@ -1,0 +1,89 @@
+name: DVWA correlation detector
+
+# Request-process-network-file correlation detector on a live DVWA.
+# See experiment-b/dvwa-correlation/protocol.json.
+#   stage=develop  one benign-only session: vocabularies, models, thresholds,
+#                  freeze; commits the freeze to the branch.
+#   stage=test     verifies the committed freeze, runs one fresh mixed session
+#                  with attacks, scores it once; commits the report.
+
+on:
+  push:
+    branches: [feat/dvwa-correlation]
+    paths: ['experiment-b/dvwa-correlation/**', '.github/workflows/dvwa-correlation.yml']
+  workflow_dispatch:
+    inputs:
+      stage:
+        description: 'develop or test'
+        default: 'develop'
+      freeze_sha256:
+        description: 'test stage only: the freeze hash in experiment-b/dvwa-correlation/frozen/freeze.json'
+        default: ''
+
+permissions:
+  contents: read
+
+jobs:
+  unit-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - working-directory: experiment-b/dvwa-correlation
+        run: python -m unittest test_dvwa_correlation -v
+
+  run:
+    if: github.event_name == 'workflow_dispatch'
+    needs: unit-tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install PHP, strace and the model library
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y php-cli php-mysql strace iputils-ping netcat-openbsd curl
+          pip install 'scikit-learn==1.7.2' 'numpy==2.3.4'
+          php -v
+          strace -V | head -1
+      - name: Start a disposable MariaDB on loopback
+        run: |
+          docker run -d --name ps-dvwa-db -p 127.0.0.1:3306:3306 \
+            -e MARIADB_ROOT_PASSWORD=ps-lab-root -e MARIADB_DATABASE=dvwa \
+            -e MARIADB_USER=dvwa -e MARIADB_PASSWORD='p@ssw0rd' mariadb:11
+          for i in $(seq 1 60); do
+            if docker exec ps-dvwa-db mariadb-admin ping -h 127.0.0.1 -uroot -pps-lab-root --silent; then exit 0; fi
+            sleep 2
+          done
+          docker logs ps-dvwa-db; exit 1
+      - name: Develop on benign traffic and freeze
+        if: github.event.inputs.stage == 'develop'
+        working-directory: experiment-b/dvwa-correlation
+        run: |
+          test ! -f frozen/freeze.json
+          python detector.py develop --out-dir frozen
+          git config user.name katlaang
+          git config user.email katlaang@users.noreply.github.com
+          git add frozen
+          git commit -m "dvwa-correlation: record the freeze from develop run ${{ github.run_id }} before any attack traffic"
+          git push origin HEAD:${{ github.ref_name }}
+      - name: Run the one test session
+        if: github.event.inputs.stage == 'test'
+        working-directory: experiment-b/dvwa-correlation
+        run: |
+          test ! -f frozen/test-report.json
+          python detector.py test --frozen-dir frozen \
+            --expected-freeze-sha256 "${{ github.event.inputs.freeze_sha256 }}" --output frozen/test-report.json
+          git config user.name katlaang
+          git config user.email katlaang@users.noreply.github.com
+          git add frozen/test-report.json
+          git commit -m "dvwa-correlation: record the test session (run ${{ github.run_id }})"
+          git push origin HEAD:${{ github.ref_name }}

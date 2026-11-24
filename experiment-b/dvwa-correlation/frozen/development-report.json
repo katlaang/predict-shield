@@ -1,0 +1,31 @@
+{
+ "freeze_sha256": "48937585467e8dfe7ae34c9c99716dc91b5d92cdff0a51eae9129a799ed4ba2c",
+ "held_out_benign": {
+  "correlated": {
+   "alert_rate": 0.005,
+   "alerts": 3,
+   "threshold_rows": 600
+  },
+  "file": {
+   "alert_rate": 0.0,
+   "alerts": 0,
+   "threshold_rows": 600
+  },
+  "network": {
+   "alert_rate": 0.0,
+   "alerts": 0,
+   "threshold_rows": 600
+  },
+  "process": {
+   "alert_rate": 0.0,
+   "alerts": 0,
+   "threshold_rows": 600
+  },
+  "request": {
+   "alert_rate": 0.005,
+   "alerts": 3,
+   "threshold_rows": 600
+  }
+ },
+ "schema": "predict-shield/dvwa-correlation-development/1"
+}

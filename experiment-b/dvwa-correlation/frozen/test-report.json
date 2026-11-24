@@ -1,0 +1,436 @@
+{
+ "attack_attempts": {
+  "cmdi": {
+   "attempts": 40,
+   "successful": 30
+  },
+  "lfi": {
+   "attempts": 40,
+   "successful": 30
+  },
+  "sqli": {
+   "attempts": 40,
+   "successful": 30
+  },
+  "sqli_login": {
+   "attempts": 40,
+   "successful": 27
+  }
+ },
+ "benign": 1000,
+ "checks": {
+  "benign_alert_rate_at_most_1pct": true,
+  "each_family_at_least_75pct": false,
+  "successful_attack_detection_at_least_90pct": false
+ },
+ "freeze_sha256": "48937585467e8dfe7ae34c9c99716dc91b5d92cdff0a51eae9129a799ed4ba2c",
+ "note": "One test session, generated live from fixed seeds after the freeze. Benign traffic is synthetic.",
+ "pass_condition": "For the correlated model, all three: (1) at most 1% of benign test requests alert; (2) at least 90% of successful attacks alert; (3) in each of the four families, at least 75% of successful attacks alert. The four single-signal models and their union are reported beside it as the comparison, with alert rates on failed attempts.",
+ "passed": false,
+ "requests": 1160,
+ "results": {
+  "any_single_modality": {
+   "benign": {
+    "alerts": 14,
+    "of": 1000,
+    "rate": 0.014,
+    "wilson_95": [
+     0.008357575097078518,
+     0.023362034209336115
+    ]
+   },
+   "failed_attempts": {
+    "alerts": 18,
+    "of": 43,
+    "rate": 0.4186046511627907,
+    "wilson_95": [
+     0.2838455083487562,
+     0.5667142272534341
+    ]
+   },
+   "successful_attacks": {
+    "alerts": 56,
+    "of": 117,
+    "rate": 0.47863247863247865,
+    "wilson_95": [
+     0.3902428925382105,
+     0.5683805795194089
+    ]
+   },
+   "successful_by_family": {
+    "cmdi": {
+     "alerts": 30,
+     "of": 30,
+     "rate": 1.0,
+     "wilson_95": [
+      0.886486605238548,
+      1.0
+     ]
+    },
+    "lfi": {
+     "alerts": 0,
+     "of": 30,
+     "rate": 0.0,
+     "wilson_95": [
+      0.0,
+      0.11351339476145204
+     ]
+    },
+    "sqli": {
+     "alerts": 6,
+     "of": 30,
+     "rate": 0.2,
+     "wilson_95": [
+      0.09505107121882947,
+      0.3730569656380418
+     ]
+    },
+    "sqli_login": {
+     "alerts": 20,
+     "of": 27,
+     "rate": 0.7407407407407407,
+     "wilson_95": [
+      0.5532142853130517,
+      0.8682962550940991
+     ]
+    }
+   }
+  },
+  "correlated": {
+   "benign": {
+    "alerts": 7,
+    "of": 1000,
+    "rate": 0.007,
+    "wilson_95": [
+     0.0033948683823943875,
+     0.014378315543659962
+    ]
+   },
+   "failed_attempts": {
+    "alerts": 2,
+    "of": 43,
+    "rate": 0.046511627906976744,
+    "wilson_95": [
+     0.012849259978574556,
+     0.1545549812336292
+    ]
+   },
+   "successful_attacks": {
+    "alerts": 29,
+    "of": 117,
+    "rate": 0.24786324786324787,
+    "wilson_95": [
+     0.17847939166257196,
+     0.333277578617335
+    ]
+   },
+   "successful_by_family": {
+    "cmdi": {
+     "alerts": 29,
+     "of": 30,
+     "rate": 0.9666666666666667,
+     "wilson_95": [
+      0.8332960885388428,
+      0.9940914096838022
+     ]
+    },
+    "lfi": {
+     "alerts": 0,
+     "of": 30,
+     "rate": 0.0,
+     "wilson_95": [
+      0.0,
+      0.11351339476145204
+     ]
+    },
+    "sqli": {
+     "alerts": 0,
+     "of": 30,
+     "rate": 0.0,
+     "wilson_95": [
+      0.0,
+      0.11351339476145204
+     ]
+    },
+    "sqli_login": {
+     "alerts": 0,
+     "of": 27,
+     "rate": 0.0,
+     "wilson_95": [
+      0.0,
+      0.12455503146207125
+     ]
+    }
+   }
+  },
+  "file": {
+   "benign": {
+    "alerts": 1,
+    "of": 1000,
+    "rate": 0.001,
+    "wilson_95": [
+     0.00017654636867653686,
+     0.005642558659926143
+    ]
+   },
+   "failed_attempts": {
+    "alerts": 0,
+    "of": 43,
+    "rate": 0.0,
+    "wilson_95": [
+     0.0,
+     0.08200980441345543
+    ]
+   },
+   "successful_attacks": {
+    "alerts": 0,
+    "of": 117,
+    "rate": 0.0,
+    "wilson_95": [
+     0.0,
+     0.03178924614829014
+    ]
+   },
+   "successful_by_family": {
+    "cmdi": {
+     "alerts": 0,
+     "of": 30,
+     "rate": 0.0,
+     "wilson_95": [
+      0.0,
+      0.11351339476145204
+     ]
+    },
+    "lfi": {
+     "alerts": 0,
+     "of": 30,
+     "rate": 0.0,
+     "wilson_95": [
+      0.0,
+      0.11351339476145204
+     ]
+    },
+    "sqli": {
+     "alerts": 0,
+     "of": 30,
+     "rate": 0.0,
+     "wilson_95": [
+      0.0,
+      0.11351339476145204
+     ]
+    },
+    "sqli_login": {
+     "alerts": 0,
+     "of": 27,
+     "rate": 0.0,
+     "wilson_95": [
+      0.0,
+      0.12455503146207125
+     ]
+    }
+   }
+  },
+  "network": {
+   "benign": {
+    "alerts": 0,
+    "of": 1000,
+    "rate": 0.0,
+    "wilson_95": [
+     2.168404344971009e-19,
+     0.0038267585456940676
+    ]
+   },
+   "failed_attempts": {
+    "alerts": 0,
+    "of": 43,
+    "rate": 0.0,
+    "wilson_95": [
+     0.0,
+     0.08200980441345543
+    ]
+   },
+   "successful_attacks": {
+    "alerts": 0,
+    "of": 117,
+    "rate": 0.0,
+    "wilson_95": [
+     0.0,
+     0.03178924614829014
+    ]
+   },
+   "successful_by_family": {
+    "cmdi": {
+     "alerts": 0,
+     "of": 30,
+     "rate": 0.0,
+     "wilson_95": [
+      0.0,
+      0.11351339476145204
+     ]
+    },
+    "lfi": {
+     "alerts": 0,
+     "of": 30,
+     "rate": 0.0,
+     "wilson_95": [
+      0.0,
+      0.11351339476145204
+     ]
+    },
+    "sqli": {
+     "alerts": 0,
+     "of": 30,
+     "rate": 0.0,
+     "wilson_95": [
+      0.0,
+      0.11351339476145204
+     ]
+    },
+    "sqli_login": {
+     "alerts": 0,
+     "of": 27,
+     "rate": 0.0,
+     "wilson_95": [
+      0.0,
+      0.12455503146207125
+     ]
+    }
+   }
+  },
+  "process": {
+   "benign": {
+    "alerts": 0,
+    "of": 1000,
+    "rate": 0.0,
+    "wilson_95": [
+     2.168404344971009e-19,
+     0.0038267585456940676
+    ]
+   },
+   "failed_attempts": {
+    "alerts": 0,
+    "of": 43,
+    "rate": 0.0,
+    "wilson_95": [
+     0.0,
+     0.08200980441345543
+    ]
+   },
+   "successful_attacks": {
+    "alerts": 0,
+    "of": 117,
+    "rate": 0.0,
+    "wilson_95": [
+     0.0,
+     0.03178924614829014
+    ]
+   },
+   "successful_by_family": {
+    "cmdi": {
+     "alerts": 0,
+     "of": 30,
+     "rate": 0.0,
+     "wilson_95": [
+      0.0,
+      0.11351339476145204
+     ]
+    },
+    "lfi": {
+     "alerts": 0,
+     "of": 30,
+     "rate": 0.0,
+     "wilson_95": [
+      0.0,
+      0.11351339476145204
+     ]
+    },
+    "sqli": {
+     "alerts": 0,
+     "of": 30,
+     "rate": 0.0,
+     "wilson_95": [
+      0.0,
+      0.11351339476145204
+     ]
+    },
+    "sqli_login": {
+     "alerts": 0,
+     "of": 27,
+     "rate": 0.0,
+     "wilson_95": [
+      0.0,
+      0.12455503146207125
+     ]
+    }
+   }
+  },
+  "request": {
+   "benign": {
+    "alerts": 13,
+    "of": 1000,
+    "rate": 0.013,
+    "wilson_95": [
+     0.00761282035790027,
+     0.02211444246560575
+    ]
+   },
+   "failed_attempts": {
+    "alerts": 18,
+    "of": 43,
+    "rate": 0.4186046511627907,
+    "wilson_95": [
+     0.2838455083487562,
+     0.5667142272534341
+    ]
+   },
+   "successful_attacks": {
+    "alerts": 56,
+    "of": 117,
+    "rate": 0.47863247863247865,
+    "wilson_95": [
+     0.3902428925382105,
+     0.5683805795194089
+    ]
+   },
+   "successful_by_family": {
+    "cmdi": {
+     "alerts": 30,
+     "of": 30,
+     "rate": 1.0,
+     "wilson_95": [
+      0.886486605238548,
+      1.0
+     ]
+    },
+    "lfi": {
+     "alerts": 0,
+     "of": 30,
+     "rate": 0.0,
+     "wilson_95": [
+      0.0,
+      0.11351339476145204
+     ]
+    },
+    "sqli": {
+     "alerts": 6,
+     "of": 30,
+     "rate": 0.2,
+     "wilson_95": [
+      0.09505107121882947,
+      0.3730569656380418
+     ]
+    },
+    "sqli_login": {
+     "alerts": 20,
+     "of": 27,
+     "rate": 0.7407407407407407,
+     "wilson_95": [
+      0.5532142853130517,
+      0.8682962550940991
+     ]
+    }
+   }
+  }
+ },
+ "schema": "predict-shield/dvwa-correlation-test/1"
+}
