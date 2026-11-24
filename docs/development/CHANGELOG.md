@@ -4,7 +4,7 @@
 
 - A live DVWA ran under strace. Each request was joined with the programs it started, the connections it opened and the files it read. One isolation forest was fitted per signal and one on all signals, on benign traffic only. Development run 45338134980; test run 45339299220.
 - **Failed.** The correlated model alerted on 0.7% of 1,000 benign requests (passed the 1% ceiling) but detected only 29 of 117 successful attacks (24.8%): command injection 29 of 30, and none of the file inclusion or SQL injection attacks.
-- **Cause.** The forest cannot score values outside its training range. The "never seen in benign traffic" program and file counts were constant in training, so they were ignored, even though every successful command injection and file inclusion showed them.
+- **Interpretation.** Unseen-category indicators were constant in benign training and cannot drive splits by themselves in the fitted forest. This is a plausible cause of the missed attacks, not an independently isolated causal finding or a claim about all learned detectors.
 - Version 2 must score novelty explicitly and add response evidence for SQL injection. Evidence: `docs/evidence/MEASURED_DVWA_CORRELATION_DETECTOR_2026_11_24.md`.
 
 ## 2026-11-24 (b): PowerDuck GOOSE detector v2, second measurement
