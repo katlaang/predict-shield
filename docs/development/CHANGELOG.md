@@ -1,5 +1,11 @@
 # Development changelog
 
+## 2026-11-21 (b): Learned GOOSE anomaly detector on PowerDuck
+
+- `experiment-b/powerduck/`: an Isolation Forest fitted on normal GOOSE messages only, using per-stream timing, state and sequence numbers, length, values and rates. The protocol and freeze were fixed before any attack capture was read; the 16 attack captures were scored once.
+- Failed its stated condition. The first malicious message raised an alert in 14 of 16 scenarios, and all 16 scenarios were flagged, but 3.0% of non-malicious messages alerted against a 1% ceiling. Outside the two floods, 15.1% of malicious messages were detected. Development on held-out normal captures had already shown 1.1% to 1.8% alert rates.
+- Evidence and the next version's changes: `docs/evidence/MEASURED_POWERDUCK_GOOSE_DETECTOR_2026_11_21.md`.
+
 ## 2026-11-20 (2): Mechanism-lab preregistration lock, controls and verifier scoring
 
 - `PREREGISTRATION.json` fixes the scored campaign's questions, ground truth, VERIFIED scope, metrics, cost matrix, controls, exclusions, rerun and stopping rules. `prereg_gate.py` hashes it with the plan and the campaign code; `campaign.py --scored` refuses to start unless locked and unchanged, and CI fails on any unrecorded change after locking (`DEVIATIONS.md`).
