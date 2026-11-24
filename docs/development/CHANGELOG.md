@@ -1,5 +1,12 @@
 # Development changelog
 
+## 2026-11-24: DVWA request-process-network-file correlation detector
+
+- A live DVWA ran under strace. Each request was joined with the programs it started, the connections it opened and the files it read. One isolation forest was fitted per signal and one on all signals, on benign traffic only. Development run 45338134980; test run 45339299220.
+- **Failed.** The correlated model alerted on 0.7% of 1,000 benign requests (passed the 1% ceiling) but detected only 29 of 117 successful attacks (24.8%): command injection 29 of 30, and none of the file inclusion or SQL injection attacks.
+- **Cause.** The forest cannot score values outside its training range. The "never seen in benign traffic" program and file counts were constant in training, so they were ignored, even though every successful command injection and file inclusion showed them.
+- Version 2 must score novelty explicitly and add response evidence for SQL injection. Evidence: `docs/evidence/MEASURED_DVWA_CORRELATION_DETECTOR_2026_11_24.md`.
+
 ## 2026-11-21: Mechanism-lab scored campaign
 
 - **Run:** 1,200 of 1,200 trials, run under lock `9422667f` (CI run 44879497946), with no reruns and no exclusions. Controls passed on the same code first. Aggregate reports are in `docs/evidence/mechanism-scored-campaign/run-44879497946/`.
