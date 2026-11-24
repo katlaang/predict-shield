@@ -1,0 +1,45 @@
+name: HIKARI in-network learning curve
+
+# Trains on growing slices of HIKARI-2021's own labelled flows and tests once
+# on the held-out half. Protocol: experiment-b/hikari-in-network/protocol.json.
+# A manual run commits the report.
+
+on:
+  push:
+    branches: [feat/hikari-in-network]
+    paths: ['experiment-b/hikari-in-network/**', '.github/workflows/hikari-in-network.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install 'scikit-learn==1.7.2' 'pandas==2.3.3' 'numpy==2.3.4'
+      - name: Unit tests
+        working-directory: experiment-b/hikari-in-network
+        run: python -m unittest test_hikari_in_network -v
+      - name: Download HIKARI-2021 and run (manual runs only)
+        if: github.event_name == 'workflow_dispatch'
+        working-directory: experiment-b/hikari-in-network
+        run: |
+          url=$(python -c "import json;print(json.load(open('protocol.json'))['source']['url'])")
+          curl -fSL --retry 8 --retry-all-errors -m 1800 -o "$RUNNER_TEMP/hikari.zip" "$url"
+          python run.py --archive "$RUNNER_TEMP/hikari.zip" --output reports/in-network.json
+      - name: Commit the report (manual runs only)
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          git config user.name katlaang
+          git config user.email katlaang@users.noreply.github.com
+          git add experiment-b/hikari-in-network/reports/in-network.json
+          git commit -m "hikari-in-network: record the single test (run ${{ github.run_id }})"
+          git push origin HEAD:${{ github.ref_name }}
