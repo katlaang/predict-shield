@@ -9,6 +9,7 @@
   - The registry filter was applied with a signed approval and verified by an observer that reads every ISP router directly.
 - Record: CI run 45327610238. Evidence: `docs/evidence/ISP_BGP_HIJACK_LAB_2026_11_24.md`.
 
+
 ## 2026-11-24 (b): PowerDuck GOOSE detector v2, second measurement
 
 - Added stream-history features, a 0.5% threshold and incident grouping. Development run 45330612517, test run 45330952174. The 16 captures had already been read by version 1's test.
