@@ -1,5 +1,14 @@
 # Development changelog
 
+## 2026-11-24: ISP network lab with a contained BGP hijack
+
+- `experiment-b/isp-net-lab/`: a routed ISP in containerlab with FRRouting routers (OSPF core, iBGP route reflector, eBGP to a transit provider and a customer) and hosts that name themselves.
+- **Scenario:** a customer hijacks the provider's prefix with two /25s, and the subscriber's traffic reaches the attacker.
+  - Detection compares received routes with the customer's registered prefixes.
+  - An over-broad filter was rolled back when the observer saw the customer cut off.
+  - The registry filter was applied with a signed approval and verified by an observer that reads every ISP router directly.
+- Record: CI run 45327610238. Evidence: `docs/evidence/ISP_BGP_HIJACK_LAB_2026_11_24.md`.
+
 ## 2026-11-21: Mechanism-lab scored campaign
 
 - **Run:** 1,200 of 1,200 trials, run under lock `9422667f` (CI run 44879497946), with no reruns and no exclusions. Controls passed on the same code first. Aggregate reports are in `docs/evidence/mechanism-scored-campaign/run-44879497946/`.
