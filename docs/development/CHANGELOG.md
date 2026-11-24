@@ -1,5 +1,12 @@
 # Development changelog
 
+## 2026-11-24 (c): In-network flow detection on HIKARI-2021
+
+- Trained on 1% to 50% of the designated half-dataset training pool (approximately 0.5% to 25% of all HIKARI-2021 flows) and tested once on the held-out half (run 45330331055).
+- Failed. It detected 5.5% of attacks at the 5% slice against a 90% floor, and the measured training-size configurations did not reach the target.
+- An exploratory check written after the result (run 45330750423) found supervised AUC 0.95 and 16% detection at 1% false alarms for the tested configuration; this does not establish the best attainable feature separation.
+- Evidence: `docs/evidence/MEASURED_HIKARI_IN_NETWORK_2026_11_24.md`.
+
 ## 2026-11-24: ISP network lab with a contained BGP hijack
 
 - `experiment-b/isp-net-lab/`: a routed ISP in containerlab with FRRouting routers (OSPF core, iBGP route reflector, eBGP to a transit provider and a customer) and hosts that name themselves.
