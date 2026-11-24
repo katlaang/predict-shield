@@ -1,0 +1,16 @@
+{
+ "name": "request-process-network-file correlation detector on a live DVWA",
+ "registered": "2026-11-24, before the development session ran and before any detector was scored on attack traffic",
+ "question": "Does joining what a web request asked for with what the server then ran, connected to and read detect successful exploitation at a low benign alert rate, and does it beat each signal alone?",
+ "setup": {
+  "target": "DVWA at commit 502ac150ce37c20ca6e04cab7c5ca959f315f2d0, security level low, PHP built-in server (one request at a time), MariaDB 11, all on 127.0.0.1",
+  "telemetry": "strace -f on the PHP server: execve (programs started), connect (connections opened), openat (files opened), with wall-clock timestamps. Each system call is joined to the request in flight when it happened (lab.attribute).",
+  "features": "Per request, lab.features: request (method, parameter count and length, symbol characters and symbols unseen in development, status, response size, latency, page one-hot); process (programs started, distinct, unseen in development, failed starts); network (connections, distinct endpoints, unseen endpoints, failed); file (files opened, distinct, unseen in development, failed opens). 'Unseen' vocabularies come from the first 70% of the development session only. The single-signal models do not see the page; the correlated model sees all four groups and the page.",
+  "models": "One IsolationForest(n_estimators=300, random_state=20261124) per signal group and one on all groups, fitted on benign requests only. No attack traffic is used before the test."
+ },
+ "development": "One session of 2000 benign requests (seed 20261124): SQL lookup page 30%, ping page 8%, file-inclusion page with its own pages 15%, greeting page 15%, login page 12%, static pages 20%. First 70% in time fits the vocabularies and models; each threshold is set so 0.5% of the last 30% alert.",
+ "pipeline_checks_before_registration": "Short local runs with benign and attack traffic were made to check the strace parser, the request join and the success oracle. No detector was fitted or scored on them.",
+ "test": "One fresh session after the freeze: 1000 benign requests (seed 20261209) and 160 attack attempts, 40 per family (seed 20261210), shuffled together (seed 20261211). Families: sqli (SQL lookup page), cmdi (command injection on the ping page, including exfiltration to a canary listener), lfi (local file inclusion), sqli_login (SQL injection on the login page). Each attempt is judged successful or failed from the response or the canary, never from the trace.",
+ "pass_condition": "For the correlated model, all three: (1) at most 1% of benign test requests alert; (2) at least 90% of successful attacks alert; (3) in each of the four families, at least 75% of successful attacks alert. The four single-signal models and their union are reported beside it as the comparison, with alert rates on failed attempts.",
+ "not_claimed": "Realistic benign traffic (it is generated); other applications or servers; multi-threaded servers, where the join by time would need request ids; attacks against DVWA's other security levels."
+}
