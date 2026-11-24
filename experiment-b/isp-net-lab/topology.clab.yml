@@ -1,0 +1,39 @@
+# Routed ISP laboratory: one transit provider, a three-router ISP core and a
+# customer that can be made to hijack the provider's prefix. Hosts are plain
+# Alpine containers that serve a page naming who answered.
+name: isp-net
+
+topology:
+  defaults:
+    kind: linux
+  nodes:
+    upstream: {image: "frrouting/frr:v8.4.1", binds: ["configs/upstream:/etc/frr"]}
+    pe1:      {image: "frrouting/frr:v8.4.1", binds: ["configs/pe1:/etc/frr"]}
+    core1:    {image: "frrouting/frr:v8.4.1", binds: ["configs/core1:/etc/frr"]}
+    pe2:      {image: "frrouting/frr:v8.4.1", binds: ["configs/pe2:/etc/frr"]}
+    cust:     {image: "frrouting/frr:v8.4.1", binds: ["configs/cust:/etc/frr"]}
+    content:
+      image: "python:3.12-alpine"
+      cmd: "sleep infinity"
+      exec: ["ip addr add 203.0.113.10/24 dev eth1", "ip route replace default via 203.0.113.1"]
+    custhost:
+      image: "python:3.12-alpine"
+      cmd: "sleep infinity"
+      exec: ["ip addr add 198.51.100.10/24 dev eth1", "ip route replace default via 198.51.100.1"]
+    attacker:
+      image: "python:3.12-alpine"
+      cmd: "sleep infinity"
+      exec: ["ip addr add 203.0.113.10/25 dev eth1", "ip route replace default via 203.0.113.1"]
+    subscriber:
+      image: "python:3.12-alpine"
+      cmd: "sleep infinity"
+      exec: ["ip addr add 100.64.0.10/24 dev eth1", "ip route replace default via 100.64.0.1"]
+  links:
+    - endpoints: ["upstream:eth1", "pe1:eth1"]
+    - endpoints: ["pe1:eth2", "core1:eth1"]
+    - endpoints: ["core1:eth2", "pe2:eth1"]
+    - endpoints: ["pe2:eth2", "cust:eth1"]
+    - endpoints: ["upstream:eth2", "content:eth1"]
+    - endpoints: ["cust:eth2", "custhost:eth1"]
+    - endpoints: ["cust:eth3", "attacker:eth1"]
+    - endpoints: ["core1:eth3", "subscriber:eth1"]

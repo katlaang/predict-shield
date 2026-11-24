@@ -1,0 +1,84 @@
+name: ISP network lab (BGP hijack)
+
+# Deploys a routed ISP with real FRRouting routers in containerlab, makes a
+# customer hijack the content provider's prefix, and contains it through the
+# gated change path with an independent observer as the verifier.
+# A manual run (workflow_dispatch) also commits the report.
+
+on:
+  push:
+    branches: [feat/isp-network-lab]
+    paths: ['experiment-b/isp-net-lab/**', '.github/workflows/isp-net-lab.yml']
+  pull_request:
+    paths: ['experiment-b/isp-net-lab/**', '.github/workflows/isp-net-lab.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  lab:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install cryptography
+      - name: Unit tests
+        working-directory: experiment-b/isp-net-lab
+        run: python -m unittest test_isp_net_lab -v
+      - name: Install containerlab and pull images
+        run: |
+          bash -c "$(curl -sL https://get.containerlab.dev)" -- -v 0.59.0
+          docker pull frrouting/frr:v8.4.1
+          docker pull python:3.12-alpine
+      - name: Deploy the lab
+        working-directory: experiment-b/isp-net-lab
+        run: |
+          sudo containerlab deploy -t topology.clab.yml
+          sleep 25
+          for r in pe1 core1 pe2; do echo "== $r"; docker exec clab-isp-net-$r vtysh -c "show bgp summary" | tail -6; done
+      - name: Run the hijack and containment scenario
+        working-directory: experiment-b/isp-net-lab
+        run: python run_lab.py --output reports/isp-bgp-hijack.json
+      - name: Check the outcome
+        run: |
+          python - <<'PY'
+          import json
+          r = json.load(open("experiment-b/isp-net-lab/reports/isp-bgp-hijack.json"))
+          s = r["summary"]
+          assert r["audit_log_chain_intact"] is True
+          assert s["baseline_content_answer"] == "content"
+          assert s["hijack_effective"] is True, "the attack must work before the response"
+          assert s["unauthorized_detected"], "the hijack must be detected"
+          assert s["overbroad"]["without_approval"] == "REFUSED" and s["overbroad"]["final_status"] == "ROLLED_BACK", s["overbroad"]
+          assert s["filter"]["without_approval"] == "REFUSED" and s["filter"]["final_status"] == "APPLIED_VERIFIED", s["filter"]
+          assert s["after_content_answer"] == "content" and s["after_customer_answer"] == "customer"
+          print("outcome as expected")
+          PY
+      - if: always()
+        name: Router state on failure
+        run: |
+          for r in pe1 core1 pe2 cust; do echo "== $r"; docker exec clab-isp-net-$r vtysh -c "show ip route" 2>&1 | head -30; done
+      - if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: isp-bgp-hijack-report
+          path: experiment-b/isp-net-lab/reports/
+          if-no-files-found: warn
+      - name: Commit the report (manual runs only)
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          git config user.name katlaang
+          git config user.email katlaang@users.noreply.github.com
+          git add experiment-b/isp-net-lab/reports/isp-bgp-hijack.json
+          git commit -m "isp-net-lab: record the BGP hijack containment run (${{ github.run_id }})"
+          git push origin HEAD:${{ github.ref_name }}
+      - if: always()
+        name: Destroy the lab
+        working-directory: experiment-b/isp-net-lab
+        run: sudo containerlab destroy -t topology.clab.yml --cleanup || true
