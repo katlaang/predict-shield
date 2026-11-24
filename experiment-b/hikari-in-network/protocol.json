@@ -1,0 +1,29 @@
+{
+ "name": "in-network flow detection on HIKARI-2021: how much of a network's own labelled traffic a detector needs",
+ "registered": "2026-11-24, before this code read any HIKARI-2021 flow",
+ "question": "When the detector learns from labelled traffic of the network it protects, what detection and false-alarm rates does it reach, and how do they change with the amount of that traffic?",
+ "relation_to_earlier_work": "Cross-dataset version 3 trained on CIC-IDS2017 and CSE-CIC-IDS2018 and was tested once on HIKARI-2021 (detected 0.14% of attack flows). Its test read every flow and label in split buckets 2 to 9 of HIKARI-2021, so the labels used here have been seen. That test measured transfer between networks. This test measures learning inside one network, so it is a separate question, and the earlier result is disclosed rather than hidden.",
+ "source": {
+  "dataset": "HIKARI-2021, Zenodo record 6463389 v1.4.0, CC BY 4.0",
+  "url": "https://zenodo.org/api/records/6463389/files/ALLFLOWMETER_HIKARI2021.csv.zip/content",
+  "sha256": "ba09d35269566fd2f269871043b24e7d8e372bc4a47e9c2027729e5ff2e660e0",
+  "member": "ALLFLOWMETER_HIKARI2021.csv",
+  "rows": 555278
+ },
+ "features": "experiment-b/cic-flow-v3/features_v3.py, feature set flow+service: 57 flow statistics (signed log) and a destination-service bucket. No addresses, flow ids or labels as inputs.",
+ "labels": "Label 1 is an attack; Benign and Background are normal (traffic_category must agree with Label, as in version 3).",
+ "split": {
+  "primary": "SHA-256 of 'hikari-in-network' and the flow uid gives a uniform u in [0,1). u < 0.5 is the training pool; u >= 0.5 is the test half, scored once per training fraction.",
+  "fractions": "training uses the pool rows with u < f/2 for f in 0.01, 0.05, 0.20, 0.50 of the whole dataset (nested subsets).",
+  "within_training": "a second SHA-256 value v of the uid: v < 0.8 fits the models, v >= 0.8 holds out normal flows for both thresholds",
+  "secondary_host_disjoint": "SHA-256 of 'hikari-hosts' and originh: hosts with value < 0.5 form the training side, the others the test side; trained on the whole training side; reported per category, including categories absent from either side"
+ },
+ "model": {
+  "supervised": "sklearn HistGradientBoostingClassifier(max_leaf_nodes=15, max_iter=100, learning_rate=0.1, class_weight='balanced', early_stopping=False, random_state=20261124): the configuration version 3 chose on development data",
+  "anomaly": "sklearn IsolationForest(n_estimators=200, max_samples=1024, random_state=20261124) on normal flows of the fitting part (at most 200,000)",
+  "alert": "supervised probability > t_s OR anomaly score > t_a; each threshold at 0.5% of the held-out normal flows of the training subset (features_v3.normal_threshold)"
+ },
+ "pass_condition": "At the 5% fraction: attack detection at least 90% pooled, AND normal alert rate at most 1% pooled AND for Benign and Background separately, on the test half.",
+ "reporting": "Per fraction: TP, FP, FN, TN, detection and normal alert rate with Wilson 95% intervals, per-category rates, training rows by category. Secondary host-disjoint result reported in full whatever it shows.",
+ "limits_stated_in_advance": "HIKARI-2021 has no timestamps, so the primary split cannot be by time. Flows of the same attack session fall on both sides of a random split, which makes the primary result optimistic; the host-disjoint split is the stricter check. A real deployment would learn from a baseline period before the period it protects."
+}
