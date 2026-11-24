@@ -1,5 +1,11 @@
 # Development changelog
 
+## 2026-11-23: Cross-dataset flow detector v3, single HIKARI-2021 test
+
+- Developed on CIC-IDS2017 and CSE-CIC-IDS2018 with verified-normal calibration, a detection floor and a fixed model-selection rule, then tested once on HIKARI-2021 (Zeek flowmeter captures). Development run 44914414336; test run 45314301123.
+- Failed both parts of the condition. It detected 0.14% of attack flows (42 of 30,174) against a 50% floor, and alerted on 1.36% of normal flows against a 1% ceiling (Benign 0.57%, Background 2.97%).
+- Development had already shown under 1.2% detection with 2018 held out. Evidence: `docs/evidence/MEASURED_CROSS_DATASET_FLOW_DETECTOR_V3_2026_11_23.md`.
+
 ## 2026-11-20 (1): Cross-dataset flow detector v2 measured on CSE-CIC-IDS2018
 
 - Thresholds and the anomaly model calibrated on the first 2018 day with its labels unread; per-source context removed; the freeze now covers the code as well as the model.
