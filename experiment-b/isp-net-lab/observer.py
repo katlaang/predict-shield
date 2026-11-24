@@ -14,8 +14,10 @@ import time
 ISP_ROUTERS = ("pe1", "core1", "pe2")
 CONTENT_IP = "203.0.113.10"
 CUSTOMER_IP = "198.51.100.10"
-STABLE_READS = 4
-MAX_READS = 40
+STABLE_READS = 6
+MAX_READS = 60
+SETTLE_S = 5.0
+READ_INTERVAL_S = 1.5
 
 
 def dexec(container: str, *args: str, timeout: int = 15) -> subprocess.CompletedProcess:
@@ -58,7 +60,10 @@ def read_once() -> dict:
     return {"content_routes": routes, "content_answer": fetch(CONTENT_IP), "customer_answer": fetch(CUSTOMER_IP)}
 
 
-def observe() -> dict:
+def observe(settle: float = SETTLE_S) -> dict:
+    """Wait `settle` seconds for a change to start propagating, then read until
+    STABLE_READS consecutive reads agree."""
+    time.sleep(settle)
     reads = []
     for _ in range(MAX_READS):
         reads.append(read_once())
@@ -66,7 +71,7 @@ def observe() -> dict:
         if len(tail) == STABLE_READS and all(json.dumps(r, sort_keys=True) == json.dumps(tail[-1], sort_keys=True)
                                              for r in tail):
             return dict(tail[-1], stable=True, reads=len(reads))
-        time.sleep(1.0)
+        time.sleep(READ_INTERVAL_S)
     return dict(reads[-1], stable=False, reads=len(reads))
 
 
@@ -74,3 +79,13 @@ def hijacked(seen: dict) -> bool:
     """True if any ISP router sends content traffic toward the customer, or the attacker answers."""
     return seen["content_answer"] == "attacker" or any(
         r.get("origin_as") == 65200 for r in seen["content_routes"].values())
+
+
+def wait_converged(timeout: float = 180.0) -> float:
+    """Block until every ISP router forwards the content address over a BGP route."""
+    start = time.monotonic()
+    while time.monotonic() - start < timeout:
+        if all(fib_entry(r, CONTENT_IP).get("protocol") == "bgp" for r in ISP_ROUTERS):
+            return time.monotonic() - start
+        time.sleep(2.0)
+    raise TimeoutError("BGP did not converge: an ISP router has no BGP route to the content prefix")

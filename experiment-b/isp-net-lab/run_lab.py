@@ -120,6 +120,7 @@ def main() -> None:
     log = AuditLog(Path(tempfile.mkdtemp(prefix="ps-isp-")) / "audit.jsonl")
     start_servers()
     report = {"schema": SCHEMA, "registry": REGISTRY, "steps": {}}
+    report["converged_after_seconds"] = round(observer.wait_converged(), 1)
 
     report["steps"]["baseline"] = base = observer.observe()
     if observer.hijacked(base) or base["content_answer"] != "content" or base["customer_answer"] != "customer":
