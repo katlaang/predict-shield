@@ -1,0 +1,217 @@
+{
+  "FN": 4253,
+  "FP": 274,
+  "TN": 9437,
+  "TP": 8580,
+  "calibration_ceiling": 0.05,
+  "calibration_false_alerts": 842,
+  "calibration_normal_rows": 16861,
+  "calibration_sample_false_alarm_rate": 0.0499377261135164,
+  "external_current_critical_infrastructure_effectiveness_established": false,
+  "fit_normal_only": true,
+  "fit_normal_rows": 50482,
+  "fitted_model_sha256": "b214b49183109bdd07ff9c18dc41450dc8df201180e3cea5c2026636c9c61737",
+  "frozen_threshold": 0.538077480712127,
+  "interpretation": "Fixed historical, non-operational NSL-KDD benchmark, not modern production telemetry; unseen means class-name absent from published train labels only. No signatures or attack examples used to fit model. Row-wise metric denominators are dependent; no operator-level inference.",
+  "mirror_bytes_pinned_to_git_object": true,
+  "operational_attack_detection_established": false,
+  "per_attack_type": {
+    "apache2": {
+      "detected": 734,
+      "tested": 737
+    },
+    "back": {
+      "detected": 17,
+      "tested": 359
+    },
+    "buffer_overflow": {
+      "detected": 5,
+      "tested": 20
+    },
+    "ftp_write": {
+      "detected": 0,
+      "tested": 3
+    },
+    "guess_passwd": {
+      "detected": 33,
+      "tested": 1231
+    },
+    "httptunnel": {
+      "detected": 116,
+      "tested": 133
+    },
+    "imap": {
+      "detected": 1,
+      "tested": 1
+    },
+    "ipsweep": {
+      "detected": 0,
+      "tested": 141
+    },
+    "land": {
+      "detected": 7,
+      "tested": 7
+    },
+    "loadmodule": {
+      "detected": 1,
+      "tested": 2
+    },
+    "mailbomb": {
+      "detected": 12,
+      "tested": 293
+    },
+    "mscan": {
+      "detected": 988,
+      "tested": 996
+    },
+    "multihop": {
+      "detected": 0,
+      "tested": 18
+    },
+    "named": {
+      "detected": 8,
+      "tested": 17
+    },
+    "neptune": {
+      "detected": 4657,
+      "tested": 4657
+    },
+    "nmap": {
+      "detected": 73,
+      "tested": 73
+    },
+    "perl": {
+      "detected": 0,
+      "tested": 2
+    },
+    "phf": {
+      "detected": 1,
+      "tested": 2
+    },
+    "pod": {
+      "detected": 4,
+      "tested": 41
+    },
+    "portsweep": {
+      "detected": 156,
+      "tested": 157
+    },
+    "processtable": {
+      "detected": 680,
+      "tested": 685
+    },
+    "ps": {
+      "detected": 2,
+      "tested": 15
+    },
+    "rootkit": {
+      "detected": 1,
+      "tested": 13
+    },
+    "saint": {
+      "detected": 215,
+      "tested": 319
+    },
+    "satan": {
+      "detected": 733,
+      "tested": 735
+    },
+    "sendmail": {
+      "detected": 0,
+      "tested": 14
+    },
+    "smurf": {
+      "detected": 18,
+      "tested": 665
+    },
+    "snmpgetattack": {
+      "detected": 0,
+      "tested": 178
+    },
+    "snmpguess": {
+      "detected": 0,
+      "tested": 331
+    },
+    "sqlattack": {
+      "detected": 0,
+      "tested": 2
+    },
+    "teardrop": {
+      "detected": 0,
+      "tested": 12
+    },
+    "udpstorm": {
+      "detected": 0,
+      "tested": 2
+    },
+    "warezmaster": {
+      "detected": 114,
+      "tested": 944
+    },
+    "worm": {
+      "detected": 0,
+      "tested": 2
+    },
+    "xlock": {
+      "detected": 2,
+      "tested": 9
+    },
+    "xsnoop": {
+      "detected": 1,
+      "tested": 4
+    },
+    "xterm": {
+      "detected": 1,
+      "tested": 13
+    }
+  },
+  "pretest_freeze_sha256": "a54c88f2875ce55e00b126f59924df8934a95af5c58d13e769d95c4c5b0c81da",
+  "provenance": {
+    "canonical_publisher": "https://www.unb.ca/cic/datasets/nsl.html",
+    "nonpublisher_mirror_commit": "27bbbdf5c5cccf9970b8b6037a0f19dc09c5a0a9",
+    "test_source": {
+      "bytes": 3441513,
+      "git_blob_sha1_verified": "b30e89605285a5ccd8cf8fd38dba72906c20d3dd",
+      "sha256": "fa46b0935342616aa83b7c2578db355b6a7aaabbc492248172c7a1e8b7ab8f84",
+      "url": "https://raw.githubusercontent.com/Jehuty4949/NSL_KDD/27bbbdf5c5cccf9970b8b6037a0f19dc09c5a0a9/KDDTest%2B.txt"
+    },
+    "train_source": {
+      "bytes": 19109424,
+      "git_blob_sha1_verified": "20002897492adc110190a10509aa694f26f7f308",
+      "sha256": "1b86d2f957b33082081bba410fe129b475efebcc13c9014c3f447c8271aadf95",
+      "url": "https://raw.githubusercontent.com/Jehuty4949/NSL_KDD/27bbbdf5c5cccf9970b8b6037a0f19dc09c5a0a9/KDDTrain%2B.txt"
+    }
+  },
+  "publisher_labels_independently_reauthenticated": false,
+  "schema": "predict-shield/historical-external-nsl-kdd-anomaly-evaluation/1",
+  "test_attack_recall": 0.6685887945141432,
+  "test_false_positive_rate": 0.02821542580578725,
+  "test_file_read_after_freeze": true,
+  "test_precision": 0.9690535351253671,
+  "test_rows": 22544,
+  "train_malicious_examples_used_for_fit": 0,
+  "unseen_attack_type_FN": 991,
+  "unseen_attack_type_TP": 2759,
+  "unseen_attack_type_names": [
+    "apache2",
+    "httptunnel",
+    "mailbomb",
+    "mscan",
+    "named",
+    "processtable",
+    "ps",
+    "saint",
+    "sendmail",
+    "snmpgetattack",
+    "snmpguess",
+    "sqlattack",
+    "udpstorm",
+    "worm",
+    "xlock",
+    "xsnoop",
+    "xterm"
+  ],
+  "unseen_attack_type_recall": 0.7357333333333334,
+  "unseen_attack_type_rows": 3750,
+  "zero_day_detection_established": false
+}
