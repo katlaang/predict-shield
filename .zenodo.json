@@ -1,0 +1,8 @@
+{
+  "title": "PREDICT-SHIELD: AI-enabled cyber defense framework for risk prioritization, policy-governed response and independent verification",
+  "upload_type": "software",
+  "creators": [{"name": "Kamau, Eunice"}],
+  "license": "Apache-2.0",
+  "description": "PREDICT-SHIELD identifies and prioritizes cybersecurity risks, selects responses under policy, applies them through gated changes and verifies outcomes independently. The repository contains the framework, its laboratories, locked evaluation protocols, controls and the committed measurement reports.",
+  "keywords": ["cybersecurity", "automated remediation", "verification", "vulnerability prioritization", "critical infrastructure"]
+}
