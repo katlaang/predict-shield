@@ -1,0 +1,176 @@
+{
+ "family_rows": {
+  "benign": 1594545,
+  "botnet": 736,
+  "brute-force-ftp": 3972,
+  "brute-force-ssh": 2961,
+  "ddos": 95144,
+  "dos-goldeneye": 7567,
+  "dos-hulk": 158468,
+  "dos-slow": 5599,
+  "heartbleed": 11,
+  "infiltration": 71803,
+  "portscan": 159066,
+  "web-attack": 104
+ },
+ "freeze_sha256": "793d315feaa1552ff68ddfa84caf4413c0f1136ed864ffeadf6562aa8982cbae",
+ "leave_one_day_out": {
+  "friday.csv": {
+   "FN": 100901,
+   "FP": 1180,
+   "TN": 115990,
+   "TP": 882,
+   "benign_alert_rate": 0.01007083724502859,
+   "by_family": {
+    "botnet": {
+     "by_anomaly_only": 17,
+     "by_supervised": 0,
+     "detected": 17,
+     "family_in_other_days": false,
+     "flows": 264
+    },
+    "ddos": {
+     "by_anomaly_only": 0,
+     "by_supervised": 865,
+     "detected": 865,
+     "family_in_other_days": false,
+     "flows": 37843
+    },
+    "portscan": {
+     "by_anomaly_only": 0,
+     "by_supervised": 0,
+     "detected": 0,
+     "family_in_other_days": false,
+     "flows": 63676
+    }
+   },
+   "detection_rate": 0.008665494237741076,
+   "thresholds": {
+    "anomaly": 0.6337262531650506,
+    "supervised": 0.9999999929360677
+   }
+  },
+  "thursday.csv": {
+   "FN": 28111,
+   "FP": 710,
+   "TN": 115107,
+   "TP": 668,
+   "benign_alert_rate": 0.006130360827857741,
+   "by_family": {
+    "infiltration": {
+     "by_anomaly_only": 36,
+     "by_supervised": 632,
+     "detected": 668,
+     "family_in_other_days": false,
+     "flows": 28743
+    },
+    "web-attack": {
+     "by_anomaly_only": 0,
+     "by_supervised": 0,
+     "detected": 0,
+     "family_in_other_days": false,
+     "flows": 36
+    }
+   },
+   "detection_rate": 0.02321136940129956,
+   "thresholds": {
+    "anomaly": 0.6151894983415966,
+    "supervised": 0.9999996856640354
+   }
+  },
+  "tuesday.csv": {
+   "FN": 2235,
+   "FP": 730,
+   "TN": 125234,
+   "TP": 518,
+   "benign_alert_rate": 0.005795306595535232,
+   "by_family": {
+    "brute-force-ftp": {
+     "by_anomaly_only": 0,
+     "by_supervised": 518,
+     "detected": 518,
+     "family_in_other_days": false,
+     "flows": 1561
+    },
+    "brute-force-ssh": {
+     "by_anomaly_only": 0,
+     "by_supervised": 0,
+     "detected": 0,
+     "family_in_other_days": false,
+     "flows": 1192
+    }
+   },
+   "detection_rate": 0.18815837268434435,
+   "thresholds": {
+    "anomaly": 0.6241755388292014,
+    "supervised": 0.00011865513106939599
+   }
+  },
+  "wednesday.csv": {
+   "FN": 67503,
+   "FP": 1019,
+   "TN": 129030,
+   "TP": 968,
+   "benign_alert_rate": 0.007835508154618644,
+   "by_family": {
+    "dos-goldeneye": {
+     "by_anomaly_only": 0,
+     "by_supervised": 179,
+     "detected": 179,
+     "family_in_other_days": false,
+     "flows": 3042
+    },
+    "dos-hulk": {
+     "by_anomaly_only": 0,
+     "by_supervised": 758,
+     "detected": 758,
+     "family_in_other_days": false,
+     "flows": 63156
+    },
+    "dos-slow": {
+     "by_anomaly_only": 0,
+     "by_supervised": 26,
+     "detected": 26,
+     "family_in_other_days": false,
+     "flows": 2267
+    },
+    "heartbleed": {
+     "by_anomaly_only": 5,
+     "by_supervised": 0,
+     "detected": 5,
+     "family_in_other_days": false,
+     "flows": 6
+    }
+   },
+   "detection_rate": 0.014137372026113246,
+   "thresholds": {
+    "anomaly": 0.6306432761818538,
+    "supervised": 0.9999991958212208
+   }
+  }
+ },
+ "member_stats": {
+  "friday.csv": {
+   "out_of_order_rows": 541904,
+   "rows": 547557
+  },
+  "monday.csv": {
+   "out_of_order_rows": 366609,
+   "rows": 371624
+  },
+  "thursday.csv": {
+   "out_of_order_rows": 350134,
+   "rows": 362076
+  },
+  "tuesday.csv": {
+   "out_of_order_rows": 316854,
+   "rows": 322078
+  },
+  "wednesday.csv": {
+   "out_of_order_rows": 486844,
+   "rows": 496641
+  }
+ },
+ "rows": 2099976,
+ "schema": "predict-shield/cic-flow-v2-development/1"
+}
