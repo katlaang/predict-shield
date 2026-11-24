@@ -71,6 +71,26 @@ class AdapterTests(unittest.TestCase):
         a = bgp_filter.FrrInboundFilterAdapter(r, "10.0.4.2", 65100)
         self.assertTrue(a.read().startswith("# prefix-list present but not applied"))
 
+    def test_rollback_restores_preexisting_unattached_filter(self):
+        r = FakeRouter()
+        r.lines = ["ip prefix-list CUST-IN seq 10 permit 198.51.100.0/24 le 24"]
+        r.route_map = True
+        r.applied = False
+        adapter = bgp_filter.FrrInboundFilterAdapter(r, "10.0.4.2", 65100)
+        original = adapter.read()
+        adapter.validate(original)
+        adapter.write("ip prefix-list CUST-IN seq 10 deny 0.0.0.0/0 le 32\n")
+        self.assertTrue(r.applied)
+        adapter.write(original)
+        self.assertEqual(adapter.read(), original)
+        self.assertFalse(r.applied)
+        self.assertTrue(r.route_map)
+
+    def test_reject_malformed_snapshot_marker(self):
+        adapter = bgp_filter.FrrInboundFilterAdapter(FakeRouter(), "10.0.4.2", 65100)
+        with self.assertRaises(ValueError):
+            adapter.validate("# prefix-list present but not applied\n")
+
     def test_write_refuses_bad_content(self):
         a = bgp_filter.FrrInboundFilterAdapter(FakeRouter(), "10.0.4.2", 65100)
         with self.assertRaises(ValueError):
