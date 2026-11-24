@@ -34,12 +34,16 @@ jobs:
         run: |
           url=$(python -c "import json;print(json.load(open('protocol.json'))['source']['url'])")
           curl -fSL --retry 8 --retry-all-errors -m 1800 -o "$RUNNER_TEMP/hikari.zip" "$url"
-          python run.py --archive "$RUNNER_TEMP/hikari.zip" --output reports/in-network.json
+          if [ -f reports/in-network.json ]; then
+            python explore_separation.py --archive "$RUNNER_TEMP/hikari.zip" --output reports/exploratory-separation.json
+          else
+            python run.py --archive "$RUNNER_TEMP/hikari.zip" --output reports/in-network.json
+          fi
       - name: Commit the report (manual runs only)
         if: github.event_name == 'workflow_dispatch'
         run: |
           git config user.name katlaang
           git config user.email katlaang@users.noreply.github.com
-          git add experiment-b/hikari-in-network/reports/in-network.json
-          git commit -m "hikari-in-network: record the single test (run ${{ github.run_id }})"
+          git add experiment-b/hikari-in-network/reports/
+          git commit -m "hikari-in-network: record run ${{ github.run_id }} (the registered test, or the exploratory separation check after it)"
           git push origin HEAD:${{ github.ref_name }}
