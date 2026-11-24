@@ -1,10 +1,20 @@
 # Development changelog
 
+## 2026-11-21: Exploitation rank drives the quarantine decision
+
+- `engine/predict_shield/exploit_scoring.py` loads the frozen exploitation model after checking the model bytes, the feature code, the scikit-learn version and the reference file against the freeze, and scores a CVE JSON 5 record (CNA container only).
+- The model was trained with balanced class weights, so its score orders CVEs but is not a probability. `reference.py` scored all 48,150 CVEs published in 2025 (after every year used to fit, choose or test; KEV not read, run 44914856897). A CVE's rank is the share of those scoring at least as high. Top 1%, 5% and 10% sit at scores 0.342, 0.039 and 0.013.
+- `decide()` now takes that rank (`exploit_top_share`) and quarantines an unfixable finding in the top 5% (the share that held 51.6% of later-exploited 2024 CVEs), or one listed in KEV. A low rank is reported as not evidence of safety. `finding_for_cve()` builds a finding from a record; an unscorable record escalates.
+
+## 2026-11-20 (a): Vulnerability response: fix, mitigate, quarantine, escalate or monitor
+
 ## 2026-11-20: Vulnerability response: fix, mitigate, quarantine, escalate or monitor
 
 - `vulnerability_response.decide()` chooses the response for a finding, with reasons. Quarantine blocks the vulnerable route with an nginx include from a closed grammar, through `change_execution` (signed approval, `nginx -t`, reload, verification, rollback).
 - DVWA lab (run 44777352174): over-broad quarantine rolled back by verification; quarantine of the SQL injection route verified (route 403, payloads refused, five other pages 200); quarantine lifted after the source fix, verified.
 - Fixed: `render_csp` accepted a source ending in a line break. Evidence: `docs/evidence/VULNERABILITY_QUARANTINE_DVWA_2026_11_20.md`.
+
+## 2026-11-20 (b): Learned exploitation likelihood for CVEs
 
 ## 2026-11-20 (1): Cross-dataset flow detector v2 measured on CSE-CIC-IDS2018
 

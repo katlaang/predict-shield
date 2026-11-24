@@ -181,7 +181,7 @@ def main() -> None:
     ap.add_argument("--output", type=Path, required=True)
     ap.add_argument("--db-host", default="127.0.0.1")
     ap.add_argument("--db-port", type=int, default=3306)
-    ap.add_argument("--exploit-likelihood", type=float, default=0.5)
+    ap.add_argument("--exploit-top-share", type=float, default=0.01)
     args = ap.parse_args()
     work = Path(tempfile.mkdtemp(prefix="ps-dvwa-q-"))
     root = work / "dvwa"
@@ -193,12 +193,12 @@ def main() -> None:
     front = Front(work / "nginx", 18090, 18091)
     client = ThroughFront(front)
     report = {"schema": SCHEMA, "dvwa_commit": commit, "route": ROUTE, "other_pages": list(OTHER_PAGES),
-              "exploit_likelihood_input": args.exploit_likelihood, "incidents": {}}
+              "exploit_top_share_input": args.exploit_top_share, "incidents": {}}
     try:
         dvwa.setup_database()
         baseline = {i: [list(r) for r in dvwa.lookup(i)] for i in chain.LEGIT_IDS}
         report["before"] = observe(front, client, baseline)
-        finding = Finding("dvwa-sqli-no-fix", "dvwa", ROUTE, args.exploit_likelihood)
+        finding = Finding("dvwa-sqli-no-fix", "dvwa", ROUTE, args.exploit_top_share)
         decision = decide(finding)
         report["decision"] = {"action": decision.action, "reasons": decision.reasons}
         if decision.action != QUARANTINE:
