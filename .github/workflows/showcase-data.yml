@@ -8,6 +8,9 @@ name: Showcase data export
 
 on:
   workflow_dispatch:
+  push:
+    branches: [feat/showcase-site]
+    paths: ['showcase/scripts/**', '.github/workflows/showcase-data.yml']
 
 permissions:
   contents: write
