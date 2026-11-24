@@ -24,7 +24,7 @@ Versions 1 and 2 had already read these captures, so this is a third measurement
 | Detection in flood scenario 15 | under 0.1% | 62.1% | |
 | Detection in flood scenario 16 | under 0.1% | 99.99% | |
 | Malicious messages detected outside the floods | 10.0% | 9.8% (454 of 4,644) | |
-| False incidents per hour, attack captures | 54 | 80 | at most 2 |
+| False incidents per hour, attack captures | 54 | 80 originally recorded; **under-counted**, awaiting exact retrospective correction | at most 2 |
 | False incidents per hour, held-out normal captures | 17 to 90 (per capture) | 58 (pooled) | at most 2 |
 
 Three of the four checks failed. The development stage had already shown 58 false incidents per hour before any attack capture was read.
@@ -34,9 +34,13 @@ Three of the four checks failed. The development stage had already shown 58 fals
 ## What the result shows
 
 - **Gating works for what it was built for.** Attack traffic no longer becomes the reference, so sustained floods are detected again.
-- **Gating also locks history after a false alarm.** In the attack captures, false incidents rose from 54 to 80 per hour. Scenario 14 alone had 44. This was the risk registered beforehand: once a legitimate message alerts, the history stops taking in the change, so later normal messages keep alerting.
+- **Gating also locks history after a false alarm.** The original report counted 80 false incidents per hour in the attack captures, but the incident truth predicate can incorrectly treat a group of benign alerts as true if a non-alerting malicious message lies between alerts. Therefore 80 is a lower bound under the original grouping, not a validated exact rate. Scenario 14 alone had 44. This was the risk registered beforehand: once a legitimate message alerts, the history stops taking in the change, so later normal messages keep alerting.
 - **The false-alarm rate on normal captures is far from usable.** At 58 incidents per hour, message-level anomaly scoring on these GOOSE features cannot meet an operator's budget. The remaining malicious messages outside the floods (distortion, suppression, replay) look like normal messages to these features.
 
 ## Next step (stated before any new result)
 
 No version 4 of this message-level forest. Distortion and suppression attacks change what a measurement means, not how a message looks, so the next detector must check physical consistency between streams (for example, a breaker state against the measurements that should follow it).
+
+## Retrospective accounting correction
+
+The original frozen scoring code and report are preserved. The original incident predicate classified any grouped alert range containing a malicious message as a true incident, even when the malicious message itself did not alert. The independent `corrected_incident_accounting.py` instead requires at least one **alerted malicious message** in each group, validates that TP/FP decisions match the frozen original report and retains the original failure. The CI job `retrospective-incident-audit` writes the corrected counts as a separate artifact after re-reading the same already-scored captures. This correction is post-hoc and does not constitute untouched test data, retraining, or a new model result.
