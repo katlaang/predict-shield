@@ -1,0 +1,19 @@
+{
+ "files": {
+  "PREREGISTRATION.json": "959e71f8d13e488a3b5cad3053d175c454ed5b4b617462b064f3e62781407607",
+  "audit.py": "8464260e383756a58418d1103cda40b71a515e71aa4047c7cbba26c49082ea27",
+  "campaign.py": "d2be35e1f1b9816244feb489ba4bcc88acf4c93504005bd245ab34f081b094c8",
+  "collect.py": "a5516a4d62ec9e9dc4f262ef30d015b4a1c9980d0f5bb098036b4344cc1e729c",
+  "controls.py": "113df5c2c366a1337a7df614c55fb3a62912635ae9846135a3c44abfa9807198",
+  "pilot.py": "a547c7e97d26ac6fea626dbdcdcad011d20c378d81064bdd5fbf4aefcc390438",
+  "plan.py": "aa54099469ae0c58298e5b62472217a3fee37d3fb3362fdcf0016a65751a4814",
+  "prereg_gate.py": "621addf814db64809de489bbf982eee747cf1436fa657e2655934dd09201a179",
+  "scope.py": "58f56bcb5e1ba0ae69693ce1e1ddff68ce056c447af0f9503d7bbfd4bc674084",
+  "verifier_scoring.py": "83fb1c773d0aa743ad49b23f50cc739b18369bd0172600a80700e36cb85ce7be"
+ },
+ "lock_sha256": "52c22efebf40f5666f96db8785eb879e4906487209d5d44132c72c8eb1e92259",
+ "locked_at": "2026-11-21T06:21:13.073107+00:00",
+ "plan_fingerprint": "a246dea52d6af69469f3d7154cbfc5cf0b3108e35fcad8d97a401fbfa3130156",
+ "status": "LOCKED",
+ "tag": "mechanism-prereg-v1"
+}
