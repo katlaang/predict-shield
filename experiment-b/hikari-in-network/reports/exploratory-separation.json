@@ -1,0 +1,26 @@
+{
+ "exploratory": true,
+ "per_category_auc_vs_all_normal": {
+  "Bruteforce": 0.9819495304002567,
+  "Bruteforce-XML": 0.976193682437269,
+  "Probing": 0.9283560445514644,
+  "XMRIGCC CryptoMiner": 0.9917333622350617
+ },
+ "supervised_detection_at_normal_alert_rate": {
+  "0.005": 0.08929901074353792,
+  "0.01": 0.1558344856930114,
+  "0.05": 0.585682374215509,
+  "0.1": 0.8233166684395277
+ },
+ "test_auc": {
+  "anomaly": 0.4775864847211514,
+  "supervised": 0.9487429318140647
+ },
+ "test_average_precision": {
+  "anomaly": 0.06558349635327759,
+  "base_rate": 0.06771347282745706,
+  "supervised": 0.46980499295754935
+ },
+ "training_fit_auc": 0.955249302815975,
+ "written_after_result": true
+}
