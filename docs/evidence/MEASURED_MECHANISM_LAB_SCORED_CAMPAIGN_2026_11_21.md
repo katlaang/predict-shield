@@ -95,7 +95,7 @@ All 1,200 trials. Post-action operator telemetry was available in 1,009.
 When the verifier gave an answer, every answer was correct.
 
 - **Specificity** (it reports NOT VERIFIED when access is truly exposed): 334 of 334, Wilson lower bound 98.9%.
-- **Sensitivity** (it reports VERIFIED when access is truly denied): 173 of 173 for the scope verdict (lower bound 97.8%) and 122 of 122 for the dual verdict (lower bound 97.0%).
+- **Sensitivity** (it reports VERIFIED when access is truly denied): 173 of 173 for the scope verdict (lower bound 97.8%) and 122 of 122 for the dual verdict (lower bound 96.9%).
 
 The cost of that accuracy is abstention.
 
