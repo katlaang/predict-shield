@@ -1,0 +1,456 @@
+{
+ "fractions": {
+  "0.01": {
+   "FN": 17179,
+   "FP": 3211,
+   "TN": 255657,
+   "TP": 1623,
+   "by_category": {
+    "Background": {
+     "alerts": 1745,
+     "attack": false,
+     "flows": 84823,
+     "rate": 0.020572250450939016,
+     "wilson_95": [
+      0.01963848374578098,
+      0.02154943977928497
+     ]
+    },
+    "Benign": {
+     "alerts": 1466,
+     "attack": false,
+     "flows": 174045,
+     "rate": 0.008423108966071994,
+     "wilson_95": [
+      0.008004471110687533,
+      0.008863446160539369
+     ]
+    },
+    "Bruteforce": {
+     "alerts": 377,
+     "attack": true,
+     "flows": 2945,
+     "rate": 0.12801358234295415,
+     "wilson_95": [
+      0.1164296040932199,
+      0.1405667347905934
+     ]
+    },
+    "Bruteforce-XML": {
+     "alerts": 199,
+     "attack": true,
+     "flows": 2603,
+     "rate": 0.07645024971187092,
+     "wilson_95": [
+      0.0668550778402647,
+      0.08729371303163702
+     ]
+    },
+    "Probing": {
+     "alerts": 413,
+     "attack": true,
+     "flows": 11661,
+     "rate": 0.03541720264128291,
+     "wilson_95": [
+      0.03221253746627306,
+      0.038927860095622394
+     ]
+    },
+    "XMRIGCC CryptoMiner": {
+     "alerts": 634,
+     "attack": true,
+     "flows": 1593,
+     "rate": 0.3979912115505336,
+     "wilson_95": [
+      0.3742273908365453,
+      0.4222458293492042
+     ]
+    }
+   },
+   "detection": 0.08632060419104351,
+   "detection_wilson_95": [
+    0.0823904156265022,
+    0.09041979688044827
+   ],
+   "normal_alert_rate": 0.01240400513002766,
+   "normal_alert_wilson_95": [
+    0.011984819422708293,
+    0.012837661935898512
+   ],
+   "threshold_rows": 502,
+   "thresholds": {
+    "anomaly": 0.6389241895332683,
+    "supervised": 0.9506977215275652
+   },
+   "training_rows": {
+    "Background": 843,
+    "Benign": 1705,
+    "Bruteforce": 27,
+    "Bruteforce-XML": 27,
+    "Probing": 104,
+    "XMRIGCC CryptoMiner": 17
+   }
+  },
+  "0.05": {
+   "FN": 17770,
+   "FP": 2926,
+   "TN": 255942,
+   "TP": 1032,
+   "by_category": {
+    "Background": {
+     "alerts": 1832,
+     "attack": false,
+     "flows": 84823,
+     "rate": 0.021597915659667778,
+     "wilson_95": [
+      0.020641099220589067,
+      0.02259806182561391
+     ]
+    },
+    "Benign": {
+     "alerts": 1094,
+     "attack": false,
+     "flows": 174045,
+     "rate": 0.006285730701829986,
+     "wilson_95": [
+      0.0059251709067312175,
+      0.006668084184823728
+     ]
+    },
+    "Bruteforce": {
+     "alerts": 402,
+     "attack": true,
+     "flows": 2945,
+     "rate": 0.1365025466893039,
+     "wilson_95": [
+      0.12457554765735591,
+      0.14937660275352685
+     ]
+    },
+    "Bruteforce-XML": {
+     "alerts": 268,
+     "attack": true,
+     "flows": 2603,
+     "rate": 0.10295812524010757,
+     "wilson_95": [
+      0.09186239905584542,
+      0.11522401850978761
+     ]
+    },
+    "Probing": {
+     "alerts": 22,
+     "attack": true,
+     "flows": 11661,
+     "rate": 0.0018866306491724552,
+     "wilson_95": [
+      0.001246280750495,
+      0.0028550573645524874
+     ]
+    },
+    "XMRIGCC CryptoMiner": {
+     "alerts": 340,
+     "attack": true,
+     "flows": 1593,
+     "rate": 0.21343377275580666,
+     "wilson_95": [
+      0.19401501892205397,
+      0.2342312888612978
+     ]
+    }
+   },
+   "detection": 0.05488777789596851,
+   "detection_wilson_95": [
+    0.05172220459120303,
+    0.0582351968578415
+   ],
+   "normal_alert_rate": 0.01130305792913763,
+   "normal_alert_wilson_95": [
+    0.010903019473345932,
+    0.011717600157899001
+   ],
+   "threshold_rows": 2461,
+   "thresholds": {
+    "anomaly": 0.6202043213401148,
+    "supervised": 0.9563157647177792
+   },
+   "training_rows": {
+    "Background": 4247,
+    "Benign": 8675,
+    "Bruteforce": 153,
+    "Bruteforce-XML": 136,
+    "Probing": 530,
+    "XMRIGCC CryptoMiner": 71
+   }
+  },
+  "0.2": {
+   "FN": 17567,
+   "FP": 2381,
+   "TN": 256487,
+   "TP": 1235,
+   "by_category": {
+    "Background": {
+     "alerts": 1490,
+     "attack": false,
+     "flows": 84823,
+     "rate": 0.017565990356389186,
+     "wilson_95": [
+      0.016703532886838002,
+      0.018472142731446973
+     ]
+    },
+    "Benign": {
+     "alerts": 891,
+     "attack": false,
+     "flows": 174045,
+     "rate": 0.005119365681289322,
+     "wilson_95": [
+      0.004794831601312388,
+      0.005465744935206518
+     ]
+    },
+    "Bruteforce": {
+     "alerts": 404,
+     "attack": true,
+     "flows": 2945,
+     "rate": 0.13718166383701189,
+     "wilson_95": [
+      0.12522793215837924,
+      0.15008068317466916
+     ]
+    },
+    "Bruteforce-XML": {
+     "alerts": 101,
+     "attack": true,
+     "flows": 2603,
+     "rate": 0.03880138301959278,
+     "wilson_95": [
+      0.032036461251408896,
+      0.046925555475772956
+     ]
+    },
+    "Probing": {
+     "alerts": 41,
+     "attack": true,
+     "flows": 11661,
+     "rate": 0.0035159934825486666,
+     "wilson_95": [
+      0.002592965658638718,
+      0.004766024961498569
+     ]
+    },
+    "XMRIGCC CryptoMiner": {
+     "alerts": 689,
+     "attack": true,
+     "flows": 1593,
+     "rate": 0.4325172630257376,
+     "wilson_95": [
+      0.408379678393415,
+      0.45697952880638865
+     ]
+    }
+   },
+   "detection": 0.06568450164876077,
+   "detection_wilson_95": [
+    0.06223148264446624,
+    0.06931495542852904
+   ],
+   "normal_alert_rate": 0.00919773784322512,
+   "normal_alert_wilson_95": [
+    0.008837209851779384,
+    0.009572832090299873
+   ],
+   "threshold_rows": 10190,
+   "thresholds": {
+    "anomaly": 0.6408136383548191,
+    "supervised": 0.9471660006328864
+   },
+   "training_rows": {
+    "Background": 17070,
+    "Benign": 34443,
+    "Bruteforce": 612,
+    "Bruteforce-XML": 511,
+    "Probing": 2330,
+    "XMRIGCC CryptoMiner": 332
+   }
+  },
+  "0.5": {
+   "FN": 17293,
+   "FP": 2479,
+   "TN": 256389,
+   "TP": 1509,
+   "by_category": {
+    "Background": {
+     "alerts": 2080,
+     "attack": false,
+     "flows": 84823,
+     "rate": 0.024521650967308396,
+     "wilson_95": [
+      0.02350216590624862,
+      0.0255842009473335
+     ]
+    },
+    "Benign": {
+     "alerts": 399,
+     "attack": false,
+     "flows": 174045,
+     "rate": 0.00229251055761441,
+     "wilson_95": [
+      0.0020785443699446364,
+      0.002528446703137166
+     ]
+    },
+    "Bruteforce": {
+     "alerts": 334,
+     "attack": true,
+     "flows": 2945,
+     "rate": 0.1134125636672326,
+     "wilson_95": [
+      0.10246015072182695,
+      0.12537219233542674
+     ]
+    },
+    "Bruteforce-XML": {
+     "alerts": 0,
+     "attack": true,
+     "flows": 2603,
+     "rate": 0.0,
+     "wilson_95": [
+      1.0842021724855044e-19,
+      0.0014736066392562783
+     ]
+    },
+    "Probing": {
+     "alerts": 3,
+     "attack": true,
+     "flows": 11661,
+     "rate": 0.0002572678157962439,
+     "wilson_95": [
+      8.749804332794446e-05,
+      0.0007561875666297442
+     ]
+    },
+    "XMRIGCC CryptoMiner": {
+     "alerts": 1172,
+     "attack": true,
+     "flows": 1593,
+     "rate": 0.7357187696170747,
+     "wilson_95": [
+      0.7135167799198637,
+      0.7567866405124505
+     ]
+    }
+   },
+   "detection": 0.08025741942346559,
+   "detection_wilson_95": [
+    0.076459123571792,
+    0.08422719644683142
+   ],
+   "normal_alert_rate": 0.0095763091614259,
+   "normal_alert_wilson_95": [
+    0.009208357171698902,
+    0.009958816171367943
+   ],
+   "threshold_rows": 25762,
+   "thresholds": {
+    "anomaly": 0.6471283658606556,
+    "supervised": 0.9392178742358919
+   },
+   "training_rows": {
+    "Background": 42722,
+    "Benign": 86652,
+    "Bruteforce": 1499,
+    "Bruteforce-XML": 1250,
+    "Probing": 5863,
+    "XMRIGCC CryptoMiner": 840
+   }
+  }
+ },
+ "host_disjoint": {
+  "FN": 2,
+  "FP": 205016,
+  "TN": 228929,
+  "TP": 34415,
+  "by_category": {
+   "Background": {
+    "alerts": 55253,
+    "attack": false,
+    "flows": 126291,
+    "rate": 0.4375054437766745,
+    "wilson_95": [
+     0.43477140643247486,
+     0.4402432828639265
+    ]
+   },
+   "Benign": {
+    "alerts": 149763,
+    "attack": false,
+    "flows": 307654,
+    "rate": 0.4867903553992472,
+    "wilson_95": [
+     0.4850243503951723,
+     0.4885566902782657
+    ]
+   },
+   "Bruteforce": {
+    "alerts": 5882,
+    "attack": true,
+    "flows": 5884,
+    "rate": 0.9996600951733514,
+    "wilson_95": [
+     0.9987614137406854,
+     0.9999067808878456
+    ]
+   },
+   "Bruteforce-XML": {
+    "alerts": 5145,
+    "attack": true,
+    "flows": 5145,
+    "rate": 1.0,
+    "wilson_95": [
+     0.9992539178158866,
+     1.0
+    ]
+   },
+   "Probing": {
+    "alerts": 23388,
+    "attack": true,
+    "flows": 23388,
+    "rate": 1.0,
+    "wilson_95": [
+     0.9998357778335643,
+     0.9999999999999998
+    ]
+   }
+  },
+  "detection": 0.9999418891826714,
+  "detection_wilson_95": [
+   0.9997881248615053,
+   0.9999840637733757
+  ],
+  "normal_alert_rate": 0.4724469690859441,
+  "normal_alert_wilson_95": [
+   0.47096183006511544,
+   0.47393259592388476
+  ],
+  "threshold_rows": 16783,
+  "thresholds": {
+   "anomaly": 0.6607130933741387,
+   "supervised": 0.9780135206544626
+  },
+  "training_rows": {
+   "Background": 43860,
+   "Benign": 39777,
+   "Bruteforce": 0,
+   "Bruteforce-XML": 0,
+   "Probing": 0,
+   "XMRIGCC CryptoMiner": 3279
+  }
+ },
+ "note": "Flows are dependent; Wilson intervals understate uncertainty. The primary split is random over flows (no timestamps).",
+ "pass_condition": "At the 5% fraction: attack detection at least 90% pooled, AND normal alert rate at most 1% pooled AND for Benign and Background separately, on the test half.",
+ "passed": false,
+ "protocol_sha256": "dbe9be5ea682ca4bfea24ea9dac89744858d834e7bc730b2e30aaddaaf834d0c",
+ "run_sha256": "c901536aac95feeea16f543a47d261fe87b7bc73b62680b1493ac510834daa72",
+ "schema": "predict-shield/hikari-in-network/1",
+ "test_flows": 277670
+}
