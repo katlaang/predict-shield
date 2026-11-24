@@ -19,6 +19,7 @@ from typing import Callable
 
 LIST = "CUST-IN"
 ROUTE_MAP = "CUST-IN"
+UNATTACHED = "# prefix-list present but not applied"
 LINE = re.compile(rf"^ip prefix-list {LIST} seq (\d{{1,4}}) (permit|deny) (\d{{1,3}}(?:\.\d{{1,3}}){{3}}/\d{{1,2}})"
                   r"(?: ge (\d{1,2}))?(?: le (\d{1,2}))?$")
 
@@ -38,7 +39,12 @@ def canonical(lines: list[str]) -> str:
 
 def validate(content: str) -> list[str]:
     """Raise ValueError unless every line is a well-formed entry of the managed list."""
-    lines = [l.strip() for l in content.splitlines() if l.strip()]
+    raw = [l.strip() for l in content.splitlines() if l.strip()]
+    if UNATTACHED in raw:
+        if raw[0] != UNATTACHED or raw.count(UNATTACHED) != 1 or len(raw) < 2:
+            raise ValueError("Invalid unattached prefix-list snapshot")
+        raw = raw[1:]
+    lines = raw
     seqs = set()
     for line in lines:
         m = LINE.match(line)
@@ -73,15 +79,15 @@ class FrrInboundFilterAdapter:
         entries = parse_running(config)
         applied = f"neighbor {self.neighbor} route-map {ROUTE_MAP} in" in config
         if entries and not applied:
-            return "# prefix-list present but not applied\n" + canonical(entries)
+            return UNATTACHED + "\n" + canonical(entries)
         return canonical(entries) if entries else ""
 
     def validate(self, candidate: str) -> None:
         validate(candidate)
 
     def write(self, content: str) -> None:
-        lines = [l for l in content.splitlines() if l.strip() and not l.startswith("#")]
-        validate("\n".join(lines))
+        lines = validate(content)
+        restore_unattached = content.startswith(UNATTACHED + "\n")
         config = self.run(["vtysh", "-c", "show running-config"])
         has_list = bool(parse_running(config))
         has_map = f"route-map {ROUTE_MAP} permit" in config
@@ -93,7 +99,10 @@ class FrrInboundFilterAdapter:
             cmds += lines
             if not has_map:
                 cmds += [f"route-map {ROUTE_MAP} permit 10", f"match ip address prefix-list {LIST}", "exit"]
-            if not applied:
+            if applied and restore_unattached:
+                cmds += [f"router bgp {self.asn}", "address-family ipv4 unicast",
+                         f"no neighbor {self.neighbor} route-map {ROUTE_MAP} in", "exit-address-family", "exit"]
+            elif not applied and not restore_unattached:
                 cmds += [f"router bgp {self.asn}", "address-family ipv4 unicast",
                          f"neighbor {self.neighbor} route-map {ROUTE_MAP} in", "exit-address-family", "exit"]
         else:
