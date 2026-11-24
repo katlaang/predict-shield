@@ -1,0 +1,10 @@
+{
+ "develop_run": 44779461910,
+ "develop_commit": "5be63f2",
+ "artifact": "cic-flow-v2-frozen",
+ "artifact_digest": "sha256:5b9041df4b1c001c1e46e502e25c07e1e9e06c20c4a76cbd5f3cf47e188deb03",
+ "supervised_sha256": "f1fa7e6536e7d623f461c7719fd4ef2fbe5ffe121843b888be061ffb5ffeff3a",
+ "freeze_sha256": "793d315feaa1552ff68ddfa84caf4413c0f1136ed864ffeadf6562aa8982cbae",
+ "recorded": "2026-11-20, before any version 2 code scored a test flow",
+ "supersedes": "freeze e06a8191 (develop run 44772051464), which carried the PENDING_PIN placeholder; the supervised model is byte-identical (f1fa7e65)"
+}

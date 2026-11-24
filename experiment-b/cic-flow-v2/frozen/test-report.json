@@ -1,0 +1,320 @@
+{
+ "FN": 3412582,
+ "FP": 295531,
+ "TN": 53560039,
+ "TP": 28643,
+ "benign_alert_rate": 0.005487473254855533,
+ "benign_alert_rate_by_day": {
+  "Friday-02-03-2018.csv": 0.006636999570394508,
+  "Friday-16-02-2018.csv": 0.007229861040760637,
+  "Friday-23-02-2018.csv": 0.005140619072965099,
+  "Thursday-01-03-2018.csv": 0.0056904889406804845,
+  "Thursday-15-02-2018.csv": 0.004927448182319115,
+  "Thursday-22-02-2018.csv": 0.004487048980831582,
+  "Tuesday-20-02-2018.csv": 0.004576571706822547,
+  "Wednesday-21-02-2018.csv": 0.004681920943358674,
+  "Wednesday-28-02-2018.csv": 0.005947325137979631
+ },
+ "benign_alert_wilson_95": [
+  0.005467778631853969,
+  0.005507238423926974
+ ],
+ "by_family": {
+  "benign": {
+   "by_anomaly": 283089,
+   "by_supervised": 12442,
+   "false_alarms": 295531,
+   "flows": 53855570
+  },
+  "botnet": {
+   "by_anomaly": 797,
+   "by_anomaly_only": 797,
+   "by_supervised": 0,
+   "detected": 797,
+   "detection_rate": 0.005576507301236347,
+   "family_in_development": true,
+   "flows": 142921,
+   "wilson_95": [
+    0.005203501955248172,
+    0.005976090357547825
+   ]
+  },
+  "ddos": {
+   "by_anomaly": 1,
+   "by_anomaly_only": 1,
+   "by_supervised": 0,
+   "detected": 1,
+   "detection_rate": 7.277236513097571e-07,
+   "family_in_development": true,
+   "flows": 1374148,
+   "wilson_95": [
+    1.284611037950905e-07,
+    4.122494798643143e-06
+   ]
+  },
+  "dos-goldeneye": {
+   "by_anomaly": 0,
+   "by_anomaly_only": 0,
+   "by_supervised": 0,
+   "detected": 0,
+   "detection_rate": 0.0,
+   "family_in_development": true,
+   "flows": 22560,
+   "wilson_95": [
+    0.0,
+    0.00017024844321373184
+   ]
+  },
+  "dos-hulk": {
+   "by_anomaly": 0,
+   "by_anomaly_only": 0,
+   "by_supervised": 0,
+   "detected": 0,
+   "detection_rate": 0.0,
+   "family_in_development": true,
+   "flows": 1803160,
+   "wilson_95": [
+    0.0,
+    2.130399242138751e-06
+   ]
+  },
+  "dos-slow": {
+   "by_anomaly": 0,
+   "by_anomaly_only": 0,
+   "by_supervised": 293,
+   "detected": 293,
+   "detection_rate": 0.03451118963486455,
+   "family_in_development": true,
+   "flows": 8490,
+   "wilson_95": [
+    0.030834062109117016,
+    0.038609364841659
+   ]
+  },
+  "infiltration": {
+   "by_anomaly": 237,
+   "by_anomaly_only": 237,
+   "by_supervised": 27315,
+   "detected": 27552,
+   "detection_rate": 0.30728394097899914,
+   "family_in_development": true,
+   "flows": 89663,
+   "wilson_95": [
+    0.30427237523872247,
+    0.3103120191960052
+   ]
+  },
+  "web-attack": {
+   "by_anomaly": 0,
+   "by_anomaly_only": 0,
+   "by_supervised": 0,
+   "detected": 0,
+   "detection_rate": 0.0,
+   "family_in_development": true,
+   "flows": 283,
+   "wilson_95": [
+    0.0,
+    0.013392272150190522
+   ]
+  }
+ },
+ "by_label": {
+  "Botnet Ares": {
+   "by_anomaly": 797,
+   "by_anomaly_only": 797,
+   "by_supervised": 0,
+   "detected": 797,
+   "flows": 142921
+  },
+  "DDoS-HOIC": {
+   "by_anomaly": 0,
+   "by_anomaly_only": 0,
+   "by_supervised": 0,
+   "detected": 0,
+   "flows": 1082293
+  },
+  "DDoS-LOIC-HTTP": {
+   "by_anomaly": 0,
+   "by_anomaly_only": 0,
+   "by_supervised": 0,
+   "detected": 0,
+   "flows": 289328
+  },
+  "DDoS-LOIC-UDP": {
+   "by_anomaly": 1,
+   "by_anomaly_only": 1,
+   "by_supervised": 0,
+   "detected": 1,
+   "flows": 2527
+  },
+  "DoS GoldenEye": {
+   "by_anomaly": 0,
+   "by_anomaly_only": 0,
+   "by_supervised": 0,
+   "detected": 0,
+   "flows": 22560
+  },
+  "DoS Hulk": {
+   "by_anomaly": 0,
+   "by_anomaly_only": 0,
+   "by_supervised": 0,
+   "detected": 0,
+   "flows": 1803160
+  },
+  "DoS Slowloris": {
+   "by_anomaly": 0,
+   "by_anomaly_only": 0,
+   "by_supervised": 293,
+   "detected": 293,
+   "flows": 8490
+  },
+  "Infiltration - Communication Victim Attacker": {
+   "by_anomaly": 2,
+   "by_anomaly_only": 2,
+   "by_supervised": 0,
+   "detected": 2,
+   "flows": 204
+  },
+  "Infiltration - Dropbox Download": {
+   "by_anomaly": 5,
+   "by_anomaly_only": 5,
+   "by_supervised": 0,
+   "detected": 5,
+   "flows": 85
+  },
+  "Infiltration - NMAP Portscan": {
+   "by_anomaly": 230,
+   "by_anomaly_only": 230,
+   "by_supervised": 27315,
+   "detected": 27545,
+   "flows": 89374
+  },
+  "Web Attack - Brute Force": {
+   "by_anomaly": 0,
+   "by_anomaly_only": 0,
+   "by_supervised": 0,
+   "detected": 0,
+   "flows": 131
+  },
+  "Web Attack - SQL": {
+   "by_anomaly": 0,
+   "by_anomaly_only": 0,
+   "by_supervised": 0,
+   "detected": 0,
+   "flows": 39
+  },
+  "Web Attack - XSS": {
+   "by_anomaly": 0,
+   "by_anomaly_only": 0,
+   "by_supervised": 0,
+   "detected": 0,
+   "flows": 113
+  }
+ },
+ "by_member": {
+  "Friday-02-03-2018.csv": {
+   "FN": 142124,
+   "FP": 40940,
+   "TN": 6127510,
+   "TP": 797,
+   "out_of_order_rows": 6310648
+  },
+  "Friday-16-02-2018.csv": {
+   "FN": 1803160,
+   "FP": 40394,
+   "TN": 5546712,
+   "out_of_order_rows": 7389431
+  },
+  "Friday-23-02-2018.csv": {
+   "FN": 158,
+   "FP": 30722,
+   "TN": 5945601,
+   "out_of_order_rows": 5975650
+  },
+  "Thursday-01-03-2018.csv": {
+   "FN": 31966,
+   "FP": 37054,
+   "TN": 6474513,
+   "TP": 7868,
+   "out_of_order_rows": 6550385
+  },
+  "Thursday-15-02-2018.csv": {
+   "FN": 30757,
+   "FP": 26505,
+   "TN": 5352547,
+   "TP": 293,
+   "out_of_order_rows": 5409182
+  },
+  "Thursday-22-02-2018.csv": {
+   "FN": 125,
+   "FP": 27241,
+   "TN": 6043787,
+   "out_of_order_rows": 6070266
+  },
+  "Tuesday-20-02-2018.csv": {
+   "FN": 290124,
+   "FP": 26382,
+   "TN": 5738195,
+   "TP": 1,
+   "out_of_order_rows": 6053987
+  },
+  "Wednesday-21-02-2018.csv": {
+   "FN": 1084023,
+   "FP": 27523,
+   "TN": 5851047,
+   "out_of_order_rows": 6961807
+  },
+  "Wednesday-28-02-2018.csv": {
+   "FN": 30145,
+   "FP": 38770,
+   "TN": 6480127,
+   "TP": 19684,
+   "out_of_order_rows": 6567935
+  }
+ },
+ "calibration": {
+  "anomaly_fit_rows": 200000,
+  "calibration_bundle_sha256": "08cef1ede37d5f5156a03e2bdf32c4ab384fe9f1295bcfbdfbdffa4ba6bcbe9a",
+  "member": "Wednesday-14-02-2018.csv",
+  "out_of_order_rows": 5897648,
+  "rows": 5898350,
+  "seconds": 321,
+  "threshold_rows": 2950384,
+  "thresholds": {
+   "anomaly": 0.6224153001209489,
+   "supervised": 0.9999999724949965
+  }
+ },
+ "code_sha256": {
+  "features_v2.py": "d99bbf5b9764f1af9fd33f28b0704dfd0ad014cc689c63f267e9c739adaff0d2",
+  "protocol_v2.json": "327af7f8b34452b396588e044c511ba661c210d5e00d9b70f58c8ea57721f7fe",
+  "score_test_v2.py": "a99de665f43119066e58a61f8e483782ca2cc46f979db1ff78bf5ffb73284f73",
+  "train_dev_v2.py": "5598efa9ebec12883cc4e495839016496380adceb1806b02b67fe4146759b990"
+ },
+ "detection_rate": 0.00832348945506324,
+ "detection_wilson_95": [
+  0.008228046071176883,
+  0.008420030560249269
+ ],
+ "flows": 57296795,
+ "freeze_sha256": "793d315feaa1552ff68ddfa84caf4413c0f1136ed864ffeadf6562aa8982cbae",
+ "members": [
+  "Friday-02-03-2018.csv",
+  "Friday-16-02-2018.csv",
+  "Friday-23-02-2018.csv",
+  "Thursday-01-03-2018.csv",
+  "Thursday-15-02-2018.csv",
+  "Thursday-22-02-2018.csv",
+  "Tuesday-20-02-2018.csv",
+  "Wednesday-21-02-2018.csv",
+  "Wednesday-28-02-2018.csv"
+ ],
+ "note": "Second measurement on the 2018 data (version 1 read its labels). Flows within a day are dependent; intervals understate uncertainty.",
+ "pass_condition": "benign alert rate at most 1% pooled and on every day",
+ "passed": true,
+ "precision": 0.08835687007594686,
+ "schema": "predict-shield/cic-flow-v2-test/1",
+ "supervised_sha256": "f1fa7e6536e7d623f461c7719fd4ef2fbe5ffe121843b888be061ffb5ffeff3a",
+ "test_archive_sha256": "7f7b6f8065a88527bcb6e1579f088e1d0480a49903c5fd7e4e907ab238344f6e",
+ "unmapped_labels": []
+}

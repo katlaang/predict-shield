@@ -1,0 +1,30 @@
+{
+ "calibration_member": "Wednesday-14-02-2018.csv",
+ "code_sha256": {
+  "features_v2.py": "d99bbf5b9764f1af9fd33f28b0704dfd0ad014cc689c63f267e9c739adaff0d2",
+  "protocol_v2.json": "327af7f8b34452b396588e044c511ba661c210d5e00d9b70f58c8ea57721f7fe",
+  "score_test_v2.py": "a99de665f43119066e58a61f8e483782ca2cc46f979db1ff78bf5ffb73284f73",
+  "train_dev_v2.py": "5598efa9ebec12883cc4e495839016496380adceb1806b02b67fe4146759b990"
+ },
+ "development_archive_sha256": "97fdb91d339e2d8cf5627f981b831e5e7e400b981c58181c451a38fd03c48883",
+ "development_families": [
+  "botnet",
+  "brute-force-ftp",
+  "brute-force-ssh",
+  "ddos",
+  "dos-goldeneye",
+  "dos-hulk",
+  "dos-slow",
+  "heartbleed",
+  "infiltration",
+  "portscan",
+  "web-attack"
+ ],
+ "freeze_sha256": "793d315feaa1552ff68ddfa84caf4413c0f1136ed864ffeadf6562aa8982cbae",
+ "numpy": "2.3.4",
+ "pandas": "2.3.3",
+ "schema": "predict-shield/cic-flow-v2-freeze/1",
+ "sklearn": "1.7.2",
+ "supervised_sha256": "f1fa7e6536e7d623f461c7719fd4ef2fbe5ffe121843b888be061ffb5ffeff3a",
+ "test_pin": "7f7b6f8065a88527bcb6e1579f088e1d0480a49903c5fd7e4e907ab238344f6e"
+}

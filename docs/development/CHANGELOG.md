@@ -8,11 +8,22 @@
 
 ## 2026-11-20 (a): Vulnerability response: fix, mitigate, quarantine, escalate or monitor
 
+## 2026-11-20: Vulnerability response: fix, mitigate, quarantine, escalate or monitor
+
 - `vulnerability_response.decide()` chooses the response for a finding, with reasons. Quarantine blocks the vulnerable route with an nginx include from a closed grammar, through `change_execution` (signed approval, `nginx -t`, reload, verification, rollback).
 - DVWA lab (run 44777352174): over-broad quarantine rolled back by verification; quarantine of the SQL injection route verified (route 403, payloads refused, five other pages 200); quarantine lifted after the source fix, verified.
 - Fixed: `render_csp` accepted a source ending in a line break. Evidence: `docs/evidence/VULNERABILITY_QUARANTINE_DVWA_2026_11_20.md`.
 
 ## 2026-11-20 (b): Learned exploitation likelihood for CVEs
+
+## 2026-11-20 (1): Cross-dataset flow detector v2 measured on CSE-CIC-IDS2018
+
+- Thresholds and the anomaly model calibrated on the first 2018 day with its labels unread; per-source context removed; the freeze now covers the code as well as the model.
+- Single locked run (freeze `793d315f`, run 44782232012): benign alert rate 0.55%, every day under 1%, so the pre-stated condition was met. Detection was 0.83% (28,643 of 3,441,225 attack flows), so this version is not usable as a detector.
+- Cause: the calibration day contained brute-force traffic, which pushed the supervised threshold to 0.99999997 and taught the anomaly model attacks as normal. Version 3 calibrates on verified-normal traffic and adds a detection floor to the pass condition.
+- Disclosed: attempt 1 was stopped by a runner shutdown after one day's result was printed; the placeholder test pin in the first freeze; the 2018 files are not stored in time order (context is computed after sorting).
+
+## 2026-11-20: Learned exploitation likelihood for CVEs
 
 - `experiment-b/exploit-likelihood/`: CVE records (CNA container only) with CISA KEV as labels; train 2017 to 2022, choose on 2023 H1, freeze, score 2024 once (run 44777279550).
 - Test: 39,924 CVEs, 161 in KEV. Top 1% by score held 53 of them (32.9%), top 10% held 99 (61.5%); 33 of the top 100 were in KEV; ROC AUC 0.876.
