@@ -1,0 +1,62 @@
+{
+ "freeze_sha256": "b1f763fa49f5444b442b815a7e4cd979e606e2a52706449689d507cd8c265fb1",
+ "leave_one_capture_out": {
+  "dataset/ipal/Normal/01-normal-1.ipal.gz": {
+   "alert_rate": 0.0022367790381850137,
+   "alert_wilson_95": [
+    0.0013329086147172097,
+    0.0037512786651862
+   ],
+   "alerts": 14,
+   "fit_rows": 14503,
+   "hours": 0.2370979850159751,
+   "incidents": 4,
+   "incidents_per_hour": 16.870662143039677,
+   "messages": 6259,
+   "threshold_rows": 6218
+  },
+  "dataset/ipal/Normal/02-normal-2.ipal.gz": {
+   "alert_rate": 0.006087712759348988,
+   "alert_wilson_95": [
+    0.004608138006026101,
+    0.00803851093165755
+   ],
+   "alerts": 49,
+   "fit_rows": 13250,
+   "hours": 0.3071256171994739,
+   "incidents": 22,
+   "incidents_per_hour": 71.6319276802993,
+   "messages": 8049,
+   "threshold_rows": 5681
+  },
+  "dataset/ipal/Normal/03-normal-3.ipal.gz": {
+   "alert_rate": 0.012904590649460547,
+   "alert_wilson_95": [
+    0.010059776239038889,
+    0.016540451220507763
+   ],
+   "alerts": 61,
+   "fit_rows": 15576,
+   "hours": 0.2105390822225147,
+   "incidents": 19,
+   "incidents_per_hour": 90.24452752158987,
+   "messages": 4727,
+   "threshold_rows": 6677
+  },
+  "dataset/ipal/Normal/04-normal-4.ipal.gz": {
+   "alert_rate": 0.008055380742605412,
+   "alert_wilson_95": [
+    0.006313702765378751,
+    0.010272545628591742
+   ],
+   "alerts": 64,
+   "fit_rows": 13323,
+   "hours": 0.28130475050873227,
+   "incidents": 18,
+   "incidents_per_hour": 63.98754364242862,
+   "messages": 7945,
+   "threshold_rows": 5712
+  }
+ },
+ "schema": "predict-shield/powerduck-v2-development/1"
+}

@@ -1,5 +1,10 @@
 # Development changelog
 
+## 2026-11-24 (b): PowerDuck GOOSE detector v2, second measurement
+
+- Added stream-history features, a 0.5% threshold and incident grouping. Development run 45330612517, test run 45330952174. The 16 captures had already been read by version 1's test.
+- Failed again. False alarms were 1.48% against a 1% ceiling (version 1: 3.0%), and 15 of 16 scenarios were flagged. Detection after onset fell, because the history window absorbed attack traffic. Evidence: `docs/evidence/MEASURED_POWERDUCK_GOOSE_DETECTOR_V2_2026_11_24.md`.
+
 ## 2026-11-21: Mechanism-lab scored campaign
 
 - **Run:** 1,200 of 1,200 trials, run under lock `9422667f` (CI run 44879497946), with no reruns and no exclusions. Controls passed on the same code first. Aggregate reports are in `docs/evidence/mechanism-scored-campaign/run-44879497946/`.
