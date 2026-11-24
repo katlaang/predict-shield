@@ -13,18 +13,18 @@
 - **Test:** the held-out half (277,670 flows), scored once per training size.
 - **Pass condition:** at the 5% slice, at least 90% of attacks detected and at most 1% of normal flows alerted, both pooled and for each normal category.
 
-| Training slice (share of the dataset) | Attack flows in training | Attacks detected | Normal flows alerted |
+| Training slice (share of the half-dataset training pool; actual full-dataset shares are half the listed value) | Attack flows in training | Attacks detected | Normal flows alerted |
 |---|---|---|---|
 | 1% | 175 | 8.6% | 1.24% |
 | 5% (pass point) | 890 | 5.5% | 1.13% |
 | 20% | 3,785 | 6.6% | 0.92% |
 | 50% | 9,452 | 8.0% | 0.96% |
 
-More of the network's own data did not improve detection.
+Within the four measured configurations, increasing the selected training-pool fraction did not produce a monotonic improvement in detection.
 
 ## Exploratory check (written after the result was seen)
 
-`explore_separation.py` (run 45330750423, `reports/exploratory-separation.json`) asked whether this was a bug or a real limit. It used the 50% slice.
+`explore_separation.py` (run 45330750423, `reports/exploratory-separation.json`) examined one possible explanation for the measured failure; it cannot rule out an implementation defect or establish a fundamental information limit. It used the 50% slice.
 
 | Measure | Value |
 |---|---|
@@ -43,8 +43,8 @@ The supervised model separates attacks from normal traffic, but the two overlap 
 
 ## What the result shows
 
-- **It is not a bug and not overfitting.** Training and test fit are almost equal. The limit is the information in flow statistics for these attacks: encrypted brute force, probing and crypto-mining traffic look much like normal encrypted traffic in flow statistics alone.
-- **Cross-network transfer was not the only problem.** Even with the network's own data, flow statistics cannot reach high detection at a 1% false-alarm rate on HIKARI.
+- **No fundamental feature limit established.** The observed similarity between train and test AUC for the tested supervised configuration does not rule out underfitting, implementation issues, or improvements from other configurations. This specific learned detector failed its registered target.
+- **Cross-network transfer was not the only problem.** With the tested models, feature representation and calibration, performance fell short at approximately 1% false alarms; other model choices were not exhaustively evaluated.
 - **The anomaly model adds nothing here.** Its AUC is 0.48.
 
 ## Secondary host-disjoint check (registered in advance)
@@ -53,4 +53,8 @@ It was uninformative. The training side held no attacking host except the crypto
 
 ## Implication for the detection design
 
-Flow statistics alone are not enough for these attacks. The next step is richer evidence per event: what the server did after the request, and connections that follow it. That is the request, process and network correlation, and it can be built and measured in the DVWA and ISP labs.
+These measured configurations did not achieve the required detection performance using their flow-only evidence. The next step is richer evidence per event: what the server did after the request, and connections that follow it. That is the request, process and network correlation, and it can be built and measured in the DVWA and ISP labs.
+
+## Post-result labeling correction (original run unchanged)
+
+The protocol and original report are retained as frozen historical artifacts. The experiment code selects `u < f / 2` from all flows for each displayed fraction `f`, while the training pool is defined as `u < 0.5`. Thus the displayed 1%, 5%, 20%, and 50% values refer to **fractions of the training pool**, approximately **0.5%, 2.5%, 10%, and 25% of the full dataset**, not 1%, 5%, 20%, and 50% of the full dataset. This correction does not alter the previously recorded scores or rerun the used test set.
