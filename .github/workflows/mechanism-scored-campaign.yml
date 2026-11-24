@@ -1,0 +1,114 @@
+name: Mechanism lab scored campaign
+
+# The preregistered campaign (experiment-b/mechanism-lab/PREREGISTRATION.json):
+# plan v3.1, 1,200 trials. Refuses to start unless the preregistration gate
+# passes and its hash equals the input. Runs the controls on the same code
+# first, then every trial under the rerun and stopping rules, then the
+# locked analysis. Aggregate reports are committed to a results branch; the
+# full four-stream records (including oracle truth) are kept as a workflow
+# artifact, never committed.
+
+on:
+  workflow_dispatch:
+    inputs:
+      expected_lock_sha256:
+        description: 'Current hash from prereg_gate.py (lock or last DEVIATIONS.md entry)'
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  campaign:
+    runs-on: ubuntu-latest
+    timeout-minutes: 340
+    permissions:
+      contents: write
+    defaults:
+      run:
+        working-directory: experiment-b/mechanism-lab
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Refuse unless the preregistration gate passes with the expected hash
+        env:
+          WANT: ${{ github.event.inputs.expected_lock_sha256 }}
+        run: |
+          python prereg_gate.py check --scored
+          python -c "import os,prereg_gate as g; h=g.current_state()['lock_sha256']; print('hash', h); assert h == os.environ['WANT'], 'hash differs from input'"
+      - name: Create disposable distinct credentials
+        run: |
+          for name in LAB_CONTROL_TOKEN LAB_ORACLE_TOKEN LAB_INTERNAL_TOKEN; do
+            value="$(python -c 'import secrets;print(secrets.token_urlsafe(32))')"
+            echo "::add-mask::$value"
+            echo "$name=$value" >> "$GITHUB_ENV"
+          done
+      - name: Start Kafka and separate enforcement JVMs
+        run: docker compose up --build -d
+      - name: Controls on this code before the first scored trial
+        run: |
+          mkdir -p reports
+          python controls.py --execute-lab --output reports/controls.json
+          python - <<'PY'
+          import json
+          r = json.load(open("reports/controls.json"))
+          assert r["summary"]["none"]["verdict"] == "VALID", "negative control failed: campaign invalid"
+          assert r["plan_classes_confirmed"], "a registered control cell was not confirmed: do not run"
+          print("controls confirmed")
+          PY
+      - name: Run every planned trial (rerun rule and stopping rule in campaign.py)
+        run: |
+          python plan.py --version v3.1 --output plans/v31
+          for batch in $(seq 1 120); do
+            python campaign.py --execute-lab --scored --plan plans/v31 --records results/scored --resume --max-trials 12 > batch.json
+            status=0
+            python - <<'PY' || status=$?
+          import json, sys
+          b = json.load(open("batch.json"))
+          print(b["total_completed"], "complete,", b["excluded_total"], "excluded,", b["reruns_total"], "reruns")
+          done = b["total_completed"] + b["excluded_total"] >= 1200 or b["newly_executed_trials"] + len(b["newly_excluded"]) == 0
+          sys.exit(3 if done else 0)
+          PY
+            if [ "$status" = 3 ]; then break; fi
+            if [ "$status" != 0 ]; then exit "$status"; fi
+          done
+      - name: Audit and locked analysis
+        if: always()
+        run: |
+          python campaign.py --audit --plan plans/v31 --records results/scored > reports/scored-audit.json || true
+          cp results/scored/reruns.jsonl reports/ 2>/dev/null || true
+          cp results/scored/excluded.jsonl reports/ 2>/dev/null || true
+          python verifier_scoring.py --records results/scored --output reports/scored-verifier-scoring.json || true
+          python outcome_report.py --plan plans/v31 --records results/scored --output reports/scored-outcomes.json || true
+          python prereg_gate.py status > reports/scored-lock-state.json
+      - name: Keep the full records as an artifact (not committed)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mechanism-scored-records
+          path: |
+            experiment-b/mechanism-lab/results/scored/
+            experiment-b/mechanism-lab/reports/
+          retention-days: 90
+          if-no-files-found: warn
+      - name: Commit the aggregate reports to a results branch
+        if: always()
+        run: |
+          dest=docs/evidence/mechanism-scored-campaign/run-${{ github.run_id }}
+          cd "$GITHUB_WORKSPACE"
+          mkdir -p "$dest"
+          cp experiment-b/mechanism-lab/reports/*.json experiment-b/mechanism-lab/reports/*.jsonl "$dest"/ 2>/dev/null || true
+          git config user.name katlaang
+          git config user.email katlaang@users.noreply.github.com
+          git checkout -b results/mechanism-scored-${{ github.run_id }}
+          git add "$dest"
+          git commit -m "mechanism-lab: scored campaign reports (run ${{ github.run_id }})"
+          git push origin HEAD
+      - name: Shutdown and diagnostics
+        if: always()
+        run: |
+          docker compose ps
+          docker compose logs --tail=60
+          docker compose down --remove-orphans --volumes
