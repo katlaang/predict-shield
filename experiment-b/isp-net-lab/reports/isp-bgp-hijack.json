@@ -1,0 +1,396 @@
+{
+ "audit_log": [
+  {
+   "action_id": "bgp_inbound_prefix_filter",
+   "case_id": "isp-cust-hijack",
+   "change_digest": "1437925fffd9ecd4b0916f7860aac0bd02b93087d977eed9308f95baa3a30827",
+   "change_id": "overbroad:filter",
+   "environment": "lab",
+   "previous_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+   "reason": "this change needs a signed approval",
+   "record_sha256": "51a7b957460c86d0dd0876a7a08034ab7907cb0683f6c8152d65f639225f5616",
+   "recorded_at": "2026-11-24T04:38:11.571266+00:00",
+   "sequence": 0,
+   "status": "REFUSED",
+   "target_id": "pe2-cust-inbound"
+  },
+  {
+   "action_id": "bgp_inbound_prefix_filter",
+   "approval_used": [
+    "1437925fffd9ecd4b0916f7860aac0bd02b93087d977eed9308f95baa3a30827",
+    "noc-approver"
+   ],
+   "authority": "SIGNED_APPROVAL",
+   "case_id": "isp-cust-hijack",
+   "change_digest": "1437925fffd9ecd4b0916f7860aac0bd02b93087d977eed9308f95baa3a30827",
+   "change_id": "overbroad:filter",
+   "environment": "lab",
+   "previous_sha256": "51a7b957460c86d0dd0876a7a08034ab7907cb0683f6c8152d65f639225f5616",
+   "record_sha256": "178389f57ef433f01a1e8d54e34cf8aee467f40e97b9b2dab5117127524550d1",
+   "recorded_at": "2026-11-24T04:38:11.635839+00:00",
+   "sequence": 1,
+   "status": "APPROVAL_CONSUMED",
+   "target_id": "pe2-cust-inbound"
+  },
+  {
+   "action_id": "bgp_inbound_prefix_filter",
+   "authority": "SIGNED_APPROVAL",
+   "case_id": "isp-cust-hijack",
+   "change_digest": "1437925fffd9ecd4b0916f7860aac0bd02b93087d977eed9308f95baa3a30827",
+   "change_id": "overbroad:filter",
+   "diff": "--- current\n+++ proposed\n@@ -0,0 +1 @@\n+ip prefix-list CUST-IN seq 5 deny 0.0.0.0/0 le 32\n",
+   "environment": "lab",
+   "previous_sha256": "178389f57ef433f01a1e8d54e34cf8aee467f40e97b9b2dab5117127524550d1",
+   "record_sha256": "ee4aa3d46127268213ac45667591f0c02bb15a28a114434b2d43bc8319a966c0",
+   "recorded_at": "2026-11-24T04:38:11.790122+00:00",
+   "sequence": 2,
+   "snapshot_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "status": "APPLIED_PENDING_VERIFICATION",
+   "target_id": "pe2-cust-inbound"
+  },
+  {
+   "action_id": "bgp_inbound_prefix_filter",
+   "authority": "SIGNED_APPROVAL",
+   "case_id": "isp-cust-hijack",
+   "change_digest": "1437925fffd9ecd4b0916f7860aac0bd02b93087d977eed9308f95baa3a30827",
+   "change_id": "overbroad:filter",
+   "environment": "lab",
+   "previous_sha256": "ee4aa3d46127268213ac45667591f0c02bb15a28a114434b2d43bc8319a966c0",
+   "record_sha256": "18fe5a3e67e77db75fabb1e520a85f15db1f7bc1255aa908d9ca2f8fc12f5bcd",
+   "recorded_at": "2026-11-24T04:38:44.588807+00:00",
+   "restored_to_snapshot": true,
+   "sequence": 3,
+   "snapshot_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "status": "ROLLED_BACK",
+   "target_id": "pe2-cust-inbound",
+   "verification": "NOT VERIFIED",
+   "verification_detail": {
+    "content_answer": "content",
+    "content_routes": {
+     "core1": {
+      "origin_as": 65000,
+      "prefix": "203.0.113.0/24",
+      "protocol": "bgp"
+     },
+     "pe1": {
+      "origin_as": 65000,
+      "prefix": "203.0.113.0/24",
+      "protocol": "bgp"
+     },
+     "pe2": {
+      "origin_as": 65000,
+      "prefix": "203.0.113.0/24",
+      "protocol": "bgp"
+     }
+    },
+    "customer_answer": "unreachable",
+    "reads": 6,
+    "stable": true
+   },
+   "verification_reason": "the customer's own network is not reachable"
+  },
+  {
+   "action_id": "bgp_inbound_prefix_filter",
+   "case_id": "isp-cust-hijack",
+   "change_digest": "3836596f979d34b9e6291c9573510012efecfdd574271d8d25fc26028a82264b",
+   "change_id": "filter:filter",
+   "environment": "lab",
+   "previous_sha256": "18fe5a3e67e77db75fabb1e520a85f15db1f7bc1255aa908d9ca2f8fc12f5bcd",
+   "reason": "this change needs a signed approval",
+   "record_sha256": "3875d836d97303c18652b653746ab0f129fb6ea4d13dfbc1b4ded4705e745caa",
+   "recorded_at": "2026-11-24T04:38:59.154893+00:00",
+   "sequence": 4,
+   "status": "REFUSED",
+   "target_id": "pe2-cust-inbound"
+  },
+  {
+   "action_id": "bgp_inbound_prefix_filter",
+   "approval_used": [
+    "3836596f979d34b9e6291c9573510012efecfdd574271d8d25fc26028a82264b",
+    "noc-approver"
+   ],
+   "authority": "SIGNED_APPROVAL",
+   "case_id": "isp-cust-hijack",
+   "change_digest": "3836596f979d34b9e6291c9573510012efecfdd574271d8d25fc26028a82264b",
+   "change_id": "filter:filter",
+   "environment": "lab",
+   "previous_sha256": "3875d836d97303c18652b653746ab0f129fb6ea4d13dfbc1b4ded4705e745caa",
+   "record_sha256": "3c5db3d27a0e609a397b86fef4e66529ece7cddd9674da2eb38721b7cbff57d1",
+   "recorded_at": "2026-11-24T04:38:59.203981+00:00",
+   "sequence": 5,
+   "status": "APPROVAL_CONSUMED",
+   "target_id": "pe2-cust-inbound"
+  },
+  {
+   "action_id": "bgp_inbound_prefix_filter",
+   "authority": "SIGNED_APPROVAL",
+   "case_id": "isp-cust-hijack",
+   "change_digest": "3836596f979d34b9e6291c9573510012efecfdd574271d8d25fc26028a82264b",
+   "change_id": "filter:filter",
+   "diff": "--- current\n+++ proposed\n@@ -0,0 +1 @@\n+ip prefix-list CUST-IN seq 10 permit 198.51.100.0/24 le 24\n",
+   "environment": "lab",
+   "previous_sha256": "3c5db3d27a0e609a397b86fef4e66529ece7cddd9674da2eb38721b7cbff57d1",
+   "record_sha256": "40242b498ad5cbe7cf7cfbe464a5af270c2f1755931f6cd4dd0093e323c6e8a5",
+   "recorded_at": "2026-11-24T04:38:59.359217+00:00",
+   "sequence": 6,
+   "snapshot_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "status": "APPLIED_PENDING_VERIFICATION",
+   "target_id": "pe2-cust-inbound"
+  },
+  {
+   "action_id": "bgp_inbound_prefix_filter",
+   "authority": "SIGNED_APPROVAL",
+   "case_id": "isp-cust-hijack",
+   "change_digest": "3836596f979d34b9e6291c9573510012efecfdd574271d8d25fc26028a82264b",
+   "change_id": "filter:filter",
+   "environment": "lab",
+   "previous_sha256": "40242b498ad5cbe7cf7cfbe464a5af270c2f1755931f6cd4dd0093e323c6e8a5",
+   "record_sha256": "14e9abdc81a5a7d2ef09020861bc03afa484dbed9ce6f04a2babf513d3f93f45",
+   "recorded_at": "2026-11-24T04:39:13.883801+00:00",
+   "sequence": 7,
+   "snapshot_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+   "status": "APPLIED_VERIFIED",
+   "target_id": "pe2-cust-inbound",
+   "verification": "VERIFIED",
+   "verification_detail": {
+    "content_answer": "content",
+    "content_routes": {
+     "core1": {
+      "origin_as": 65000,
+      "prefix": "203.0.113.0/24",
+      "protocol": "bgp"
+     },
+     "pe1": {
+      "origin_as": 65000,
+      "prefix": "203.0.113.0/24",
+      "protocol": "bgp"
+     },
+     "pe2": {
+      "origin_as": 65000,
+      "prefix": "203.0.113.0/24",
+      "protocol": "bgp"
+     }
+    },
+    "customer_answer": "customer",
+    "reads": 6,
+    "stable": true
+   },
+   "verification_reason": "verified"
+  }
+ ],
+ "audit_log_chain_intact": true,
+ "converged_after_seconds": 0.1,
+ "registry": {
+  "65200": [
+   "198.51.100.0/24"
+  ]
+ },
+ "schema": "predict-shield/isp-bgp-hijack/1",
+ "steps": {
+  "baseline": {
+   "content_answer": "content",
+   "content_routes": {
+    "core1": {
+     "origin_as": 65000,
+     "prefix": "203.0.113.0/24",
+     "protocol": "bgp"
+    },
+    "pe1": {
+     "origin_as": 65000,
+     "prefix": "203.0.113.0/24",
+     "protocol": "bgp"
+    },
+    "pe2": {
+     "origin_as": 65000,
+     "prefix": "203.0.113.0/24",
+     "protocol": "bgp"
+    }
+   },
+   "customer_answer": "customer",
+   "reads": 6,
+   "stable": true
+  },
+  "detect": {
+   "received_from_customer": {
+    "100.64.0.0/24": [
+     65200,
+     65100
+    ],
+    "198.51.100.0/24": [
+     65200
+    ],
+    "203.0.113.0/24": [
+     65200,
+     65100,
+     65000
+    ],
+    "203.0.113.0/25": [
+     65200
+    ],
+    "203.0.113.128/25": [
+     65200
+    ]
+   },
+   "unauthorized": [
+    "203.0.113.0/25",
+    "203.0.113.128/25"
+   ]
+  },
+  "filter": {
+   "filter": [
+    "ip prefix-list CUST-IN seq 10 permit 198.51.100.0/24 le 24"
+   ],
+   "filter_on_router_after": [
+    "ip prefix-list CUST-IN seq 10 permit 198.51.100.0/24 le 24"
+   ],
+   "final_status": "APPLIED_VERIFIED",
+   "observed_after": {
+    "content_answer": "content",
+    "content_routes": {
+     "core1": {
+      "origin_as": 65000,
+      "prefix": "203.0.113.0/24",
+      "protocol": "bgp"
+     },
+     "pe1": {
+      "origin_as": 65000,
+      "prefix": "203.0.113.0/24",
+      "protocol": "bgp"
+     },
+     "pe2": {
+      "origin_as": 65000,
+      "prefix": "203.0.113.0/24",
+      "protocol": "bgp"
+     }
+    },
+    "customer_answer": "customer",
+    "reads": 6,
+    "stable": true
+   },
+   "verification_reason": "verified",
+   "without_approval": "REFUSED"
+  },
+  "hijack": {
+   "content_answer": "attacker",
+   "content_routes": {
+    "core1": {
+     "origin_as": 65200,
+     "prefix": "203.0.113.0/25",
+     "protocol": "bgp"
+    },
+    "pe1": {
+     "origin_as": 65200,
+     "prefix": "203.0.113.0/25",
+     "protocol": "bgp"
+    },
+    "pe2": {
+     "origin_as": 65200,
+     "prefix": "203.0.113.0/25",
+     "protocol": "bgp"
+    }
+   },
+   "customer_answer": "customer",
+   "hijack_effective": true,
+   "reads": 6,
+   "stable": true
+  },
+  "overbroad": {
+   "filter": [
+    "ip prefix-list CUST-IN seq 5 deny 0.0.0.0/0 le 32"
+   ],
+   "filter_on_router_after": [],
+   "final_status": "ROLLED_BACK",
+   "observed_after": {
+    "content_answer": "attacker",
+    "content_routes": {
+     "core1": {
+      "origin_as": 65200,
+      "prefix": "203.0.113.0/25",
+      "protocol": "bgp"
+     },
+     "pe1": {
+      "origin_as": 65200,
+      "prefix": "203.0.113.0/25",
+      "protocol": "bgp"
+     },
+     "pe2": {
+      "origin_as": 65200,
+      "prefix": "203.0.113.0/25",
+      "protocol": "bgp"
+     }
+    },
+    "customer_answer": "customer",
+    "reads": 6,
+    "stable": true
+   },
+   "verification_reason": "the customer's own network is not reachable",
+   "without_approval": "REFUSED"
+  },
+  "withdraw_check": {
+   "observed": {
+    "content_answer": "content",
+    "content_routes": {
+     "core1": {
+      "origin_as": 65000,
+      "prefix": "203.0.113.0/24",
+      "protocol": "bgp"
+     },
+     "pe1": {
+      "origin_as": 65000,
+      "prefix": "203.0.113.0/24",
+      "protocol": "bgp"
+     },
+     "pe2": {
+      "origin_as": 65000,
+      "prefix": "203.0.113.0/24",
+      "protocol": "bgp"
+     }
+    },
+    "customer_answer": "customer",
+    "reads": 6,
+    "stable": true
+   },
+   "still_announced_by_customer": {
+    "100.64.0.0/24": [
+     65200,
+     65100
+    ],
+    "198.51.100.0/24": [
+     65200
+    ],
+    "203.0.113.0/24": [
+     65200,
+     65100,
+     65000
+    ],
+    "203.0.113.0/25": [
+     65200
+    ],
+    "203.0.113.128/25": [
+     65200
+    ]
+   }
+  }
+ },
+ "summary": {
+  "after_content_answer": "content",
+  "after_customer_answer": "customer",
+  "baseline_content_answer": "content",
+  "filter": {
+   "final_status": "APPLIED_VERIFIED",
+   "verification_reason": "verified",
+   "without_approval": "REFUSED"
+  },
+  "hijack_content_answer": "attacker",
+  "hijack_effective": true,
+  "overbroad": {
+   "final_status": "ROLLED_BACK",
+   "verification_reason": "the customer's own network is not reachable",
+   "without_approval": "REFUSED"
+  },
+  "unauthorized_detected": [
+   "203.0.113.0/25",
+   "203.0.113.128/25"
+  ]
+ }
+}

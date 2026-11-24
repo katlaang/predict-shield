@@ -7,6 +7,16 @@
 - An exploratory check written after the result (run 45330750423) found supervised AUC 0.95 and 16% detection at 1% false alarms for the tested configuration; this does not establish the best attainable feature separation.
 - Evidence: `docs/evidence/MEASURED_HIKARI_IN_NETWORK_2026_11_24.md`.
 
+## 2026-11-24: ISP network lab with a contained BGP hijack
+
+- `experiment-b/isp-net-lab/`: a routed ISP in containerlab with FRRouting routers (OSPF core, iBGP route reflector, eBGP to a transit provider and a customer) and hosts that name themselves.
+- **Scenario:** a customer hijacks the provider's prefix with two /25s, and the subscriber's traffic reaches the attacker.
+  - Detection compares received routes with the customer's registered prefixes.
+  - An over-broad filter was rolled back when the observer saw the customer cut off.
+  - The registry filter was applied with a signed approval and verified by an observer that reads every ISP router directly.
+- Record: CI run 45327610238. Evidence: `docs/evidence/ISP_BGP_HIJACK_LAB_2026_11_24.md`.
+
+
 ## 2026-11-24 (b): PowerDuck GOOSE detector v2, second measurement
 
 - Added stream-history features, a 0.5% threshold and incident grouping. Development run 45330612517, test run 45330952174. The 16 captures had already been read by version 1's test.
