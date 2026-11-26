@@ -1,0 +1,98 @@
+name: Public real-web-traffic applicability and alert burden
+
+on:
+  pull_request:
+    paths:
+      - 'experiment-b/real-traffic/**'
+      - 'experiment-b/open-datasets/registry.json'
+      - '.github/workflows/real-web-traffic.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  unit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install 'numpy==2.3.4' 'scikit-learn==1.7.2'
+      - name: Test parser, frozen-component coverage and unknown-label safeguards
+        run: |
+          cd experiment-b/real-traffic
+          python -m unittest test_request_only_burden -v
+          cd ../open-datasets
+          python registry.py validate
+          python -m unittest test_registry -v
+      - name: Verify committed DVWA v3 freeze and exact feature implementation
+        run: |
+          python - <<'PY'
+          import sys
+          from pathlib import Path
+          sys.path.insert(0, 'experiment-b/real-traffic')
+          import request_only_burden as b
+          freeze, state = b.verify_frozen(Path('experiment-b/dvwa-correlation-v3/frozen'))
+          assert freeze['freeze_sha256'] == '7ae09d7d4d4a39d762f1edf3ca214aa89c6ebe2f23e851c865e02a2ae4eda97a'
+          assert state['thresholds']['request_novelty'] == 0.0
+          print('Verified frozen request-only component:',freeze['freeze_sha256'])
+          PY
+
+  study:
+    needs: unit
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - source: indonesia-public-sector-web-2025
+            filename: organization-x.zip
+            mb: 25
+          - source: poland-ecommerce-dec2025
+            filename: domain.access.log-20251208.anonymized.txt
+            mb: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install 'numpy==2.3.4' 'scikit-learn==1.7.2'
+      - name: Fetch original publisher files and verify pinned checksum
+        run: |
+          mkdir -p "$RUNNER_TEMP/real-traffic"
+          python experiment-b/open-datasets/registry.py download \
+            --dataset '${{ matrix.source }}' \
+            --file '${{ matrix.filename }}' \
+            --output "$RUNNER_TEMP/real-traffic/source.bin" \
+            --max-mb '${{ matrix.mb }}'
+      - name: Score frozen request component, preserve UNKNOWN labels and no raw logs
+        run: |
+          python experiment-b/real-traffic/request_only_burden.py \
+            --dataset '${{ matrix.source }}' \
+            --file '${{ matrix.filename }}' \
+            --archive "$RUNNER_TEMP/real-traffic/source.bin" \
+            --output "$RUNNER_TEMP/real-traffic/burden.json"
+      - name: Assert truthful scientific limitations
+        run: |
+          python - "$RUNNER_TEMP/real-traffic/burden.json" <<'PY'
+          import json,sys
+          r=json.load(open(sys.argv[1]))
+          assert r["full_dvwa_v3_fused_detector_executed"] is False
+          assert r["false_positive_rate"] is None and r["attack_recall"] is None
+          assert r["labels_available"] is False
+          assert r["source"]["publisher_checksum_verified"] is True
+          assert r["frozen_model"]=="7ae09d7d4d4a39d762f1edf3ca214aa89c6ebe2f23e851c865e02a2ae4eda97a"
+          assert r["counts"]["parsed_http_requests"] > 0
+          print("Verified unlabeled request-only study:",r["source"]["id"],r["counts"]["parsed_http_requests"])
+          PY
+      - name: Save aggregate-only evidence (never upload raw source logs)
+        uses: actions/upload-artifact@v4
+        with:
+          name: aggregate-real-traffic-${{ matrix.source }}
+          path: ${{ runner.temp }}/real-traffic/burden.json
+          if-no-files-found: error
+          retention-days: 30
