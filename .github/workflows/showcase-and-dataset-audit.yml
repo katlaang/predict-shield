@@ -42,6 +42,20 @@ jobs:
           assert a["latest"]["powerduck_v3"]["passed"] is False
           assert a["latest"]["dvwa_v1"]["passed"] is False
           PY
+      - name: Test actual small licensed SOC archive and publisher checksum
+        run: |
+          python experiment-b/open-datasets/registry.py download \
+            --dataset soc-mld-v2 --file SOC-MLD-v1.zip \
+            --output "$RUNNER_TEMP/soc-mld.zip" --max-mb 25
+          python - "$RUNNER_TEMP/soc-mld.zip" <<'PY'
+          import sys, zipfile
+          path = sys.argv[1]
+          assert zipfile.is_zipfile(path), "Publisher archive is not ZIP"
+          with zipfile.ZipFile(path) as z:
+              files = [x for x in z.infolist() if not x.is_dir()]
+              assert files, "Publisher archive has no files"
+              print("Verified publisher checksum and ZIP members:", len(files))
+          PY
       - name: Validate pilot contact and no unsupported product language
         run: |
           python - <<'PY'
