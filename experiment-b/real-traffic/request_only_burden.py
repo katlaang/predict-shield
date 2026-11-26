@@ -14,6 +14,7 @@ import collections
 import datetime as dt
 import hashlib
 import json
+import random
 import re
 import sys
 import urllib.parse
@@ -117,6 +118,10 @@ def score(path: Path, source: dict, pinned: dict, frozen_dir: Path,
     stats = collections.Counter()
     by_day: dict[str, collections.Counter] = {}
     analyzed = 0
+    sample_rng = random.Random(20261126)
+    review_sample = {"alerted": [], "not_alerted": []}
+    # Balance the authorized human review frame, but never publish client IDs,
+    # request contents, URIs, or any model-derived verdict as ground truth.
     first = last = None
     for raw in iter_source(path):
         stats["log_lines"] += 1
@@ -149,6 +154,15 @@ def score(path: Path, source: dict, pinned: dict, frozen_dir: Path,
                           path=record["path"], params=record["params"])
         raw_score = v3.request_novelty(ex, profiles)
         alerted = raw_score > threshold
+        sample_key = "alerted" if alerted else "not_alerted"
+        group = review_sample[sample_key]
+        seen = stats["request_component_alerts"] + 1 if alerted else stats["parsed_http_requests"] - stats["request_component_alerts"]
+        if len(group) < 100:
+            group.append(stats["parsed_http_requests"])
+        else:
+            position = sample_rng.randrange(seen)
+            if position < len(group):
+                group[position] = stats["parsed_http_requests"]
         if alerted:
             stats["request_component_alerts"] += 1
             day["request_component_alerts"] += 1
@@ -194,6 +208,12 @@ def score(path: Path, source: dict, pinned: dict, frozen_dir: Path,
         "mean_request_component_alerts_per_observed_day": stats["request_component_alerts"] / observed,
         "calendar_span_days": round((last - first) / 86400, 4) if last is not None else None,
         "by_observed_day": days,
+        "manual_review": {"completed": False, "benign_confirmed": 0, "malicious_confirmed": 0,
+                          "indeterminate_reviewed": 0,
+                          "sample_alerted_size": len(review_sample["alerted"]),
+                          "sample_not_alerted_size": len(review_sample["not_alerted"]),
+                          "sampling": "deterministic reservoir; private offline manifest only"},
+        "_offline_review_sample_indices": review_sample,
         "warnings": [
             "NOT a false-positive rate: ground truth is unknown and real traffic includes attacks",
             "NOT a test of the full frozen DVWA v3 model: no response bodies or per-request host/network/file trace",
@@ -215,6 +235,8 @@ def main():
     p.add_argument("--frozen-dir", type=Path,
                    default=PROJECT / "experiment-b" / "dvwa-correlation-v3" / "frozen")
     p.add_argument("--output", type=Path, required=True)
+    p.add_argument("--private-review-manifest", type=Path,
+                   help="Optional locally retained blinded request ordinals for authorized human review")
     args = p.parse_args()
     reg = registry_module.get_registry(args.registry)
     source, pinned = registry_module.lookup(reg, args.dataset, args.file)
@@ -222,7 +244,24 @@ def main():
     if args.output.exists():
         raise ValueError("refusing to overwrite earlier measured evidence")
     args.output.parent.mkdir(parents=True, exist_ok=True)
+    # The index mapping is intentionally kept out of uploaded/public metrics.
+    private_sample = result.pop("_offline_review_sample_indices")
     args.output.write_text(json.dumps(result, indent=2, sort_keys=True) + "\n")
+    if args.private_review_manifest is not None:
+        if args.private_review_manifest.exists():
+            raise ValueError("refusing to overwrite private review sample")
+        # Deliberately no alert classes in reviewer's blinded manifest.
+        entries = [{"case_id": f"r{i+1:04d}", "parsed_request_ordinal": ordinal,
+                    "reviewer_assessment": "UNREVIEWED"}
+                   for i, ordinal in enumerate(
+                       private_sample["alerted"] + private_sample["not_alerted"])]
+        random.Random(20261126).shuffle(entries)
+        args.private_review_manifest.write_text(json.dumps({
+            "source_sha256": result["source"]["archive_sha256"],
+            "cases": entries,
+            "note": "PRIVATE. Review source file locally; do not publish URI/IPs or case-level logs.",
+            "false_positive_rate": None
+        }, indent=2) + "\n")
     # Print only counts and hashes, never request URLs or pseudonymous clients.
     print(json.dumps({k:v for k,v in result.items() if k!="by_observed_day"}, sort_keys=True))
 
