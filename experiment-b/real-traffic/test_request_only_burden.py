@@ -48,7 +48,11 @@ class RealTrafficTests(unittest.TestCase):
             self.assertIsNone(result["false_positive_rate"])
             self.assertIsNone(result["attack_recall"])
             self.assertFalse(result["full_dvwa_v3_fused_detector_executed"])
-            self.assertTrue(result["genuinely_usable_request_only_outside_training_site"])
+            self.assertFalse(result["cross_site_request_only_performance_validated"])
+            self.assertEqual(result["path_vocabulary_overlap_fraction"], 1/3)
+            self.assertEqual(result["manual_review"]["sample_alerted_size"], 3)
+            self.assertEqual(result["manual_review"]["sample_not_alerted_size"], 0)
+            self.assertFalse(result["manual_review"]["completed"])
 
     def test_empty_and_bad_records_refused(self):
         with tempfile.TemporaryDirectory() as root:
