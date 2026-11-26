@@ -203,7 +203,7 @@
       "zenodo_record": 20001206,
       "license": "MIT",
       "license_evidence": "https://zenodo.org/records/20001206",
-      "collection_environment": "indonesia-public-sector-organizations-x-and-y-2025-distinct-sites",
+      "collection_environment": "indonesia-public-sector-web-2025-multiple-independent-sites",
       "kind": "raw-web-server-access-error-auth-syslog",
       "evaluation_role": "real_traffic_alert_burden_unlabeled_no_recall",
       "ground_truth": "publisher supplies pattern-matching rules; non-matching events are UNKNOWN, never confirmed benign",
@@ -213,13 +213,15 @@
           "name": "organization-x.zip",
           "md5": "b4bf79effa6f3ee1b9e53f278d916620",
           "approx_mb": 2.1,
-          "ci_default": true
+          "ci_default": true,
+          "collection_environment": "indonesia-public-sector-organization-x-2025"
         },
         {
           "name": "organization-y.zip",
           "md5": "b1925ff7f043c391d501cfd404e0df10",
           "approx_mb": 390.8,
-          "ci_default": false
+          "ci_default": false,
+          "collection_environment": "indonesia-public-sector-organization-y-2025"
         }
       ],
       "status": "publisher_verified_pending_archive_inspection",
