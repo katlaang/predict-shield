@@ -1,0 +1,35 @@
+name: SOC-MLD schema inspection
+
+# Downloads the pinned SOC-MLD archive (publisher checksum verified by the
+# registry) and prints its structure. No detection is run.
+
+on:
+  push:
+    branches: [feat/soc-mld-external]
+    paths: ['experiment-b/soc-mld-external/**', '.github/workflows/soc-mld-inspect.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  inspect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Download with checksum check
+        run: |
+          python experiment-b/open-datasets/registry.py download \
+            --dataset soc-mld-v2 --file SOC-MLD-v1.zip \
+            --output "$RUNNER_TEMP/soc-mld.zip" --max-mb 25
+          sha256sum "$RUNNER_TEMP/soc-mld.zip"
+      - name: Describe the archive
+        run: python experiment-b/soc-mld-external/inspect_schema.py "$RUNNER_TEMP/soc-mld.zip" | tee "$RUNNER_TEMP/schema.json"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: soc-mld-schema
+          path: ${{ runner.temp }}/schema.json
