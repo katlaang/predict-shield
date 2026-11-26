@@ -27,3 +27,5 @@ cd showcase/public && python3 -m http.server 8000
 ## Scientific integrity
 
 The evidence table includes the documented unsuccessful DVWA v1 test and PowerDuck v3 results, including the independent 242-incident retrospective correction. The corrected count is derived from previously examined captures and is **not new external validation**. Run `python showcase/scripts/build_evidence.py` after new committed experimental evidence and review the generated `public/data/evidence.json` before deploying.
+
+The November 26, 2026 evidence table also includes the first-scored DVWA v2 follow-up (35/92 successful attacks, 3/500 benign alerts), which **failed** its registered 90% attack detection condition; see `docs/evidence/MEASURED_DVWA_CORRELATION_V2_2026_11_26.md`. It is not a controlled paired superiority result relative to v1.
