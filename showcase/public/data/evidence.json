@@ -429,6 +429,42 @@
    "scenarios_detected": 15,
    "scenarios_total": 16,
    "source": "https://github.com/katlaang/predict-shield/blob/master/docs/evidence/MEASURED_POWERDUCK_GOOSE_DETECTOR_V3_2026_11_24.md"
+  },
+  "superviz25_sql": {
+   "attacks": {
+    "alerts": 308190,
+    "of": 336281,
+    "rate": 0.9164656938691154,
+    "wilson_95": [
+     0.9155257663927687,
+     0.9173961065791614
+    ]
+   },
+   "benign": {
+    "alerts": 15881,
+    "of": 3017390,
+    "rate": 0.005263157894736842,
+    "wilson_95": [
+     0.005182144114004917,
+     0.005345431379263411
+    ]
+   },
+   "dataset": "Superviz25-SQL (T\u00e9l\u00e9com Paris, LAAS-CNRS, Inria; MIT license)",
+   "exploit_stage": {
+    "alerts": 161178,
+    "of": 161178,
+    "rate": 1.0
+   },
+   "lowest_technique": {
+    "alerts": 18668,
+    "name": "time",
+    "of": 24713,
+    "rate": 0.7553918990005261
+   },
+   "passed": true,
+   "run": "https://github.com/katlaang/predict-shield/actions/runs/45895391129",
+   "source": "https://github.com/katlaang/predict-shield/blob/master/docs/evidence/MEASURED_SUPERVIZ25_SQL_EXTERNAL_2026_11_26.md",
+   "synthetic_benign_traffic": true
   }
  },
  "misses": [

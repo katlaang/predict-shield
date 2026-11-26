@@ -34,6 +34,10 @@ def main() -> None:
     dvwa = load("experiment-b/dvwa-correlation/frozen/test-report.json")
     dvwa_v2 = load("experiment-b/dvwa-correlation-v2/reports/first-scored-run-45881347517.json")
     dvwa_v3 = load("experiment-b/dvwa-correlation-v3/frozen/test-report.json")
+    sql = load("experiment-b/superviz25-sql/frozen/test-report.json")
+    sqlf = sql["results"]["fused"]
+    if not sql["passed"] or sqlf["attacks"]["alerts"] != 308190 or sqlf["benign"]["alerts"] != 15881:
+        raise ValueError("unexpected Superviz25-SQL test report")
     v3f = dvwa_v3["results"]["fused"]
     if not dvwa_v3["passed"] or v3f["successful_attacks"]["alerts"] != 117 or v3f["benign"]["alerts"] != 5:
         raise ValueError("unexpected DVWA v3 test report")
@@ -75,6 +79,17 @@ def main() -> None:
             "top": {k: exploit[k] for k in ("top_1pct", "top_5pct", "top_10pct")},
         },
         "latest": {
+            "superviz25_sql": {
+                "source": REPO + "docs/evidence/MEASURED_SUPERVIZ25_SQL_EXTERNAL_2026_11_26.md",
+                "run": "https://github.com/katlaang/predict-shield/actions/runs/45895391129",
+                "dataset": "Superviz25-SQL (Télécom Paris, LAAS-CNRS, Inria; MIT license)",
+                "passed": sql["passed"],
+                "benign": sqlf["benign"],
+                "attacks": sqlf["attacks"],
+                "exploit_stage": sqlf["by_stage"]["exploit"],
+                "lowest_technique": min(({"name": k, **v} for k, v in sqlf["by_technique"].items()), key=lambda x: x["rate"]),
+                "synthetic_benign_traffic": True,
+            },
             "dvwa_v3": {
                 "source": REPO + "docs/evidence/MEASURED_DVWA_CORRELATION_V3_2026_11_26.md",
                 "run": "https://github.com/katlaang/predict-shield/actions/runs/45884393589",
