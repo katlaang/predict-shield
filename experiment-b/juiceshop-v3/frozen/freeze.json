@@ -1,0 +1,29 @@
+{
+ "code_sha256": {
+  "benign.py": "29018fbbf644a517e9d196097d79ae07afecd97598b041520b98ba2325711d2c",
+  "detector.py": "cff106a84e57a9fa05f8ebe9c85a5070ac91a2211e8c27da6cd13009f5e75051",
+  "lab.py": "85e41e385ae39c8435e3110ba824cb72009ac4cfbcf22d2ae527971ace8b458b",
+  "model_js.py": "8efe67486ae88c41d802572706167852c1689548d8c7207fcfe797f70580b0e5",
+  "model_v3.py": "8df890c22184e77ab42a520f0e99c341a9981f67a1dc93b151990b0fdf8d5cdd",
+  "protocol.json": "9d225ed243da765da3cfedff2a10df354827b7a12671da9b761d880dd08db38f",
+  "serial_proxy.py": "2ebe0bd38d0a073a9420ae665ddf955dd3d920e820410dad11059a08a1c7085d"
+ },
+ "freeze_sha256": "14a03b445cb80fb3b4eba50b27af9af487650711c17cd85fee113a9fdfffb2e5",
+ "model_sha256": "2688415d1f8b9459437ba07258a97bd2e61ea672be9f4df51e0b0f7325556ee3",
+ "rows": {
+  "calibration": 1050,
+  "fit": 1200,
+  "threshold": 751
+ },
+ "schema": "predict-shield/juiceshop-v3-freeze/1",
+ "sklearn": "1.7.2",
+ "threshold_split_alert_rate": 0.0039946737683089215,
+ "thresholds": {
+  "fused": 25.68677011602223,
+  "fused_without_learned_anomaly": 16.16622452894077,
+  "host_novelty": 0.0,
+  "learned_anomaly": 0.6136296307908081,
+  "request_novelty": 1.0,
+  "response_shift": 50.0
+ }
+}
