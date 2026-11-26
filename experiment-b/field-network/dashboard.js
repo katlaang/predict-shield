@@ -18,6 +18,7 @@
       el("anomalies").textContent = fmt(p.anomalies);
       el("fraction").textContent = p.alert_fraction === null ? "–" : (p.alert_fraction * 100).toFixed(2) + "%";
       el("invalid").textContent = fmt(p.invalid_records);
+      el("overlap").textContent = fmt(p.excluded_overlap_records);
       el("updated").textContent = response.served_at;
       el("site").textContent = p.site;
       el("freeze").textContent = (p.model_sha256 || "").slice(0,20) + "…";
