@@ -1,0 +1,22 @@
+{
+ "code_sha256": {
+  "model_sql.py": "9e8cf0b66c1a34041f816173943c7ba014ceb5e6b8346c0eba861ee3eef864ba",
+  "model_v3.py": "8df890c22184e77ab42a520f0e99c341a9981f67a1dc93b151990b0fdf8d5cdd",
+  "protocol.json": "17e6f1bd3d8a34e39737368c95087407c80ede95cdc93c7d3a03e6031384b8a3"
+ },
+ "freeze_sha256": "e3423d8bcba6624e85a9ca08f37608d159e8bb9a7153b855a7f9fe3018f0d8aa",
+ "model_sha256": "23c28b29124c766bcc460771659d86dc2fdfafb0e31a7955c77fa09305b7624d",
+ "rows": {
+  "calibration": 117357,
+  "fit": 134122,
+  "threshold": 83827
+ },
+ "schema": "predict-shield/superviz25-sql-freeze/1",
+ "sklearn": "1.7.2",
+ "threshold_split_alert_rate": 0.004986460209717633,
+ "thresholds": {
+  "fused": 10.89685188362967,
+  "input_novelty": 0.0,
+  "learned_anomaly": 0.447200279007057
+ }
+}
