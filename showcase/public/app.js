@@ -43,6 +43,7 @@ function renderResults(ev) {
   const exp = ev.exploit;
   const pd = ev.latest.powerduck_v3;
   const dvwa = ev.latest.dvwa_v1;
+  const dvwa2 = ev.latest.dvwa_v2;
   const v3 = ev.misses.find((m) => m.name.endsWith("v3"));
   const rows = [
     ["Verifying a fix", `${c.trials.toLocaleString("en-US")} sealed trials on a lab of independent services enforcing access revocation`,
@@ -62,6 +63,9 @@ function renderResults(ev) {
     ["Request, process and network attack correlation", "Live DVWA lab: 1,000 benign requests and 117 successful attacks",
       `Correlated model detected ${dvwa.successful_attacks.alerts} of ${dvwa.successful_attacks.of} successful attacks (${pct(dvwa.successful_attacks.rate, 1)}) against a 90% target; ${dvwa.benign.alerts} of ${dvwa.benign.of} benign requests were alerted (${pct(dvwa.benign.rate, 1)}). Failed detection target.`,
       "short", dvwa.source],
+    ["DVWA v2: learned novelty and response evidence", "Follow-up local DVWA lab, fresh session with previously examined attack families",
+      `Detected ${dvwa2.successful_attacks.alerts} of ${dvwa2.successful_attacks.rows} successful attacks (${pct(dvwa2.successful_attacks.rate, 1)}), versus a 90% requirement; flagged ${dvwa2.benign.alerts} of ${dvwa2.benign.rows} benign requests (${pct(dvwa2.benign.rate, 1)}). Failed the detection condition. Not a matched comparison with v1.`,
+      "short", dvwa2.source],
     ["Detecting attacks on a new network", "Trained on two lab datasets, tested on HIKARI-2021",
       `Detected ${pct(v3.detection_rate, 2)} of attack flows in the cross-environment test. This configuration did not establish cross-network generalization.`, "short", v3.source],
   ];
