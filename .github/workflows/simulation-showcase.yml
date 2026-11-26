@@ -1,0 +1,41 @@
+name: Standalone interactive simulation smoke tests
+
+on:
+  pull_request:
+    paths:
+      - 'showcase/public/simulation.html'
+      - 'showcase/public/index.html'
+      - 'showcase/scripts/test_simulation.mjs'
+      - '.github/workflows/simulation-showcase.yml'
+  push:
+    branches: [master]
+    paths:
+      - 'showcase/public/simulation.html'
+      - 'showcase/public/index.html'
+      - 'showcase/scripts/test_simulation.mjs'
+
+permissions:
+  contents: read
+
+jobs:
+  simulation-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify synthetic simulation has usable controls and no external assets
+        run: node showcase/scripts/test_simulation.mjs
+      - name: Verify linked from showcase homepage
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          html=Path("showcase/public/index.html").read_text()
+          sim=Path("showcase/public/simulation.html").read_text()
+          assert html.count('href="simulation.html"') >= 3
+          assert "independently measured security accuracy" in sim
+          assert "synthetic:true" in sim
+          assert "function exportAudit()" in sim
+          PY
