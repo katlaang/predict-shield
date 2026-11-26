@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PREDICT-SHIELD | Authorized Network Pilot</title>
+<style>
+:root { color-scheme: dark; font-family: system-ui, sans-serif; background: #101827; color:#e9edf5 }
+body{max-width:920px;margin:3rem auto;padding:1rem} h1{font-size:1.8rem;margin-bottom:.5rem}
+h2{font-size:1.1rem}.sub{color:#b7c8da} .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:1rem;margin:1.4rem 0}
+.stat{border:1px solid #33465c;border-radius:10px;padding:1.3rem;background:#172337}
+.label{font-size:.8rem;color:#b7c8da}.value{display:block;font-size:2rem;font-weight:700;margin:.3rem 0}
+.note{border-left:4px solid #dd8b45;padding:1rem;background:#1d2835}
+footer{font-size:.8rem;margin-top:2rem;color:#9daec3} a{color:#a9cbf0}
+</style></head><body>
+<header><h1>PREDICT-SHIELD: Field Network Pilot</h1>
+<p class="sub">Authorized traffic metadata only · Read-only · No scanning · No automated defense</p>
+<p id="status" role="status">Connecting to local sensor…</p></header>
+<section class="grid">
+<div class="stat"><span class="label">Zeek flows processed</span><strong class="value" id="flows">0</strong></div>
+<div class="stat"><span class="label">AI anomaly observations</span><strong class="value" id="anomalies">0</strong></div>
+<div class="stat"><span class="label">Anomaly alert fraction</span><strong class="value" id="fraction">–</strong></div>
+<div class="stat"><span class="label">Incomplete or unscorable records</span><strong class="value" id="invalid">0</strong></div>
+<div class="stat"><span class="label">Excluded baseline/calibration-period records</span><strong class="value" id="overlap">0</strong></div>
+</section>
+<section class="note"><h2>Interpretation</h2>
+<p>This page displays live aggregate observations from a newly calibrated network model. An anomalous flow is not a confirmed cyberattack. The operator has not provided independently reviewed ground-truth labels. No response actions are enabled.</p></section>
+<footer><p>Local loopback dashboard, not the publicly hosted showcase. Last API update: <span id="updated">–</span></p><p>Site: <span id="site">–</span> · Frozen model: <span id="freeze">–</span></p></footer>
+<script src="/live.js" defer></script>
+</body></html>

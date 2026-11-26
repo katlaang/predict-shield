@@ -1,0 +1,43 @@
+name: Authorized real-network pilot engineering tests
+
+on:
+  pull_request:
+    paths:
+      - 'experiment-b/field-network/**'
+      - '.github/workflows/field-network-pilot.yml'
+  push:
+    branches: [master]
+    paths:
+      - 'experiment-b/field-network/**'
+      - '.github/workflows/field-network-pilot.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  field-pilot-unit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned numerical model libraries
+        run: python -m pip install 'numpy==2.3.4' 'scikit-learn==1.7.2'
+      - name: Run synthetic engineering tests, never claim external evidence
+        working-directory: experiment-b/field-network
+        run: python -m unittest test_pilot -v
+      - name: Audit field pilot safety posture
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          s=Path('experiment-b/field-network/pilot.py').read_text()
+          for required in ('--operator-authorized', 'MONITOR_ONLY_NO_AUTO_RESPONSE',
+                           'response_actions_attempted', 'false_positive_rate',
+                           'attack_detection_recall', 'sha(HERE / "pilot.py")'):
+              assert required in s, required
+          for excluded in ('iptables ', 'nmap ', 'ssh ', 'subprocess.run(', 'socket.connect('):
+              assert excluded not in s, excluded
+          print('Verified synthetic-only engineering CI and explicit monitor-only posture.')
+          PY
