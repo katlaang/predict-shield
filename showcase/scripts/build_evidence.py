@@ -35,6 +35,17 @@ def main() -> None:
     dvwa_v2 = load("experiment-b/dvwa-correlation-v2/reports/first-scored-run-45881347517.json")
     dvwa_v3 = load("experiment-b/dvwa-correlation-v3/frozen/test-report.json")
     sql = load("experiment-b/superviz25-sql/frozen/test-report.json")
+    real_indonesia = load("experiment-b/real-traffic/reports/indonesia-public-sector-web-2025-first-scored.json")
+    real_poland = load("experiment-b/real-traffic/reports/poland-ecommerce-dec2025-first-scored.json")
+    if (real_indonesia["counts"]["parsed_http_requests"] != 21617 or
+        real_indonesia["counts"]["request_component_alerts"] != 21617 or
+        real_poland["counts"]["parsed_http_requests"] != 178939 or
+        real_poland["counts"]["request_component_alerts"] != 178920):
+        raise ValueError("real-web-log results disagree with first-scored GitHub CI evidence")
+    if (real_indonesia["false_positive_rate"] is not None or
+        real_poland["false_positive_rate"] is not None or
+        real_indonesia["full_fused_detector_executed"] or real_poland["full_fused_detector_executed"]):
+        raise ValueError("invalid external operational performance claim")
     sqlf = sql["results"]["fused"]
     if not sql["passed"] or sqlf["attacks"]["alerts"] != 308190 or sqlf["benign"]["alerts"] != 15881:
         raise ValueError("unexpected Superviz25-SQL test report")
@@ -79,6 +90,27 @@ def main() -> None:
             "top": {k: exploit[k] for k in ("top_1pct", "top_5pct", "top_10pct")},
         },
         "latest": {
+            "real_web_request_only": {
+                "source": REPO + "docs/evidence/MEASURED_REAL_WEB_REQUEST_BURDEN_2026_11_26.md",
+                "run": real_indonesia["first_scored_run"],
+                "frozen_model": real_indonesia["frozen_model"],
+                "indonesia": {
+                    "requests": real_indonesia["counts"]["parsed_http_requests"],
+                    "alerts": real_indonesia["counts"]["request_component_alerts"],
+                    "unseen_paths": real_indonesia["counts"]["unseen_path_requests"],
+                    "queries": real_indonesia["counts"]["requests_with_query"]
+                },
+                "poland": {
+                    "requests": real_poland["counts"]["parsed_http_requests"],
+                    "alerts": real_poland["counts"]["request_component_alerts"],
+                    "unseen_paths": real_poland["counts"]["unseen_path_requests"],
+                    "queries": 0
+                },
+                "full_detector_ran": False,
+                "false_positive_rate": None,
+                "attack_recall": None,
+                "note": "Real unlabeled web access logs: request-only domain-shift diagnostic, not full DVWA v3 detection or false-positive-rate estimate."
+            },
             "superviz25_sql": {
                 "source": REPO + "docs/evidence/MEASURED_SUPERVIZ25_SQL_EXTERNAL_2026_11_26.md",
                 "run": "https://github.com/katlaang/predict-shield/actions/runs/45895391129",
