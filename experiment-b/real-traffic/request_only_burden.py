@@ -47,16 +47,30 @@ def parsed_record(line: str):
         return None
     try:
         when = dt.datetime.strptime(m["timestamp"], "%d/%b/%Y:%H:%M:%S %z")
-        target = urllib.parse.urlsplit(m["uri"])
-        if not target.path or not target.path.startswith("/"):
+        uri = m["uri"]
+        if uri.startswith("/"):
+            # Origin-form targets are opaque paths. urlsplit('//foo') would
+            # misinterpret 'foo' as an authority and silently alter the path.
+            path, separator, query = uri.partition("?")
+        elif uri.startswith("http://") or uri.startswith("https://"):
+            # Explicitly distinguish absolute-form proxy requests from the
+            # same path on a different origin (avoid false vocab overlap).
+            target = urllib.parse.urlsplit(uri)
+            if not target.netloc:
+                return None
+            path = "/__absolute_target__/" + target.netloc.lower() + target.path
+            query = target.query
+        else:
+            return None
+        if not path or not path.startswith("/"):
             return None
         # Preserve parsed multi-valued query parameters without inventing POST
         # bodies, JSON bodies, response data, system calls or server context.
         params = {k: vals[-1] for k, vals in
-                  urllib.parse.parse_qs(target.query, keep_blank_values=True).items()
+                  urllib.parse.parse_qs(query, keep_blank_values=True).items()
                   if vals}
-        return {"timestamp": when, "method": m["method"], "path": target.path,
-                "params": params, "has_query": bool(target.query),
+        return {"timestamp": when, "method": m["method"], "path": path,
+                "params": params, "has_query": bool(query),
                 "status": int(m["status"])}
     except (ValueError, UnicodeError):
         return None
