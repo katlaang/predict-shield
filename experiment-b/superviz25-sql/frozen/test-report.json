@@ -1,0 +1,397 @@
+{
+ "checks": {
+  "attack_detection_at_least_90pct": true,
+  "benign_alert_rate_at_most_1pct": true,
+  "each_technique_at_least_75pct": true
+ },
+ "freeze_sha256": "e3423d8bcba6624e85a9ca08f37608d159e8bb9a7153b855a7f9fe3018f0d8aa",
+ "pass_condition": "For the fused detector, all three: (1) at most 1% of benign test queries alert; (2) at least 90% of attack queries alert; (3) for each sqlmap technique (boolean, error, inline, stacked, time, union, insider), at least 75% of its attack queries alert. Reported beside it: each component alone, and rates by attack stage, campaign status and tamper script.",
+ "passed": true,
+ "results": {
+  "fused": {
+   "attacks": {
+    "alerts": 308190,
+    "of": 336281,
+    "rate": 0.9164656938691154,
+    "wilson_95": [
+     0.9155257663927687,
+     0.9173961065791614
+    ]
+   },
+   "benign": {
+    "alerts": 15881,
+    "of": 3017390,
+    "rate": 0.005263157894736842,
+    "wilson_95": [
+     0.005182144114004917,
+     0.005345431379263411
+    ]
+   },
+   "by_stage": {
+    "exploit": {
+     "alerts": 161178,
+     "of": 161178,
+     "rate": 1.0
+    },
+    "recon": {
+     "alerts": 147012,
+     "of": 175103,
+     "rate": 0.8395744219116749
+    }
+   },
+   "by_status": {
+    "failure": {
+     "alerts": 65376,
+     "of": 75607,
+     "rate": 0.8646818416284207
+    },
+    "success": {
+     "alerts": 242814,
+     "of": 260674,
+     "rate": 0.9314853034825107
+    }
+   },
+   "by_tamper": {
+    "(none)": {
+     "alerts": 1089,
+     "of": 1089,
+     "rate": 1.0
+    },
+    "commentbeforeparentheses": {
+     "alerts": 18585,
+     "of": 25774,
+     "rate": 0.7210755024443237
+    },
+    "equaltolike": {
+     "alerts": 56526,
+     "of": 59853,
+     "rate": 0.9444138138439176
+    },
+    "lowercase": {
+     "alerts": 49767,
+     "of": 52363,
+     "rate": 0.9504230086129519
+    },
+    "multiplespaces": {
+     "alerts": 29076,
+     "of": 33387,
+     "rate": 0.8708778866025698
+    },
+    "randomcase": {
+     "alerts": 67460,
+     "of": 71630,
+     "rate": 0.9417841686444227
+    },
+    "sleep2getlock": {
+     "alerts": 38094,
+     "of": 38925,
+     "rate": 0.9786512524084778
+    },
+    "space2comment": {
+     "alerts": 27746,
+     "of": 29915,
+     "rate": 0.9274945679425037
+    },
+    "space2mysqlblank": {
+     "alerts": 19847,
+     "of": 23345,
+     "rate": 0.8501606339687299
+    }
+   },
+   "by_technique": {
+    "boolean": {
+     "alerts": 198466,
+     "of": 203845,
+     "rate": 0.9736123034658687
+    },
+    "error": {
+     "alerts": 35350,
+     "of": 40995,
+     "rate": 0.8623002805220149
+    },
+    "inline": {
+     "alerts": 1250,
+     "of": 1389,
+     "rate": 0.8999280057595392
+    },
+    "insider": {
+     "alerts": 1089,
+     "of": 1089,
+     "rate": 1.0
+    },
+    "stacked": {
+     "alerts": 19612,
+     "of": 24659,
+     "rate": 0.7953282777079362
+    },
+    "time": {
+     "alerts": 18668,
+     "of": 24713,
+     "rate": 0.7553918990005261
+    },
+    "union": {
+     "alerts": 33755,
+     "of": 39591,
+     "rate": 0.8525927609810311
+    }
+   }
+  },
+  "input_novelty": {
+   "attacks": {
+    "alerts": 301634,
+    "of": 336281,
+    "rate": 0.8969700934635022,
+    "wilson_95": [
+     0.8959380883978766,
+     0.897993029168258
+    ]
+   },
+   "benign": {
+    "alerts": 3222,
+    "of": 3017390,
+    "rate": 0.0010678102598603429,
+    "wilson_95": [
+     0.0010315891599940188,
+     0.0011053017457565632
+    ]
+   },
+   "by_stage": {
+    "exploit": {
+     "alerts": 161125,
+     "of": 161178,
+     "rate": 0.9996711710034868
+    },
+    "recon": {
+     "alerts": 140509,
+     "of": 175103,
+     "rate": 0.802436280360702
+    }
+   },
+   "by_status": {
+    "failure": {
+     "alerts": 60391,
+     "of": 75607,
+     "rate": 0.7987487931011679
+    },
+    "success": {
+     "alerts": 241243,
+     "of": 260674,
+     "rate": 0.9254586188112355
+    }
+   },
+   "by_tamper": {
+    "(none)": {
+     "alerts": 1089,
+     "of": 1089,
+     "rate": 1.0
+    },
+    "commentbeforeparentheses": {
+     "alerts": 16362,
+     "of": 25774,
+     "rate": 0.6348257934352448
+    },
+    "equaltolike": {
+     "alerts": 55360,
+     "of": 59853,
+     "rate": 0.9249327519088434
+    },
+    "lowercase": {
+     "alerts": 49558,
+     "of": 52363,
+     "rate": 0.9464316406622997
+    },
+    "multiplespaces": {
+     "alerts": 27559,
+     "of": 33387,
+     "rate": 0.8254410399257196
+    },
+    "randomcase": {
+     "alerts": 66786,
+     "of": 71630,
+     "rate": 0.9323747033365908
+    },
+    "sleep2getlock": {
+     "alerts": 37921,
+     "of": 38925,
+     "rate": 0.9742068079640334
+    },
+    "space2comment": {
+     "alerts": 27163,
+     "of": 29915,
+     "rate": 0.9080060170483035
+    },
+    "space2mysqlblank": {
+     "alerts": 19836,
+     "of": 23345,
+     "rate": 0.8496894409937888
+    }
+   },
+   "by_technique": {
+    "boolean": {
+     "alerts": 197022,
+     "of": 203845,
+     "rate": 0.9665284897839045
+    },
+    "error": {
+     "alerts": 35094,
+     "of": 40995,
+     "rate": 0.8560556165386023
+    },
+    "inline": {
+     "alerts": 1225,
+     "of": 1389,
+     "rate": 0.8819294456443485
+    },
+    "insider": {
+     "alerts": 1089,
+     "of": 1089,
+     "rate": 1.0
+    },
+    "stacked": {
+     "alerts": 19099,
+     "of": 24659,
+     "rate": 0.7745245143760898
+    },
+    "time": {
+     "alerts": 18225,
+     "of": 24713,
+     "rate": 0.737466110953749
+    },
+    "union": {
+     "alerts": 29880,
+     "of": 39591,
+     "rate": 0.7547169811320755
+    }
+   }
+  },
+  "learned_anomaly": {
+   "attacks": {
+    "alerts": 248674,
+    "of": 336281,
+    "rate": 0.7394827540063221,
+    "wilson_95": [
+     0.7379965528371015,
+     0.7409634838426793
+    ]
+   },
+   "benign": {
+    "alerts": 16088,
+    "of": 3017390,
+    "rate": 0.005331760229867534,
+    "wilson_95": [
+     0.005250218860388321,
+     0.0054145611284654544
+    ]
+   },
+   "by_stage": {
+    "exploit": {
+     "alerts": 159152,
+     "of": 161178,
+     "rate": 0.9874300462842324
+    },
+    "recon": {
+     "alerts": 89522,
+     "of": 175103,
+     "rate": 0.5112533765840677
+    }
+   },
+   "by_status": {
+    "failure": {
+     "alerts": 35824,
+     "of": 75607,
+     "rate": 0.4738185617733808
+    },
+    "success": {
+     "alerts": 212850,
+     "of": 260674,
+     "rate": 0.8165371306689582
+    }
+   },
+   "by_tamper": {
+    "(none)": {
+     "alerts": 0,
+     "of": 1089,
+     "rate": 0.0
+    },
+    "commentbeforeparentheses": {
+     "alerts": 13101,
+     "of": 25774,
+     "rate": 0.5083029409482425
+    },
+    "equaltolike": {
+     "alerts": 50150,
+     "of": 59853,
+     "rate": 0.8378861544116418
+    },
+    "lowercase": {
+     "alerts": 42339,
+     "of": 52363,
+     "rate": 0.8085671180031702
+    },
+    "multiplespaces": {
+     "alerts": 22378,
+     "of": 33387,
+     "rate": 0.670260879983227
+    },
+    "randomcase": {
+     "alerts": 59773,
+     "of": 71630,
+     "rate": 0.8344687979896691
+    },
+    "sleep2getlock": {
+     "alerts": 31120,
+     "of": 38925,
+     "rate": 0.7994861913937058
+    },
+    "space2comment": {
+     "alerts": 19552,
+     "of": 29915,
+     "rate": 0.6535851579475179
+    },
+    "space2mysqlblank": {
+     "alerts": 10261,
+     "of": 23345,
+     "rate": 0.43953737417005784
+    }
+   },
+   "by_technique": {
+    "boolean": {
+     "alerts": 173376,
+     "of": 203845,
+     "rate": 0.8505285878976674
+    },
+    "error": {
+     "alerts": 32656,
+     "of": 40995,
+     "rate": 0.7965849493840712
+    },
+    "inline": {
+     "alerts": 960,
+     "of": 1389,
+     "rate": 0.6911447084233261
+    },
+    "insider": {
+     "alerts": 0,
+     "of": 1089,
+     "rate": 0.0
+    },
+    "stacked": {
+     "alerts": 10818,
+     "of": 24659,
+     "rate": 0.43870392148911147
+    },
+    "time": {
+     "alerts": 12248,
+     "of": 24713,
+     "rate": 0.4956095981871889
+    },
+    "union": {
+     "alerts": 18616,
+     "of": 39591,
+     "rate": 0.4702078755272663
+    }
+   }
+  }
+ },
+ "schema": "predict-shield/superviz25-sql-test/1"
+}
