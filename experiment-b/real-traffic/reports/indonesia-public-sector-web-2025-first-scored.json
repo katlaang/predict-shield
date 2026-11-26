@@ -1,0 +1,43 @@
+{
+  "schema": "predict-shield/real-log-observations-from-ci/1",
+  "first_scored_run": "https://github.com/katlaang/predict-shield/actions/runs/45898435311",
+  "first_scored_job_id": 140178199388,
+  "first_scored_pr_head": "39168b68109636bdf2a289fd8b8421f77e553413",
+  "source": {
+    "archive_bytes": 2135289,
+    "archive_sha256": "1429caba2803c3e8c90e9fb287bc04f6f8249f8bb34712b39127044e134d631f",
+    "collection_environment": "indonesia-public-sector-organizations-x-and-y-2025-distinct-sites",
+    "id": "indonesia-public-sector-web-2025",
+    "publisher_checksum_verified": true,
+    "url": "https://zenodo.org/records/20001206"
+  },
+  "frozen_model": "7ae09d7d4d4a39d762f1edf3ca214aa89c6ebe2f23e851c865e02a2ae4eda97a",
+  "component": "request_novelty_only",
+  "frozen_threshold": 0,
+  "full_fused_detector_executed": false,
+  "counts": {
+    "alerts_on_queries": 1930,
+    "alerts_on_unknown_paths": 21617,
+    "log_lines": 31035,
+    "parsed_http_requests": 21617,
+    "request_component_alerts": 21617,
+    "requests_with_query": 1930,
+    "requests_without_body_capture": 1789,
+    "unparseable_lines": 9418,
+    "unseen_path_requests": 21617
+  },
+  "observed_days": 2,
+  "calendar_span_days": 1.1735,
+  "request_component_alert_fraction": 1,
+  "unseen_path_fraction": 1,
+  "query_request_fraction": 0.08928158393856687,
+  "confirmed_benign_requests": 0,
+  "confirmed_malicious_requests": 0,
+  "manually_reviewed_requests": 0,
+  "ground_truth": "UNKNOWN",
+  "false_positive_rate": null,
+  "attack_recall": null,
+  "interpretation": "Domain shift: unseen DVWA URL paths cause request novelty alerts. Not validated full-model operating alert burden, not a false alarm or attack recall estimate.",
+  "review_status": "NOT_PERFORMED",
+  "first_ci_flag_correction": "An initial boolean based on any matching path was too permissive; no cross-site suitability is established."
+}
