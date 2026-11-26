@@ -1,0 +1,38 @@
+name: Superviz25-SQL external test
+
+# stage=inspect  download (publisher md5 checked), print structure from the training split only
+# stage=develop  fit on the training split only, freeze, commit the freeze
+# stage=test     verify the freeze, score the test split once, commit the report
+
+on:
+  push:
+    branches: [feat/superviz25-sql]
+    paths: ['experiment-b/superviz25-sql/**', '.github/workflows/superviz25-sql.yml']
+  workflow_dispatch:
+    inputs:
+      stage:
+        description: 'inspect, develop or test'
+        default: 'inspect'
+      freeze_sha256:
+        description: 'test stage only'
+        default: ''
+
+permissions:
+  contents: read
+
+jobs:
+  inspect:
+    if: github.event_name == 'push' || github.event.inputs.stage == 'inspect'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Download with publisher checksum
+        run: |
+          python experiment-b/open-datasets/registry.py download --dataset superviz25-sql-v2 \
+            --file dataset.csv --output "$RUNNER_TEMP/superviz.csv" --max-mb 1200
+          sha256sum "$RUNNER_TEMP/superviz.csv"
+      - run: python experiment-b/superviz25-sql/inspect_train.py "$RUNNER_TEMP/superviz.csv"
