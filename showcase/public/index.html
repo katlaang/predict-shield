@@ -22,6 +22,7 @@
     <a href="#who">Who it's for</a>
     <a href="#proof">Results</a>
     <a href="simulation.html">Interactive simulation</a>
+    <a href="ai-trained.html">Trained AI demo</a>
     <a href="#try">Try it</a>
   </nav>
   <a class="btn btn-small" href="#pilot">Request a pilot</a>
@@ -35,6 +36,7 @@
       <div class="cta-row">
         <a class="btn" href="#pilot">Request a free pilot</a>
         <a class="btn btn-ghost" href="#how">See how it works</a>
+        <a class="btn" href="ai-trained.html">Test the trained AI</a>
         <a class="btn btn-ghost" href="simulation.html">Run interactive simulation</a>
       </div>
     </div>
@@ -116,6 +118,13 @@
     <p class="intro">Where protocols were pre-registered, we report the original acceptance conditions. We also publish unsuccessful tests, independent verification outcomes, and retrospective audit corrections without describing them as new held-out evidence.</p>
     <div class="table-scroll"><table class="results" id="results"></table></div>
     <p class="fine">All results come from laboratory networks and public datasets. PREDICT-SHIELD is an experimental prototype for controlled pilots and has not yet been validated on production critical infrastructure. Full reports, code and test records are public on <a href="https://github.com/katlaang/predict-shield">GitHub</a>.</p>
+  </section>
+
+  <section class="section" id="trained-ai">
+  <h2>Test a genuinely trained network AI model</h2>
+  <p class="intro">This offline-capable demo executes a supervised classifier trained on the NSL-KDD network-intrusion benchmark. Run original held-out connection examples, inspect the model's learned score, and see its correct predictions and failures. On the official 22,544-record legacy test, it detected 63.95% of attack-labeled records and flagged 8.21% of normal-labeled records. These are not modern operational performance figures.</p>
+  <p><a class="btn" href="ai-trained.html">Open trained network AI demonstration</a></p>
+  <p class="fine"><a href="https://github.com/katlaang/predict-shield/blob/master/docs/evidence/MEASURED_TRAINED_NETWORK_ML_DEMO_2026_11_26.md">Training, source attribution, confusion matrix and reproducibility report</a>. The trained demo is separate from the synthetic decision-workflow simulation below.</p>
   </section>
 
   <section class="section" id="simulation">
