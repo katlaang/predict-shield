@@ -153,6 +153,7 @@ def train(baseline: Path, calibration: Path, out_dir: Path, site: str, authorize
         "threshold": threshold, "feature_names": FEATURES,
         "model_sha256": hashlib.sha256(blob).hexdigest(),
         "implementation_sha256": sha(HERE / "pilot.py"),
+        "protocol_sha256": sha(HERE / "protocol.json"),
         "sklearn": SKLEARN_VERSION,
         "policy": "MONITOR_ONLY_NO_AUTO_RESPONSE",
         "assumed_normal_baseline_not_ground_truth": True,
@@ -174,6 +175,8 @@ def load_frozen(directory: Path, site: str):
         raise ValueError("wrong site or feature schema")
     if frozen["implementation_sha256"] != sha(HERE / "pilot.py"):
         raise ValueError("feature implementation changed; model no longer frozen")
+    if frozen["protocol_sha256"] != sha(HERE / "protocol.json"):
+        raise ValueError("field protocol changed after model freeze")
     if frozen["sklearn"] != SKLEARN_VERSION:
         raise ValueError("model runtime library version changed")
     raw = (directory / "model.pkl").read_bytes()
