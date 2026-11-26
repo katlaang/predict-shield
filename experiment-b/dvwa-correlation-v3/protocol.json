@@ -1,0 +1,15 @@
+{
+ "name": "DVWA correlation detector v3: per-field request profiles and calibrated evidence fusion",
+ "registered": "2026-11-26, before the v3 development session ran and before v3 scored any attack traffic",
+ "parents": ["experiment-b/dvwa-correlation/protocol.json", "experiment-b/dvwa-correlation-v2/protocol.json"],
+ "why_v3": "v1 (29/117) and v2 (35/92) failed. Diagnosis from the v2 code: novelty and response evidence entered with hand-picked weights (0.08, 0.025) too small to cross the threshold, and character novelty was tracked across the whole site, so a quote that is normal on the greeting page counted as normal in the id and username fields.",
+ "changes": {
+  "request_novelty": "Learned per page and per parameter from benign traffic: character classes, length range, parameter names (model_v3.request_profiles).",
+  "fusion": "Four component scores (request_novelty, host_novelty, response_shift, learned_anomaly) are each converted to a tail probability against a benign calibration split and combined with Fisher's method. No hand-set weights.",
+  "splits": "3000 benign development requests (seed 2026112701): first 40% fits profiles, vocabularies and the forest; next 35% calibrates tail probabilities; last 25% sets each threshold at 0.5%."
+ },
+ "test": "One fresh session after the freeze: 1000 benign requests (seed 2026112711) and 160 attack attempts from the existing v1 generator lab.attacks, 40 per family (seed 2026112712), shuffled (seed 2026112713). Success judged by lab.judge from responses and the canary, never from the trace.",
+ "known_limits": "The four families and their payload strings come from the v1 generator and were seen in v1 and v2; only the seeds are new. Benign traffic is synthetic. Single-threaded server, loopback only.",
+ "pass_condition": "For the fused detector, all three: (1) at most 1% of benign test requests alert; (2) at least 90% of successful attacks alert; (3) in each of the four families, at least 75% of successful attacks alert. Each component alone and the fusion without the forest are reported as ablations, not pass criteria.",
+ "not_claimed": "Detection of new attack families; realistic benign traffic; other applications."
+}

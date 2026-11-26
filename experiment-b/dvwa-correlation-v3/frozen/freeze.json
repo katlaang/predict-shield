@@ -1,0 +1,27 @@
+{
+ "code_sha256": {
+  "detector.py": "cff106a84e57a9fa05f8ebe9c85a5070ac91a2211e8c27da6cd13009f5e75051",
+  "lab.py": "85e41e385ae39c8435e3110ba824cb72009ac4cfbcf22d2ae527971ace8b458b",
+  "model_v3.py": "8df890c22184e77ab42a520f0e99c341a9981f67a1dc93b151990b0fdf8d5cdd",
+  "protocol.json": "f7989f7c562667d4bc948e4bb23bd760a168998e04876b69269ea8589ba0c5ab"
+ },
+ "dvwa_commit": "502ac150ce37c20ca6e04cab7c5ca959f315f2d0",
+ "freeze_sha256": "7ae09d7d4d4a39d762f1edf3ca214aa89c6ebe2f23e851c865e02a2ae4eda97a",
+ "model_sha256": "0fa06513a4e8e36a448dbd85edfc49ac5d141a30bc56a26bdb48483a0307dbff",
+ "rows": {
+  "calibration": 1050,
+  "fit": 1200,
+  "threshold": 750
+ },
+ "schema": "predict-shield/dvwa-v3-freeze/1",
+ "sklearn": "1.7.2",
+ "threshold_split_alert_rate": 0.004,
+ "thresholds": {
+  "fused": 10.023174443643276,
+  "fused_without_learned_anomaly": 4.6847537080713835,
+  "host_novelty": 0.0,
+  "learned_anomaly": 0.6445290998592498,
+  "request_novelty": 0.0,
+  "response_shift": 4.0
+ }
+}
