@@ -46,6 +46,7 @@ function renderResults(ev) {
   const dvwa2 = ev.latest.dvwa_v2;
   const dvwa3 = ev.latest.dvwa_v3;
   const sql = ev.latest.superviz25_sql;
+  const real = ev.latest.real_web_request_only;
   const v3 = ev.misses.find((m) => m.name.endsWith("v3"));
   const rows = [
     ["Verifying a fix", `${c.trials.toLocaleString("en-US")} sealed trials on a lab of independent services enforcing access revocation`,
@@ -74,6 +75,9 @@ function renderResults(ev) {
     ["Detecting SQL injection on outside data", `${sql.dataset}: learned from its benign training queries only, tested once on ${sql.benign.of.toLocaleString("en-US")} benign and ${sql.attacks.of.toLocaleString("en-US")} attack queries`,
       `Caught ${pct(sql.attacks.rate, 1)} of attack queries, including every exploitation-stage query (${sql.exploit_stage.alerts.toLocaleString("en-US")} of ${sql.exploit_stage.of.toLocaleString("en-US")}), and alerted on ${pct(sql.benign.rate, 2)} of benign queries. Margins were narrow: the weakest technique (${sql.lowest_technique.name}) was ${pct(sql.lowest_technique.rate, 1)} against a 75% bar. Benign queries are template-generated.`,
       "ok", sql.source],
+    ["Frozen request novelty on real web traffic", "Indonesian public-sector and Polish e-commerce access logs; no independent benign labels",
+      "Indonesia X: " + real.indonesia.alerts.toLocaleString("en-US") + " of " + real.indonesia.requests.toLocaleString("en-US") + " parsed requests flagged. Poland: " + real.poland.alerts.toLocaleString("en-US") + " of " + real.poland.requests.toLocaleString("en-US") + " flagged. Almost all paths were unknown to the DVWA-trained component. The full detector was NOT run; these are NOT measured false positives or attack recall.",
+      "short", real.source],
     ["Detecting attacks on a new network", "Trained on two lab datasets, tested on HIKARI-2021",
       `Detected ${pct(v3.detection_rate, 2)} of attack flows in the cross-environment test. This configuration did not establish cross-network generalization.`, "short", v3.source],
   ];
