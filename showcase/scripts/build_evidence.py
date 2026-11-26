@@ -29,6 +29,15 @@ def main() -> None:
     pd = load("experiment-b/powerduck/frozen/test-report.json")
     v2 = load("experiment-b/cic-flow-v2/frozen/test-report.json")
     v3 = load("experiment-b/cic-flow-v3/frozen/test-report.json")
+    powerduck_v3 = load("experiment-b/powerduck-v3/frozen/test-report.json")
+    incident_fix = load("experiment-b/powerduck-v3/reports/corrected-incident-accounting-45341753534.json")
+    dvwa = load("experiment-b/dvwa-correlation/frozen/test-report.json")
+    if incident_fix["freeze_sha256"] != powerduck_v3["freeze_sha256"]:
+        raise ValueError("audit does not match the frozen model")
+    if incident_fix["corrected_false_incidents"] < powerduck_v3["false_incidents"]:
+        raise ValueError("retrospective correction unexpectedly reduced false incident count")
+    if not incident_fix["registered_pass_condition_failed"] or powerduck_v3["passed"] or dvwa["passed"]:
+        raise ValueError("unverified successful-detection claim")
 
     arms = {cls: {a: {k: s[k] for k in ("remediated", "trials", "configurations",
                                          "configurations_remediated_in_majority_of_repeats",
@@ -57,6 +66,27 @@ def main() -> None:
             "source": REPO + "docs/evidence/MEASURED_EXPLOIT_LIKELIHOOD_2026_11_20.md",
             "cves": exploit["rows"], "exploited": exploit["positives"], "roc_auc": exploit["roc_auc"],
             "top": {k: exploit[k] for k in ("top_1pct", "top_5pct", "top_10pct")},
+        },
+        "latest": {
+            "powerduck_v3": {
+                "source": REPO + "docs/evidence/MEASURED_POWERDUCK_GOOSE_DETECTOR_V3_2026_11_24.md",
+                "audit": incident_fix["source_run"],
+                "passed": powerduck_v3["passed"],
+                "scenarios_detected": powerduck_v3["scenarios_detected"],
+                "scenarios_total": powerduck_v3["scenarios_total"],
+                "benign_alert_rate": powerduck_v3["non_malicious_alert_rate"],
+                "false_incidents": incident_fix["corrected_false_incidents"],
+                "false_incidents_per_hour": incident_fix["corrected_false_incidents_per_hour"],
+                "false_incidents_per_hour_limit": 2,
+                "post_hoc": True,
+            },
+            "dvwa_v1": {
+                "source": REPO + "docs/evidence/MEASURED_DVWA_CORRELATION_DETECTOR_2026_11_24.md",
+                "passed": dvwa["passed"],
+                "benign": dvwa["results"]["correlated"]["benign"],
+                "successful_attacks": dvwa["results"]["correlated"]["successful_attacks"],
+                "successful_by_family": dvwa["results"]["correlated"]["successful_by_family"],
+            }
         },
         "misses": [
             {"name": "Substation GOOSE detector", "source": REPO + "docs/evidence/MEASURED_POWERDUCK_GOOSE_DETECTOR_2026_11_21.md",
