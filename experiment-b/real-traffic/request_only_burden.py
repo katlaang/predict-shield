@@ -238,11 +238,13 @@ def main():
     p.add_argument("--private-review-manifest", type=Path,
                    help="Optional locally retained blinded request ordinals for authorized human review")
     args = p.parse_args()
+    if args.output.exists():
+        raise ValueError("refusing to overwrite earlier measured evidence")
+    if args.private_review_manifest is not None and args.private_review_manifest.exists():
+        raise ValueError("refusing to overwrite private review sample")
     reg = registry_module.get_registry(args.registry)
     source, pinned = registry_module.lookup(reg, args.dataset, args.file)
     result = score(args.archive, source, pinned, args.frozen_dir)
-    if args.output.exists():
-        raise ValueError("refusing to overwrite earlier measured evidence")
     args.output.parent.mkdir(parents=True, exist_ok=True)
     # The index mapping is intentionally kept out of uploaded/public metrics.
     private_sample = result.pop("_offline_review_sample_indices")
