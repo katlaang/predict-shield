@@ -7,6 +7,12 @@ on:
       - 'experiment-b/powerduck-physical/**'
       - '.github/workflows/dvwa-v2-physical.yml'
   workflow_dispatch:
+    inputs:
+      exploratory_replay:
+        description: 'Replay the already-scored fixed-seed DVWA session for debugging, NOT a new held-out evaluation'
+        type: boolean
+        default: false
+        required: true
 
 permissions:
   contents: read
@@ -29,6 +35,7 @@ jobs:
         run: python -m unittest test_physical_consistency -v
 
   follow-up-dvwa-lab:
+    if: github.event_name == 'workflow_dispatch' && inputs.exploratory_replay
     needs: unit-tests
     runs-on: ubuntu-latest
     timeout-minutes: 50
