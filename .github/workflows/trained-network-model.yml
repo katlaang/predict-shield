@@ -1,0 +1,48 @@
+name: Train and validate real network benchmark model
+
+on:
+  pull_request:
+    paths:
+      - 'experiment-b/trained-demo/**'
+      - '.github/workflows/trained-network-model.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  train-holdout:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install fixed model libraries
+        run: pip install 'numpy==2.3.4' 'scikit-learn==1.7.2'
+      - name: Download SHA1-pinned network benchmark and train genuine model
+        run: python experiment-b/trained-demo/train_nslkdd.py --output "$RUNNER_TEMP/nslkdd-trained.json"
+      - name: Verify untouched holdout and model weights were exported
+        run: |
+          python - "$RUNNER_TEMP/nslkdd-trained.json" <<'PY'
+          import json,sys
+          m=json.load(open(sys.argv[1]))
+          assert m["kind"]=="REAL_TRAINED_SUPERVISED_BINARY_CLASSIFIER"
+          assert m["official_test"]["total"]==22544
+          assert m["validation"]["total"]==6298
+          assert m["testing_used_once"]
+          assert len(m["examples"])>=20
+          assert len(m["coefficients"])>80
+          assert m["real_world_false_positive_rate"] is None
+          assert m["operational_attack_accuracy"] is None
+          assert m["live_telemetry_integrated"] is False
+          print('PASS: original ML coefficients and out-of-sample metrics frozen')
+          PY
+      - name: Preserve learned model and audit metrics
+        uses: actions/upload-artifact@v4
+        with:
+          name: nslkdd-learned-model-and-heldout-metrics
+          path: ${{ runner.temp }}/nslkdd-trained.json
+          if-no-files-found: error
+          retention-days: 90
