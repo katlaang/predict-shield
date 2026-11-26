@@ -1,0 +1,34 @@
+name: CSIC 2010 external web-request test
+
+# stage=pin      find links, download, print sizes, hashes and request counts
+#                (no request contents); used to fix the protocol's pins
+# stage=develop  fit on normalTrafficTraining only, freeze, commit the freeze
+# stage=test     verify the freeze, score the two test files once, commit report
+
+on:
+  push:
+    branches: [feat/csic2010-external]
+    paths: ['experiment-b/csic2010-external/**', '.github/workflows/csic2010-external.yml']
+  workflow_dispatch:
+    inputs:
+      stage:
+        description: 'pin, develop or test'
+        default: 'pin'
+      freeze_sha256:
+        description: 'test stage only'
+        default: ''
+
+permissions:
+  contents: read
+
+jobs:
+  pin:
+    if: github.event_name == 'push' || github.event.inputs.stage == 'pin'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python experiment-b/csic2010-external/pin_sources.py "$RUNNER_TEMP/csic"
