@@ -352,6 +352,44 @@
           ]
         }
       }
+    },
+    "dvwa_v2": {
+      "source": "https://github.com/katlaang/predict-shield/blob/master/docs/evidence/MEASURED_DVWA_CORRELATION_V2_2026_11_26.md",
+      "run": "https://github.com/katlaang/predict-shield/actions/runs/45881347517",
+      "passed": false,
+      "benign": {
+        "alerts": 3,
+        "rate": 0.006,
+        "rows": 500
+      },
+      "successful_attacks": {
+        "alerts": 35,
+        "rate": 0.3804347826086957,
+        "rows": 92
+      },
+      "attack_families": {
+        "cmdi": {
+          "alerts": 26,
+          "rate": 1,
+          "rows": 26
+        },
+        "lfi": {
+          "alerts": 6,
+          "rate": 0.2727272727272727,
+          "rows": 22
+        },
+        "sqli": {
+          "alerts": 3,
+          "rate": 0.13636363636363635,
+          "rows": 22
+        },
+        "sqli_login": {
+          "alerts": 0,
+          "rate": 0,
+          "rows": 22
+        }
+      },
+      "known_attack_families": true
     }
   }
 }

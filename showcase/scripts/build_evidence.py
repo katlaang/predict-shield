@@ -32,6 +32,9 @@ def main() -> None:
     powerduck_v3 = load("experiment-b/powerduck-v3/frozen/test-report.json")
     incident_fix = load("experiment-b/powerduck-v3/reports/corrected-incident-accounting-45341753534.json")
     dvwa = load("experiment-b/dvwa-correlation/frozen/test-report.json")
+    dvwa_v2 = load("experiment-b/dvwa-correlation-v2/reports/first-scored-run-45881347517.json")
+    if dvwa_v2["passed"] or dvwa_v2["successful_attacks"]["alerts"] != 35 or dvwa_v2["successful_attacks"]["rows"] != 92:
+        raise ValueError("unexpected first-scored DVWA v2 result")
     if incident_fix["freeze_sha256"] != powerduck_v3["freeze_sha256"]:
         raise ValueError("audit does not match the frozen model")
     if incident_fix["corrected_false_incidents"] < powerduck_v3["false_incidents"]:
@@ -79,6 +82,15 @@ def main() -> None:
                 "false_incidents_per_hour": incident_fix["corrected_false_incidents_per_hour"],
                 "false_incidents_per_hour_limit": 2,
                 "post_hoc": True,
+            },
+            "dvwa_v2": {
+                "source": REPO + "docs/evidence/MEASURED_DVWA_CORRELATION_V2_2026_11_26.md",
+                "run": dvwa_v2["source_ci_run"],
+                "passed": dvwa_v2["passed"],
+                "benign": dvwa_v2["benign"],
+                "successful_attacks": dvwa_v2["successful_attacks"],
+                "attack_families": dvwa_v2["attack_families"],
+                "known_attack_families": dvwa_v2["attack_families_previously_examined"],
             },
             "dvwa_v1": {
                 "source": REPO + "docs/evidence/MEASURED_DVWA_CORRELATION_DETECTOR_2026_11_24.md",
