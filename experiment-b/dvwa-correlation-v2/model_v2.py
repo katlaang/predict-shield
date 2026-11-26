@@ -165,6 +165,8 @@ def planned_attack_session():
 
 
 def test(frozen_dir: Path, output: Path):
+    if output.exists():
+        raise ValueError("test report already exists; refusing a second held-out run")
     frozen, payload = verify(frozen_dir)
     with tempfile.TemporaryDirectory() as tmp:
         ex, per, docroot = v1.session(planned_attack_session(), Path(tmp), True)
@@ -192,8 +194,6 @@ def test(frozen_dir: Path, output: Path):
               "unsuccessful_attack_attempts": counts(unknown),
               "attack_families": by_family, "checks": checks, "passed": all(checks.values()),
               "limitations": "Fresh test traffic, same synthetic DVWA scenario families as earlier tests, not operational or zero-day evidence."}
-    if output.exists():
-        raise ValueError("test report already exists; test set must not be overwritten")
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(json.dumps(report, sort_keys=True, indent=2) + "\n")
     print(json.dumps(report, sort_keys=True), flush=True)
