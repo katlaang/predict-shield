@@ -2,6 +2,7 @@ import json
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 import numpy as np
 
@@ -52,6 +53,14 @@ class EvidenceFeaturesTests(unittest.TestCase):
     def test_fitting_requires_only_benign(self):
         with self.assertRaises(ValueError):
             m.fit([lab.Exchange("attack", "cmdi", "GET", "/", {})], [[]], "/tmp")
+
+    def test_existing_report_fails_before_live_lab_side_effects(self):
+        with tempfile.TemporaryDirectory() as root:
+            path = Path(root) / "report.json"
+            path.write_text("{}")
+            with patch.object(m.v1, "session", side_effect=AssertionError("should never execute live lab")):
+                with self.assertRaisesRegex(ValueError, "refusing a second held-out run"):
+                    m.test(Path(root), path)
 
     def test_frozen_report_refuses_overwrite(self):
         with tempfile.TemporaryDirectory() as root:
