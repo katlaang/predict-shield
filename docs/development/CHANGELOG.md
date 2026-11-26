@@ -1,5 +1,18 @@
 # Development changelog
 
+## 2026-11-26: DVWA v3 method on Superviz25-SQL (external)
+
+- First detection test on data generated outside this project: Superviz25-SQL (Télécom Paris, LAAS-CNRS, Inria; MIT license).
+  - The v3 per-field profiles and Fisher fusion were learned from the publisher's benign training split only, then tested once on its test split.
+  - Develop run 45894824541; test run 45895391129.
+- **Passed, by narrow margins:**
+  - 91.6% of 336,281 sqlmap attack queries caught (bar 90%).
+  - 0.53% of 3,017,390 benign queries alerted (ceiling 1%).
+  - Every technique at or above 75%; time-based was lowest, at 75.5%.
+- Every exploitation-stage query was caught (161,178 of 161,178). All misses were reconnaissance probes.
+- **Limits:** benign queries are template-generated, the data is SQL only, and the attacks come from sqlmap alone.
+- Also approves MIT alongside CC BY 4.0 in the dataset registry. Evidence: `docs/evidence/MEASURED_SUPERVIZ25_SQL_EXTERNAL_2026_11_26.md`.
+
 ## 2026-11-26: DVWA correlation detector v3, single test session
 
 - Per-field request profiles, learned from benign traffic, plus Fisher fusion of four calibrated evidence scores, with no hand-set weights. Development run 45883884274; test run 45884393589.

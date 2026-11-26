@@ -188,8 +188,10 @@
      "ci_default": false
     }
    ],
-   "status": "publisher_verified_not_ingested",
-   "notes": "Benign traffic is synthetic and template-generated; benign train and test come from the same generator. Queries and user inputs only, no HTTP responses or host telemetry."
+   "status": "ingested_scored_once",
+   "notes": "Benign traffic is synthetic and template-generated; benign train and test come from the same generator. Queries and user inputs only, no HTTP responses or host telemetry.",
+   "sha256_observed": "cd343652f37cd5d153a1cf417439e60c5e15f063642905b1d521cb5c5c96c4b5",
+   "result": "docs/evidence/MEASURED_SUPERVIZ25_SQL_EXTERNAL_2026_11_26.md"
   }
  ]
 }
