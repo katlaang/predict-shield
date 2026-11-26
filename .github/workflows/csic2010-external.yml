@@ -31,4 +31,12 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
+      - name: Reachability of the publisher page
+        continue-on-error: true
+        run: |
+          for u in https://www.tic.itefi.csic.es/dataset/ http://www.tic.itefi.csic.es/dataset/ https://tic.itefi.csic.es/dataset/; do
+            echo "== $u"
+            curl -sS -L -m 120 -A "Mozilla/5.0" -o /tmp/page.html -w "%{http_code} %{size_download} %{remote_ip}\n" "$u" || true
+            grep -oiE 'href="[^"]*(Traffic|\.txt|\.zip)[^"]*"' /tmp/page.html 2>/dev/null | sort -u || true
+          done
       - run: python experiment-b/csic2010-external/pin_sources.py "$RUNNER_TEMP/csic"
