@@ -1,0 +1,34 @@
+name: PREDICT-SHIELD pilot interest
+description: Public issue for expressing interest in a limited, approved lab pilot. Never include secrets or private infrastructure details.
+title: "Pilot interest: "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        This request is PUBLIC on GitHub. Do not provide credentials, customer data, non-public IPs, vulnerabilities, or sensitive contact information. No deployment or testing will start automatically.
+  - type: dropdown
+    id: environment
+    attributes:
+      label: Evaluation environment
+      options:
+        - Offline research lab
+        - Disposable test environment
+        - Controlled internal lab
+        - Discussion only
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: Non-sensitive evaluation goal
+      description: Describe the capability you want to review without sensitive information.
+      placeholder: "Example: evaluate offline alert correlation on sample network logs"
+    validations:
+      required: true
+  - type: checkboxes
+    id: public
+    attributes:
+      label: Public issue acknowledgement
+      options:
+        - label: I understand this issue is publicly visible and I will not post sensitive infrastructure or personal information.
+          required: true

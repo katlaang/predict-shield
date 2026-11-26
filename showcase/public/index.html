@@ -81,7 +81,7 @@
     <h2>How it works</h2>
     <p class="intro">Four steps, with a person approving every change that touches your network.</p>
     <ol class="how">
-      <li><h3>Prioritize</h3><p>Ranks every known vulnerability by how likely it is to be exploited, using a model tested on a full year of real vulnerability data, so your team starts with the few that matter.</p></li>
+      <li><h3>Prioritize</h3><p>Ranks CVEs in the supported, dated vulnerability catalog using a model assessed against historical vulnerability records. It does not establish that an exploit will occur or that the resulting ranking is optimal for your network.</p></li>
       <li><h3>Decide</h3><p>Chooses fix, mitigate, quarantine, escalate or monitor under rules you set, and explains why. Nothing is changed without a signed approval.</p></li>
       <li><h3>Act</h3><p>Applies the approved change through a controlled path that validates it first and can put everything back exactly as it was.</p></li>
       <li><h3>Verify</h3><p>Confirms the result with evidence the change itself can't influence. If the check fails, the change is rolled back. If it can't see enough, it says "cannot confirm" instead of guessing.</p></li>
@@ -110,10 +110,10 @@
   </section>
 
   <section class="section" id="proof">
-    <h2>Tested before we ask you to trust it</h2>
-    <p class="intro">Every test had its success criteria fixed before it ran, and was scored against an independent observer the system could not see. Results that fell short are published too.</p>
+    <h2>What the laboratory tests actually show</h2>
+    <p class="intro">Where protocols were pre-registered, we report the original acceptance conditions. We also publish unsuccessful tests, independent verification outcomes, and retrospective audit corrections without describing them as new held-out evidence.</p>
     <div class="table-scroll"><table class="results" id="results"></table></div>
-    <p class="fine">All results come from laboratory networks and public datasets. PREDICT-SHIELD is ready for pilots and has not yet run in production. Full reports, code and test records are public on <a href="https://github.com/katlaang/predict-shield">GitHub</a>.</p>
+    <p class="fine">All results come from laboratory networks and public datasets. PREDICT-SHIELD is an experimental prototype for controlled pilots and has not yet been validated on production critical infrastructure. Full reports, code and test records are public on <a href="https://github.com/katlaang/predict-shield">GitHub</a>.</p>
   </section>
 
   <section class="section try" id="try">
@@ -141,8 +141,8 @@
       </ul>
     </div>
     <div class="pilot-cta">
-      <a class="btn btn-light" id="contact-link" href="#pilot">Request a pilot</a>
-      <p>Built by Eunice Kamau, IEEE Senior Member, with 14+ years in telecommunications and cloud security.</p>
+      <a class="btn btn-light" id="contact-link" href="https://github.com/katlaang/predict-shield/issues/new?template=pilot-request.yml">Request a lab pilot on GitHub</a>
+      <p>GitHub pilot requests are public. Do not post credentials, internal IP addresses, vulnerabilities, or confidential network details.</p>
     </div>
   </section>
 </main>

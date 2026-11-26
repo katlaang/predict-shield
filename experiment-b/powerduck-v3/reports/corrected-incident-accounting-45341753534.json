@@ -1,0 +1,18 @@
+{
+  "schema": "predict-shield/powerduck-v3-incident-correction/1",
+  "source_run": "https://github.com/katlaang/predict-shield/actions/runs/45341753534",
+  "source_artifact": "https://github.com/katlaang/predict-shield/actions/runs/45341753534/artifacts/14897031603",
+  "artifact_zip_sha256": "df740911ee94dea9a6677f6ef5dc26a22d5f40eb4cb70f57617148ab93fb3ca3",
+  "post_hoc": true,
+  "new_holdout": false,
+  "model_changed": false,
+  "threshold_changed": false,
+  "original_report_false_incidents": 206,
+  "corrected_false_incidents": 242,
+  "corrected_true_incidents": 282,
+  "hours": 2.5695841042863,
+  "corrected_false_incidents_per_hour": 94.17866478716225,
+  "freeze_sha256": "93e14a4cb7b0d5bef9d7b4953ae7f145b7439e7c210b2479d8bb27b73414baec",
+  "registered_pass_condition_failed": true,
+  "qualification": "Verified original-data retrospective correction from CI logs; zero fresh test sets; model still fails the registered target."
+}

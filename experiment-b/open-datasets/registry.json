@@ -1,0 +1,170 @@
+{
+  "schema": "predict-shield/dataset-registry/1",
+  "last_reviewed": "2026-11-26",
+  "policy": {
+    "open_license_is_not_a_test_result": true,
+    "unknown_is_not_benign": true,
+    "external_environment_required_for_cross_network_claim": true,
+    "max_automatic_download_mb": 25,
+    "raw_data_committed": false
+  },
+  "datasets": [
+    {
+      "id": "cam-lds-v2",
+      "title": "Cyber Attack Manifestations Log Data Set v2",
+      "publisher": "Austrian Institute of Technology",
+      "country": "Austria",
+      "url": "https://zenodo.org/records/18861762",
+      "zenodo_record": 18861762,
+      "license": "CC-BY-4.0",
+      "license_evidence": "https://zenodo.org/records/18861762",
+      "collection_environment": "ait-attackbed-virtual-enterprise",
+      "kind": "host-plus-network",
+      "evaluation_role": "external_attack_chain_correlation_only",
+      "ground_truth": "attackmate time intervals; idle and unlabeled events must be UNKNOWN, not benign",
+      "benign_baseline_available": false,
+      "files": [
+        {
+          "name": "scenario_2_cron.zip",
+          "md5": "c33aca73d6962414bd6c2c3f82b934c4",
+          "approx_mb": 160.5,
+          "ci_default": false
+        },
+        {
+          "name": "manifestations_raw.zip",
+          "md5": "9cbce6fd08044d298335a77eacd2e83f",
+          "approx_mb": 535.9,
+          "ci_default": false
+        }
+      ],
+      "status": "publisher_verified_not_ingested",
+      "notes": "Scenario archives include host logs, Suricata, Wazuh and time-based attackmate labels; missing realistic benign user sessions means no operational false-positive estimate."
+    },
+    {
+      "id": "soc-mld-v2",
+      "title": "Session-Aware Multi-Layer Attack Detection Dataset",
+      "publisher": "Zenodo authors Mai et al.",
+      "country": "Vietnam",
+      "url": "https://zenodo.org/records/23116148",
+      "zenodo_record": 23116148,
+      "license": "CC-BY-4.0",
+      "license_evidence": "https://zenodo.org/records/23116148",
+      "collection_environment": "soc-mld-containernet-docker-cyber-range",
+      "kind": "network-http-suricata-correlation",
+      "evaluation_role": "separate_cyber_range_correlation_candidate",
+      "ground_truth": "publisher reports attack-instance identifiers; validate labels against files before scoring",
+      "benign_baseline_available": true,
+      "files": [
+        {
+          "name": "SOC-MLD-v1.zip",
+          "md5": "764ca570a35753a90f6ac3046750c716",
+          "approx_mb": 10.4,
+          "ci_default": true
+        }
+      ],
+      "status": "publisher_verified_not_ingested",
+      "notes": "Record is v2; ZIP filename is v1. No training/test leakage across attack_instance_id."
+    },
+    {
+      "id": "ctu-sme-11",
+      "title": "CTU-SME-11",
+      "publisher": "Czech Technical University",
+      "country": "Czech Republic",
+      "url": "https://zenodo.org/records/7958259",
+      "zenodo_record": 7958259,
+      "license": "CC-BY-4.0",
+      "license_evidence": "https://zenodo.org/records/7958259",
+      "collection_environment": "ctu-prague-11-devices-feb2023",
+      "kind": "zeek-labeled-flow",
+      "evaluation_role": "external_network_test_after_format_review",
+      "ground_truth": "benign / malicious / background separated; background is UNKNOWN unless independently annotated",
+      "benign_baseline_available": true,
+      "files": [
+        {
+          "name": "CTU-SME-11_summary_table.csv",
+          "md5": "2ff3da15a7b58eb65482eeeaadcbd917",
+          "approx_mb": 0.002,
+          "ci_default": true
+        },
+        {
+          "name": "CTU-SME-11_Honeypot-Assistant-Amazon-Echo1stGen-1_v1.0.0.tar.bz2",
+          "md5": "311cbd100eeddf76c8056919fe35b0cb",
+          "approx_mb": 742.9,
+          "ci_default": false
+        }
+      ],
+      "status": "publisher_verified_not_ingested",
+      "notes": "Full collection ~80 GB compressed according to author description; use explicit opt-in per device and keep collection environment IDs."
+    },
+    {
+      "id": "hikari-2021",
+      "title": "HIKARI-2021 (existing project benchmark)",
+      "publisher": "HIKARI dataset authors",
+      "country": "Japan",
+      "url": "https://zenodo.org/records/6463389",
+      "zenodo_record": 6463389,
+      "license": "CC-BY-4.0",
+      "license_evidence": "https://github.com/katlaang/predict-shield/blob/master/experiment-b/hikari-in-network/protocol.json",
+      "collection_environment": "hikari-2021-original-testbed",
+      "kind": "flow",
+      "evaluation_role": "already_tested_do_not_count_as_new_independent_evidence",
+      "ground_truth": "available labeled flows; original held-out evaluations have failed targets",
+      "benign_baseline_available": true,
+      "files": [
+        {
+          "name": "ALLFLOWMETER_HIKARI2021.csv.zip",
+          "sha256": "ba09d35269566fd2f269871043b24e7d8e372bc4a47e9c2027729e5ff2e660e0",
+          "approx_mb": null,
+          "ci_default": false
+        }
+      ],
+      "status": "existing_completed_negative_results",
+      "notes": "Not a novel external evaluation; repeated tuning on previously scored HIKARI is exploratory."
+    },
+    {
+      "id": "genis",
+      "title": "GeNIS",
+      "country": "Portugal",
+      "url": "https://zenodo.org/records/14919237",
+      "license": "UNVERIFIED",
+      "collection_environment": "gecad-airbus-cyberrange",
+      "kind": "network-flow",
+      "evaluation_role": "candidate",
+      "ground_truth": "not audited",
+      "benign_baseline_available": null,
+      "files": [],
+      "status": "blocked_license_validation",
+      "notes": "Do not ingest before reuse terms and publisher hashes reviewed."
+    },
+    {
+      "id": "gotham-iot",
+      "title": "Gotham IoT",
+      "country": "United Kingdom",
+      "url": "https://zenodo.org/records/14502760",
+      "license": "UNVERIFIED",
+      "collection_environment": "gotham-simulated-iot",
+      "kind": "iot-network",
+      "evaluation_role": "offline_large_scale_only",
+      "ground_truth": "not audited",
+      "benign_baseline_available": null,
+      "files": [],
+      "status": "blocked_resources_or_license",
+      "notes": "23.8GB archive is not appropriate for free CI."
+    },
+    {
+      "id": "unified-packet-flow",
+      "title": "Unified Packet-Flow IDS sets",
+      "country": "Finland",
+      "url": "https://zenodo.org/records/20778180",
+      "license": "UPSTREAM_RIGHTS_UNVERIFIED",
+      "collection_environment": "derived-from-multiple-original-benchmarks",
+      "kind": "packet-sequence",
+      "evaluation_role": "candidate",
+      "ground_truth": "label and original-source rights must be reviewed per component",
+      "benign_baseline_available": null,
+      "files": [],
+      "status": "blocked_upstream_provenance",
+      "notes": "Do not call this independent new environment unless underlying source captures differ."
+    }
+  ]
+}

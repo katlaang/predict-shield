@@ -1,7 +1,7 @@
 "use strict";
 
-// Where the "Request a pilot" button sends people. Set before deploying.
-const CONTACT_URL = "";
+// Pilot requests use a PUBLIC GitHub issue form; never ask for secrets or private network details.
+const CONTACT_URL = "https://github.com/katlaang/predict-shield/issues/new?template=pilot-request.yml";
 
 const $ = (sel) => document.querySelector(sel);
 const pct = (x, d = 1) => `${(100 * x).toFixed(d)}%`;
@@ -41,7 +41,8 @@ function renderResults(ev) {
   const c = ev.campaign;
   const ver = c.verifier.single_evidence;
   const exp = ev.exploit;
-  const pd = ev.misses.find((m) => m.name.startsWith("Substation"));
+  const pd = ev.latest.powerduck_v3;
+  const dvwa = ev.latest.dvwa_v1;
   const v3 = ev.misses.find((m) => m.name.endsWith("v3"));
   const rows = [
     ["Verifying a fix", `${c.trials.toLocaleString("en-US")} sealed trials on a lab of independent services enforcing access revocation`,
@@ -55,11 +56,14 @@ function renderResults(ev) {
     ["Containing a route hijack", "Routed ISP lab with real routing software",
       "Detected the hijack, applied a filter after approval and verified traffic was restored. A too-broad filter was caught and rolled back.",
       "ok", "https://github.com/katlaang/predict-shield/blob/master/docs/evidence/ISP_BGP_HIJACK_LAB_2026_11_24.md"],
-    ["Detecting attacks on substation traffic", "16 attack scenarios on power-grid (IEC 61850) messages",
-      `Flagged ${pd.detection} of ${pd.scenarios} attacks, but false alarms were ${pct(pd.false_alarm_rate)} against a 1% target. Being reworked.`,
+    ["Detecting substation attacks", "PowerDuck v3: 16 IEC 61850 GOOSE attack captures, previously used in earlier development",
+      `Caught attacks in ${pd.scenarios_detected} of ${pd.scenarios_total} scenarios, but alerted on ${pct(pd.benign_alert_rate, 2)} of non-malicious messages. The corrected retrospective count was ${pd.false_incidents_per_hour.toFixed(2)} false incidents per hour, versus a ${pd.false_incidents_per_hour_limit}/hr limit. Failed.`,
       "short", pd.source],
-    ["Detecting attacks on a new network", "Trained on two lab networks, tested on a third",
-      `Caught ${pct(v3.detection_rate, 2)} of attacks. Needs training data from the network it protects.`, "short", v3.source],
+    ["Request, process and network attack correlation", "Live DVWA lab: 1,000 benign requests and 117 successful attacks",
+      `Correlated model detected ${dvwa.successful_attacks.alerts} of ${dvwa.successful_attacks.of} successful attacks (${pct(dvwa.successful_attacks.rate, 1)}) against a 90% target; ${dvwa.benign.alerts} of ${dvwa.benign.of} benign requests were alerted (${pct(dvwa.benign.rate, 1)}). Failed detection target.`,
+      "short", dvwa.source],
+    ["Detecting attacks on a new network", "Trained on two lab datasets, tested on HIKARI-2021",
+      `Detected ${pct(v3.detection_rate, 2)} of attack flows in the cross-environment test. This configuration did not establish cross-network generalization.`, "short", v3.source],
   ];
   $("#results").innerHTML = `<thead><tr><th>Capability</th><th>How it was tested</th><th>Result</th><th></th></tr></thead><tbody>${
     rows.map(([cap, how, res, kind, src]) => `<tr><td><b>${esc(cap)}</b></td><td>${esc(how)}</td><td>${esc(res)} <a href="${esc(src)}">Report</a></td><td><span class="tag ${kind}">${kind === "ok" ? "Met target" : "Fell short"}</span></td></tr>`).join("")
