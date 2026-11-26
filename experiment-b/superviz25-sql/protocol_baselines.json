@@ -1,0 +1,14 @@
+{
+ "name": "Baselines on the Superviz25-SQL test split, beside the frozen v3-method detector",
+ "registered": "2026-11-26, before any baseline was run on any Superviz25-SQL row",
+ "relation_to_the_registered_test": "The single pass/fail test (run 45895391129) stands unchanged. This is a comparison: the frozen model (freeze e3423d8b) is re-scored to obtain its continuous fused statistic; nothing in it is refitted or changed.",
+ "evaluation_sample": "Fixed by seed 2026112901 before any scoring: 10% of benign test rows and 25% of attack test rows, sampled independently per row. Every detector is scored on exactly this sample; the frozen detector and libinjection are also reported on the full test split.",
+ "detectors": {
+  "frozen_v3_method": "Fisher statistic F from model_sql.py with the frozen bundle (benign-only training).",
+  "libinjection": "libinjection-python 1.1.6 is_sql_injection on user_inputs (signature tokenizer; binary).",
+  "owasp_crs": "Official owasp/modsecurity-crs:4-nginx image (digest recorded in the run), user_inputs sent as a URL-encoded GET parameter q to a local backend; blocking paranoia levels 1, 2, 3 and 4 at the default inbound anomaly threshold 5; an alert is an HTTP 403. Binary per level.",
+  "supervised_reference": "TF-IDF character 1-4-grams (max 200,000 features) and logistic regression (C=1.0, class_weight balanced). Five folds over the evaluation sample, grouped by attack_id for attacks and by random group for benign, so no campaign is in both train and test. It sees attack labels, which the frozen detector never does; it is a reference ceiling, not a deployable equal."
+ },
+ "measures": "For continuous scores: ROC AUC, and detection at benign alert rates of 0.1%, 0.5% and 1% (threshold set on the sample's benign scores, so this is an oracle threshold for every continuous detector alike). For binary detectors: their single benign alert rate and detection. Detection by sqlmap technique and by stage for every detector at the 0.5% point or its native point. Wilson 95% intervals.",
+ "not_claimed": "Production false-alarm rates; the sample's benign queries remain template-generated."
+}
