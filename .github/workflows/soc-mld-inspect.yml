@@ -30,7 +30,7 @@ jobs:
       - name: Describe the archive
         run: python experiment-b/soc-mld-external/inspect_schema.py "$RUNNER_TEMP/soc-mld.zip" | tee "$RUNNER_TEMP/schema.json"
       - name: Describe the raw file formats
-        run: python experiment-b/soc-mld-external/inspect_raw.py "$RUNNER_TEMP/soc-mld.zip"
+        run: python experiment-b/soc-mld-external/inspect_raw.py "$RUNNER_TEMP/soc-mld.zip" && python experiment-b/soc-mld-external/inspect_raw.py "$RUNNER_TEMP/soc-mld.zip" ids
       - uses: actions/upload-artifact@v4
         with:
           name: soc-mld-schema

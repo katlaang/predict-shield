@@ -45,3 +45,31 @@ def main(path: str) -> None:
 
 if __name__ == "__main__":
     main(sys.argv[1])
+
+
+def request_ids(path: str) -> None:
+    """How curated request_id values relate to access-log lines (format only)."""
+    with zipfile.ZipFile(path) as z:
+        cur = list(csv.DictReader(io.StringIO(z.read("SOC-MLD-v1.0/dataset/curated/dataset.csv").decode())))
+        log = z.read(ROOT + "access.log").decode("utf-8", errors="replace").splitlines()
+    l7 = [r for r in cur if r["request_id"] not in ("", "None", "nan")]
+    print("curated rows with request_id", len(l7), "of", len(cur))
+    print("request_id examples", [r["request_id"] for r in l7[:5]])
+    print("source values", Counter(r["source"] for r in cur))
+    print("NORMAL rows by source", Counter(r["source"] for r in cur if r["label"] == "NORMAL"))
+    numeric = [r for r in l7 if r["request_id"].isdigit()]
+    print("numeric request_ids", len(numeric))
+    if numeric:
+        hits = 0
+        for r in numeric[:200]:
+            i = int(r["request_id"])
+            if 0 <= i < len(log):
+                m = TS.search(log[i])
+                if m and m.group(1).split()[0][-8:] == r["timestamp"][-8:]:
+                    hits += 1
+        print("first 200 numeric ids whose log line has the same clock time", hits)
+    print("timestamp examples", [r["timestamp"] for r in cur[:3]])
+
+
+if __name__ == "__main__" and len(sys.argv) > 2:
+    request_ids(sys.argv[1])
