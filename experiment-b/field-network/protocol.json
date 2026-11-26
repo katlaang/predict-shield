@@ -1,0 +1,50 @@
+{
+  "schema": "predict-shield/field-network-pilot-protocol/1",
+  "registered": "2026-11-26",
+  "purpose": "Initial read-only, expressly authorized, real network telemetry integration and time-separated unsupervised anomaly measurement",
+  "sensor": "Operator-managed Zeek JSON conn.log on a passive permitted interface or approved mirror/TAP; Python only reads local files",
+  "excluded_actions": [
+    "active scanning",
+    "packet injection",
+    "firewall modification",
+    "route changes",
+    "endpoint isolation",
+    "automatic response",
+    "upload of raw telemetry to GitHub or Vercel"
+  ],
+  "software_gate": {
+    "minimum_fitting_flows": 200,
+    "minimum_calibration_flows": 100,
+    "calibration_target_alert_fraction": 0.005,
+    "maximum_rows_per_file": 300000,
+    "baseline_calibration_observation_must_be_distinct": true,
+    "nonoverlapping_chronological_fitting": true,
+    "code_model_and_protocol_frozen_before_evaluation": true
+  },
+  "evaluation": {
+    "model": "IsolationForest unsupervised fitted on assumed-normal baseline",
+    "fit": "operator-approved earliest observation period",
+    "calibration": "separate later capture, threshold set from anomaly-score order statistic without attacks",
+    "measurement": "fresh later capture or bounded append-only live Zeek log",
+    "observable_metrics": [
+      "flows processed",
+      "incomplete or unscorable records",
+      "anomaly alerts",
+      "anomalies per 1,000 flows",
+      "monitor-only operation verified",
+      "per-model code and data SHA-256"
+    ],
+    "primary_operational_gate": "no unauthorized network modification; capture and reporting complete"
+  },
+  "required_ground_truth_for_security_accuracy": "independent expert review of prespecified random alerts and nonalerts, with explicit indeterminate labels, blinded where feasible",
+  "comparators": "future field study must score rule-only heuristic, anomaly model, and fusion on the same time windows and independently labelled ground truth",
+  "no_ground_truth_metrics": [
+    "false-positive rate",
+    "attack recall",
+    "precision",
+    "protective benefit",
+    "AI decision superiority"
+  ],
+  "critical_infrastructure_validated": false,
+  "acceptance_criteria": "Engineering feasibility is established if the sensor supplies valid observed Zeek flow records, the read-only trained/frozen model evaluates future periods without modification or data leaks, and all scope/safety gates hold. Cybersecurity efficacy has NO pass/fail claim absent independent ground truth."
+}
