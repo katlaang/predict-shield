@@ -165,10 +165,13 @@ def score(path: Path, source: dict, pinned: dict, frozen_dir: Path,
         raise ValueError("no parseable HTTP access requests; dataset is not compatible")
     days = [dict(day=d, **dict(v)) for d, v in sorted(by_day.items())]
     observed = len(by_day)
+    matched_share = stats["known_path_requests"] / analyzed
+    # A shared path is not proof of transferability; do not infer model
+    # suitability from even a handful of coincidental path matches.
     return {
         "schema": "predict-shield/public-request-only-burden/1",
         "source": {"id": source["id"], "url": source["url"],
-                   "collection_environment": source["collection_environment"],
+                   "collection_environment": pinned.get("collection_environment", source["collection_environment"]),
                    "archive_sha256": integrity["sha256"],
                    "publisher_checksum_verified": integrity["verified"],
                    "archive_bytes": integrity["bytes"]},
@@ -176,15 +179,17 @@ def score(path: Path, source: dict, pinned: dict, frozen_dir: Path,
         "component": "request_novelty_only", "frozen_threshold": threshold,
         "full_dvwa_v3_fused_detector_executed": False,
         "training_site": "DVWA local laboratory",
-        "evaluation_site": source["collection_environment"],
+        "evaluation_site": pinned.get("collection_environment", source["collection_environment"]),
         "labels_available": False, "confirmed_benign_requests": 0,
         "confirmed_malicious_requests": 0,
         "false_positive_rate": None, "attack_recall": None,
-        "genuinely_usable_request_only_outside_training_site": bool(stats["known_path_requests"]),
+        "cross_site_request_only_performance_validated": False,
+        "path_vocabulary_overlap_fraction": matched_share,
         "counts": dict(stats),
         "request_component_alert_fraction": stats["request_component_alerts"] / analyzed,
         "unseen_path_fraction": stats["unseen_path_requests"] / analyzed,
         "query_request_fraction": stats["requests_with_query"] / analyzed,
+        "full_model_input_coverage_available": False,
         "observed_days": observed,
         "mean_request_component_alerts_per_observed_day": stats["request_component_alerts"] / observed,
         "calendar_span_days": round((last - first) / 86400, 4) if last is not None else None,
