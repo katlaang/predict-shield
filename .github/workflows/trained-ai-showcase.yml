@@ -1,0 +1,60 @@
+name: Browser trained network ML inference verification
+
+on:
+  pull_request:
+    paths:
+      - 'showcase/public/ai-trained.html'
+      - 'showcase/public/data/nslkdd-trained-model.json'
+      - 'experiment-b/trained-demo/**'
+      - 'showcase/public/index.html'
+      - '.github/workflows/trained-ai-showcase.yml'
+  push:
+    branches: [master]
+    paths:
+      - 'showcase/public/ai-trained.html'
+      - 'showcase/public/data/nslkdd-trained-model.json'
+      - 'experiment-b/trained-demo/**'
+      - '.github/workflows/trained-ai-showcase.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  learned-browser-demo:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Verify real trained model inference in offline HTML
+        run: node experiment-b/trained-demo/test_browser.mjs
+      - name: Verify same learned model JSON embedded in browser and homepage link
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import json,re
+          html=Path('showcase/public/ai-trained.html').read_text()
+          file=json.loads(Path('showcase/public/data/nslkdd-trained-model.json').read_text())
+          found=re.search(r'<script type="application/json" id="trained-model-data">(.*?)</script>',html,re.S)
+          assert found and json.loads(found.group(1))==file, 'Embedded model differs from frozen JSON'
+          assert 'href="ai-trained.html"' in Path('showcase/public/index.html').read_text()
+          assert file['official_test']=={'tp':8207,'tn':8914,'fp':797,'fn':4626,'total':22544,
+              'precision':file['official_test']['precision'],
+              'recall':file['official_test']['recall'],
+              'benign_false_alert_rate':file['official_test']['benign_false_alert_rate'],
+              'balanced_accuracy':file['official_test']['balanced_accuracy'],
+              'accuracy':file['official_test']['accuracy']}
+          print('PASS learned model bytes and all recorded confusion-matrix counts')
+          PY
+      - name: Emit compressed offline model bundle for optional standalone distribution
+        run: |
+          python - <<'PY'
+          import json,zlib,base64
+          from pathlib import Path
+          m=json.loads(Path('showcase/public/data/nslkdd-trained-model.json').read_text())
+          raw=json.dumps(m,separators=(',',':'),ensure_ascii=False).encode()
+          print('OFFLINE_MODEL_ZLIB_B64='+base64.b64encode(zlib.compress(raw,9)).decode())
+          print('Compressed bytes:',len(zlib.compress(raw,9)))
+          PY
