@@ -33,7 +33,8 @@ RATES = (0.001, 0.005, 0.01)
 BROWSER_HEADERS = {"User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0",
                    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
                    "Accept-Language": "en-US,en;q=0.5", "Accept-Encoding": "identity", "Connection": "keep-alive"}
-PROBES = ("Vieques Airport", "MX 950.0", "Fort Cavazos", "GB 2")
+PROBES = ("Vieques", "Cavazos", "Miyakejima", "950")   # single tokens: test the client, not CRS's view of spaces
+INFO_PROBES = ("Vieques Airport", "MX 950.0", "Fort Cavazos")
 
 
 def test_rows(data: Path):
@@ -120,6 +121,15 @@ def cmd_crs(a):
             code = e.code
         if code != 200:
             raise SystemExit(f"harness check failed at level {a.level}: benign probe {probe!r} returned {code}")
+
+    info = {}
+    for probe in INFO_PROBES:
+        try:
+            with get(urllib.parse.quote(probe, safe="")) as resp:
+                info[probe] = resp.status
+        except urllib.error.HTTPError as e:
+            info[probe] = e.code
+    print("level", a.level, "multi-word benign probes:", info, flush=True)
 
     def send(i):
         q = urllib.parse.quote(rows[i][1], safe="")
