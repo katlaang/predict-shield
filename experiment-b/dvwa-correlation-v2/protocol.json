@@ -1,0 +1,18 @@
+{
+  "schema": "predict-shield/dvwa-v2-protocol/1",
+  "registered": "2026-11-26",
+  "parent": "experiment-b/dvwa-correlation/protocol.json",
+  "question": "Does an AI anomaly model with independent novelty and learned response-profile evidence improve over the failed DVWA v1 correlation model in a fresh controlled session?",
+  "data": "Local DVWA at v1 pinned commit, traced process/connect/openat data plus HTTP response structure; single sequential PHP server, loopback only.",
+  "development": "1400 benign-only requests with seed 2026112601, first 70% for fit and baseline profiles, last 30% for threshold calibration; no attack telemetry before freeze.",
+  "test": "Fresh session using different seeds, 500 benign requests and 30 attempts per previously known family, assessed once after SHA-256 freeze. Prior v1 experiment informed feature design; family novelty is NOT claimed.",
+  "model": "IsolationForest fit on v1 correlated numerical features plus explicitly scored novelty for previously unseen executables/endpoints/files and per-path response-structure divergence learned from benign training only.",
+  "target": {
+    "max_benign_alert_rate": 0.01,
+    "min_successful_attack_recall": 0.9,
+    "min_each_family_recall": 0.75
+  },
+  "calibration": "Benign-only 0.5% quantile; no change after viewing test. Unknown attack outcomes are not treated as success.",
+  "limitations": "Synthetic local lab, known families, network/process traces joined using PHP single-thread assumption; not equivalent to operational unknown attack detection.",
+  "results": "Pending execution; no outcome may be claimed before CI artifact is reviewed."
+}

@@ -1,0 +1,56 @@
+{
+  "attack_families": {
+    "cmdi": {
+      "alerts": 26,
+      "rate": 1,
+      "rows": 26
+    },
+    "lfi": {
+      "alerts": 6,
+      "rate": 0.2727272727272727,
+      "rows": 22
+    },
+    "sqli": {
+      "alerts": 3,
+      "rate": 0.13636363636363635,
+      "rows": 22
+    },
+    "sqli_login": {
+      "alerts": 0,
+      "rate": 0,
+      "rows": 22
+    }
+  },
+  "attack_families_previously_examined": true,
+  "benign": {
+    "alerts": 3,
+    "rate": 0.006,
+    "rows": 500
+  },
+  "checks": {
+    "attacks_at_least_90pct": false,
+    "each_family_at_least_75pct": false,
+    "normal_at_most_1pct": true
+  },
+  "development_is_benign_only": true,
+  "freeze_sha256": "b26755182533b82f009afba5b1fccbded60c3649c4d6e85649fd9eea686e2304",
+  "limitations": "Fresh test traffic, same synthetic DVWA scenario families as earlier tests, not operational or zero-day evidence.",
+  "passed": false,
+  "schema": "predict-shield/dvwa-v2-fresh-session/1",
+  "successful_attacks": {
+    "alerts": 35,
+    "rate": 0.3804347826086957,
+    "rows": 92
+  },
+  "test_session_unique_seeds": true,
+  "unsuccessful_attack_attempts": {
+    "alerts": 0,
+    "rate": 0,
+    "rows": 28
+  },
+  "source_ci_run": "https://github.com/katlaang/predict-shield/actions/runs/45881347517",
+  "source_artifact": "https://github.com/katlaang/predict-shield/actions/runs/45881347517/artifacts/15147900824",
+  "first_tested_commit": "4f6d9e2c70f9ce1e74eeb730afe8b006d9ff1551",
+  "report_extracted_from": "first-scored CI job 140121348551",
+  "evidence_status": "negative_result_no_reuse_as_new_holdout"
+}
