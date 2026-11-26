@@ -62,9 +62,13 @@ def aligned(records: list[dict], spec: PairSpec) -> list[dict]:
         if channel(r) != spec.primary_stream:
             continue
         val = numeric(r, spec.primary_field)
-        if val is None:
-            continue
         t = float(r["timestamp"])
+        if val is None:
+            rows.append({"timestamp": t, "observed": None, "prediction": None,
+                         "reference": None,
+                         "truth": "ATTACK_LABELED_PRIMARY" if r.get("malicious") not in (None, False) else "UNLABELED",
+                         "reason": "missing_primary_measurement"})
+            continue
         index = bisect.bisect_right(times, t) - 1
         if index < 0 or t - times[index] > spec.max_lag_s:
             rows.append({"timestamp": t, "observed": val, "prediction": None,
@@ -89,6 +93,8 @@ def quantile_threshold(values, false_rate: float) -> float:
 
 
 def train(records: list[dict], spec: PairSpec) -> tuple[dict, dict]:
+    if any(r.get("malicious") not in (None, False) for r in records):
+        raise ValueError("normal-only training records cannot include malicious annotations")
     pairs = [r for r in aligned(records, spec) if r["reference"] is not None]
     if len(pairs) < 50:
         raise ValueError("insufficient paired normal behavior, abstaining")
