@@ -73,9 +73,9 @@ class RegistryTests(unittest.TestCase):
     def test_correlation_budget_rejects_dense_match_without_oom(self):
         with tempfile.TemporaryDirectory() as root:
             archive = Path(root) / "dense.zip"
-            host = "\\n".join(json.dumps({"timestamp": "2026-01-01T00:00:00Z",
+            host = "\n".join(json.dumps({"timestamp": "2026-01-01T00:00:00Z",
                                                 "data": {"srcip": "192.0.2.4"}}) for _ in range(105))
-            net = "\\n".join(json.dumps({"timestamp": "2026-01-01T00:00:00Z",
+            net = "\n".join(json.dumps({"timestamp": "2026-01-01T00:00:00Z",
                                                "src_ip": "192.0.2.4"}) for _ in range(105))
             with zipfile.ZipFile(archive, "w") as z:
                 z.writestr("a/wazuh.json", host)
