@@ -51,7 +51,7 @@
    "license_evidence": "https://zenodo.org/records/23116148",
    "collection_environment": "soc-mld-containernet-docker-cyber-range",
    "kind": "network-http-suricata-correlation",
-   "evaluation_role": "separate_cyber_range_correlation_candidate",
+   "evaluation_role": "not_used_for_detection_scoring; descriptive_only",
    "ground_truth": "publisher reports attack-instance identifiers; validate labels against files before scoring",
    "benign_baseline_available": true,
    "files": [
@@ -62,8 +62,9 @@
      "ci_default": true
     }
    ],
-   "status": "publisher_verified_not_ingested",
-   "notes": "Record is v2; ZIP filename is v1. No training/test leakage across attack_instance_id."
+   "status": "inspected_labels_unsuitable_for_request_level_detection",
+   "notes": "Record is v2; ZIP filename is v1. No training/test leakage across attack_instance_id.",
+   "label_audit": "Read 2026-11-26 from the publisher's code/extract_features.py (lines 367-389, 705-711): each of the 5,840 L7 label events is assigned to one request, the nearest unused one within 30 s; every other request (about 192,000 of 198,082) is labelled by label_l7_payload(), the publisher's own payload pattern rule, which defaults to NORMAL. Request-level labels therefore mostly reproduce a signature detector, and NORMAL means only that no pattern matched. All traffic, benign and attack, comes from one source IP (192.168.70.132). The label file records step start times without end times."
   },
   {
    "id": "ctu-sme-11",

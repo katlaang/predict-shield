@@ -44,6 +44,7 @@ function renderResults(ev) {
   const pd = ev.latest.powerduck_v3;
   const dvwa = ev.latest.dvwa_v1;
   const dvwa2 = ev.latest.dvwa_v2;
+  const dvwa3 = ev.latest.dvwa_v3;
   const v3 = ev.misses.find((m) => m.name.endsWith("v3"));
   const rows = [
     ["Verifying a fix", `${c.trials.toLocaleString("en-US")} sealed trials on a lab of independent services enforcing access revocation`,
@@ -66,6 +67,9 @@ function renderResults(ev) {
     ["DVWA v2: learned novelty and response evidence", "Follow-up local DVWA lab, fresh session with previously examined attack families",
       `Detected ${dvwa2.successful_attacks.alerts} of ${dvwa2.successful_attacks.rows} successful attacks (${pct(dvwa2.successful_attacks.rate, 1)}), versus a 90% requirement; flagged ${dvwa2.benign.alerts} of ${dvwa2.benign.rows} benign requests (${pct(dvwa2.benign.rate, 1)}). Failed the detection condition. Not a matched comparison with v1.`,
       "short", dvwa2.source],
+    ["Detecting web attacks from request, server and response evidence", "DVWA v3, one fresh lab session: 1,000 benign requests and 117 successful attacks in four families",
+      `Caught ${dvwa3.successful_attacks.alerts} of ${dvwa3.successful_attacks.of} successful attacks and alerted on ${dvwa3.benign.alerts} of ${dvwa3.benign.of} benign requests (${pct(dvwa3.benign.rate, 1)}). The attack payloads had been used in earlier versions and the benign traffic is generated, so this is a lab result, not field performance.`,
+      "ok", dvwa3.source],
     ["Detecting attacks on a new network", "Trained on two lab datasets, tested on HIKARI-2021",
       `Detected ${pct(v3.detection_rate, 2)} of attack flows in the cross-environment test. This configuration did not establish cross-network generalization.`, "short", v3.source],
   ];
