@@ -45,6 +45,7 @@ function renderResults(ev) {
   const dvwa = ev.latest.dvwa_v1;
   const dvwa2 = ev.latest.dvwa_v2;
   const dvwa3 = ev.latest.dvwa_v3;
+  const sql = ev.latest.superviz25_sql;
   const v3 = ev.misses.find((m) => m.name.endsWith("v3"));
   const rows = [
     ["Verifying a fix", `${c.trials.toLocaleString("en-US")} sealed trials on a lab of independent services enforcing access revocation`,
@@ -70,6 +71,9 @@ function renderResults(ev) {
     ["Detecting web attacks from request, server and response evidence", "DVWA v3, one fresh lab session: 1,000 benign requests and 117 successful attacks in four families",
       `Caught ${dvwa3.successful_attacks.alerts} of ${dvwa3.successful_attacks.of} successful attacks and alerted on ${dvwa3.benign.alerts} of ${dvwa3.benign.of} benign requests (${pct(dvwa3.benign.rate, 1)}). The attack payloads had been used in earlier versions and the benign traffic is generated, so this is a lab result, not field performance.`,
       "ok", dvwa3.source],
+    ["Detecting SQL injection on outside data", `${sql.dataset}: learned from its benign training queries only, tested once on ${sql.benign.of.toLocaleString("en-US")} benign and ${sql.attacks.of.toLocaleString("en-US")} attack queries`,
+      `Caught ${pct(sql.attacks.rate, 1)} of attack queries, including every exploitation-stage query (${sql.exploit_stage.alerts.toLocaleString("en-US")} of ${sql.exploit_stage.of.toLocaleString("en-US")}), and alerted on ${pct(sql.benign.rate, 2)} of benign queries. Margins were narrow: the weakest technique (${sql.lowest_technique.name}) was ${pct(sql.lowest_technique.rate, 1)} against a 75% bar. Benign queries are template-generated.`,
+      "ok", sql.source],
     ["Detecting attacks on a new network", "Trained on two lab datasets, tested on HIKARI-2021",
       `Detected ${pct(v3.detection_rate, 2)} of attack flows in the cross-environment test. This configuration did not establish cross-network generalization.`, "short", v3.source],
   ];
