@@ -1,5 +1,15 @@
 # Development changelog
 
+## 2026-11-26: DVWA correlation detector v3, single test session
+
+- Per-field request profiles, learned from benign traffic, plus Fisher fusion of four calibrated evidence scores, with no hand-set weights. Development run 45883884274; test run 45884393589.
+- **Passed.** The fused detector caught 117 of 117 successful attacks (all four families) with 5 of 1,000 benign alerts (0.5%).
+- Ablations:
+  - Request-field novelty alone: 117 of 117, with 0 benign alerts.
+  - Isolation forest alone: 17 of 117, with 4 benign alerts.
+  - Host and response evidence fired only on successful attacks.
+- **Limits:** the payload strings come from the v1 generator and were seen before (only the seeds are new), and benign traffic is synthetic. Evidence: `docs/evidence/MEASURED_DVWA_CORRELATION_V3_2026_11_26.md`.
+
 ## 2026-11-24: PowerDuck GOOSE detector v3, third measurement
 
 - Version 3 builds each stream's history only from messages the detector did not alert on. False incidents per hour are part of the pass condition. Development run 45337132344; test run 45338172898.
@@ -33,23 +43,6 @@
 - **Failed.** The correlated model alerted on 0.7% of 1,000 benign requests (passed the 1% ceiling) but detected only 29 of 117 successful attacks (24.8%): command injection 29 of 30, and none of the file inclusion or SQL injection attacks.
 - **Interpretation.** Unseen-category indicators were constant in benign training and cannot drive splits by themselves in the fitted forest. This is a plausible cause of the missed attacks, not an independently isolated causal finding or a claim about all learned detectors.
 - Version 2 must score novelty explicitly and add response evidence for SQL injection. Evidence: `docs/evidence/MEASURED_DVWA_CORRELATION_DETECTOR_2026_11_24.md`.
-
-## 2026-11-24 (c): In-network flow detection on HIKARI-2021
-
-- Trained on 1% to 50% of the designated half-dataset training pool (approximately 0.5% to 25% of all HIKARI-2021 flows) and tested once on the held-out half (run 45330331055).
-- Failed. It detected 5.5% of attacks at the 5% slice against a 90% floor, and the measured training-size configurations did not reach the target.
-- An exploratory check written after the result (run 45330750423) found supervised AUC 0.95 and 16% detection at 1% false alarms for the tested configuration; this does not establish the best attainable feature separation.
-- Evidence: `docs/evidence/MEASURED_HIKARI_IN_NETWORK_2026_11_24.md`.
-
-## 2026-11-24: ISP network lab with a contained BGP hijack
-
-- `experiment-b/isp-net-lab/`: a routed ISP in containerlab with FRRouting routers (OSPF core, iBGP route reflector, eBGP to a transit provider and a customer) and hosts that name themselves.
-- **Scenario:** a customer hijacks the provider's prefix with two /25s, and the subscriber's traffic reaches the attacker.
-  - Detection compares received routes with the customer's registered prefixes.
-  - An over-broad filter was rolled back when the observer saw the customer cut off.
-  - The registry filter was applied with a signed approval and verified by an observer that reads every ISP router directly.
-- Record: CI run 45327610238. Evidence: `docs/evidence/ISP_BGP_HIJACK_LAB_2026_11_24.md`.
-
 
 ## 2026-11-24 (b): PowerDuck GOOSE detector v2, second measurement
 
