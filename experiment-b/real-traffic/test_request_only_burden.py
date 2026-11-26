@@ -16,6 +16,18 @@ class RealTrafficTests(unittest.TestCase):
         self.assertEqual(out["params"]["id"], "abc'")
         self.assertEqual(out["timestamp"].utcoffset(), datetime.timedelta(hours=7))
 
+    def test_double_slash_origin_form_keeps_full_path(self):
+        line = 'IP0001 - - [01/Feb/2026:03:04:05 +0700] "GET //outside-site/index.php HTTP/1.1" 200 99 "-" "-"'
+        parsed = mod.parsed_record(line)
+        self.assertEqual(parsed["path"], "//outside-site/index.php")
+        self.assertIsNotNone(mod.parsed_record(
+            'IP0001 - - [01/Feb/2026:03:04:05 +0700] "GET //admin HTTP/1.1" 200 99 "-" "-"'))
+
+    def test_absolute_form_retains_distinct_origin(self):
+        line = 'IP0001 - - [01/Feb/2026:03:04:05 +0700] "GET http://other.example/vulnerabilities/sqli/?id=2 HTTP/1.1" 200 99 "-" "-"'
+        parsed = mod.parsed_record(line)
+        self.assertEqual(parsed["path"], "/__absolute_target__/other.example/vulnerabilities/sqli/")
+
     def test_never_invent_post_body(self):
         line = 'IP0001 - - [01/Feb/2026:03:04:05 +0700] "POST /login HTTP/1.1" 200 99 "-" "agent"'
         out = mod.parsed_record(line)
