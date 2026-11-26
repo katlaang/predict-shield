@@ -7,6 +7,7 @@ import threading
 import time
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 import pilot
 
@@ -85,6 +86,11 @@ class ReadOnlyPilotTests(unittest.TestCase):
             pilot.train(a,b,md,"site_x",True)
             frozen, loaded=pilot.load_frozen(md,"site_x")
             self.assertTrue(hasattr(loaded, "score_samples"))
+            self.assertIn("protocol_sha256", frozen)
+            original_sha = pilot.sha
+            with patch.object(pilot, "sha", side_effect=lambda p: "0"*64 if p.name=="protocol.json" else original_sha(p)):
+                with self.assertRaisesRegex(ValueError, "protocol changed"):
+                    pilot.load_frozen(md, "site_x")
             model_file = md/"model.pkl"
             original = model_file.read_bytes()
             model_file.write_bytes(original + b"tamper")
