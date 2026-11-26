@@ -1,0 +1,54 @@
+name: Showcase and dataset provenance audit
+
+on:
+  pull_request:
+    paths:
+      - 'experiment-b/open-datasets/**'
+      - 'experiment-b/powerduck-v3/reports/**'
+      - 'showcase/**'
+      - '.github/ISSUE_TEMPLATE/pilot-request.yml'
+      - '.github/workflows/showcase-and-dataset-audit.yml'
+  push:
+    branches: [master]
+    paths:
+      - 'experiment-b/open-datasets/**'
+      - 'experiment-b/powerduck-v3/reports/**'
+      - 'showcase/**'
+      - '.github/workflows/showcase-and-dataset-audit.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  provenance-and-showcase:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate publisher registry and bounded correlation semantics
+        run: |
+          cd experiment-b/open-datasets
+          python registry.py validate
+          python -m unittest test_registry -v
+      - name: Verify showroom data match the pinned frozen reports
+        run: |
+          cp showcase/public/data/evidence.json "$RUNNER_TEMP/evidence-before.json"
+          python showcase/scripts/build_evidence.py
+          python - "$RUNNER_TEMP/evidence-before.json" showcase/public/data/evidence.json <<'PY'
+          import json, sys
+          a, b = [json.load(open(p)) for p in sys.argv[1:]]
+          assert a == b, "Showcase data differ from actual committed evidence."
+          assert a["latest"]["powerduck_v3"]["false_incidents"] == 242
+          assert a["latest"]["powerduck_v3"]["passed"] is False
+          assert a["latest"]["dvwa_v1"]["passed"] is False
+          PY
+      - name: Validate pilot contact and no unsupported product language
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          html = Path("showcase/public/index.html").read_text()
+          js = Path("showcase/public/app.js").read_text()
+          assert "pilot-request.yml" in html and "pilot-request.yml" in js
+          assert "Every test had its success criteria fixed" not in html
+          assert "Needs training data from the network it protects." not in js
+          PY
