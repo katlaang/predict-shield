@@ -105,3 +105,9 @@ class RegistryTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class LicenseAllowListTests(unittest.TestCase):
+    def test_only_permissive_reuse_licenses_are_approved(self):
+        import registry
+        self.assertEqual(registry.APPROVED_LICENSES, {"CC-BY-4.0", "MIT"})

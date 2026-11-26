@@ -19,7 +19,7 @@ from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 DEFAULT_REGISTRY = HERE / "registry.json"
-APPROVED_LICENSES = {"CC-BY-4.0"}
+APPROVED_LICENSES = {"CC-BY-4.0", "MIT"}
 MAX_READ_MEMBER = 64 * 1024 * 1024
 MAX_EVENTS = 10_000
 MAX_PAIRS = 10_000
