@@ -1,0 +1,10 @@
+{
+  "schema": "predict-shield/cross-stream-consistency/1",
+  "registered": "2026-11-26",
+  "hypothesis": "Cross-stream, lagged learned normal relationships can flag physical inconsistencies missed by message-only detection.",
+  "inputs": "IPAL records with timestamp, src, dest and data; explicit physically justified stream and field mapping is mandatory.",
+  "development": "Chronological first 70% of aligned normal-only pairs used to fit least-squares linear mapping; remaining 30% calibrate a 1% residual threshold. No attack labels used until frozen model is stored.",
+  "test": "Separate attack capture scored once against unchanged frozen calibration; per-target message label is recorded separately from reference-stream attack context.",
+  "passes": "Not defined until real target mapping and independent ground truth are reviewed; current proof is a deterministic synthetic unit demonstration, not a claim of attack detection.",
+  "limits": "If no validated mapping or insufficient correlation/normal variation, fail closed. Missing reference data is INDETERMINATE, not benign. Correlation does not establish causal physical relationship."
+}
