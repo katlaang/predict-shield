@@ -22,7 +22,7 @@ permissions:
 
 jobs:
   inspect:
-    if: github.event_name == 'push' || github.event.inputs.stage == 'inspect'
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.stage == 'inspect'
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -36,3 +36,56 @@ jobs:
             --file dataset.csv --output "$RUNNER_TEMP/superviz.csv" --max-mb 1200
           sha256sum "$RUNNER_TEMP/superviz.csv"
       - run: python experiment-b/superviz25-sql/inspect_train.py "$RUNNER_TEMP/superviz.csv"
+
+  unit-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install 'scikit-learn==1.7.2' 'numpy==2.3.4'
+      - working-directory: experiment-b/superviz25-sql
+        run: python -m unittest test_model_sql -v
+
+  run:
+    if: github.event_name == 'workflow_dispatch' && (github.event.inputs.stage == 'develop' || github.event.inputs.stage == 'test')
+    needs: unit-tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install 'scikit-learn==1.7.2' 'numpy==2.3.4'
+      - name: Download with publisher checksum
+        run: |
+          python experiment-b/open-datasets/registry.py download --dataset superviz25-sql-v2 \
+            --file dataset.csv --output "$RUNNER_TEMP/superviz.csv" --max-mb 1200
+      - name: Develop on the training split and freeze
+        if: github.event.inputs.stage == 'develop'
+        working-directory: experiment-b/superviz25-sql
+        run: |
+          test ! -f frozen/freeze.json
+          python model_sql.py develop --data "$RUNNER_TEMP/superviz.csv" --out-dir frozen
+          git config user.name katlaang
+          git config user.email katlaang@users.noreply.github.com
+          git add frozen
+          git commit -m "superviz25-sql: record the freeze from develop run ${{ github.run_id }} before any test row is read"
+          git push origin HEAD:${{ github.ref_name }}
+      - name: Score the test split once
+        if: github.event.inputs.stage == 'test'
+        working-directory: experiment-b/superviz25-sql
+        run: |
+          test ! -f frozen/test-report.json
+          python model_sql.py test --data "$RUNNER_TEMP/superviz.csv" --frozen-dir frozen \
+            --expected-freeze-sha256 "${{ github.event.inputs.freeze_sha256 }}" --output frozen/test-report.json
+          git config user.name katlaang
+          git config user.email katlaang@users.noreply.github.com
+          git add frozen/test-report.json
+          git commit -m "superviz25-sql: record the single test run (run ${{ github.run_id }})"
+          git push origin HEAD:${{ github.ref_name }}

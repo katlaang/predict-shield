@@ -1,0 +1,14 @@
+{
+ "name": "DVWA v3 detection method on Superviz25-SQL (external, France)",
+ "registered": "2026-11-26, after reading only the training split's structure and the published row counts, before any model was fitted or any test row was read",
+ "question": "Does the v3 method (per-field input profiles plus a learned anomaly model, fused by Fisher's method over benign-calibrated tail probabilities), learned only from this dataset's benign training queries, detect sqlmap SQL injection at a low benign alert rate on data we did not generate?",
+ "source": {"dataset": "Superviz25-SQL v2, Zenodo 17086037, MIT license", "file": "dataset.csv",
+            "md5": "7fe0fd69a3cde9b57bc4f1e2d19260f8",
+            "sha256": "cd343652f37cd5d153a1cf417439e60c5e15f063642905b1d521cb5c5c96c4b5"},
+ "method_carried_over": "char_class, tail_p and fused are imported unchanged from experiment-b/dvwa-correlation-v3/model_v3.py. The field is the query template (query_template_id) and its value is user_inputs. Components: input_novelty (character classes and length outside what benign training showed for that template; unseen template scores 10) and learned_anomaly (IsolationForest(n_estimators=300, random_state=2026112801) over character-class counts, length and token count of user_inputs plus a template one-hot). There are no host or response signals in this dataset.",
+ "development": "Training split only (all benign). Rows shuffled with seed 2026112801, then 40% fit profiles and the forest, 35% calibrate tail probabilities, 25% set the threshold at 0.5%.",
+ "test": "The publisher's test split, scored once after the freeze: 3,017,390 benign and 336,281 attack queries. Labels are by construction (sqlmap campaigns).",
+ "pass_condition": "For the fused detector, all three: (1) at most 1% of benign test queries alert; (2) at least 90% of attack queries alert; (3) for each sqlmap technique (boolean, error, inline, stacked, time, union, insider), at least 75% of its attack queries alert. Reported beside it: each component alone, and rates by attack stage, campaign status and tamper script.",
+ "known_limits": "Benign queries are synthetic, generated from the same 65 templates and value pools in train and test, so benign test traffic matches training closely. SQL queries only. The method was designed on DVWA before this dataset was read; no setting is tuned here.",
+ "not_claimed": "Real user traffic; attacks other than sqlmap; HTTP, host or response evidence."
+}
