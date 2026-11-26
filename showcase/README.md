@@ -2,7 +2,7 @@
 
 A static product site for PREDICT-SHIELD, aimed at ISPs, telecom operators and businesses with websites. It covers what PREDICT-SHIELD does, how it works and who it is for. It also shows the tested results (including the ones that fell short), offers a live CVE exploitation-rank lookup, and invites visitors to request a pilot.
 
-Set `CONTACT_URL` at the top of `public/app.js` (a mailto: link or a form URL) before deploying. Until it is set, the "Request a pilot" button scrolls to the pilot section.
+Pilot requests now open a public GitHub issue form at `https://github.com/katlaang/predict-shield/issues/new?template=pilot-request.yml`. This requires GitHub sign-in; visitors are warned not to disclose private infrastructure details. Configure a private business contact channel separately before accepting confidential inquiries.
 
 Every number on the site is read from files in `public/data/`, which are generated from committed reports and recorded runs:
 
@@ -23,3 +23,7 @@ Every number on the site is read from files in `public/data/`, which are generat
 ```bash
 cd showcase/public && python3 -m http.server 8000
 ```
+
+## Scientific integrity
+
+The evidence table includes the documented unsuccessful DVWA v1 test and PowerDuck v3 results, including the independent 242-incident retrospective correction. The corrected count is derived from previously examined captures and is **not new external validation**. Run `python showcase/scripts/build_evidence.py` after new committed experimental evidence and review the generated `public/data/evidence.json` before deploying.
