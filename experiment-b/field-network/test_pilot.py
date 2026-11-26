@@ -136,5 +136,31 @@ class ReadOnlyPilotTests(unittest.TestCase):
             self.assertFalse(res["changes_to_network"])
 
 
+    def test_partial_zeek_line_does_not_block_rotated_log(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            a = make(root / "baseline", 10000, 250)
+            b = make(root / "calibration", 12000, 150)
+            model = root / "model"
+            pilot.train(a, b, model, "site", True)
+            current = make(root / "conn.log", 15000, 2)
+            def append_and_rotate():
+                time.sleep(0.25)
+                with current.open("ab") as f:
+                    f.write(b'{"ts":')
+                    f.flush()
+                time.sleep(0.4)
+                current.rename(root / "conn.log.1")
+                current.write_text(json.dumps({
+                    "ts": 16001, "proto": "udp", "orig_bytes": 300,
+                    "orig_pkts": 5, "resp_pkts": 2}) + "\n")
+            t = threading.Thread(target=append_and_rotate, daemon=True)
+            t.start()
+            result = pilot.watch(current, model, root / "rotation.json", "site", True, 2)
+            t.join(2)
+            self.assertEqual(result["flow_records_scored"], 1)
+            self.assertEqual(result["response_actions_attempted"], 0)
+
+
 if __name__=="__main__":
     unittest.main()
