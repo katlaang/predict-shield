@@ -32,6 +32,24 @@ class PhysicalRelationshipTests(unittest.TestCase):
         self.assertEqual(result["primary_attack_alerts"], 1)
         self.assertIsNone(result["normal_false_positive_rate"])
 
+    def test_missing_primary_measurement_is_indeterminate_not_dropped(self):
+        example = trace()
+        example[1]["data"].pop("current_A")
+        frozen, _ = train(trace(), SPEC)
+        scored = score(example, frozen)
+        self.assertEqual(scored["total_primary_messages"], 300)
+        self.assertEqual(scored["indeterminate"], 1)
+        self.assertEqual(scored["events"][0]["reason"], "missing_primary_measurement")
+
+    def test_missing_malicious_primary_still_audited_as_missing(self):
+        example = trace()
+        example[1]["data"].pop("current_A")
+        example[1]["malicious"] = "labeled"
+        frozen, _ = train(trace(), SPEC)
+        scored = score(example, frozen)
+        self.assertEqual(scored["indeterminate"], 1)
+        self.assertEqual(scored["events"][0]["truth"], "ATTACK_LABELED_PRIMARY")
+
     def test_no_reference_abstains(self):
         spec = PairSpec("breaker>bus", "current_A", "meter>bus", "current_A")
         result = aligned(trace(2, break_reference=True), spec)
