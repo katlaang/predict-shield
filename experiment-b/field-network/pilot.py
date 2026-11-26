@@ -189,7 +189,7 @@ def load_frozen(directory: Path, site: str):
 
 
 def report(site: str, frozen: dict, total: int, alerts: int, invalid: int,
-           first_ts, last_ts, *, source_sha=None, observation_seconds=None):
+           first_ts, last_ts, *, source_sha=None, observation_seconds=None, overlap_count=0):
     flow_rate = alerts / total if total else None
     return {
         "schema": SCHEMA + "/observation",
@@ -198,6 +198,7 @@ def report(site: str, frozen: dict, total: int, alerts: int, invalid: int,
         "operational_scope": "authorized_network_passive_observation_only",
         "flow_records_scored": total, "anomaly_alerts": alerts,
         "invalid_or_incomplete_records": invalid,
+        "excluded_precalibration_or_overlapping_flows": overlap_count,
         "anomaly_alert_fraction": flow_rate,
         "anomalies_per_1000_flows": 1000 * flow_rate if flow_rate is not None else None,
         "first_connection_ts": first_ts, "last_connection_ts": last_ts,
@@ -264,13 +265,14 @@ def watch(path: Path, model_dir: Path, output: Path, site: str, authorized: bool
                                 page=HERE / "dashboard.html",
                                 script=HERE / "dashboard.js").start()
         print("LOCAL READ-ONLY DASHBOARD:", server.url, flush=True)
-    count = alerts = invalid = 0
+    count = alerts = invalid = overlap = 0
     first = last = None
     begin = time.monotonic()
     # Start at EOF by design: historical data must be handled by 'evaluate'.
     handle = path.open("rb")
     handle.seek(0, os.SEEK_END)
     inode = path.stat().st_ino
+    previous_size = path.stat().st_size
     try:
         while time.monotonic() - begin < duration_s:
             raw = handle.readline()
@@ -280,27 +282,38 @@ def watch(path: Path, model_dir: Path, output: Path, site: str, authorized: bool
                     invalid += 1
                 else:
                     ts, vec = parsed
-                    v = np.asarray([vec])
-                    flag = float(-model.score_samples(v)[0]) > frozen["threshold"]
-                    count += 1
-                    alerts += bool(flag)
-                    first = ts if first is None else min(first, ts)
-                    last = ts if last is None else max(last, ts)
+                    if ts <= frozen["calibration_max_ts"]:
+                        # A newly appended line is not necessarily a new flow.
+                        # Exclude delayed/replayed calibration-period telemetry.
+                        overlap += 1
+                    else:
+                        v = np.asarray([vec])
+                        flag = float(-model.score_samples(v)[0]) > frozen["threshold"]
+                        count += 1
+                        alerts += bool(flag)
+                        first = ts if first is None else min(first, ts)
+                        last = ts if last is None else max(last, ts)
             elif raw:
                 handle.seek(-len(raw), os.SEEK_CUR)  # incomplete log line
-            else:
+            # Incomplete lines, EOF and ordinary progress must all check
+            # rotation/truncation; never spin forever on a partial record.
+            if not raw or not raw.endswith(b"\n"):
                 time.sleep(0.25)
-                try:
-                    s = path.stat()
-                    if s.st_ino != inode or s.st_size < handle.tell():
-                        handle.close()
-                        handle = path.open("rb")
-                        inode = s.st_ino
-                except FileNotFoundError:
-                    pass  # Zeek may briefly rotate the file
+            try:
+                file_stat = path.stat()
+                if (file_stat.st_ino != inode or
+                    file_stat.st_size < handle.tell() or
+                    file_stat.st_size < previous_size):
+                    handle.close()
+                    handle = path.open("rb")
+                    inode = file_stat.st_ino
+                previous_size = file_stat.st_size
+            except FileNotFoundError:
+                pass  # Zeek may briefly rotate the file
             if state is not None:
                 state.panel("field_network", {"site": site, "flow_records": count,
                     "anomalies": alerts, "invalid_records": invalid,
+                    "excluded_overlap_records": overlap,
                     "alert_fraction": alerts / count if count else None,
                     "monitor_only": True, "ground_truth": "UNKNOWN",
                     "model_sha256": frozen["freeze_sha256"]})
@@ -311,7 +324,8 @@ def watch(path: Path, model_dir: Path, output: Path, site: str, authorized: bool
         if server is not None:
             server.stop()
     result = report(site, frozen, count, int(alerts), invalid, first, last,
-                    observation_seconds=round(time.monotonic() - begin, 3))
+                    observation_seconds=round(time.monotonic() - begin, 3),
+                    overlap_count=overlap)
     write_new(output, result)
     return result
 
