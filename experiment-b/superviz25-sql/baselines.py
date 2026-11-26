@@ -29,6 +29,11 @@ import model_sql as ms  # noqa: E402
 SAMPLE_SEED = 2026112901
 BENIGN_SHARE, ATTACK_SHARE = 0.10, 0.25
 RATES = (0.001, 0.005, 0.01)
+# Sent with every CRS request, so CRS judges the input and not the HTTP client.
+BROWSER_HEADERS = {"User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:128.0) Gecko/20100101 Firefox/128.0",
+                   "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+                   "Accept-Language": "en-US,en;q=0.5", "Accept-Encoding": "identity", "Connection": "keep-alive"}
+PROBES = ("Vieques Airport", "MX 950.0", "Fort Cavazos", "GB 2")
 
 
 def test_rows(data: Path):
@@ -101,11 +106,26 @@ def cmd_crs(a):
     idx = np.flatnonzero(keep)
     opener = urllib.request.build_opener()
 
+    def get(q):
+        req = urllib.request.Request(f"{a.url}?q={q}", headers=BROWSER_HEADERS)
+        return opener.open(req, timeout=30)
+
+    # Harness check: benign training-style inputs must pass at every level, or the client
+    # (not the input) is what CRS is reacting to.
+    for probe in PROBES:
+        try:
+            with get(urllib.parse.quote(probe, safe="")) as resp:
+                code = resp.status
+        except urllib.error.HTTPError as e:
+            code = e.code
+        if code != 200:
+            raise SystemExit(f"harness check failed at level {a.level}: benign probe {probe!r} returned {code}")
+
     def send(i):
         q = urllib.parse.quote(rows[i][1], safe="")
         for attempt in range(3):
             try:
-                with opener.open(f"{a.url}?q={q}", timeout=30) as resp:
+                with get(q) as resp:
                     return resp.status
             except urllib.error.HTTPError as e:
                 return e.code

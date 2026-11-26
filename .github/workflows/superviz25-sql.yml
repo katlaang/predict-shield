@@ -11,7 +11,7 @@ on:
   workflow_dispatch:
     inputs:
       stage:
-        description: 'inspect, develop, test or baselines'
+        description: 'inspect, develop, test, baselines or baselines-rerun'
         default: 'inspect'
       freeze_sha256:
         description: 'test stage only'
@@ -92,7 +92,7 @@ jobs:
           git push origin HEAD:${{ github.ref_name }}
 
   baselines:
-    if: github.event_name == 'workflow_dispatch' && github.event.inputs.stage == 'baselines'
+    if: github.event_name == 'workflow_dispatch' && (github.event.inputs.stage == 'baselines' || github.event.inputs.stage == 'baselines-rerun')
     needs: unit-tests
     runs-on: ubuntu-latest
     timeout-minutes: 240
@@ -111,7 +111,7 @@ jobs:
       - name: Fixed sample, frozen detector, libinjection, supervised reference
         working-directory: experiment-b/superviz25-sql
         run: |
-          test ! -f reports/baselines.json
+          test ! -f reports/baselines-rerun.json
           mkdir -p "$RUNNER_TEMP/b"
           D="$RUNNER_TEMP/superviz.csv"; B="$RUNNER_TEMP/b"
           python baselines.py sample --data "$D" --out "$B/sample.npz"
@@ -143,10 +143,10 @@ jobs:
           mkdir -p reports
           python baselines.py report --data "$D" --sample "$B/sample.npz" --inputs "$B"/frozen_v3_method.npz \
             "$B"/libinjection.npz "$B"/supervised_reference.npz "$B"/owasp_crs_pl1.npz "$B"/owasp_crs_pl2.npz \
-            "$B"/owasp_crs_pl3.npz "$B"/owasp_crs_pl4.npz --output reports/baselines.json
-          cp "$B/crs-image-digest.txt" reports/crs-image-digest.txt
+            "$B"/owasp_crs_pl3.npz "$B"/owasp_crs_pl4.npz --output reports/baselines-rerun.json
+          cp "$B/crs-image-digest.txt" reports/crs-image-digest-rerun.txt
           git config user.name katlaang
           git config user.email katlaang@users.noreply.github.com
           git add reports
-          git commit -m "superviz25-sql: record the baseline comparison (run ${{ github.run_id }})"
+          git commit -m "superviz25-sql: record the baseline comparison rerun with fixed client headers (run ${{ github.run_id }})"
           git push origin HEAD:${{ github.ref_name }}
