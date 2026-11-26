@@ -1,0 +1,69 @@
+name: DVWA v2 and cross-stream learned consistency
+
+on:
+  pull_request:
+    paths:
+      - 'experiment-b/dvwa-correlation-v2/**'
+      - 'experiment-b/powerduck-physical/**'
+      - '.github/workflows/dvwa-v2-physical.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  unit-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install 'scikit-learn==1.7.2' 'numpy==2.3.4'
+      - name: Test novelty and response scoring
+        working-directory: experiment-b/dvwa-correlation-v2
+        run: python -m unittest test_model_v2 -v
+      - name: Test learned cross-stream physical consistency
+        working-directory: experiment-b/powerduck-physical
+        run: python -m unittest test_physical_consistency -v
+
+  follow-up-dvwa-lab:
+    needs: unit-tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install pinned model dependencies and local DVWA instrumentation
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y php-cli php-mysql strace iputils-ping netcat-openbsd curl
+          pip install 'scikit-learn==1.7.2' 'numpy==2.3.4'
+      - name: Start disposable MariaDB bound to loopback
+        run: |
+          docker run -d --name ps-dvwa-v2-db -p 127.0.0.1:3306:3306 \
+            -e MARIADB_ROOT_PASSWORD=ps-lab-root -e MARIADB_DATABASE=dvwa \
+            -e MARIADB_USER=dvwa -e MARIADB_PASSWORD='p@ssw0rd' mariadb:11
+          for i in $(seq 1 60); do
+            if docker exec ps-dvwa-v2-db mariadb-admin ping -h 127.0.0.1 -uroot -pps-lab-root --silent; then exit 0; fi
+            sleep 2
+          done
+          docker logs ps-dvwa-v2-db; exit 1
+      - name: Benign-only train, threshold and freeze
+        working-directory: experiment-b/dvwa-correlation-v2
+        run: python model_v2.py develop --out-dir /tmp/dvwa-v2-freeze
+      - name: Score fresh session once after code and model freeze
+        working-directory: experiment-b/dvwa-correlation-v2
+        run: python model_v2.py test --frozen-dir /tmp/dvwa-v2-freeze --output /tmp/dvwa-v2-result.json
+      - name: Preserve first-scored result even if it failed its pass condition
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: dvwa-v2-normal-only-freeze-and-fresh-test
+          path: |
+            /tmp/dvwa-v2-freeze/freeze.json
+            /tmp/dvwa-v2-result.json
+          if-no-files-found: warn
