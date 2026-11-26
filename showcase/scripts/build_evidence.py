@@ -33,6 +33,10 @@ def main() -> None:
     incident_fix = load("experiment-b/powerduck-v3/reports/corrected-incident-accounting-45341753534.json")
     dvwa = load("experiment-b/dvwa-correlation/frozen/test-report.json")
     dvwa_v2 = load("experiment-b/dvwa-correlation-v2/reports/first-scored-run-45881347517.json")
+    dvwa_v3 = load("experiment-b/dvwa-correlation-v3/frozen/test-report.json")
+    v3f = dvwa_v3["results"]["fused"]
+    if not dvwa_v3["passed"] or v3f["successful_attacks"]["alerts"] != 117 or v3f["benign"]["alerts"] != 5:
+        raise ValueError("unexpected DVWA v3 test report")
     if dvwa_v2["passed"] or dvwa_v2["successful_attacks"]["alerts"] != 35 or dvwa_v2["successful_attacks"]["rows"] != 92:
         raise ValueError("unexpected first-scored DVWA v2 result")
     if incident_fix["freeze_sha256"] != powerduck_v3["freeze_sha256"]:
@@ -71,6 +75,16 @@ def main() -> None:
             "top": {k: exploit[k] for k in ("top_1pct", "top_5pct", "top_10pct")},
         },
         "latest": {
+            "dvwa_v3": {
+                "source": REPO + "docs/evidence/MEASURED_DVWA_CORRELATION_V3_2026_11_26.md",
+                "run": "https://github.com/katlaang/predict-shield/actions/runs/45884393589",
+                "passed": dvwa_v3["passed"],
+                "benign": v3f["benign"],
+                "successful_attacks": v3f["successful_attacks"],
+                "successful_by_family": v3f["successful_by_family"],
+                "known_attack_payloads": True,
+                "synthetic_benign_traffic": True,
+            },
             "powerduck_v3": {
                 "source": REPO + "docs/evidence/MEASURED_POWERDUCK_GOOSE_DETECTOR_V3_2026_11_24.md",
                 "audit": incident_fix["source_run"],
