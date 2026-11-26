@@ -1,0 +1,41 @@
+{
+  "schema": "predict-shield/real-log-observations-from-ci/1",
+  "first_scored_run": "https://github.com/katlaang/predict-shield/actions/runs/45898435311",
+  "first_scored_job_id": 140178199358,
+  "first_scored_pr_head": "39168b68109636bdf2a289fd8b8421f77e553413",
+  "source": {
+    "archive_bytes": 28630570,
+    "archive_sha256": "d60f8cf9a907a7d70df201e8d931b5df6d3d384e21ed058551cc154089b84f59",
+    "collection_environment": "polish-online-shop-december-2025",
+    "id": "poland-ecommerce-dec2025",
+    "publisher_checksum_verified": true,
+    "url": "https://zenodo.org/records/18895701"
+  },
+  "frozen_model": "7ae09d7d4d4a39d762f1edf3ca214aa89c6ebe2f23e851c865e02a2ae4eda97a",
+  "component": "request_novelty_only",
+  "frozen_threshold": 0,
+  "full_fused_detector_executed": false,
+  "counts": {
+    "alerts_on_unknown_paths": 178920,
+    "known_path_requests": 19,
+    "log_lines": 178939,
+    "parsed_http_requests": 178939,
+    "request_component_alerts": 178920,
+    "requests_without_body_capture": 19837,
+    "unseen_path_requests": 178920
+  },
+  "observed_days": 2,
+  "calendar_span_days": 1,
+  "request_component_alert_fraction": 0.9998938185638682,
+  "unseen_path_fraction": 0.9998938185638682,
+  "query_request_fraction": 0,
+  "confirmed_benign_requests": 0,
+  "confirmed_malicious_requests": 0,
+  "manually_reviewed_requests": 0,
+  "ground_truth": "UNKNOWN",
+  "false_positive_rate": null,
+  "attack_recall": null,
+  "interpretation": "Domain shift: unseen DVWA URL paths cause request novelty alerts. Not validated full-model operating alert burden, not a false alarm or attack recall estimate.",
+  "review_status": "NOT_PERFORMED",
+  "first_ci_flag_correction": "An initial boolean based on any matching path was too permissive; no cross-site suitability is established."
+}
