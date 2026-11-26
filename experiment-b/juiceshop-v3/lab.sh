@@ -40,9 +40,13 @@ start_zap() {
   docker pull -q zaproxy/zap-stable
   docker inspect --format '{{index .RepoDigests 0}}' zaproxy/zap-stable | tee "$S/zap-digest.txt"
   docker run -d --name zap --network host zaproxy/zap-stable zap.sh -daemon -host 127.0.0.1 -port 8090 \
-    -config api.disablekey=true -config scanner.injectPluginIdInHeader=true -config scanner.threadPerHost=2 >/dev/null
+    -config api.disablekey=true >/dev/null
   for i in $(seq 1 90); do curl -s http://127.0.0.1:8090/JSON/core/view/version/ | grep -q version && break; sleep 2; done
   curl -s http://127.0.0.1:8090/JSON/core/view/version/; echo
+  curl -s "http://127.0.0.1:8090/JSON/ascan/action/setOptionInjectPluginIdInHeader/?Boolean=true" >/dev/null
+  INJ=$(curl -s "http://127.0.0.1:8090/JSON/ascan/view/optionInjectPluginIdInHeader/")
+  echo "inject plugin id: $INJ"
+  echo "$INJ" | grep -q true || { echo "harness check failed: plugin id injection is off"; exit 1; }
 }
 
 zap_seed_and_scan() {   # $1 = max scan minutes
@@ -81,6 +85,9 @@ print("benign field names:", sorted({k for e, l in zip(ex, labels) if l == "beni
 print("benign paths:", sorted({e.path for e, l in zip(ex, labels) if l == "benign"})[:40])
 print("statuses benign:", dict(collections.Counter(r["status"] for r, l in zip(recs, labels) if l == "benign")))
 print("alerts:", len(json.load(open(S + "/alerts.json")).get("alerts", [])))
+zap = [l for l in labels if l.startswith("zap:")]
+print("zap plugin ids seen:", sorted(collections.Counter(zap).items())[:30])
+assert zap, "harness check failed: no request carried a ZAP plugin id"
 PY
     ;;
   develop)
