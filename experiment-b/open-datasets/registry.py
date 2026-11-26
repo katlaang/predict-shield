@@ -6,6 +6,7 @@ publisher made a file downloadable. Raw records never enter this repository.
 from __future__ import annotations
 
 import argparse
+import bisect
 import datetime as dt
 import hashlib
 import json
@@ -21,6 +22,7 @@ DEFAULT_REGISTRY = HERE / "registry.json"
 APPROVED_LICENSES = {"CC-BY-4.0"}
 MAX_READ_MEMBER = 64 * 1024 * 1024
 MAX_EVENTS = 10_000
+MAX_PAIRS = 10_000
 
 
 def validate_registry(reg: dict) -> None:
@@ -217,15 +219,21 @@ def correlate(archive: Path, host_member: str, network_member: str,
     with zipfile.ZipFile(archive) as z:
         host = read_json_lines(z, host_member)
         network = read_json_lines(z, network_member)
+    # Sort by time to avoid an unbounded all-to-all comparison. Refuse more
+    # than MAX_PAIRS outputs rather than truncate or exhaust CI memory.
+    indexed = sorted(enumerate(network), key=lambda item: item[1]["time"])
+    net_times = [row["time"] for _, row in indexed]
     pairs = []
     for i, h in enumerate(host):
         if not h["ips"]:
             continue
-        for j, n in enumerate(network):
-            if abs(h["time"] - n["time"]) > seconds:
-                continue
+        left = bisect.bisect_left(net_times, h["time"] - seconds)
+        right = bisect.bisect_right(net_times, h["time"] + seconds)
+        for j, n in indexed[left:right]:
             shared = sorted(h["ips"] & n["ips"])
             if shared:
+                if len(pairs) >= MAX_PAIRS:
+                    raise ValueError("correlation pair budget exceeded; narrow the window or sample by capture")
                 pairs.append({"host_event": i, "network_event": j,
                               "time_delta_s": round(h["time"] - n["time"], 4),
                               "shared_ips": shared, "ground_truth": "UNKNOWN"})
