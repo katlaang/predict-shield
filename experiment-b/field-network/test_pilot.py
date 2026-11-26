@@ -120,6 +120,8 @@ class ReadOnlyPilotTests(unittest.TestCase):
             def append():
                 time.sleep(0.25)
                 with current.open("a") as f:
+                    f.write(json.dumps({"ts": 12001.0, "proto": "tcp",
+                                        "orig_bytes": 400, "orig_pkts": 4})+"\n")
                     f.write(json.dumps({"ts": 16001.0, "proto": "tcp",
                                         "orig_bytes": 500, "orig_pkts": 4})+"\n")
                     f.flush()
@@ -128,6 +130,7 @@ class ReadOnlyPilotTests(unittest.TestCase):
             res=pilot.watch(current,model,root/"watch.json","site",True,2)
             t.join(2)
             self.assertEqual(res["flow_records_scored"],1)
+            self.assertEqual(res["excluded_precalibration_or_overlapping_flows"],1)
             self.assertEqual(res["response_actions_attempted"],0)
             self.assertEqual(res["ground_truth"],"UNKNOWN")
             self.assertFalse(res["changes_to_network"])
