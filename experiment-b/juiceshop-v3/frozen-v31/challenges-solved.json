@@ -1,0 +1,50 @@
+[
+ {
+  "key": "captchaBypassChallenge",
+  "name": "CAPTCHA Bypass",
+  "category": "Broken Anti Automation",
+  "difficulty": 3,
+  "solved": true,
+  "updatedAt": "2026-11-27T00:55:12.132Z"
+ },
+ {
+  "key": "errorHandlingChallenge",
+  "name": "Error Handling",
+  "category": "Security Misconfiguration",
+  "difficulty": 1,
+  "solved": true,
+  "updatedAt": "2026-11-27T00:55:13.790Z"
+ },
+ {
+  "key": "forgedReviewChallenge",
+  "name": "Forged Review",
+  "category": "Broken Access Control",
+  "difficulty": 3,
+  "solved": true,
+  "updatedAt": "2026-11-27T00:55:25.826Z"
+ },
+ {
+  "key": "passwordRepeatChallenge",
+  "name": "Repetitive Registration",
+  "category": "Improper Input Validation",
+  "difficulty": 1,
+  "solved": true,
+  "updatedAt": "2026-11-27T00:55:24.351Z"
+ },
+ {
+  "key": "basketAccessChallenge",
+  "name": "View Basket",
+  "category": "Broken Access Control",
+  "difficulty": 2,
+  "solved": true,
+  "updatedAt": "2026-11-27T00:55:19.883Z"
+ },
+ {
+  "key": "zeroStarsChallenge",
+  "name": "Zero Stars",
+  "category": "Improper Input Validation",
+  "difficulty": 1,
+  "solved": true,
+  "updatedAt": "2026-11-27T01:03:35.975Z"
+ }
+]

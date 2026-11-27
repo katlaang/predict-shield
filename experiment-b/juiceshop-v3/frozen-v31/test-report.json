@@ -1,0 +1,3101 @@
+{
+ "challenges_solved": 6,
+ "checks": {
+  "at_least_2_confirmed_families": true,
+  "at_least_30_confirmed": false,
+  "benign_alert_rate_at_most_1pct": false,
+  "confirmed_attacks_at_least_90pct": false
+ },
+ "confirmed": 20,
+ "confirmed_by_source": {
+  "challenge": 15,
+  "sqlmap": 3,
+  "zap": 2
+ },
+ "confirmed_families": 5,
+ "freeze_sha256": "fd5d1b9314c3d2e0e14d7ccb62a63d7eb5cec0c05e34f3aa4adae09bb4550447",
+ "label_counts": {
+  "benign": 2257,
+  "sqlmap": 1773,
+  "unknown": 1422
+ },
+ "outcome": "inconclusive",
+ "pass_condition": "For the Cauchy-fused detector: (1) at most 1% of benign test requests alert; (2) at least 90% of confirmed attacks alert. If fewer than 30 confirmed attacks exist, or they come from fewer than 2 families, the outcome is inconclusive.",
+ "requests": 12526,
+ "results": {
+  "cauchy": {
+   "attack_attempts": {
+    "alerts": 7425,
+    "of": 8847,
+    "rate": 0.8392675483214649,
+    "wilson_95": [
+     0.8314671842011824,
+     0.846773413361024
+    ]
+   },
+   "attempts_by_family": {
+    "cmdi (seen in DVWA)": {
+     "alerts": 764,
+     "of": 805,
+     "rate": 0.9490683229813665,
+     "wilson_95": [
+      0.9316345545831362,
+      0.9622365397596009
+     ]
+    },
+    "lfi (seen in DVWA)": {
+     "alerts": 555,
+     "of": 590,
+     "rate": 0.940677966101695,
+     "wilson_95": [
+      0.9186151657044632,
+      0.9570394256398298
+     ]
+    },
+    "sqli (seen in DVWA)": {
+     "alerts": 3066,
+     "of": 3189,
+     "rate": 0.9614299153339605,
+     "wilson_95": [
+      0.9541722218896785,
+      0.9675772723777772
+     ]
+    },
+    "unseen: .env Information Leak": {
+     "alerts": 27,
+     "of": 27,
+     "rate": 1.0,
+     "wilson_95": [
+      0.8754449685379289,
+      1.0
+     ]
+    },
+    "unseen: .htaccess Information Leak": {
+     "alerts": 27,
+     "of": 27,
+     "rate": 1.0,
+     "wilson_95": [
+      0.8754449685379289,
+      1.0
+     ]
+    },
+    "unseen: Buffer Overflow": {
+     "alerts": 23,
+     "of": 23,
+     "rate": 1.0,
+     "wilson_95": [
+      0.8568833796149266,
+      1.0
+     ]
+    },
+    "unseen: CRLF Injection": {
+     "alerts": 161,
+     "of": 161,
+     "rate": 1.0,
+     "wilson_95": [
+      0.9766960392891071,
+      1.0
+     ]
+    },
+    "unseen: Cloud Metadata Potentially Exposed": {
+     "alerts": 13,
+     "of": 13,
+     "rate": 1.0,
+     "wilson_95": [
+      0.7719046248681998,
+      1.0
+     ]
+    },
+    "unseen: Cross Site Scripting (DOM Based)": {
+     "alerts": 224,
+     "of": 312,
+     "rate": 0.717948717948718,
+     "wilson_95": [
+      0.6655994307741828,
+      0.7649963513049312
+     ]
+    },
+    "unseen: Cross Site Scripting (Persistent)": {
+     "alerts": 11,
+     "of": 12,
+     "rate": 0.9166666666666666,
+     "wilson_95": [
+      0.6461200862787544,
+      0.9851349057603305
+     ]
+    },
+    "unseen: Cross Site Scripting (Persistent) - Prime": {
+     "alerts": 11,
+     "of": 23,
+     "rate": 0.4782608695652174,
+     "wilson_95": [
+      0.2923715729307258,
+      0.6703726279555817
+     ]
+    },
+    "unseen: Cross Site Scripting (Persistent) - Spider": {
+     "alerts": 56,
+     "of": 238,
+     "rate": 0.23529411764705882,
+     "wilson_95": [
+      0.18587286721463392,
+      0.2931246521402047
+     ]
+    },
+    "unseen: Cross Site Scripting (Reflected)": {
+     "alerts": 63,
+     "of": 69,
+     "rate": 0.9130434782608695,
+     "wilson_95": [
+      0.8229850157229862,
+      0.9595363790350239
+     ]
+    },
+    "unseen: Directory Browsing": {
+     "alerts": 90,
+     "of": 98,
+     "rate": 0.9183673469387755,
+     "wilson_95": [
+      0.8471171277629918,
+      0.9580559412479036
+     ]
+    },
+    "unseen: ELMAH Information Leak": {
+     "alerts": 1,
+     "of": 1,
+     "rate": 1.0,
+     "wilson_95": [
+      0.2065493117918027,
+      1.0
+     ]
+    },
+    "unseen: External Redirect": {
+     "alerts": 201,
+     "of": 207,
+     "rate": 0.9710144927536232,
+     "wilson_95": [
+      0.9382161542613101,
+      0.9866493870541919
+     ]
+    },
+    "unseen: Format String Error": {
+     "alerts": 54,
+     "of": 67,
+     "rate": 0.8059701492537313,
+     "wilson_95": [
+      0.695808876778016,
+      0.8829482613083239
+     ]
+    },
+    "unseen: Hidden File Finder": {
+     "alerts": 52,
+     "of": 52,
+     "rate": 1.0,
+     "wilson_95": [
+      0.9312077628655455,
+      1.0
+     ]
+    },
+    "unseen: Parameter Tampering": {
+     "alerts": 57,
+     "of": 113,
+     "rate": 0.504424778761062,
+     "wilson_95": [
+      0.4136219224929821,
+      0.5949366834126149
+     ]
+    },
+    "unseen: Remote Code Execution (React2Shell)": {
+     "alerts": 1,
+     "of": 1,
+     "rate": 1.0,
+     "wilson_95": [
+      0.2065493117918027,
+      1.0
+     ]
+    },
+    "unseen: Remote Code Execution - CVE-2012-1823": {
+     "alerts": 196,
+     "of": 196,
+     "rate": 1.0,
+     "wilson_95": [
+      0.9807774677847112,
+      0.9999999999999998
+     ]
+    },
+    "unseen: Remote Code Execution - Shell Shock": {
+     "alerts": 46,
+     "of": 46,
+     "rate": 1.0,
+     "wilson_95": [
+      0.92292643579224,
+      1.0
+     ]
+    },
+    "unseen: Server Side Code Injection": {
+     "alerts": 180,
+     "of": 184,
+     "rate": 0.9782608695652174,
+     "wilson_95": [
+      0.9454459826364616,
+      0.99151437237878
+     ]
+    },
+    "unseen: Server Side Include": {
+     "alerts": 92,
+     "of": 92,
+     "rate": 1.0,
+     "wilson_95": [
+      0.9599186101074083,
+      0.9999999999999999
+     ]
+    },
+    "unseen: Server Side Template Injection": {
+     "alerts": 322,
+     "of": 322,
+     "rate": 1.0,
+     "wilson_95": [
+      0.9882106503743115,
+      1.0
+     ]
+    },
+    "unseen: Server Side Template Injection (Blind)": {
+     "alerts": 276,
+     "of": 276,
+     "rate": 1.0,
+     "wilson_95": [
+      0.9862727313649208,
+      0.9999999999999999
+     ]
+    },
+    "unseen: Source Code Disclosure - /WEB-INF Folder": {
+     "alerts": 58,
+     "of": 58,
+     "rate": 1.0,
+     "wilson_95": [
+      0.9378821432937142,
+      0.9999999999999999
+     ]
+    },
+    "unseen: Source Code Disclosure - CVE-2012-1823": {
+     "alerts": 70,
+     "of": 70,
+     "rate": 1.0,
+     "wilson_95": [
+      0.9479769368117258,
+      0.9999999999999999
+     ]
+    },
+    "unseen: Spring Actuator Information Leak": {
+     "alerts": 2,
+     "of": 2,
+     "rate": 1.0,
+     "wilson_95": [
+      0.3423802239546494,
+      1.0
+     ]
+    },
+    "unseen: Spring4Shell": {
+     "alerts": 197,
+     "of": 197,
+     "rate": 1.0,
+     "wilson_95": [
+      0.9808731777657199,
+      0.9999999999999999
+     ]
+    },
+    "unseen: Trace.axd Information Leak": {
+     "alerts": 27,
+     "of": 27,
+     "rate": 1.0,
+     "wilson_95": [
+      0.8754449685379289,
+      1.0
+     ]
+    },
+    "unseen: User Agent Fuzzer": {
+     "alerts": 333,
+     "of": 1176,
+     "rate": 0.28316326530612246,
+     "wilson_95": [
+      0.2581517776570356,
+      0.3095867552102765
+     ]
+    },
+    "unseen: XPath Injection": {
+     "alerts": 69,
+     "of": 69,
+     "rate": 1.0,
+     "wilson_95": [
+      0.9472627410228545,
+      1.0
+     ]
+    },
+    "unseen: XSLT Injection": {
+     "alerts": 100,
+     "of": 104,
+     "rate": 0.9615384615384616,
+     "wilson_95": [
+      0.9052524856261187,
+      0.9849431867606003
+     ]
+    }
+   },
+   "benign": {
+    "alerts": 56,
+    "of": 2257,
+    "rate": 0.024811696942844484,
+    "wilson_95": [
+     0.019156585061804222,
+     0.0320816202649047
+    ]
+   },
+   "confirmed_attacks": {
+    "alerts": 13,
+    "of": 20,
+    "rate": 0.65,
+    "wilson_95": [
+     0.4328542750684442,
+     0.818808176876017
+    ]
+   },
+   "confirmed_by_family": {
+    "challenge: Broken Access Control": {
+     "alerts": 3,
+     "of": 5,
+     "rate": 0.6,
+     "wilson_95": [
+      0.23072427940911855,
+      0.8823792268590028
+     ]
+    },
+    "challenge: Broken Anti Automation": {
+     "alerts": 0,
+     "of": 2,
+     "rate": 0.0,
+     "wilson_95": [
+      0.0,
+      0.6576197760453506
+     ]
+    },
+    "challenge: Improper Input Validation": {
+     "alerts": 5,
+     "of": 6,
+     "rate": 0.8333333333333334,
+     "wilson_95": [
+      0.4364971749742326,
+      0.969946630588185
+     ]
+    },
+    "challenge: Security Misconfiguration": {
+     "alerts": 0,
+     "of": 2,
+     "rate": 0.0,
+     "wilson_95": [
+      0.0,
+      0.6576197760453506
+     ]
+    },
+    "sqli (seen in DVWA)": {
+     "alerts": 5,
+     "of": 5,
+     "rate": 1.0,
+     "wilson_95": [
+      0.5655175313406071,
+      1.0
+     ]
+    }
+   }
+  },
+  "cauchy_without_learned_anomaly": {
+   "attack_attempts": {
+    "alerts": 7521,
+    "of": 8847,
+    "rate": 0.8501186842997627,
+    "wilson_95": [
+     0.8425286596865705,
+     0.8574047905712786
+    ]
+   },
+   "attempts_by_family": {
+    "cmdi (seen in DVWA)": {
+     "alerts": 782,
+     "of": 805,
+     "rate": 0.9714285714285714,
+     "wilson_95": [
+      0.9574921095010271,
+      0.9808870891243358
+     ]
+    },
+    "lfi (seen in DVWA)": {
+     "alerts": 580,
+     "of": 590,
+     "rate": 0.9830508474576272,
+     "wilson_95": [
+      0.9690841621873366,
+      0.9907679860169846
+     ]
+    },
+    "sqli (seen in DVWA)": {
+     "alerts": 3083,
+     "of": 3189,
+     "rate": 0.9667607400439009,
+     "wilson_95": [
+      0.9599559371257453,
+      0.972442379025874
+     ]
+    },
+    "unseen: .env Information Leak": {
+     "alerts": 27,
+     "of": 27,
+     "rate": 1.0,
+     "wilson_95": [
+      0.8754449685379289,
+      1.0
+     ]
+    },
+    "unseen: .htaccess Information Leak": {
+     "alerts": 27,
+     "of": 27,
+     "rate": 1.0,
+     "wilson_95": [
+      0.8754449685379289,
+      1.0
+     ]
+    },
+    "unseen: Buffer Overflow": {
+     "alerts": 23,
+     "of": 23,
+     "rate": 1.0,
+     "wilson_95": [
+      0.8568833796149266,
+      1.0
+     ]
+    },
+    "unseen: CRLF Injection": {
+     "alerts": 161,
+     "of": 161,
+     "rate": 1.0,
+     "wilson_95": [
+      0.9766960392891071,
+      1.0
+     ]
+    },
+    "unseen: Cloud Metadata Potentially Exposed": {
+     "alerts": 13,
+     "of": 13,
+     "rate": 1.0,
+     "wilson_95": [
+      0.7719046248681998,
+      1.0
+     ]
+    },
+    "unseen: Cross Site Scripting (DOM Based)": {
+     "alerts": 224,
+     "of": 312,
+     "rate": 0.717948717948718,
+     "wilson_95": [
+      0.6655994307741828,
+      0.7649963513049312
+     ]
+    },
+    "unseen: Cross Site Scripting (Persistent)": {
+     "alerts": 12,
+     "of": 12,
+     "rate": 1.0,
+     "wilson_95": [
+      0.7575059904469021,
+      1.0
+     ]
+    },
+    "unseen: Cross Site Scripting (Persistent) - Prime": {
+     "alerts": 20,
+     "of": 23,
+     "rate": 0.8695652173913043,
+     "wilson_95": [
+      0.6787251755146014,
+      0.9546234094181704
+     ]
+    },
+    "unseen: Cross Site Scripting (Persistent) - Spider": {
+     "alerts": 54,
+     "of": 238,
+     "rate": 0.226890756302521,
+     "wilson_95": [
+      0.17826579096628015,
+      0.2841919670982359
+     ]
+    },
+    "unseen: Cross Site Scripting (Reflected)": {
+     "alerts": 67,
+     "of": 69,
+     "rate": 0.9710144927536232,
+     "wilson_95": [
+      0.900334161555053,
+      0.99201479737952
+     ]
+    },
+    "unseen: Directory Browsing": {
+     "alerts": 90,
+     "of": 98,
+     "rate": 0.9183673469387755,
+     "wilson_95": [
+      0.8471171277629918,
+      0.9580559412479036
+     ]
+    },
+    "unseen: ELMAH Information Leak": {
+     "alerts": 1,
+     "of": 1,
+     "rate": 1.0,
+     "wilson_95": [
+      0.2065493117918027,
+      1.0
+     ]
+    },
+    "unseen: External Redirect": {
+     "alerts": 203,
+     "of": 207,
+     "rate": 0.9806763285024155,
+     "wilson_95": [
+      0.9513767681532161,
+      0.9924603740097835
+     ]
+    },
+    "unseen: Format String Error": {
+     "alerts": 64,
+     "of": 67,
+     "rate": 0.9552238805970149,
+     "wilson_95": [
+      0.8764216682530326,
+      0.9846560249973755
+     ]
+    },
+    "unseen: Hidden File Finder": {
+     "alerts": 52,
+     "of": 52,
+     "rate": 1.0,
+     "wilson_95": [
+      0.9312077628655455,
+      1.0
+     ]
+    },
+    "unseen: Parameter Tampering": {
+     "alerts": 83,
+     "of": 113,
+     "rate": 0.7345132743362832,
+     "wilson_95": [
+      0.6463625058104147,
+      0.8072436071862134
+     ]
+    },
+    "unseen: Remote Code Execution (React2Shell)": {
+     "alerts": 1,
+     "of": 1,
+     "rate": 1.0,
+     "wilson_95": [
+      0.2065493117918027,
+      1.0
+     ]
+    },
+    "unseen: Remote Code Execution - CVE-2012-1823": {
+     "alerts": 196,
+     "of": 196,
+     "rate": 1.0,
+     "wilson_95": [
+      0.9807774677847112,
+      0.9999999999999998
+     ]
+    },
+    "unseen: Remote Code Execution - Shell Shock": {
+     "alerts": 46,
+     "of": 46,
+     "rate": 1.0,
+     "wilson_95": [
+      0.92292643579224,
+      1.0
+     ]
+    },
+    "unseen: Server Side Code Injection": {
+     "alerts": 184,
+     "of": 184,
+     "rate": 1.0,
+     "wilson_95": [
+      0.979549462061389,
+      1.0
+     ]
+    },
+    "unseen: Server Side Include": {
+     "alerts": 92,
+     "of": 92,
+     "rate": 1.0,
+     "wilson_95": [
+      0.9599186101074083,
+      0.9999999999999999
+     ]
+    },
+    "unseen: Server Side Template Injection": {
+     "alerts": 322,
+     "of": 322,
+     "rate": 1.0,
+     "wilson_95": [
+      0.9882106503743115,
+      1.0
+     ]
+    },
+    "unseen: Server Side Template Injection (Blind)": {
+     "alerts": 276,
+     "of": 276,
+     "rate": 1.0,
+     "wilson_95": [
+      0.9862727313649208,
+      0.9999999999999999
+     ]
+    },
+    "unseen: Source Code Disclosure - /WEB-INF Folder": {
+     "alerts": 58,
+     "of": 58,
+     "rate": 1.0,
+     "wilson_95": [
+      0.9378821432937142,
+      0.9999999999999999
+     ]
+    },
+    "unseen: Source Code Disclosure - CVE-2012-1823": {
+     "alerts": 70,
+     "of": 70,
+     "rate": 1.0,
+     "wilson_95": [
+      0.9479769368117258,
+      0.9999999999999999
+     ]
+    },
+    "unseen: Spring Actuator Information Leak": {
+     "alerts": 2,
+     "of": 2,
+     "rate": 1.0,
+     "wilson_95": [
+      0.3423802239546494,
+      1.0
+     ]
+    },
+    "unseen: Spring4Shell": {
+     "alerts": 197,
+     "of": 197,
+     "rate": 1.0,
+     "wilson_95": [
+      0.9808731777657199,
+      0.9999999999999999
+     ]
+    },
+    "unseen: Trace.axd Information Leak": {
+     "alerts": 27,
+     "of": 27,
+     "rate": 1.0,
+     "wilson_95": [
+      0.8754449685379289,
+      1.0
+     ]
+    },
+    "unseen: User Agent Fuzzer": {
+     "alerts": 312,
+     "of": 1176,
+     "rate": 0.2653061224489796,
+     "wilson_95": [
+      0.2408666511753635,
+      0.2912738785163154
+     ]
+    },
+    "unseen: XPath Injection": {
+     "alerts": 69,
+     "of": 69,
+     "rate": 1.0,
+     "wilson_95": [
+      0.9472627410228545,
+      1.0
+     ]
+    },
+    "unseen: XSLT Injection": {
+     "alerts": 103,
+     "of": 104,
+     "rate": 0.9903846153846154,
+     "wilson_95": [
+      0.9475322747417618,
+      0.998300627169127
+     ]
+    }
+   },
+   "benign": {
+    "alerts": 34,
+    "of": 2257,
+    "rate": 0.015064244572441293,
+    "wilson_95": [
+     0.01080004812885297,
+     0.02097637679430127
+    ]
+   },
+   "confirmed_attacks": {
+    "alerts": 13,
+    "of": 20,
+    "rate": 0.65,
+    "wilson_95": [
+     0.4328542750684442,
+     0.818808176876017
+    ]
+   },
+   "confirmed_by_family": {
+    "challenge: Broken Access Control": {
+     "alerts": 3,
+     "of": 5,
+     "rate": 0.6,
+     "wilson_95": [
+      0.23072427940911855,
+      0.8823792268590028
+     ]
+    },
+    "challenge: Broken Anti Automation": {
+     "alerts": 0,
+     "of": 2,
+     "rate": 0.0,
+     "wilson_95": [
+      0.0,
+      0.6576197760453506
+     ]
+    },
+    "challenge: Improper Input Validation": {
+     "alerts": 5,
+     "of": 6,
+     "rate": 0.8333333333333334,
+     "wilson_95": [
+      0.4364971749742326,
+      0.969946630588185
+     ]
+    },
+    "challenge: Security Misconfiguration": {
+     "alerts": 0,
+     "of": 2,
+     "rate": 0.0,
+     "wilson_95": [
+      0.0,
+      0.6576197760453506
+     ]
+    },
+    "sqli (seen in DVWA)": {
+     "alerts": 5,
+     "of": 5,
+     "rate": 1.0,
+     "wilson_95": [
+      0.5655175313406071,
+      1.0
+     ]
+    }
+   }
+  },
+  "fused_fisher_v3": {
+   "attack_attempts": {
+    "alerts": 7459,
+    "of": 8847,
+    "rate": 0.8431106589804453,
+    "wilson_95": [
+     0.835383321166232,
+     0.8505401617256811
+    ]
+   },
+   "attempts_by_family": {
+    "cmdi (seen in DVWA)": {
+     "alerts": 782,
+     "of": 805,
+     "rate": 0.9714285714285714,
+     "wilson_95": [
+      0.9574921095010271,
+      0.9808870891243358
+     ]
+    },
+    "lfi (seen in DVWA)": {
+     "alerts": 578,
+     "of": 590,
+     "rate": 0.9796610169491525,
+     "wilson_95": [
+      0.9647886746251971,
+      0.9883276690303217
+     ]
+    },
+    "sqli (seen in DVWA)": {
+     "alerts": 3103,
+     "of": 3189,
+     "rate": 0.9730322985261838,
+     "wilson_95": [
+      0.9668156025620903,
+      0.978110739335604
+     ]
+    },
+    "unseen: .env Information Leak": {
+     "alerts": 27,
+     "of": 27,
+     "rate": 1.0,
+     "wilson_95": [
+      0.8754449685379289,
+      1.0
+     ]
+    },
+    "unseen: .htaccess Information Leak": {
+     "alerts": 27,
+     "of": 27,
+     "rate": 1.0,
+     "wilson_95": [
+      0.8754449685379289,
+      1.0
+     ]
+    },
+    "unseen: Buffer Overflow": {
+     "alerts": 23,
+     "of": 23,
+     "rate": 1.0,
+     "wilson_95": [
+      0.8568833796149266,
+      1.0
+     ]
+    },
+    "unseen: CRLF Injection": {
+     "alerts": 161,
+     "of": 161,
+     "rate": 1.0,
+     "wilson_95": [
+      0.9766960392891071,
+      1.0
+     ]
+    },
+    "unseen: Cloud Metadata Potentially Exposed": {
+     "alerts": 13,
+     "of": 13,
+     "rate": 1.0,
+     "wilson_95": [
+      0.7719046248681998,
+      1.0
+     ]
+    },
+    "unseen: Cross Site Scripting (DOM Based)": {
+     "alerts": 197,
+     "of": 312,
+     "rate": 0.6314102564102564,
+     "wilson_95": [
+      0.5765843685932942,
+      0.6830395588367598
+     ]
+    },
+    "unseen: Cross Site Scripting (Persistent)": {
+     "alerts": 12,
+     "of": 12,
+     "rate": 1.0,
+     "wilson_95": [
+      0.7575059904469021,
+      1.0
+     ]
+    },
+    "unseen: Cross Site Scripting (Persistent) - Prime": {
+     "alerts": 19,
+     "of": 23,
+     "rate": 0.8260869565217391,
+     "wilson_95": [
+      0.6286235218500337,
+      0.9302134648553532
+     ]
+    },
+    "unseen: Cross Site Scripting (Persistent) - Spider": {
+     "alerts": 55,
+     "of": 238,
+     "rate": 0.23109243697478993,
+     "wilson_95": [
+      0.18206570975120973,
+      0.28866192895846765
+     ]
+    },
+    "unseen: Cross Site Scripting (Reflected)": {
+     "alerts": 67,
+     "of": 69,
+     "rate": 0.9710144927536232,
+     "wilson_95": [
+      0.900334161555053,
+      0.99201479737952
+     ]
+    },
+    "unseen: Directory Browsing": {
+     "alerts": 90,
+     "of": 98,
+     "rate": 0.9183673469387755,
+     "wilson_95": [
+      0.8471171277629918,
+      0.9580559412479036
+     ]
+    },
+    "unseen: ELMAH Information Leak": {
+     "alerts": 1,
+     "of": 1,
+     "rate": 1.0,
+     "wilson_95": [
+      0.2065493117918027,
+      1.0
+     ]
+    },
+    "unseen: External Redirect": {
+     "alerts": 203,
+     "of": 207,
+     "rate": 0.9806763285024155,
+     "wilson_95": [
+      0.9513767681532161,
+      0.9924603740097835
+     ]
+    },
+    "unseen: Format String Error": {
+     "alerts": 64,
+     "of": 67,
+     "rate": 0.9552238805970149,
+     "wilson_95": [
+      0.8764216682530326,
+      0.9846560249973755
+     ]
+    },
+    "unseen: Hidden File Finder": {
+     "alerts": 52,
+     "of": 52,
+     "rate": 1.0,
+     "wilson_95": [
+      0.9312077628655455,
+      1.0
+     ]
+    },
+    "unseen: Parameter Tampering": {
+     "alerts": 77,
+     "of": 113,
+     "rate": 0.6814159292035398,
+     "wilson_95": [
+      0.5907584358889467,
+      0.7601444062405199
+     ]
+    },
+    "unseen: Remote Code Execution (React2Shell)": {
+     "alerts": 1,
+     "of": 1,
+     "rate": 1.0,
+     "wilson_95": [
+      0.2065493117918027,
+      1.0
+     ]
+    },
+    "unseen: Remote Code Execution - CVE-2012-1823": {
+     "alerts": 196,
+     "of": 196,
+     "rate": 1.0,
+     "wilson_95": [
+      0.9807774677847112,
+      0.9999999999999998
+     ]
+    },
+    "unseen: Remote Code Execution - Shell Shock": {
+     "alerts": 46,
+     "of": 46,
+     "rate": 1.0,
+     "wilson_95": [
+      0.92292643579224,
+      1.0
+     ]
+    },
+    "unseen: Server Side Code Injection": {
+     "alerts": 184,
+     "of": 184,
+     "rate": 1.0,
+     "wilson_95": [
+      0.979549462061389,
+      1.0
+     ]
+    },
+    "unseen: Server Side Include": {
+     "alerts": 92,
+     "of": 92,
+     "rate": 1.0,
+     "wilson_95": [
+      0.9599186101074083,
+      0.9999999999999999
+     ]
+    },
+    "unseen: Server Side Template Injection": {
+     "alerts": 322,
+     "of": 322,
+     "rate": 1.0,
+     "wilson_95": [
+      0.9882106503743115,
+      1.0
+     ]
+    },
+    "unseen: Server Side Template Injection (Blind)": {
+     "alerts": 276,
+     "of": 276,
+     "rate": 1.0,
+     "wilson_95": [
+      0.9862727313649208,
+      0.9999999999999999
+     ]
+    },
+    "unseen: Source Code Disclosure - /WEB-INF Folder": {
+     "alerts": 58,
+     "of": 58,
+     "rate": 1.0,
+     "wilson_95": [
+      0.9378821432937142,
+      0.9999999999999999
+     ]
+    },
+    "unseen: Source Code Disclosure - CVE-2012-1823": {
+     "alerts": 40,
+     "of": 70,
+     "rate": 0.5714285714285714,
+     "wilson_95": [
+      0.4547783646975474,
+      0.680646911989842
+     ]
+    },
+    "unseen: Spring Actuator Information Leak": {
+     "alerts": 2,
+     "of": 2,
+     "rate": 1.0,
+     "wilson_95": [
+      0.3423802239546494,
+      1.0
+     ]
+    },
+    "unseen: Spring4Shell": {
+     "alerts": 168,
+     "of": 197,
+     "rate": 0.8527918781725888,
+     "wilson_95": [
+      0.7965802295254351,
+      0.8955079517407328
+     ]
+    },
+    "unseen: Trace.axd Information Leak": {
+     "alerts": 27,
+     "of": 27,
+     "rate": 1.0,
+     "wilson_95": [
+      0.8754449685379289,
+      1.0
+     ]
+    },
+    "unseen: User Agent Fuzzer": {
+     "alerts": 324,
+     "of": 1176,
+     "rate": 0.2755102040816326,
+     "wilson_95": [
+      0.25073762906857516,
+      0.3017446167234655
+     ]
+    },
+    "unseen: XPath Injection": {
+     "alerts": 69,
+     "of": 69,
+     "rate": 1.0,
+     "wilson_95": [
+      0.9472627410228545,
+      1.0
+     ]
+    },
+    "unseen: XSLT Injection": {
+     "alerts": 103,
+     "of": 104,
+     "rate": 0.9903846153846154,
+     "wilson_95": [
+      0.9475322747417618,
+      0.998300627169127
+     ]
+    }
+   },
+   "benign": {
+    "alerts": 59,
+    "of": 2257,
+    "rate": 0.026140894993354008,
+    "wilson_95": [
+     0.020320040871164426,
+     0.033572043601483775
+    ]
+   },
+   "confirmed_attacks": {
+    "alerts": 13,
+    "of": 20,
+    "rate": 0.65,
+    "wilson_95": [
+     0.4328542750684442,
+     0.818808176876017
+    ]
+   },
+   "confirmed_by_family": {
+    "challenge: Broken Access Control": {
+     "alerts": 3,
+     "of": 5,
+     "rate": 0.6,
+     "wilson_95": [
+      0.23072427940911855,
+      0.8823792268590028
+     ]
+    },
+    "challenge: Broken Anti Automation": {
+     "alerts": 0,
+     "of": 2,
+     "rate": 0.0,
+     "wilson_95": [
+      0.0,
+      0.6576197760453506
+     ]
+    },
+    "challenge: Improper Input Validation": {
+     "alerts": 5,
+     "of": 6,
+     "rate": 0.8333333333333334,
+     "wilson_95": [
+      0.4364971749742326,
+      0.969946630588185
+     ]
+    },
+    "challenge: Security Misconfiguration": {
+     "alerts": 0,
+     "of": 2,
+     "rate": 0.0,
+     "wilson_95": [
+      0.0,
+      0.6576197760453506
+     ]
+    },
+    "sqli (seen in DVWA)": {
+     "alerts": 5,
+     "of": 5,
+     "rate": 1.0,
+     "wilson_95": [
+      0.5655175313406071,
+      1.0
+     ]
+    }
+   }
+  },
+  "fused_fisher_without_learned_anomaly": {
+   "attack_attempts": {
+    "alerts": 7521,
+    "of": 8847,
+    "rate": 0.8501186842997627,
+    "wilson_95": [
+     0.8425286596865705,
+     0.8574047905712786
+    ]
+   },
+   "attempts_by_family": {
+    "cmdi (seen in DVWA)": {
+     "alerts": 782,
+     "of": 805,
+     "rate": 0.9714285714285714,
+     "wilson_95": [
+      0.9574921095010271,
+      0.9808870891243358
+     ]
+    },
+    "lfi (seen in DVWA)": {
+     "alerts": 580,
+     "of": 590,
+     "rate": 0.9830508474576272,
+     "wilson_95": [
+      0.9690841621873366,
+      0.9907679860169846
+     ]
+    },
+    "sqli (seen in DVWA)": {
+     "alerts": 3083,
+     "of": 3189,
+     "rate": 0.9667607400439009,
+     "wilson_95": [
+      0.9599559371257453,
+      0.972442379025874
+     ]
+    },
+    "unseen: .env Information Leak": {
+     "alerts": 27,
+     "of": 27,
+     "rate": 1.0,
+     "wilson_95": [
+      0.8754449685379289,
+      1.0
+     ]
+    },
+    "unseen: .htaccess Information Leak": {
+     "alerts": 27,
+     "of": 27,
+     "rate": 1.0,
+     "wilson_95": [
+      0.8754449685379289,
+      1.0
+     ]
+    },
+    "unseen: Buffer Overflow": {
+     "alerts": 23,
+     "of": 23,
+     "rate": 1.0,
+     "wilson_95": [
+      0.8568833796149266,
+      1.0
+     ]
+    },
+    "unseen: CRLF Injection": {
+     "alerts": 161,
+     "of": 161,
+     "rate": 1.0,
+     "wilson_95": [
+      0.9766960392891071,
+      1.0
+     ]
+    },
+    "unseen: Cloud Metadata Potentially Exposed": {
+     "alerts": 13,
+     "of": 13,
+     "rate": 1.0,
+     "wilson_95": [
+      0.7719046248681998,
+      1.0
+     ]
+    },
+    "unseen: Cross Site Scripting (DOM Based)": {
+     "alerts": 224,
+     "of": 312,
+     "rate": 0.717948717948718,
+     "wilson_95": [
+      0.6655994307741828,
+      0.7649963513049312
+     ]
+    },
+    "unseen: Cross Site Scripting (Persistent)": {
+     "alerts": 12,
+     "of": 12,
+     "rate": 1.0,
+     "wilson_95": [
+      0.7575059904469021,
+      1.0
+     ]
+    },
+    "unseen: Cross Site Scripting (Persistent) - Prime": {
+     "alerts": 20,
+     "of": 23,
+     "rate": 0.8695652173913043,
+     "wilson_95": [
+      0.6787251755146014,
+      0.9546234094181704
+     ]
+    },
+    "unseen: Cross Site Scripting (Persistent) - Spider": {
+     "alerts": 54,
+     "of": 238,
+     "rate": 0.226890756302521,
+     "wilson_95": [
+      0.17826579096628015,
+      0.2841919670982359
+     ]
+    },
+    "unseen: Cross Site Scripting (Reflected)": {
+     "alerts": 67,
+     "of": 69,
+     "rate": 0.9710144927536232,
+     "wilson_95": [
+      0.900334161555053,
+      0.99201479737952
+     ]
+    },
+    "unseen: Directory Browsing": {
+     "alerts": 90,
+     "of": 98,
+     "rate": 0.9183673469387755,
+     "wilson_95": [
+      0.8471171277629918,
+      0.9580559412479036
+     ]
+    },
+    "unseen: ELMAH Information Leak": {
+     "alerts": 1,
+     "of": 1,
+     "rate": 1.0,
+     "wilson_95": [
+      0.2065493117918027,
+      1.0
+     ]
+    },
+    "unseen: External Redirect": {
+     "alerts": 203,
+     "of": 207,
+     "rate": 0.9806763285024155,
+     "wilson_95": [
+      0.9513767681532161,
+      0.9924603740097835
+     ]
+    },
+    "unseen: Format String Error": {
+     "alerts": 64,
+     "of": 67,
+     "rate": 0.9552238805970149,
+     "wilson_95": [
+      0.8764216682530326,
+      0.9846560249973755
+     ]
+    },
+    "unseen: Hidden File Finder": {
+     "alerts": 52,
+     "of": 52,
+     "rate": 1.0,
+     "wilson_95": [
+      0.9312077628655455,
+      1.0
+     ]
+    },
+    "unseen: Parameter Tampering": {
+     "alerts": 83,
+     "of": 113,
+     "rate": 0.7345132743362832,
+     "wilson_95": [
+      0.6463625058104147,
+      0.8072436071862134
+     ]
+    },
+    "unseen: Remote Code Execution (React2Shell)": {
+     "alerts": 1,
+     "of": 1,
+     "rate": 1.0,
+     "wilson_95": [
+      0.2065493117918027,
+      1.0
+     ]
+    },
+    "unseen: Remote Code Execution - CVE-2012-1823": {
+     "alerts": 196,
+     "of": 196,
+     "rate": 1.0,
+     "wilson_95": [
+      0.9807774677847112,
+      0.9999999999999998
+     ]
+    },
+    "unseen: Remote Code Execution - Shell Shock": {
+     "alerts": 46,
+     "of": 46,
+     "rate": 1.0,
+     "wilson_95": [
+      0.92292643579224,
+      1.0
+     ]
+    },
+    "unseen: Server Side Code Injection": {
+     "alerts": 184,
+     "of": 184,
+     "rate": 1.0,
+     "wilson_95": [
+      0.979549462061389,
+      1.0
+     ]
+    },
+    "unseen: Server Side Include": {
+     "alerts": 92,
+     "of": 92,
+     "rate": 1.0,
+     "wilson_95": [
+      0.9599186101074083,
+      0.9999999999999999
+     ]
+    },
+    "unseen: Server Side Template Injection": {
+     "alerts": 322,
+     "of": 322,
+     "rate": 1.0,
+     "wilson_95": [
+      0.9882106503743115,
+      1.0
+     ]
+    },
+    "unseen: Server Side Template Injection (Blind)": {
+     "alerts": 276,
+     "of": 276,
+     "rate": 1.0,
+     "wilson_95": [
+      0.9862727313649208,
+      0.9999999999999999
+     ]
+    },
+    "unseen: Source Code Disclosure - /WEB-INF Folder": {
+     "alerts": 58,
+     "of": 58,
+     "rate": 1.0,
+     "wilson_95": [
+      0.9378821432937142,
+      0.9999999999999999
+     ]
+    },
+    "unseen: Source Code Disclosure - CVE-2012-1823": {
+     "alerts": 70,
+     "of": 70,
+     "rate": 1.0,
+     "wilson_95": [
+      0.9479769368117258,
+      0.9999999999999999
+     ]
+    },
+    "unseen: Spring Actuator Information Leak": {
+     "alerts": 2,
+     "of": 2,
+     "rate": 1.0,
+     "wilson_95": [
+      0.3423802239546494,
+      1.0
+     ]
+    },
+    "unseen: Spring4Shell": {
+     "alerts": 197,
+     "of": 197,
+     "rate": 1.0,
+     "wilson_95": [
+      0.9808731777657199,
+      0.9999999999999999
+     ]
+    },
+    "unseen: Trace.axd Information Leak": {
+     "alerts": 27,
+     "of": 27,
+     "rate": 1.0,
+     "wilson_95": [
+      0.8754449685379289,
+      1.0
+     ]
+    },
+    "unseen: User Agent Fuzzer": {
+     "alerts": 312,
+     "of": 1176,
+     "rate": 0.2653061224489796,
+     "wilson_95": [
+      0.2408666511753635,
+      0.2912738785163154
+     ]
+    },
+    "unseen: XPath Injection": {
+     "alerts": 69,
+     "of": 69,
+     "rate": 1.0,
+     "wilson_95": [
+      0.9472627410228545,
+      1.0
+     ]
+    },
+    "unseen: XSLT Injection": {
+     "alerts": 103,
+     "of": 104,
+     "rate": 0.9903846153846154,
+     "wilson_95": [
+      0.9475322747417618,
+      0.998300627169127
+     ]
+    }
+   },
+   "benign": {
+    "alerts": 34,
+    "of": 2257,
+    "rate": 0.015064244572441293,
+    "wilson_95": [
+     0.01080004812885297,
+     0.02097637679430127
+    ]
+   },
+   "confirmed_attacks": {
+    "alerts": 13,
+    "of": 20,
+    "rate": 0.65,
+    "wilson_95": [
+     0.4328542750684442,
+     0.818808176876017
+    ]
+   },
+   "confirmed_by_family": {
+    "challenge: Broken Access Control": {
+     "alerts": 3,
+     "of": 5,
+     "rate": 0.6,
+     "wilson_95": [
+      0.23072427940911855,
+      0.8823792268590028
+     ]
+    },
+    "challenge: Broken Anti Automation": {
+     "alerts": 0,
+     "of": 2,
+     "rate": 0.0,
+     "wilson_95": [
+      0.0,
+      0.6576197760453506
+     ]
+    },
+    "challenge: Improper Input Validation": {
+     "alerts": 5,
+     "of": 6,
+     "rate": 0.8333333333333334,
+     "wilson_95": [
+      0.4364971749742326,
+      0.969946630588185
+     ]
+    },
+    "challenge: Security Misconfiguration": {
+     "alerts": 0,
+     "of": 2,
+     "rate": 0.0,
+     "wilson_95": [
+      0.0,
+      0.6576197760453506
+     ]
+    },
+    "sqli (seen in DVWA)": {
+     "alerts": 5,
+     "of": 5,
+     "rate": 1.0,
+     "wilson_95": [
+      0.5655175313406071,
+      1.0
+     ]
+    }
+   }
+  },
+  "host_novelty": {
+   "attack_attempts": {
+    "alerts": 144,
+    "of": 8847,
+    "rate": 0.01627670396744659,
+    "wilson_95": [
+     0.013842120759752453,
+     0.01913118016729673
+    ]
+   },
+   "attempts_by_family": {
+    "cmdi (seen in DVWA)": {
+     "alerts": 0,
+     "of": 805,
+     "rate": 0.0,
+     "wilson_95": [
+      0.0,
+      0.004749334791281718
+     ]
+    },
+    "lfi (seen in DVWA)": {
+     "alerts": 0,
+     "of": 590,
+     "rate": 0.0,
+     "wilson_95": [
+      0.0,
+      0.006468829051667602
+     ]
+    },
+    "sqli (seen in DVWA)": {
+     "alerts": 0,
+     "of": 3189,
+     "rate": 0.0,
+     "wilson_95": [
+      0.0,
+      0.0012031473941841028
+     ]
+    },
+    "unseen: .env Information Leak": {
+     "alerts": 1,
+     "of": 27,
+     "rate": 0.037037037037037035,
+     "wilson_95": [
+      0.006568145908046982,
+      0.18283466100127826
+     ]
+    },
+    "unseen: .htaccess Information Leak": {
+     "alerts": 1,
+     "of": 27,
+     "rate": 0.037037037037037035,
+     "wilson_95": [
+      0.006568145908046982,
+      0.18283466100127826
+     ]
+    },
+    "unseen: Buffer Overflow": {
+     "alerts": 0,
+     "of": 23,
+     "rate": 0.0,
+     "wilson_95": [
+      0.0,
+      0.14311662038507353
+     ]
+    },
+    "unseen: CRLF Injection": {
+     "alerts": 0,
+     "of": 161,
+     "rate": 0.0,
+     "wilson_95": [
+      1.734723475976807e-18,
+      0.02330396071089296
+     ]
+    },
+    "unseen: Cloud Metadata Potentially Exposed": {
+     "alerts": 13,
+     "of": 13,
+     "rate": 1.0,
+     "wilson_95": [
+      0.7719046248681998,
+      1.0
+     ]
+    },
+    "unseen: Cross Site Scripting (DOM Based)": {
+     "alerts": 52,
+     "of": 312,
+     "rate": 0.16666666666666666,
+     "wilson_95": [
+      0.12942088430405424,
+      0.21202086075141835
+     ]
+    },
+    "unseen: Cross Site Scripting (Persistent)": {
+     "alerts": 0,
+     "of": 12,
+     "rate": 0.0,
+     "wilson_95": [
+      0.0,
+      0.2424940095530979
+     ]
+    },
+    "unseen: Cross Site Scripting (Persistent) - Prime": {
+     "alerts": 0,
+     "of": 23,
+     "rate": 0.0,
+     "wilson_95": [
+      0.0,
+      0.14311662038507353
+     ]
+    },
+    "unseen: Cross Site Scripting (Persistent) - Spider": {
+     "alerts": 1,
+     "of": 238,
+     "rate": 0.004201680672268907,
+     "wilson_95": [
+      0.0007420852493265091,
+      0.02341199862164115
+     ]
+    },
+    "unseen: Cross Site Scripting (Reflected)": {
+     "alerts": 0,
+     "of": 69,
+     "rate": 0.0,
+     "wilson_95": [
+      3.469446951953614e-18,
+      0.05273725897714547
+     ]
+    },
+    "unseen: Directory Browsing": {
+     "alerts": 1,
+     "of": 98,
+     "rate": 0.01020408163265306,
+     "wilson_95": [
+      0.0018035477368670456,
+      0.05555481049427992
+     ]
+    },
+    "unseen: ELMAH Information Leak": {
+     "alerts": 1,
+     "of": 1,
+     "rate": 1.0,
+     "wilson_95": [
+      0.2065493117918027,
+      1.0
+     ]
+    },
+    "unseen: External Redirect": {
+     "alerts": 0,
+     "of": 207,
+     "rate": 0.0,
+     "wilson_95": [
+      1.734723475976807e-18,
+      0.018219656142005478
+     ]
+    },
+    "unseen: Format String Error": {
+     "alerts": 0,
+     "of": 67,
+     "rate": 0.0,
+     "wilson_95": [
+      0.0,
+      0.054226140200371364
+     ]
+    },
+    "unseen: Hidden File Finder": {
+     "alerts": 0,
+     "of": 52,
+     "rate": 0.0,
+     "wilson_95": [
+      0.0,
+      0.06879223713445441
+     ]
+    },
+    "unseen: Parameter Tampering": {
+     "alerts": 0,
+     "of": 113,
+     "rate": 0.0,
+     "wilson_95": [
+      0.0,
+      0.03287753266756704
+     ]
+    },
+    "unseen: Remote Code Execution (React2Shell)": {
+     "alerts": 0,
+     "of": 1,
+     "rate": 0.0,
+     "wilson_95": [
+      0.0,
+      0.7934506882081973
+     ]
+    },
+    "unseen: Remote Code Execution - CVE-2012-1823": {
+     "alerts": 2,
+     "of": 196,
+     "rate": 0.01020408163265306,
+     "wilson_95": [
+      0.0028028021471185223,
+      0.036435596757654065
+     ]
+    },
+    "unseen: Remote Code Execution - Shell Shock": {
+     "alerts": 0,
+     "of": 46,
+     "rate": 0.0,
+     "wilson_95": [
+      0.0,
+      0.07707356420776004
+     ]
+    },
+    "unseen: Server Side Code Injection": {
+     "alerts": 0,
+     "of": 184,
+     "rate": 0.0,
+     "wilson_95": [
+      0.0,
+      0.020450537938611096
+     ]
+    },
+    "unseen: Server Side Include": {
+     "alerts": 0,
+     "of": 92,
+     "rate": 0.0,
+     "wilson_95": [
+      0.0,
+      0.04008138989259148
+     ]
+    },
+    "unseen: Server Side Template Injection": {
+     "alerts": 0,
+     "of": 322,
+     "rate": 0.0,
+     "wilson_95": [
+      8.673617379884035e-19,
+      0.011789349625688495
+     ]
+    },
+    "unseen: Server Side Template Injection (Blind)": {
+     "alerts": 0,
+     "of": 276,
+     "rate": 0.0,
+     "wilson_95": [
+      8.673617379884035e-19,
+      0.013727268635079129
+     ]
+    },
+    "unseen: Source Code Disclosure - /WEB-INF Folder": {
+     "alerts": 58,
+     "of": 58,
+     "rate": 1.0,
+     "wilson_95": [
+      0.9378821432937142,
+      0.9999999999999999
+     ]
+    },
+    "unseen: Source Code Disclosure - CVE-2012-1823": {
+     "alerts": 0,
+     "of": 70,
+     "rate": 0.0,
+     "wilson_95": [
+      0.0,
+      0.05202306318827402
+     ]
+    },
+    "unseen: Spring Actuator Information Leak": {
+     "alerts": 0,
+     "of": 2,
+     "rate": 0.0,
+     "wilson_95": [
+      0.0,
+      0.6576197760453506
+     ]
+    },
+    "unseen: Spring4Shell": {
+     "alerts": 1,
+     "of": 197,
+     "rate": 0.005076142131979695,
+     "wilson_95": [
+      0.0008966264266832783,
+      0.02818829913516746
+     ]
+    },
+    "unseen: Trace.axd Information Leak": {
+     "alerts": 1,
+     "of": 27,
+     "rate": 0.037037037037037035,
+     "wilson_95": [
+      0.006568145908046982,
+      0.18283466100127826
+     ]
+    },
+    "unseen: User Agent Fuzzer": {
+     "alerts": 12,
+     "of": 1176,
+     "rate": 0.01020408163265306,
+     "wilson_95": [
+      0.005846693267896508,
+      0.01775093391473764
+     ]
+    },
+    "unseen: XPath Injection": {
+     "alerts": 0,
+     "of": 69,
+     "rate": 0.0,
+     "wilson_95": [
+      3.469446951953614e-18,
+      0.05273725897714547
+     ]
+    },
+    "unseen: XSLT Injection": {
+     "alerts": 0,
+     "of": 104,
+     "rate": 0.0,
+     "wilson_95": [
+      0.0,
+      0.035621354914387775
+     ]
+    }
+   },
+   "benign": {
+    "alerts": 0,
+    "of": 2257,
+    "rate": 0.0,
+    "wilson_95": [
+     0.0,
+     0.0016991279358424458
+    ]
+   },
+   "confirmed_attacks": {
+    "alerts": 0,
+    "of": 20,
+    "rate": 0.0,
+    "wilson_95": [
+     0.0,
+     0.16112516018512965
+    ]
+   },
+   "confirmed_by_family": {
+    "challenge: Broken Access Control": {
+     "alerts": 0,
+     "of": 5,
+     "rate": 0.0,
+     "wilson_95": [
+      0.0,
+      0.43448246865939283
+     ]
+    },
+    "challenge: Broken Anti Automation": {
+     "alerts": 0,
+     "of": 2,
+     "rate": 0.0,
+     "wilson_95": [
+      0.0,
+      0.6576197760453506
+     ]
+    },
+    "challenge: Improper Input Validation": {
+     "alerts": 0,
+     "of": 6,
+     "rate": 0.0,
+     "wilson_95": [
+      0.0,
+      0.39033429165637346
+     ]
+    },
+    "challenge: Security Misconfiguration": {
+     "alerts": 0,
+     "of": 2,
+     "rate": 0.0,
+     "wilson_95": [
+      0.0,
+      0.6576197760453506
+     ]
+    },
+    "sqli (seen in DVWA)": {
+     "alerts": 0,
+     "of": 5,
+     "rate": 0.0,
+     "wilson_95": [
+      0.0,
+      0.43448246865939283
+     ]
+    }
+   }
+  },
+  "learned_anomaly": {
+   "attack_attempts": {
+    "alerts": 3029,
+    "of": 8847,
+    "rate": 0.34237594664858145,
+    "wilson_95": [
+     0.33255867590963983,
+     0.35233004196459095
+    ]
+   },
+   "attempts_by_family": {
+    "cmdi (seen in DVWA)": {
+     "alerts": 528,
+     "of": 805,
+     "rate": 0.6559006211180124,
+     "wilson_95": [
+      0.6224119247613694,
+      0.6879084689869389
+     ]
+    },
+    "lfi (seen in DVWA)": {
+     "alerts": 261,
+     "of": 590,
+     "rate": 0.4423728813559322,
+     "wilson_95": [
+      0.40279739489297417,
+      0.4826939277773875
+     ]
+    },
+    "sqli (seen in DVWA)": {
+     "alerts": 1085,
+     "of": 3189,
+     "rate": 0.34023204766384446,
+     "wilson_95": [
+      0.3239891724033978,
+      0.3568593717153458
+     ]
+    },
+    "unseen: .env Information Leak": {
+     "alerts": 0,
+     "of": 27,
+     "rate": 0.0,
+     "wilson_95": [
+      0.0,
+      0.12455503146207125
+     ]
+    },
+    "unseen: .htaccess Information Leak": {
+     "alerts": 0,
+     "of": 27,
+     "rate": 0.0,
+     "wilson_95": [
+      0.0,
+      0.12455503146207125
+     ]
+    },
+    "unseen: Buffer Overflow": {
+     "alerts": 7,
+     "of": 23,
+     "rate": 0.30434782608695654,
+     "wilson_95": [
+      0.1560402436889323,
+      0.5086575642878356
+     ]
+    },
+    "unseen: CRLF Injection": {
+     "alerts": 126,
+     "of": 161,
+     "rate": 0.782608695652174,
+     "wilson_95": [
+      0.7127129909552152,
+      0.8393325964690628
+     ]
+    },
+    "unseen: Cloud Metadata Potentially Exposed": {
+     "alerts": 0,
+     "of": 13,
+     "rate": 0.0,
+     "wilson_95": [
+      0.0,
+      0.22809537513180025
+     ]
+    },
+    "unseen: Cross Site Scripting (DOM Based)": {
+     "alerts": 1,
+     "of": 312,
+     "rate": 0.003205128205128205,
+     "wilson_95": [
+      0.0005660080571352963,
+      0.01792890043900175
+     ]
+    },
+    "unseen: Cross Site Scripting (Persistent)": {
+     "alerts": 0,
+     "of": 12,
+     "rate": 0.0,
+     "wilson_95": [
+      0.0,
+      0.2424940095530979
+     ]
+    },
+    "unseen: Cross Site Scripting (Persistent) - Prime": {
+     "alerts": 4,
+     "of": 23,
+     "rate": 0.17391304347826086,
+     "wilson_95": [
+      0.0697865351446468,
+      0.3713764781499663
+     ]
+    },
+    "unseen: Cross Site Scripting (Persistent) - Spider": {
+     "alerts": 2,
+     "of": 238,
+     "rate": 0.008403361344537815,
+     "wilson_95": [
+      0.002307537882315131,
+      0.030116426633813816
+     ]
+    },
+    "unseen: Cross Site Scripting (Reflected)": {
+     "alerts": 41,
+     "of": 69,
+     "rate": 0.5942028985507246,
+     "wilson_95": [
+      0.47635887742909655,
+      0.7021109143578179
+     ]
+    },
+    "unseen: Directory Browsing": {
+     "alerts": 0,
+     "of": 98,
+     "rate": 0.0,
+     "wilson_95": [
+      0.0,
+      0.037719990694295866
+     ]
+    },
+    "unseen: ELMAH Information Leak": {
+     "alerts": 0,
+     "of": 1,
+     "rate": 0.0,
+     "wilson_95": [
+      0.0,
+      0.7934506882081973
+     ]
+    },
+    "unseen: External Redirect": {
+     "alerts": 120,
+     "of": 207,
+     "rate": 0.5797101449275363,
+     "wilson_95": [
+      0.511615068249412,
+      0.6449006387424421
+     ]
+    },
+    "unseen: Format String Error": {
+     "alerts": 41,
+     "of": 67,
+     "rate": 0.6119402985074627,
+     "wilson_95": [
+      0.4922308957805443,
+      0.7195095205925068
+     ]
+    },
+    "unseen: Hidden File Finder": {
+     "alerts": 0,
+     "of": 52,
+     "rate": 0.0,
+     "wilson_95": [
+      0.0,
+      0.06879223713445441
+     ]
+    },
+    "unseen: Parameter Tampering": {
+     "alerts": 13,
+     "of": 113,
+     "rate": 0.11504424778761062,
+     "wilson_95": [
+      0.06847720746604091,
+      0.18692407874704164
+     ]
+    },
+    "unseen: Remote Code Execution (React2Shell)": {
+     "alerts": 1,
+     "of": 1,
+     "rate": 1.0,
+     "wilson_95": [
+      0.2065493117918027,
+      1.0
+     ]
+    },
+    "unseen: Remote Code Execution - CVE-2012-1823": {
+     "alerts": 0,
+     "of": 196,
+     "rate": 0.0,
+     "wilson_95": [
+      0.0,
+      0.01922253221528868
+     ]
+    },
+    "unseen: Remote Code Execution - Shell Shock": {
+     "alerts": 43,
+     "of": 46,
+     "rate": 0.9347826086956522,
+     "wilson_95": [
+      0.824972588030455,
+      0.9775721387454057
+     ]
+    },
+    "unseen: Server Side Code Injection": {
+     "alerts": 154,
+     "of": 184,
+     "rate": 0.8369565217391305,
+     "wilson_95": [
+      0.7767910859359017,
+      0.8833400732793824
+     ]
+    },
+    "unseen: Server Side Include": {
+     "alerts": 88,
+     "of": 92,
+     "rate": 0.9565217391304348,
+     "wilson_95": [
+      0.8934831427744904,
+      0.9829642838453175
+     ]
+    },
+    "unseen: Server Side Template Injection": {
+     "alerts": 146,
+     "of": 322,
+     "rate": 0.453416149068323,
+     "wilson_95": [
+      0.39990930218749404,
+      0.5080213825602409
+     ]
+    },
+    "unseen: Server Side Template Injection (Blind)": {
+     "alerts": 245,
+     "of": 276,
+     "rate": 0.8876811594202898,
+     "wilson_95": [
+      0.8449832161474132,
+      0.9197354958529239
+     ]
+    },
+    "unseen: Source Code Disclosure - /WEB-INF Folder": {
+     "alerts": 0,
+     "of": 58,
+     "rate": 0.0,
+     "wilson_95": [
+      0.0,
+      0.06211785670628563
+     ]
+    },
+    "unseen: Source Code Disclosure - CVE-2012-1823": {
+     "alerts": 0,
+     "of": 70,
+     "rate": 0.0,
+     "wilson_95": [
+      0.0,
+      0.05202306318827402
+     ]
+    },
+    "unseen: Spring Actuator Information Leak": {
+     "alerts": 0,
+     "of": 2,
+     "rate": 0.0,
+     "wilson_95": [
+      0.0,
+      0.6576197760453506
+     ]
+    },
+    "unseen: Spring4Shell": {
+     "alerts": 1,
+     "of": 197,
+     "rate": 0.005076142131979695,
+     "wilson_95": [
+      0.0008966264266832783,
+      0.02818829913516746
+     ]
+    },
+    "unseen: Trace.axd Information Leak": {
+     "alerts": 0,
+     "of": 27,
+     "rate": 0.0,
+     "wilson_95": [
+      0.0,
+      0.12455503146207125
+     ]
+    },
+    "unseen: User Agent Fuzzer": {
+     "alerts": 22,
+     "of": 1176,
+     "rate": 0.01870748299319728,
+     "wilson_95": [
+      0.012386178850333156,
+      0.028162878415935823
+     ]
+    },
+    "unseen: XPath Injection": {
+     "alerts": 23,
+     "of": 69,
+     "rate": 0.3333333333333333,
+     "wilson_95": [
+      0.23351050633136186,
+      0.45073524666101994
+     ]
+    },
+    "unseen: XSLT Injection": {
+     "alerts": 77,
+     "of": 104,
+     "rate": 0.7403846153846154,
+     "wilson_95": [
+      0.6486335143687221,
+      0.8150100649993608
+     ]
+    }
+   },
+   "benign": {
+    "alerts": 41,
+    "of": 2257,
+    "rate": 0.018165706690296855,
+    "wilson_95": [
+     0.013418847670067055,
+     0.024549961926945495
+    ]
+   },
+   "confirmed_attacks": {
+    "alerts": 3,
+    "of": 20,
+    "rate": 0.15,
+    "wilson_95": [
+     0.05236874548672649,
+     0.36041886664286427
+    ]
+   },
+   "confirmed_by_family": {
+    "challenge: Broken Access Control": {
+     "alerts": 2,
+     "of": 5,
+     "rate": 0.4,
+     "wilson_95": [
+      0.11762077314099711,
+      0.7692757205908813
+     ]
+    },
+    "challenge: Broken Anti Automation": {
+     "alerts": 0,
+     "of": 2,
+     "rate": 0.0,
+     "wilson_95": [
+      0.0,
+      0.6576197760453506
+     ]
+    },
+    "challenge: Improper Input Validation": {
+     "alerts": 1,
+     "of": 6,
+     "rate": 0.16666666666666666,
+     "wilson_95": [
+      0.030053369411815023,
+      0.5635028250257673
+     ]
+    },
+    "challenge: Security Misconfiguration": {
+     "alerts": 0,
+     "of": 2,
+     "rate": 0.0,
+     "wilson_95": [
+      0.0,
+      0.6576197760453506
+     ]
+    },
+    "sqli (seen in DVWA)": {
+     "alerts": 0,
+     "of": 5,
+     "rate": 0.0,
+     "wilson_95": [
+      0.0,
+      0.43448246865939283
+     ]
+    }
+   }
+  },
+  "request_novelty": {
+   "attack_attempts": {
+    "alerts": 7252,
+    "of": 8847,
+    "rate": 0.8197128970272409,
+    "wilson_95": [
+     0.8115641034858244,
+     0.827584165781109
+    ]
+   },
+   "attempts_by_family": {
+    "cmdi (seen in DVWA)": {
+     "alerts": 748,
+     "of": 805,
+     "rate": 0.929192546583851,
+     "wilson_95": [
+      0.9093600231431656,
+      0.9449483118372375
+     ]
+    },
+    "lfi (seen in DVWA)": {
+     "alerts": 546,
+     "of": 590,
+     "rate": 0.9254237288135593,
+     "wilson_95": [
+      0.9013640502820082,
+      0.9439794205926746
+     ]
+    },
+    "sqli (seen in DVWA)": {
+     "alerts": 2968,
+     "of": 3189,
+     "rate": 0.9306992787707745,
+     "wilson_95": [
+      0.9213567266103748,
+      0.9390054415013143
+     ]
+    },
+    "unseen: .env Information Leak": {
+     "alerts": 27,
+     "of": 27,
+     "rate": 1.0,
+     "wilson_95": [
+      0.8754449685379289,
+      1.0
+     ]
+    },
+    "unseen: .htaccess Information Leak": {
+     "alerts": 27,
+     "of": 27,
+     "rate": 1.0,
+     "wilson_95": [
+      0.8754449685379289,
+      1.0
+     ]
+    },
+    "unseen: Buffer Overflow": {
+     "alerts": 23,
+     "of": 23,
+     "rate": 1.0,
+     "wilson_95": [
+      0.8568833796149266,
+      1.0
+     ]
+    },
+    "unseen: CRLF Injection": {
+     "alerts": 161,
+     "of": 161,
+     "rate": 1.0,
+     "wilson_95": [
+      0.9766960392891071,
+      1.0
+     ]
+    },
+    "unseen: Cloud Metadata Potentially Exposed": {
+     "alerts": 13,
+     "of": 13,
+     "rate": 1.0,
+     "wilson_95": [
+      0.7719046248681998,
+      1.0
+     ]
+    },
+    "unseen: Cross Site Scripting (DOM Based)": {
+     "alerts": 224,
+     "of": 312,
+     "rate": 0.717948717948718,
+     "wilson_95": [
+      0.6655994307741828,
+      0.7649963513049312
+     ]
+    },
+    "unseen: Cross Site Scripting (Persistent)": {
+     "alerts": 11,
+     "of": 12,
+     "rate": 0.9166666666666666,
+     "wilson_95": [
+      0.6461200862787544,
+      0.9851349057603305
+     ]
+    },
+    "unseen: Cross Site Scripting (Persistent) - Prime": {
+     "alerts": 8,
+     "of": 23,
+     "rate": 0.34782608695652173,
+     "wilson_95": [
+      0.18811275843801456,
+      0.5510966477661382
+     ]
+    },
+    "unseen: Cross Site Scripting (Persistent) - Spider": {
+     "alerts": 54,
+     "of": 238,
+     "rate": 0.226890756302521,
+     "wilson_95": [
+      0.17826579096628015,
+      0.2841919670982359
+     ]
+    },
+    "unseen: Cross Site Scripting (Reflected)": {
+     "alerts": 59,
+     "of": 69,
+     "rate": 0.855072463768116,
+     "wilson_95": [
+      0.7533647830164287,
+      0.9193290475650187
+     ]
+    },
+    "unseen: Directory Browsing": {
+     "alerts": 90,
+     "of": 98,
+     "rate": 0.9183673469387755,
+     "wilson_95": [
+      0.8471171277629918,
+      0.9580559412479036
+     ]
+    },
+    "unseen: ELMAH Information Leak": {
+     "alerts": 1,
+     "of": 1,
+     "rate": 1.0,
+     "wilson_95": [
+      0.2065493117918027,
+      1.0
+     ]
+    },
+    "unseen: External Redirect": {
+     "alerts": 201,
+     "of": 207,
+     "rate": 0.9710144927536232,
+     "wilson_95": [
+      0.9382161542613101,
+      0.9866493870541919
+     ]
+    },
+    "unseen: Format String Error": {
+     "alerts": 50,
+     "of": 67,
+     "rate": 0.746268656716418,
+     "wilson_95": [
+      0.6307080536302594,
+      0.8351208623904534
+     ]
+    },
+    "unseen: Hidden File Finder": {
+     "alerts": 52,
+     "of": 52,
+     "rate": 1.0,
+     "wilson_95": [
+      0.9312077628655455,
+      1.0
+     ]
+    },
+    "unseen: Parameter Tampering": {
+     "alerts": 42,
+     "of": 113,
+     "rate": 0.37168141592920356,
+     "wilson_95": [
+      0.28817432773946644,
+      0.4636261009982278
+     ]
+    },
+    "unseen: Remote Code Execution (React2Shell)": {
+     "alerts": 1,
+     "of": 1,
+     "rate": 1.0,
+     "wilson_95": [
+      0.2065493117918027,
+      1.0
+     ]
+    },
+    "unseen: Remote Code Execution - CVE-2012-1823": {
+     "alerts": 196,
+     "of": 196,
+     "rate": 1.0,
+     "wilson_95": [
+      0.9807774677847112,
+      0.9999999999999998
+     ]
+    },
+    "unseen: Remote Code Execution - Shell Shock": {
+     "alerts": 46,
+     "of": 46,
+     "rate": 1.0,
+     "wilson_95": [
+      0.92292643579224,
+      1.0
+     ]
+    },
+    "unseen: Server Side Code Injection": {
+     "alerts": 180,
+     "of": 184,
+     "rate": 0.9782608695652174,
+     "wilson_95": [
+      0.9454459826364616,
+      0.99151437237878
+     ]
+    },
+    "unseen: Server Side Include": {
+     "alerts": 92,
+     "of": 92,
+     "rate": 1.0,
+     "wilson_95": [
+      0.9599186101074083,
+      0.9999999999999999
+     ]
+    },
+    "unseen: Server Side Template Injection": {
+     "alerts": 322,
+     "of": 322,
+     "rate": 1.0,
+     "wilson_95": [
+      0.9882106503743115,
+      1.0
+     ]
+    },
+    "unseen: Server Side Template Injection (Blind)": {
+     "alerts": 276,
+     "of": 276,
+     "rate": 1.0,
+     "wilson_95": [
+      0.9862727313649208,
+      0.9999999999999999
+     ]
+    },
+    "unseen: Source Code Disclosure - /WEB-INF Folder": {
+     "alerts": 58,
+     "of": 58,
+     "rate": 1.0,
+     "wilson_95": [
+      0.9378821432937142,
+      0.9999999999999999
+     ]
+    },
+    "unseen: Source Code Disclosure - CVE-2012-1823": {
+     "alerts": 70,
+     "of": 70,
+     "rate": 1.0,
+     "wilson_95": [
+      0.9479769368117258,
+      0.9999999999999999
+     ]
+    },
+    "unseen: Spring Actuator Information Leak": {
+     "alerts": 2,
+     "of": 2,
+     "rate": 1.0,
+     "wilson_95": [
+      0.3423802239546494,
+      1.0
+     ]
+    },
+    "unseen: Spring4Shell": {
+     "alerts": 197,
+     "of": 197,
+     "rate": 1.0,
+     "wilson_95": [
+      0.9808731777657199,
+      0.9999999999999999
+     ]
+    },
+    "unseen: Trace.axd Information Leak": {
+     "alerts": 27,
+     "of": 27,
+     "rate": 1.0,
+     "wilson_95": [
+      0.8754449685379289,
+      1.0
+     ]
+    },
+    "unseen: User Agent Fuzzer": {
+     "alerts": 312,
+     "of": 1176,
+     "rate": 0.2653061224489796,
+     "wilson_95": [
+      0.2408666511753635,
+      0.2912738785163154
+     ]
+    },
+    "unseen: XPath Injection": {
+     "alerts": 69,
+     "of": 69,
+     "rate": 1.0,
+     "wilson_95": [
+      0.9472627410228545,
+      1.0
+     ]
+    },
+    "unseen: XSLT Injection": {
+     "alerts": 99,
+     "of": 104,
+     "rate": 0.9519230769230769,
+     "wilson_95": [
+      0.8923579714067601,
+      0.9792919578052354
+     ]
+    }
+   },
+   "benign": {
+    "alerts": 20,
+    "of": 2257,
+    "rate": 0.008861320336730172,
+    "wilson_95": [
+     0.005743676601510527,
+     0.013647978973927088
+    ]
+   },
+   "confirmed_attacks": {
+    "alerts": 12,
+    "of": 20,
+    "rate": 0.6,
+    "wilson_95": [
+     0.3865814992347542,
+     0.7811934687282198
+    ]
+   },
+   "confirmed_by_family": {
+    "challenge: Broken Access Control": {
+     "alerts": 2,
+     "of": 5,
+     "rate": 0.4,
+     "wilson_95": [
+      0.11762077314099711,
+      0.7692757205908813
+     ]
+    },
+    "challenge: Broken Anti Automation": {
+     "alerts": 0,
+     "of": 2,
+     "rate": 0.0,
+     "wilson_95": [
+      0.0,
+      0.6576197760453506
+     ]
+    },
+    "challenge: Improper Input Validation": {
+     "alerts": 5,
+     "of": 6,
+     "rate": 0.8333333333333334,
+     "wilson_95": [
+      0.4364971749742326,
+      0.969946630588185
+     ]
+    },
+    "challenge: Security Misconfiguration": {
+     "alerts": 0,
+     "of": 2,
+     "rate": 0.0,
+     "wilson_95": [
+      0.0,
+      0.6576197760453506
+     ]
+    },
+    "sqli (seen in DVWA)": {
+     "alerts": 5,
+     "of": 5,
+     "rate": 1.0,
+     "wilson_95": [
+      0.5655175313406071,
+      1.0
+     ]
+    }
+   }
+  },
+  "response_shift": {
+   "attack_attempts": {
+    "alerts": 0,
+    "of": 8847,
+    "rate": 0.0,
+    "wilson_95": [
+     0.0,
+     0.00043402188358501476
+    ]
+   },
+   "attempts_by_family": {
+    "cmdi (seen in DVWA)": {
+     "alerts": 0,
+     "of": 805,
+     "rate": 0.0,
+     "wilson_95": [
+      0.0,
+      0.004749334791281718
+     ]
+    },
+    "lfi (seen in DVWA)": {
+     "alerts": 0,
+     "of": 590,
+     "rate": 0.0,
+     "wilson_95": [
+      0.0,
+      0.006468829051667602
+     ]
+    },
+    "sqli (seen in DVWA)": {
+     "alerts": 0,
+     "of": 3189,
+     "rate": 0.0,
+     "wilson_95": [
+      0.0,
+      0.0012031473941841028
+     ]
+    },
+    "unseen: .env Information Leak": {
+     "alerts": 0,
+     "of": 27,
+     "rate": 0.0,
+     "wilson_95": [
+      0.0,
+      0.12455503146207125
+     ]
+    },
+    "unseen: .htaccess Information Leak": {
+     "alerts": 0,
+     "of": 27,
+     "rate": 0.0,
+     "wilson_95": [
+      0.0,
+      0.12455503146207125
+     ]
+    },
+    "unseen: Buffer Overflow": {
+     "alerts": 0,
+     "of": 23,
+     "rate": 0.0,
+     "wilson_95": [
+      0.0,
+      0.14311662038507353
+     ]
+    },
+    "unseen: CRLF Injection": {
+     "alerts": 0,
+     "of": 161,
+     "rate": 0.0,
+     "wilson_95": [
+      1.734723475976807e-18,
+      0.02330396071089296
+     ]
+    },
+    "unseen: Cloud Metadata Potentially Exposed": {
+     "alerts": 0,
+     "of": 13,
+     "rate": 0.0,
+     "wilson_95": [
+      0.0,
+      0.22809537513180025
+     ]
+    },
+    "unseen: Cross Site Scripting (DOM Based)": {
+     "alerts": 0,
+     "of": 312,
+     "rate": 0.0,
+     "wilson_95": [
+      0.0,
+      0.012162617583208895
+     ]
+    },
+    "unseen: Cross Site Scripting (Persistent)": {
+     "alerts": 0,
+     "of": 12,
+     "rate": 0.0,
+     "wilson_95": [
+      0.0,
+      0.2424940095530979
+     ]
+    },
+    "unseen: Cross Site Scripting (Persistent) - Prime": {
+     "alerts": 0,
+     "of": 23,
+     "rate": 0.0,
+     "wilson_95": [
+      0.0,
+      0.14311662038507353
+     ]
+    },
+    "unseen: Cross Site Scripting (Persistent) - Spider": {
+     "alerts": 0,
+     "of": 238,
+     "rate": 0.0,
+     "wilson_95": [
+      0.0,
+      0.015884203225806366
+     ]
+    },
+    "unseen: Cross Site Scripting (Reflected)": {
+     "alerts": 0,
+     "of": 69,
+     "rate": 0.0,
+     "wilson_95": [
+      3.469446951953614e-18,
+      0.05273725897714547
+     ]
+    },
+    "unseen: Directory Browsing": {
+     "alerts": 0,
+     "of": 98,
+     "rate": 0.0,
+     "wilson_95": [
+      0.0,
+      0.037719990694295866
+     ]
+    },
+    "unseen: ELMAH Information Leak": {
+     "alerts": 0,
+     "of": 1,
+     "rate": 0.0,
+     "wilson_95": [
+      0.0,
+      0.7934506882081973
+     ]
+    },
+    "unseen: External Redirect": {
+     "alerts": 0,
+     "of": 207,
+     "rate": 0.0,
+     "wilson_95": [
+      1.734723475976807e-18,
+      0.018219656142005478
+     ]
+    },
+    "unseen: Format String Error": {
+     "alerts": 0,
+     "of": 67,
+     "rate": 0.0,
+     "wilson_95": [
+      0.0,
+      0.054226140200371364
+     ]
+    },
+    "unseen: Hidden File Finder": {
+     "alerts": 0,
+     "of": 52,
+     "rate": 0.0,
+     "wilson_95": [
+      0.0,
+      0.06879223713445441
+     ]
+    },
+    "unseen: Parameter Tampering": {
+     "alerts": 0,
+     "of": 113,
+     "rate": 0.0,
+     "wilson_95": [
+      0.0,
+      0.03287753266756704
+     ]
+    },
+    "unseen: Remote Code Execution (React2Shell)": {
+     "alerts": 0,
+     "of": 1,
+     "rate": 0.0,
+     "wilson_95": [
+      0.0,
+      0.7934506882081973
+     ]
+    },
+    "unseen: Remote Code Execution - CVE-2012-1823": {
+     "alerts": 0,
+     "of": 196,
+     "rate": 0.0,
+     "wilson_95": [
+      0.0,
+      0.01922253221528868
+     ]
+    },
+    "unseen: Remote Code Execution - Shell Shock": {
+     "alerts": 0,
+     "of": 46,
+     "rate": 0.0,
+     "wilson_95": [
+      0.0,
+      0.07707356420776004
+     ]
+    },
+    "unseen: Server Side Code Injection": {
+     "alerts": 0,
+     "of": 184,
+     "rate": 0.0,
+     "wilson_95": [
+      0.0,
+      0.020450537938611096
+     ]
+    },
+    "unseen: Server Side Include": {
+     "alerts": 0,
+     "of": 92,
+     "rate": 0.0,
+     "wilson_95": [
+      0.0,
+      0.04008138989259148
+     ]
+    },
+    "unseen: Server Side Template Injection": {
+     "alerts": 0,
+     "of": 322,
+     "rate": 0.0,
+     "wilson_95": [
+      8.673617379884035e-19,
+      0.011789349625688495
+     ]
+    },
+    "unseen: Server Side Template Injection (Blind)": {
+     "alerts": 0,
+     "of": 276,
+     "rate": 0.0,
+     "wilson_95": [
+      8.673617379884035e-19,
+      0.013727268635079129
+     ]
+    },
+    "unseen: Source Code Disclosure - /WEB-INF Folder": {
+     "alerts": 0,
+     "of": 58,
+     "rate": 0.0,
+     "wilson_95": [
+      0.0,
+      0.06211785670628563
+     ]
+    },
+    "unseen: Source Code Disclosure - CVE-2012-1823": {
+     "alerts": 0,
+     "of": 70,
+     "rate": 0.0,
+     "wilson_95": [
+      0.0,
+      0.05202306318827402
+     ]
+    },
+    "unseen: Spring Actuator Information Leak": {
+     "alerts": 0,
+     "of": 2,
+     "rate": 0.0,
+     "wilson_95": [
+      0.0,
+      0.6576197760453506
+     ]
+    },
+    "unseen: Spring4Shell": {
+     "alerts": 0,
+     "of": 197,
+     "rate": 0.0,
+     "wilson_95": [
+      0.0,
+      0.019126822234279976
+     ]
+    },
+    "unseen: Trace.axd Information Leak": {
+     "alerts": 0,
+     "of": 27,
+     "rate": 0.0,
+     "wilson_95": [
+      0.0,
+      0.12455503146207125
+     ]
+    },
+    "unseen: User Agent Fuzzer": {
+     "alerts": 0,
+     "of": 1176,
+     "rate": 0.0,
+     "wilson_95": [
+      0.0,
+      0.0032559110822723597
+     ]
+    },
+    "unseen: XPath Injection": {
+     "alerts": 0,
+     "of": 69,
+     "rate": 0.0,
+     "wilson_95": [
+      3.469446951953614e-18,
+      0.05273725897714547
+     ]
+    },
+    "unseen: XSLT Injection": {
+     "alerts": 0,
+     "of": 104,
+     "rate": 0.0,
+     "wilson_95": [
+      0.0,
+      0.035621354914387775
+     ]
+    }
+   },
+   "benign": {
+    "alerts": 0,
+    "of": 2257,
+    "rate": 0.0,
+    "wilson_95": [
+     0.0,
+     0.0016991279358424458
+    ]
+   },
+   "confirmed_attacks": {
+    "alerts": 0,
+    "of": 20,
+    "rate": 0.0,
+    "wilson_95": [
+     0.0,
+     0.16112516018512965
+    ]
+   },
+   "confirmed_by_family": {
+    "challenge: Broken Access Control": {
+     "alerts": 0,
+     "of": 5,
+     "rate": 0.0,
+     "wilson_95": [
+      0.0,
+      0.43448246865939283
+     ]
+    },
+    "challenge: Broken Anti Automation": {
+     "alerts": 0,
+     "of": 2,
+     "rate": 0.0,
+     "wilson_95": [
+      0.0,
+      0.6576197760453506
+     ]
+    },
+    "challenge: Improper Input Validation": {
+     "alerts": 0,
+     "of": 6,
+     "rate": 0.0,
+     "wilson_95": [
+      0.0,
+      0.39033429165637346
+     ]
+    },
+    "challenge: Security Misconfiguration": {
+     "alerts": 0,
+     "of": 2,
+     "rate": 0.0,
+     "wilson_95": [
+      0.0,
+      0.6576197760453506
+     ]
+    },
+    "sqli (seen in DVWA)": {
+     "alerts": 0,
+     "of": 5,
+     "rate": 0.0,
+     "wilson_95": [
+      0.0,
+      0.43448246865939283
+     ]
+    }
+   }
+  }
+ },
+ "schema": "predict-shield/juiceshop-v31-test/1",
+ "zap_requests": 7074
+}
