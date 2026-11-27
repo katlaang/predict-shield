@@ -119,6 +119,16 @@ class CohortGuardTests(unittest.TestCase):
         m["protocol_sha256"] = "unregistered"
         self.assertEqual(self.check(m)["status"], "BLOCKED")
 
+    def test_unhashable_json_fields_fail_closed_without_exception(self):
+        m = manifest()
+        m["sources"][0]["rights_status"] = ["pending"]
+        m["rows"][0]["source_id"] = []
+        m["rows"][1]["role"] = []
+        m["rows"][2]["capture_group"] = []
+        result = self.check(m)
+        self.assertEqual(result["status"], "REJECTED")
+        self.assertGreater(len(result["errors"]), 0)
+
     def test_malformed_manifest_fails_closed(self):
         self.assertEqual(audit({"schema": "wrong"})["status"], "REJECTED")
 
