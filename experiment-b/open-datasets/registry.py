@@ -20,6 +20,9 @@ from pathlib import Path
 HERE = Path(__file__).resolve().parent
 DEFAULT_REGISTRY = HERE / "registry.json"
 APPROVED_LICENSES = {"CC-BY-4.0", "MIT"}
+# Research-only licenses, allowed per named dataset. Such data is analysed locally by the owner's copy,
+# never downloaded in CI, never committed and never redistributed in any form; only aggregate results leave it.
+RESEARCH_ONLY = {"CC-BY-NC-ND-4.0": {"biblio-us17"}}
 MAX_READ_MEMBER = 64 * 1024 * 1024
 MAX_EVENTS = 10_000
 MAX_PAIRS = 10_000
@@ -36,6 +39,10 @@ def validate_registry(reg: dict) -> None:
         ids.add(ident)
         if not entry.get("collection_environment") or not entry.get("url"):
             raise ValueError("missing provenance")
+        lic = entry.get("license")
+        if lic in RESEARCH_ONLY and (ident not in RESEARCH_ONLY[lic] or entry.get("redistribution") != "never"
+                                     or any(f.get("ci_default") for f in entry.get("files", []))):
+            raise ValueError("research-only license outside its named dataset or terms")
         for file in entry.get("files", []):
             if Path(file["name"]).name != file["name"] or not file["name"]:
                 raise ValueError("unsafe dataset file name")

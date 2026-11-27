@@ -119,3 +119,25 @@ class DownloadCapTests(unittest.TestCase):
         reg = registry.get_registry()
         with self.assertRaises(ValueError):
             registry.download(reg, "superviz26-sql", "superviz26.zip", Path("/tmp/never.zip"), max_mb=4097)
+
+
+class ResearchOnlyLicenseTests(unittest.TestCase):
+    def test_research_only_license_is_limited_to_its_named_dataset(self):
+        import copy
+        import registry
+        reg = registry.get_registry()
+        registry.validate_registry(reg)
+        bad = copy.deepcopy(reg)
+        e = next(x for x in bad["datasets"] if x["id"] == "biblio-us17")
+        e["id"] = "some-other-dataset"
+        with self.assertRaises(ValueError):
+            registry.validate_registry(bad)
+        bad = copy.deepcopy(reg)
+        next(x for x in bad["datasets"] if x["id"] == "biblio-us17")["redistribution"] = "allowed"
+        with self.assertRaises(ValueError):
+            registry.validate_registry(bad)
+
+    def test_research_only_dataset_cannot_be_downloaded_in_ci(self):
+        import registry
+        with self.assertRaises(ValueError):
+            registry.download(registry.get_registry(), "biblio-us17", "Biblio-US17.tar.gz", Path("/tmp/never"), max_mb=2000)
