@@ -111,6 +111,7 @@ def audit(manifest: dict, *, dataset_root: Path | None = None) -> dict:
             seen_ids.add(uid)
         if not isinstance(sid, str) or sid not in source_by_id:
             errors.append(f"row {idx}: unknown source")
+            continue
         if not isinstance(group, str) or not group:
             errors.append(f"row {idx}: capture group missing")
             continue
