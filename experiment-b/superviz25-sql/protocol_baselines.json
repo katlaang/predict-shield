@@ -1,0 +1,16 @@
+{
+ "name": "Baselines on the Superviz25-SQL test split, beside the frozen v3-method detector",
+ "registered": "2026-11-26, before any baseline was run on any Superviz25-SQL row",
+ "relation_to_the_registered_test": "The single pass/fail test (run 45895391129) stands unchanged. This is a comparison: the frozen model (freeze e3423d8b) is re-scored to obtain its continuous fused statistic; nothing in it is refitted or changed.",
+ "evaluation_sample": "Fixed by seed 2026112901 before any scoring: 10% of benign test rows and 25% of attack test rows, sampled independently per row. Every detector is scored on exactly this sample; the frozen detector and libinjection are also reported on the full test split.",
+ "detectors": {
+  "frozen_v3_method": "Fisher statistic F from model_sql.py with the frozen bundle (benign-only training).",
+  "libinjection": "libinjection-python 1.1.6 is_sql_injection on user_inputs (signature tokenizer; binary).",
+  "owasp_crs": "Official owasp/modsecurity-crs:4-nginx image (digest recorded in the run), user_inputs sent as a URL-encoded GET parameter q to a local backend; blocking paranoia levels 1, 2, 3 and 4 at the default inbound anomaly threshold 5; an alert is an HTTP 403. Binary per level.",
+  "supervised_reference": "TF-IDF character 1-4-grams (max 200,000 features) and logistic regression (C=1.0, class_weight balanced). Five folds over the evaluation sample, grouped by attack_id for attacks and by random group for benign, so no campaign is in both train and test. It sees attack labels, which the frozen detector never does; it is a reference ceiling, not a deployable equal."
+ },
+ "measures": "For continuous scores: ROC AUC, and detection at benign alert rates of 0.1%, 0.5% and 1% (threshold set on the sample's benign scores, so this is an oracle threshold for every continuous detector alike). For binary detectors: their single benign alert rate and detection. Detection by sqlmap technique and by stage for every detector at the 0.5% point or its native point. Wilson 95% intervals.",
+ "not_claimed": "Production false-alarm rates; the sample's benign queries remain template-generated.",
+ "amendment_2026_11_26": "The first CRS run (45906319077) sent requests with Python's default client headers (no Accept header, a non-browser User-Agent). CRS blocked every request at paranoia levels 3 and 4, including benign probes, so those figures measured the client, not the input; levels 1 and 2 may be affected too. That run's CRS results are void. The rerun sends one fixed set of browser headers with every request and aborts unless benign training-style probes pass at each level. No other detector or setting changes; the frozen detector, libinjection and supervised results are recomputed identically.",
+ "amendment_2026_11_26_b": "Rerun 45911603634 reproduced the first run's paranoia level 1 and 2 counts exactly (71,705 and 93,502 blocked), so client headers did not affect those levels. At level 4 the harness check stopped the run: CRS blocked the benign probe 'Vieques Airport' with browser headers, while the single word 'Vieques' passed. That is CRS's own strictness toward spaces, not a client artifact. The client check now uses single-token benign probes; multi-word benign probe outcomes are recorded per level as part of the result."
+}
