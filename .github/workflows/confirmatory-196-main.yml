@@ -78,6 +78,7 @@ jobs:
       - name: Freeze main shard plan and selection before any physical outcome
         run: |
           python confirmatory_196_plan.py --phase main --shard ${{ matrix.shard }} \
+            --main-lock ../../docs/protocols/CONFIRMATORY_196_MAIN_LOCK.json \
             --output "plans/confirm196-main-${{ matrix.shard }}"
           python - <<'PY'
           from pathlib import Path
