@@ -83,3 +83,17 @@ jobs:
             exit 1
           }
           echo "Verified remote annotated tag $tag targets $TARGET_COMMIT"
+          # Record the real tagger timestamp from the tag object. The
+          # original protocol commit date must never be represented as
+          # the later tag's creation date.
+          git fetch origin "refs/tags/$tag" --force
+          tag_type="$(git cat-file -t "refs/tags/$tag")"
+          test "$tag_type" = tag || { echo "Expected annotated tag object"; exit 1; }
+          echo "Actual tag object creation identity and timestamp:"
+          git cat-file -p "refs/tags/$tag" | sed -n '/^tagger /p'
+          echo "Hash of unchanged historical protocol from tag:"
+          actual="$(git show "refs/tags/$tag:experiment-b/mechanism-lab/PROTOCOL_V3_AI_EVALUATION.md" | git hash-object --stdin)"
+          test "$actual" = 3ac868036435720d6a809c3de3b3e265ea766fcf || {
+            echo "Refuses misleading historical protocol tag"; exit 1;
+          }
+          echo "$actual"
