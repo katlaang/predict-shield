@@ -31,6 +31,7 @@ def check_lock(lock):
             not 40<=lock["main_n"]<=150
             or type(lock.get("unbounded_n")) is not int
             or lock["unbounded_n"]<1
+            or lock["main_n"]!=max(40,min(150,lock["unbounded_n"]))
             or lock.get("pilot_groups")!=16
             or lock.get("pilot_physical_arms")!=192
             or len(lock.get("pilot_measured_dataset_sha256",""))!=64
