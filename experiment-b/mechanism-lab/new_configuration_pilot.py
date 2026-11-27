@@ -29,7 +29,7 @@ def _selected(configs: list[dict]) -> dict:
 
 
 def load_new_paired(registered_plan: Path, records: Path, *,
-                    expected_seed: int = 20261127) -> tuple[list[dict], dict]:
+                    expected_seed: int = 20261128) -> tuple[list[dict], dict]:
     # Independently regenerate, rather than trusting an attacker-writable
     # manifest for a "fresh" label or selected test configuration.
     from plan import create_plan
