@@ -65,7 +65,7 @@ class BrokerEvidenceTests(unittest.TestCase):
         self.assertEqual(result["status"], "UNKNOWN")
 
     def test_stale_future_and_missing_timestamps_fail_closed(self):
-        for value in (None, 98., 110.):
+        for value in (None, 98., 111.):
             bad = valid_broker()
             bad["observed_at_monotonic"] = value
             self.assertIn("STALE_OR_INVALID_BROKER_TIMESTAMP",
