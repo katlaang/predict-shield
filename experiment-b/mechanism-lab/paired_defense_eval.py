@@ -142,6 +142,7 @@ def make_trusted_lab_model_policy(bundle: dict) -> Callable:
             raise ValueError("Incomplete trusted bounds for feature " + feature)
 
     def choose(context: dict, eligible: tuple[str, ...]) -> str | None:
+        choose.last_abstention_reason = None
         pre = context["pre_action"]
         _preaction(pre)
         # The offline policy abstains on unseen operating conditions.
@@ -149,8 +150,10 @@ def make_trusted_lab_model_policy(bundle: dict) -> Callable:
             if feature == "routing_profile":
                 continue
             if feature not in pre or not _finite(pre[feature]):
+                choose.last_abstention_reason = "MISSING_OPERATOR_FEATURE:" + feature
                 return None
             if not _finite(lo) or not _finite(hi) or not lo <= pre[feature] <= hi:
+                choose.last_abstention_reason = "FEATURE_OUTSIDE_TRAINING_BOUNDS:" + feature
                 return None
         budget = context["absolute_error_budget_requests"]
         estimates = {}
@@ -161,8 +164,10 @@ def make_trusted_lab_model_policy(bundle: dict) -> Callable:
                     float(models[name].predict(vector)[0]) for name in LABELS
                 )
             except (ValueError, IndexError, TypeError, KeyError):
+                choose.last_abstention_reason = "MODEL_INFERENCE_FAILED"
                 return None
             if not all(map(_finite, (path, security, failures))):
+                choose.last_abstention_reason = "NONFINITE_MODEL_PREDICTION"
                 return None
             # Predictions may overshoot physical bounds. Clip only for
             # ranking; never interpret this as a verified risk estimate.
@@ -177,8 +182,10 @@ def make_trusted_lab_model_policy(bundle: dict) -> Callable:
             if action != "monitor_only" and failures + disruption_radius > budget:
                 continue
             estimates[action] = 0.5 * path + 0.25 * security + 0.25 * failures / budget
-        return (min(estimates, key=lambda action: (estimates[action], ACTIONS.index(action)))
-                if estimates else None)
+        if not estimates:
+            choose.last_abstention_reason = "NO_ELIGIBLE_ACTION_WITHIN_CALIBRATED_BUDGET"
+            return None
+        return min(estimates, key=lambda action: (estimates[action], ACTIONS.index(action)))
     return choose
 
 
@@ -201,6 +208,7 @@ def evaluate_paired(rows: list[dict], choose: Callable, *,
         raise ValueError("No held-out test configurations")
     by_policy = defaultdict(lambda: defaultdict(list))
     abstentions = Counter()
+    abstention_reasons = Counter()
     policy_violations = Counter()
     evidence = []
     for (group, repeat), arms in sorted(test.items()):
@@ -214,9 +222,11 @@ def evaluate_paired(rows: list[dict], choose: Callable, *,
             "absolute_error_budget_requests": base["absolute_error_budget_requests"],
         }
         picked = choose(MappingProxyType(context), eligible)
+        abstention_reason = getattr(choose, "last_abstention_reason", None) if picked is None else None
         if picked not in eligible:
             if picked is None:
                 abstentions["learned_policy"] += 1
+                abstention_reasons[abstention_reason or "UNCLASSIFIED_ABSTENTION"] += 1
             else:
                 policy_violations["learned_policy"] += 1
             picked = "monitor_only"  # Explicit safe evaluation fallback, not free cost.
@@ -241,6 +251,7 @@ def evaluate_paired(rows: list[dict], choose: Callable, *,
         evidence.append({
             "configuration_id": group, "repeat": repeat, "allowed_actions": list(eligible),
             "selected_actions": choices, "oracle_best_cost_analysis_only": oracle_best,
+            "learned_policy_abstention_reason": abstention_reason,
         })
     report_policies = {}
     for name, groups in by_policy.items():
@@ -274,6 +285,7 @@ def evaluate_paired(rows: list[dict], choose: Callable, *,
         "configuration_groups": len({key[0] for key in test}),
         "paired_replays": len(test),
         "policies": report_policies,
+        "abstention_reasons": dict(abstention_reasons),
         "choices": evidence,
         "execution_performed": False,
         "production_effectiveness_established": False,

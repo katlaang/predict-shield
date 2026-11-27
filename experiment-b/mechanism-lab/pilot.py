@@ -330,22 +330,53 @@ def operator_telemetry(control_token: str) -> list[dict]:
         status, payload, latency = request(
             node, "/operator/telemetry", token=control_token, timeout=1.5
         )
-        if status != 200 or payload.get("observation_type") != "operator_pre_action":
+        # The Java handler emits operator_pre_action_v2. An older v1-only
+        # check incorrectly marked every healthy response as missing.
+        # Reject malformed / misidentified telemetry rather than passing
+        # missing fields off as healthy measurements.
+        valid = (status == 200 and isinstance(payload, dict)
+                 and payload.get("instance") == node
+                 and payload.get("observation_type") == "operator_pre_action_v2")
+        if valid:
+            for key in ("applied_revision", "cache_age_ms", "cache_ttl_ms",
+                        "legitimate_service_latency_ms", "handled_events",
+                        "scheduled_callbacks_pending"):
+                value = payload.get(key)
+                if type(value) is not int or value < 0:
+                    valid = False
+                    break
+            for key in ("refresh_failed", "consumer_state_observed",
+                        "consumer_running", "consumer_paused",
+                        "consumer_pause_requested", "broker_consumer_lag_measured"):
+                if type(payload.get(key)) is not bool:
+                    valid = False
+                    break
+            if payload.get("broker_consumer_lag_measured") is not False:
+                valid = False
+        if not valid:
             samples.append({"node": node, "observed": False,
+                            "observation_status": "UNAVAILABLE_OR_SCHEMA_INVALID",
+                            "operator_http_status": status,
                             "latency_ms": latency})
-        else:
-            samples.append({
-                "node": node, "observed": True,
-                "observed_at_monotonic": time.monotonic(),
-                "applied_revision": payload["applied_revision"],
-                "cache_age_ms": payload["cache_age_ms"],
-                "cache_ttl_ms": payload["cache_ttl_ms"],
-                "legitimate_service_latency_ms": payload["legitimate_service_latency_ms"],
-                "handled_events": payload["handled_events"],
-                "refresh_failed": payload["refresh_failed"],
-                "scheduled_callbacks_pending": payload["scheduled_callbacks_pending"],
-                "latency_ms": latency,
-            })
+            continue
+        samples.append({
+            "node": node, "observed": True,
+            "observed_at_monotonic": time.monotonic(),
+            "applied_revision": payload["applied_revision"],
+            "cache_age_ms": payload["cache_age_ms"],
+            "cache_ttl_ms": payload["cache_ttl_ms"],
+            "legitimate_service_latency_ms": payload["legitimate_service_latency_ms"],
+            "handled_events": payload["handled_events"],
+            "refresh_failed": payload["refresh_failed"],
+            "scheduled_callbacks_pending": payload["scheduled_callbacks_pending"],
+            "consumer_state_observed": payload["consumer_state_observed"],
+            "consumer_running": payload["consumer_running"],
+            "consumer_paused": payload["consumer_paused"],
+            "consumer_pause_requested": payload["consumer_pause_requested"],
+            "broker_consumer_lag_measured": False,
+            "operator_schema": "operator_pre_action_v2",
+            "latency_ms": latency,
+        })
     return samples
 
 
