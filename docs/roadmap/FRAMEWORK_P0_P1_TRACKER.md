@@ -20,8 +20,8 @@
 | P0-01 | Correct historical Superviz25 ablation rounding | DONE | [PR #171](https://github.com/katlaang/predict-shield/pull/171) merged. Isolation forest alone 73.9%, not 74.0%. | Exact source numerator and denominator retained |
 | P0-02 | Preserve completed Juice Shop v3 inconclusive result | DONE | [PR #172](https://github.com/katlaang/predict-shield/pull/172) merged, source protocol and freeze intact. | Never relabel old evaluation as pass |
 | P0-03 | Complete and independently audit Superviz25 baseline comparison with CRS | DONE | Corrected run [45913812903](https://github.com/katlaang/predict-shield/actions/runs/45913812903) completed successfully, report reviewed. Original [PR #175](https://github.com/katlaang/predict-shield/pull/175) closed after merge conflict; conflict-free [PR #177](https://github.com/katlaang/predict-shield/pull/177) is merged with evidence. First CRS results void. | Audit logs + sample reports, disclose test-benign oracle threshold and unmatched WAF HTTP surface |
-| P0-04 | Implement test-independent calibration & no-leakage evaluation gate | IMPLEMENTED_UNVALIDATED | Tools and 20 synthetic unit tests in [PR #176](https://github.com/katlaang/predict-shield/pull/176); [readiness CI 45918572425](https://github.com/katlaang/predict-shield/actions/runs/45918572425) passed. No genuine dataset scored. | Tests reject calibration on test, duplicate raw rows across partitions and cross-campaign split leakage |
-| P0-05 | Juice Shop next-generation detector correcting response-score saturation | PENDING | Propose separate development-only v4; do not change frozen v3. [Revalidation protocol](../protocols/DETECTOR_V4_REVALIDATION.md). | More robust unseen signal sensitivity with independently calibrated false alarm budget |
+| P0-04 | Implement test-independent calibration & no-leakage evaluation gate | IMPLEMENTED_UNVALIDATED | Tools and 29 synthetic unit tests in [PR #176](https://github.com/katlaang/predict-shield/pull/176); [readiness CI 45918572425](https://github.com/katlaang/predict-shield/actions/runs/45918572425) passed. No genuine dataset scored. | Tests reject calibration on test, duplicate raw rows across partitions and cross-campaign split leakage |
+| P0-05 | Juice Shop next-generation detector correcting response-score saturation | IMPLEMENTED_UNVALIDATED | Isolated candidate v4 fusion and unit tests under `experiment-b/framework-readiness/` in [PR #176](https://github.com/katlaang/predict-shield/pull/176). Original v3 freeze untouched. [Revalidation protocol](../protocols/DETECTOR_V4_REVALIDATION.md). | More robust unseen signal sensitivity with independently calibrated false alarm budget |
 | P0-06 | Better multi-family independent ground truth | PENDING | Pre-register exploit outcome checks, ZAP alert joins and unknown semantics, require independent audit. | At least 30 confirmed cases **with diverse families**, or honestly inconclusive |
 | P0-07 | Superviz26-SQL cross-domain, drift and limited-adaptation tests | READY_FOR_DATA | [Publisher Zenodo record](https://zenodo.org/records/21068333). [Prospective protocol](../protocols/SUPERVIZ26_GENERALIZATION.md). | Publisher-verified archive; respect identical OurAirports data overlap; separate untouched target-domain test |
 | P0-08 | Second controlled vulnerable application (crAPI or VulnerableApp) | PENDING | Localhost or isolated owned environment only. | Frozen model(s), measured benign denominator, independently confirmed exploits, no public demo scanning |
@@ -54,7 +54,8 @@
 - [ ] PR #176 merged into master.
 - [ ] Source permissions for UGR'16, LANL and MAWILab confirmed in writing where necessary.
 - [ ] New third-party dataset actually acquired, checksum verified and accepted for evaluation.
-- [ ] Detector v4 developed, frozen and prospectively evaluated.
+- [x] Candidate v4 fusion implementation and deterministic saturation tests added, without changing v3.
+- [ ] Candidate v4 fitted to real benign development data, frozen and prospectively evaluated.
 - [ ] AI-vs-fixed-defense experiment completed.
 - [ ] Any external operator has signed participation and independent assessment.
 
