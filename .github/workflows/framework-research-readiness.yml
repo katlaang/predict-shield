@@ -1,0 +1,32 @@
+name: Framework P0/P1 research readiness tests
+
+on:
+  pull_request:
+    paths:
+      - "experiment-b/framework-readiness/**"
+      - "docs/roadmap/FRAMEWORK_P0_P1_TRACKER.md"
+      - "docs/protocols/**"
+      - ".github/workflows/framework-research-readiness.yml"
+  push:
+    branches: [master]
+    paths:
+      - "experiment-b/framework-readiness/**"
+      - ".github/workflows/framework-research-readiness.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  validate-research-cohorts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run permission, provenance, leakage and threshold calibration tests
+        working-directory: experiment-b/framework-readiness
+        run: python -m unittest discover -s . -p "test_*.py" -v
+      - name: Compile evaluator
+        run: python -m py_compile experiment-b/framework-readiness/cohort_guard.py experiment-b/framework-readiness/frozen_evaluator.py

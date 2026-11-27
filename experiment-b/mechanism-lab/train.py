@@ -26,7 +26,11 @@ import os
 from collections import Counter
 from pathlib import Path
 
-FAULTS = ("loss", "delay", "duplicate", "reorder")
+# Older v3 control fixtures use duplicate/reorder; the locked v3.1 scored
+# physical campaign explicitly includes consumer_paused instead. Accept
+# both documented generations during offline data admission, but never
+# allow fault labels into inference feature vectors.
+FAULTS = ("loss", "delay", "duplicate", "reorder", "consumer_paused")
 TARGETS = ("enforcer-a", "enforcer-b", "enforcer-c", "enforcer-hidden")
 ACTIONS = ("resync_policy", "restart_enforcer", "gateway_restrict", "monitor_only")
 ROUTING_PROFILES = ("balanced", "skewed_a", "skewed_hidden")
