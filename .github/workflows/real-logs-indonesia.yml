@@ -1,0 +1,26 @@
+name: Real web logs (Zenodo 20001206)
+
+on:
+  push:
+    branches: [feat/real-logs-indonesia]
+    paths: ['experiment-b/real-logs-indonesia/**', '.github/workflows/real-logs-indonesia.yml']
+  workflow_dispatch:
+    inputs:
+      stage:
+        description: 'metadata, inspect, develop or test'
+        default: 'metadata'
+
+permissions:
+  contents: read
+
+jobs:
+  metadata:
+    if: github.event_name == 'push' || github.event.inputs.stage == 'metadata'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python experiment-b/real-logs-indonesia/record_metadata.py 20001206
