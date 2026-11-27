@@ -1,0 +1,90 @@
+name: Development-only withheld Kafka policy publication physical test
+on:
+  pull_request:
+    paths:
+      - 'experiment-b/mechanism-lab/java/src/main/java/org/predictshield/mechanism/AuthorityController.java'
+      - 'experiment-b/mechanism-lab/java/src/test/java/org/predictshield/mechanism/AuthorityWithheldPublicationTest.java'
+      - 'experiment-b/mechanism-lab/authority_revision_observer.py'
+      - 'experiment-b/mechanism-lab/test_authority_revision_observer.py'
+      - 'experiment-b/mechanism-lab/withheld_publication_dev_smoke.py'
+      - 'experiment-b/mechanism-lab/compose.yaml'
+      - '.github/workflows/withheld-publication-dev-scenario.yml'
+  push:
+    branches: [master]
+    paths:
+      - 'experiment-b/mechanism-lab/java/src/main/java/org/predictshield/mechanism/AuthorityController.java'
+      - 'experiment-b/mechanism-lab/withheld_publication_dev_smoke.py'
+      - '.github/workflows/withheld-publication-dev-scenario.yml'
+permissions:
+  contents: read
+
+jobs:
+  metadata-unit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate no oracle leaks into revision-gap metadata
+        working-directory: experiment-b/mechanism-lab
+        run: |
+          python -m unittest test_authority_revision_observer -v
+          python -m py_compile authority_revision_observer.py withheld_publication_dev_smoke.py
+
+  physically-distinct-resync:
+    needs: metadata-unit
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 32
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Four separate disposable credentials, no production access
+        run: |
+          for name in LAB_CONTROL_TOKEN LAB_ORACLE_TOKEN LAB_INTERNAL_TOKEN LAB_OBSERVER_TOKEN; do
+            value="$(python -c 'import secrets;print(secrets.token_urlsafe(32))')"
+            echo "::add-mask::$value"
+            echo "$name=$value" >> "$GITHUB_ENV"
+          done
+      - name: Compile and start isolated authority Kafka and JVM enforcers
+        working-directory: experiment-b/mechanism-lab
+        run: |
+          for attempt in 1 2 3; do
+            if docker compose up --build -d; then exit 0; fi
+            docker compose down --volumes --remove-orphans || true
+            if [ "$attempt" -lt 3 ]; then sleep $((attempt * 7)); fi
+          done
+          exit 1
+      - name: Compare independently reset no-action and resync under withheld publication
+        working-directory: experiment-b/mechanism-lab
+        run: |
+          python withheld_publication_dev_smoke.py \
+            --execute-isolated-lab --output reports/withheld-publication-development.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          report=json.loads(Path('reports/withheld-publication-development.json').read_text())
+          assert report['status']=='EXPLORATORY_PHYSICAL_FAULT_DEVELOPMENT'
+          assert report['all_arms_measured'] is True
+          assert report['expected_pattern_confirmed'] is True
+          assert report['trained_model_evaluated'] is False
+          assert report['service_disruption_comparison_completed'] is False
+          assert [a['arm'] for a in report['arms']] == ['monitor_only','resync_policy']
+          print('PASS: physically measured resync vs monitor under withheld publication, not an AI study')
+          PY
+      - name: Preserve actual negative or positive result when available
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: untrained-withheld-publication-development
+          path: experiment-b/mechanism-lab/reports/withheld-publication-development.json
+          if-no-files-found: warn
+          retention-days: 60
+      - name: Dispose of laboratory environment
+        if: always()
+        working-directory: experiment-b/mechanism-lab
+        run: docker compose down --volumes --remove-orphans
