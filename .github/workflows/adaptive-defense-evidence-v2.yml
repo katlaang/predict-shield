@@ -1,0 +1,101 @@
+name: P0 v2 pre-action evidence and defensive escalation gates
+
+on:
+  pull_request:
+    paths:
+      - 'experiment-b/mechanism-lab/defense_review_v2.py'
+      - 'experiment-b/mechanism-lab/test_defense_review_v2.py'
+      - 'experiment-b/mechanism-lab/lab_ai_decision.py'
+      - 'experiment-b/mechanism-lab/lab_autonomous_execution.py'
+      - 'experiment-b/mechanism-lab/test_lab_ai_decision.py'
+      - 'experiment-b/mechanism-lab/test_lab_autonomous_execution.py'
+      - 'experiment-b/mechanism-lab/pilot.py'
+      - 'experiment-b/mechanism-lab/operator_health_v2_smoke.py'
+      - 'experiment-b/mechanism-lab/java/src/main/java/org/predictshield/mechanism/EnforcementController.java'
+      - 'docs/protocols/ADAPTIVE_DEFENSE_EVIDENCE_V2.md'
+      - '.github/workflows/adaptive-defense-evidence-v2.yml'
+  push:
+    branches: [master]
+    paths:
+      - 'experiment-b/mechanism-lab/defense_review_v2.py'
+      - 'experiment-b/mechanism-lab/lab_ai_decision.py'
+      - 'experiment-b/mechanism-lab/lab_autonomous_execution.py'
+      - 'experiment-b/mechanism-lab/pilot.py'
+      - 'experiment-b/mechanism-lab/java/src/main/java/org/predictshield/mechanism/EnforcementController.java'
+      - '.github/workflows/adaptive-defense-evidence-v2.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  synthetic-contracts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Compile guarded advisory and audit code
+        run: |
+          python -m py_compile experiment-b/mechanism-lab/defense_review_v2.py experiment-b/mechanism-lab/lab_ai_decision.py experiment-b/mechanism-lab/lab_autonomous_execution.py
+      - name: Unit tests for missingness, paused consumer, miscalibration, execution veto
+        env:
+          PYTHONPATH: ${{ github.workspace }}/engine
+        working-directory: experiment-b/mechanism-lab
+        run: |
+          python -m unittest test_defense_review_v2 test_lab_ai_decision test_lab_autonomous_execution test_model_adapter test_operator_evidence -v
+
+  physical-consumer-health:
+    needs: synthetic-contracts
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 32
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Create isolated disposable lab credentials
+        run: |
+          for name in LAB_CONTROL_TOKEN LAB_ORACLE_TOKEN LAB_INTERNAL_TOKEN; do
+            value="$(python -c 'import secrets;print(secrets.token_urlsafe(32))')"
+            echo "::add-mask::$value"
+            echo "$name=$value" >> "$GITHUB_ENV"
+          done
+      - name: Build real Spring/Kafka four-enforcer sandbox
+        working-directory: experiment-b/mechanism-lab
+        run: |
+          for attempt in 1 2 3; do
+            if docker compose up --build -d; then exit 0; fi
+            docker compose down --remove-orphans --volumes || true
+            if [ "$attempt" -lt 3 ]; then sleep $((attempt * 7)); fi
+          done
+          exit 1
+      - name: Observe real listener state and restoration through operator-only endpoint
+        working-directory: experiment-b/mechanism-lab
+        run: |
+          python operator_health_v2_smoke.py --execute-isolated-lab --output reports/operator-health-v2.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path("reports/operator-health-v2.json").read_text())
+          assert r["before"]["status"] == "COMPLETE"
+          assert r["physical_paused_signal"]["paused_nodes"] == ["enforcer-b"]
+          assert r["restored"]["status"] == "COMPLETE"
+          assert r["real_broker_lag_observed"] is False
+          assert r["security_action_executed"] is False
+          assert r["ai_decision_superiority_established"] is False
+          print("PASS: physical listener state observed without consulting private oracle or fault label")
+          PY
+      - name: Archive isolated lab operator evidence
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: preaction-operator-health-v2-physical
+          path: experiment-b/mechanism-lab/reports/operator-health-v2.json
+          retention-days: 30
+      - name: Dispose of lab
+        if: always()
+        working-directory: experiment-b/mechanism-lab
+        run: docker compose down --remove-orphans --volumes
