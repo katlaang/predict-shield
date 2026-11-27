@@ -40,6 +40,8 @@ The aggregate mean cost improvement against restart-if-authorized is `0.113110 -
 
 The fixed gateway restriction exceeded the 25-request budget in six replays, illustrating why security containment must be evaluated separately from disruption. No result justifies relaxing prior authorization to permit restart when explicitly prohibited.
 
+**Important prohibited-action counterfactual:** In the three `mechanism-008` loss episodes, the isolated experimental restart arms were physically executed and independently verified **resolved in all 3/3**, with **15, 14 and 13 failed legitimate requests**, respectively, each under the **25-request disruption allowance**. But `restart_permitted=false` was established **before** every replay. These measurements are **not** eligible learned-policy actions or permission to restart. They show a case where an effective, within-budget physical remedy exists but lacks advance authorization. The appropriate operational response is **human approval/escalation**, not silent monitoring and not circumventing the authorization gate. This distinction must be tested in the future online AI-to-policy-to-human workflow.
+
 ## Calibration and scientific limitations
 
 Nominal 90% historical model intervals were observed to cover all outcomes for only **70%** of held-out configuration groups on residual security exposure and **60%** on gateway path exposure, versus **90%** for failed legitimate requests. The model therefore lacks a demonstrated reliable security-outcome uncertainty bound. A lower average utility cannot override this calibration deficit or the three unresolved persistent-loss episodes.
