@@ -1,8 +1,8 @@
 name: New-configuration physical defense pilot (non-confirmatory)
 
 on:
-  # The measured run is already complete (45922944490); future physical
-  # repetitions are opt-in, never auto-launched for documentation-only PRs.
+  # Physical trials run for trusted same-repository PRs changing this workflow.
+  # Existing historical evidence is never relabeled as fresh confirmation.
   workflow_dispatch:
   pull_request:
     paths:
@@ -28,7 +28,7 @@ jobs:
         run: python -m unittest test_new_configuration_pilot -v
 
   new-configuration-physical-pilot:
-    if: github.event_name == 'workflow_dispatch'
+    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)
     needs: admission-unit-tests
     runs-on: ubuntu-latest
     timeout-minutes: 85
@@ -64,13 +64,13 @@ jobs:
           test -s "$RUNNER_TEMP/frozen-model.sha256"
       - name: Generate and independently verify new deterministic plan
         run: |
-          python plan.py --version v3.1 --seed 20261127 --output plans/new-disjoint-test
+          python plan.py --version v3.1 --seed 20261128 --output plans/new-disjoint-test
           python - <<'PY'
           from collect import load_plan
           from plan import create_plan
           import hashlib,json, pathlib
           cs,ts=load_plan(pathlib.Path("plans/new-disjoint-test"))
-          a,b=create_plan(seed=20261127,version="v3.1")
+          a,b=create_plan(seed=20261128,version="v3.1")
           assert (cs,ts)==(a,b)
           chosen=min((c for c in cs if c["partition"]=="test"),
                      key=lambda c:c["configuration_id"])
@@ -90,7 +90,7 @@ jobs:
           done
       - name: Start isolated 4-JVM authorization laboratory
         run: docker compose up --build -d
-      - name: Measure twelve new physical action replays with existing audit
+      - name: Measure twelve NEW physical action replays and preserve negative outcomes
         run: |
           FIRST="$(cat reports/new-config-start-index.txt)"
           python campaign.py --execute-lab \
