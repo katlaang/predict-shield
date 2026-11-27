@@ -63,7 +63,7 @@ def read_measured(plan: Path, records: Path, *, phase: str, shard: int):
                 ("run_id",run_id),("configuration_id",t["configuration_id"]),
                 ("repeat",t["repeat"]),("action_id",t["action_id"]),
                 ("partition","test"),("initial_state_seed",t["initial_state_seed"]),
-                ("experiment_type","real_kafka_multijvm_lab")):
+                ("experiment_type","real_kafka_multijvm_lab"))):
                 raise ValueError("Cross-stream trial identity mismatch")
         revisions={r.get("source_commit") for r in (pre,verify,ops,oracle)}
         if len(revisions)!=1:
