@@ -1,0 +1,188 @@
+name: Superviz26-SQL cross-domain test
+
+# stage=inspect  download (publisher md5 checked), list members and count (split, label) rows
+# stage=develop  fit every arm on train rows only, commit freeze.json, keep the models as an artifact
+# stage=test     verify freeze, code and models, score the test rows once, commit the report
+
+on:
+  push:
+    branches: [feat/superviz26-sql]
+    paths: ['experiment-b/superviz26-sql/**', '.github/workflows/superviz26-sql.yml']
+  pull_request:
+    paths: ['experiment-b/superviz26-sql/**', '.github/workflows/superviz26-sql.yml']
+  workflow_dispatch:
+    inputs:
+      stage:
+        description: 'inspect, values, develop, test, stress-develop or stress-test'
+        default: 'inspect'
+      freeze_sha256:
+        description: 'test stage only'
+        default: ''
+      develop_run_id:
+        description: 'test stage only: the develop run that holds the models artifact'
+        default: ''
+      stress_develop_run_id:
+        description: 'stress-test stage only: the stress-develop run that holds the stress models'
+        default: ''
+
+permissions:
+  contents: read
+
+jobs:
+  unit-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install 'scikit-learn==1.7.2' 'numpy==2.3.4'
+      - working-directory: experiment-b/superviz26-sql
+        run: python -m unittest test_model26 -v
+      - run: pip install 'faker==37.12.0'
+      - working-directory: experiment-b/superviz26-sql/stress
+        run: python -m unittest test_stress -v
+
+  inspect:
+    if: github.event_name == 'workflow_dispatch' && (github.event.inputs.stage == 'inspect' || github.event.inputs.stage == 'values')
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install 'pandas==2.3.3'
+      - name: Download with publisher checksum
+        run: |
+          python experiment-b/open-datasets/registry.py download --dataset superviz26-sql \
+            --file superviz26.zip --output "$RUNNER_TEMP/s26.zip" --max-mb 2500
+          sha256sum "$RUNNER_TEMP/s26.zip"
+      - run: python experiment-b/superviz26-sql/inspect_archive.py "$RUNNER_TEMP/s26.zip"
+        if: github.event.inputs.stage == 'inspect'
+      - run: python experiment-b/superviz26-sql/inspect_values.py "$RUNNER_TEMP/s26.zip"
+        if: github.event.inputs.stage == 'values'
+
+  run:
+    if: github.event_name == 'workflow_dispatch' && (github.event.inputs.stage == 'develop' || github.event.inputs.stage == 'test')
+    needs: unit-tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install 'scikit-learn==1.7.2' 'numpy==2.3.4'
+      - name: Download with publisher checksum
+        run: |
+          python experiment-b/open-datasets/registry.py download --dataset superviz26-sql \
+            --file superviz26.zip --output "$RUNNER_TEMP/s26.zip" --max-mb 2500
+      - name: Develop every arm on train rows and freeze
+        if: github.event.inputs.stage == 'develop'
+        working-directory: experiment-b/superviz26-sql
+        run: |
+          test ! -f frozen/freeze.json
+          python model26.py develop --zip "$RUNNER_TEMP/s26.zip" --out-dir frozen --models-dir "$RUNNER_TEMP/models"
+          git config user.name katlaang
+          git config user.email katlaang@users.noreply.github.com
+          git add frozen/freeze.json
+          git commit -m "superviz26-sql: record the freeze from develop run ${{ github.run_id }} before any test row is read"
+          git push origin HEAD:${{ github.ref_name }}
+      - name: Keep the frozen models
+        if: github.event.inputs.stage == 'develop'
+        uses: actions/upload-artifact@v4
+        with:
+          name: superviz26-models
+          path: ${{ runner.temp }}/models
+          retention-days: 90
+      - name: Fetch the frozen models
+        if: github.event.inputs.stage == 'test'
+        uses: actions/download-artifact@v4
+        with:
+          name: superviz26-models
+          path: ${{ runner.temp }}/models
+          run-id: ${{ github.event.inputs.develop_run_id }}
+          github-token: ${{ github.token }}
+      - name: Score the test rows once
+        if: github.event.inputs.stage == 'test'
+        working-directory: experiment-b/superviz26-sql
+        run: |
+          test ! -f frozen/test-report.json
+          python model26.py test --zip "$RUNNER_TEMP/s26.zip" --frozen-dir frozen --models-dir "$RUNNER_TEMP/models" \
+            --expected-freeze-sha256 "${{ github.event.inputs.freeze_sha256 }}" --output frozen/test-report.json
+          git config user.name katlaang
+          git config user.email katlaang@users.noreply.github.com
+          git add frozen/test-report.json
+          git commit -m "superviz26-sql: record the single test run (run ${{ github.run_id }})"
+          git push origin HEAD:${{ github.ref_name }}
+
+  stress:
+    if: github.event_name == 'workflow_dispatch' && (github.event.inputs.stage == 'stress-develop' || github.event.inputs.stage == 'stress-test')
+    needs: unit-tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install 'scikit-learn==1.7.2' 'numpy==2.3.4' 'faker==37.12.0'
+      - name: Download with publisher checksum
+        run: |
+          python experiment-b/open-datasets/registry.py download --dataset superviz26-sql \
+            --file superviz26.zip --output "$RUNNER_TEMP/s26.zip" --max-mb 2500
+      - name: Fit the matched-noise arms on train rows and freeze
+        if: github.event.inputs.stage == 'stress-develop'
+        working-directory: experiment-b/superviz26-sql/stress
+        run: |
+          test ! -f frozen/freeze.json
+          python stress.py develop --zip "$RUNNER_TEMP/s26.zip" --out-dir frozen --models-dir "$RUNNER_TEMP/stress-models"
+          git config user.name katlaang
+          git config user.email katlaang@users.noreply.github.com
+          git add frozen/freeze.json
+          git commit -m "superviz26-sql: record the stress-test freeze from run ${{ github.run_id }} before any perturbed test row is scored"
+          git push origin HEAD:${{ github.ref_name }}
+      - name: Keep the stress models
+        if: github.event.inputs.stage == 'stress-develop'
+        uses: actions/upload-artifact@v4
+        with:
+          name: superviz26-stress-models
+          path: ${{ runner.temp }}/stress-models
+          retention-days: 90
+      - name: Fetch the frozen indomain models
+        if: github.event.inputs.stage == 'stress-test'
+        uses: actions/download-artifact@v4
+        with:
+          name: superviz26-models
+          path: ${{ runner.temp }}/models
+          run-id: 45928319914
+          github-token: ${{ github.token }}
+      - name: Fetch the stress models
+        if: github.event.inputs.stage == 'stress-test'
+        uses: actions/download-artifact@v4
+        with:
+          name: superviz26-stress-models
+          path: ${{ runner.temp }}/stress-models
+          run-id: ${{ github.event.inputs.stress_develop_run_id }}
+          github-token: ${{ github.token }}
+      - name: Score the perturbed test rows once
+        if: github.event.inputs.stage == 'stress-test'
+        working-directory: experiment-b/superviz26-sql/stress
+        run: |
+          test ! -f frozen/test-report.json
+          python stress.py test --zip "$RUNNER_TEMP/s26.zip" --frozen-dir frozen --models-dir "$RUNNER_TEMP/stress-models" \
+            --base-models-dir "$RUNNER_TEMP/models" --expected-freeze-sha256 "${{ github.event.inputs.freeze_sha256 }}" \
+            --output frozen/test-report.json
+          git config user.name katlaang
+          git config user.email katlaang@users.noreply.github.com
+          git add frozen/test-report.json
+          git commit -m "superviz26-sql: record the single stress test run (run ${{ github.run_id }})"
+          git push origin HEAD:${{ github.ref_name }}

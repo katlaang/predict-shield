@@ -1,0 +1,7373 @@
+{
+ "freeze_sha256": "b739c5846f913c5e786b105f2038b7f030b72f992d9fb18f64dc77db64dced35",
+ "indomain_checks": {
+  "a": {
+   "attack_detection_at_least_90pct": true,
+   "benign_alert_rate_at_most_1pct": true,
+   "each_technique_at_least_75pct": true
+  },
+  "b": {
+   "attack_detection_at_least_90pct": true,
+   "benign_alert_rate_at_most_1pct": true,
+   "each_technique_at_least_75pct": true
+  },
+  "c": {
+   "attack_detection_at_least_90pct": true,
+   "benign_alert_rate_at_most_1pct": true,
+   "each_technique_at_least_75pct": true
+  },
+  "d": {
+   "attack_detection_at_least_90pct": true,
+   "benign_alert_rate_at_most_1pct": true,
+   "each_technique_at_least_75pct": true
+  }
+ },
+ "indomain_passed": {
+  "a": true,
+  "b": true,
+  "c": true,
+  "d": true
+ },
+ "pass_condition": "Primary, per domain B, C and D, for the fused detector of indomain-x, all three: (1) at most 1% of benign test queries alert; (2) at least 90% of attack test queries alert; (3) every attack_technique value with at least 1,000 attack test queries has at least 75% alerting. Headline: the number of domains (of B, C, D) that pass. Indomain-a is reported against the same condition as a replication. Fewshot, lodo and drift arms have no pass condition; their benign alert rates and detection rates are reported, with the lodo and drift expectations above checked as stated.",
+ "primary_domains": [
+  "b",
+  "c",
+  "d"
+ ],
+ "primary_domains_passed": 3,
+ "results": {
+  "drift-a": {
+   "fused": {
+    "attacks": {
+     "alerts": 326370,
+     "of": 333745,
+     "rate": 0.9779022906710213,
+     "wilson_95": [
+      0.9773980364683895,
+      0.9783955435350965
+     ]
+    },
+    "benign": {
+     "alerts": 1473828,
+     "of": 3001818,
+     "rate": 0.4909784670489683,
+     "wilson_95": [
+      0.4904129495186729,
+      0.49154400766914014
+     ]
+    },
+    "by_attack_stage": {
+     "exploit": {
+      "alerts": 159443,
+      "of": 159443,
+      "rate": 1.0
+     },
+     "recon": {
+      "alerts": 166927,
+      "of": 174302,
+      "rate": 0.957688379938268
+     }
+    },
+    "by_attack_status": {
+     "failure": {
+      "alerts": 70745,
+      "of": 75275,
+      "rate": 0.9398206575888409
+     },
+     "success": {
+      "alerts": 255625,
+      "of": 258470,
+      "rate": 0.988992919874647
+     }
+    },
+    "by_attack_technique": {
+     "boolean": {
+      "alerts": 201690,
+      "of": 202945,
+      "rate": 0.9938160585380276
+     },
+     "error": {
+      "alerts": 39824,
+      "of": 40809,
+      "rate": 0.9758631674385552
+     },
+     "inline": {
+      "alerts": 1338,
+      "of": 1388,
+      "rate": 0.9639769452449568
+     },
+     "stacked": {
+      "alerts": 23148,
+      "of": 24537,
+      "rate": 0.9433916126665851
+     },
+     "time": {
+      "alerts": 22987,
+      "of": 24613,
+      "rate": 0.9339373501807988
+     },
+     "union": {
+      "alerts": 37383,
+      "of": 39453,
+      "rate": 0.9475325070336856
+     }
+    },
+    "by_drift_set": {
+     "origin": {
+      "attacks": {
+       "alerts": 134094,
+       "of": 141469,
+       "rate": 0.9478684376082392,
+       "wilson_95": [
+        0.9466978729074438,
+        0.9490146800692387
+       ]
+      },
+      "benign": {
+       "alerts": 7376,
+       "of": 1535366,
+       "rate": 0.004804066261725217,
+       "wilson_95": [
+        0.0046959276662175775,
+        0.0049146827941654115
+       ]
+      }
+     },
+     "shifted": {
+      "attacks": {
+       "alerts": 192276,
+       "of": 192276,
+       "rate": 1.0,
+       "wilson_95": [
+        0.9999800215204458,
+        1.0
+       ]
+      },
+      "benign": {
+       "alerts": 1466452,
+       "of": 1466452,
+       "rate": 1.0,
+       "wilson_95": [
+        0.9999973804469438,
+        1.0
+       ]
+      }
+     }
+    },
+    "by_tamper_method": {
+     "commentbeforeparentheses": {
+      "alerts": 24386,
+      "of": 25654,
+      "rate": 0.9505730100569112
+     },
+     "equaltolike": {
+      "alerts": 58560,
+      "of": 59611,
+      "rate": 0.9823690258509336
+     },
+     "lowercase": {
+      "alerts": 50850,
+      "of": 52101,
+      "rate": 0.9759889445500086
+     },
+     "multiplespaces": {
+      "alerts": 31598,
+      "of": 33146,
+      "rate": 0.9532975321305738
+     },
+     "randomcase": {
+      "alerts": 71110,
+      "of": 71566,
+      "rate": 0.9936282592292429
+     },
+     "sleep2getlock": {
+      "alerts": 38393,
+      "of": 38696,
+      "rate": 0.9921697333057681
+     },
+     "space2comment": {
+      "alerts": 29405,
+      "of": 29738,
+      "rate": 0.9888022059318045
+     },
+     "space2mysqlblank": {
+      "alerts": 22068,
+      "of": 23233,
+      "rate": 0.9498558085481857
+     }
+    }
+   },
+   "input_novelty": {
+    "attacks": {
+     "alerts": 322694,
+     "of": 333745,
+     "rate": 0.9668878934515873,
+     "wilson_95": [
+      0.9662754524618642,
+      0.9674895866548192
+     ]
+    },
+    "benign": {
+     "alerts": 1467742,
+     "of": 3001818,
+     "rate": 0.4889510290097534,
+     "wilson_95": [
+      0.4883855601154751,
+      0.4895165261829702
+     ]
+    },
+    "by_attack_stage": {
+     "exploit": {
+      "alerts": 159443,
+      "of": 159443,
+      "rate": 1.0
+     },
+     "recon": {
+      "alerts": 163251,
+      "of": 174302,
+      "rate": 0.9365985473488543
+     }
+    },
+    "by_attack_status": {
+     "failure": {
+      "alerts": 67848,
+      "of": 75275,
+      "rate": 0.9013351046164065
+     },
+     "success": {
+      "alerts": 254846,
+      "of": 258470,
+      "rate": 0.985979030448408
+     }
+    },
+    "by_attack_technique": {
+     "boolean": {
+      "alerts": 201164,
+      "of": 202945,
+      "rate": 0.9912242233117347
+     },
+     "error": {
+      "alerts": 39813,
+      "of": 40809,
+      "rate": 0.9755936190546203
+     },
+     "inline": {
+      "alerts": 1328,
+      "of": 1388,
+      "rate": 0.9567723342939481
+     },
+     "stacked": {
+      "alerts": 22606,
+      "of": 24537,
+      "rate": 0.921302522720789
+     },
+     "time": {
+      "alerts": 22743,
+      "of": 24613,
+      "rate": 0.9240238898143258
+     },
+     "union": {
+      "alerts": 35040,
+      "of": 39453,
+      "rate": 0.8881453881834082
+     }
+    },
+    "by_drift_set": {
+     "origin": {
+      "attacks": {
+       "alerts": 130418,
+       "of": 141469,
+       "rate": 0.9218839463062579,
+       "wilson_95": [
+        0.9204740811333267,
+        0.9232709003703756
+       ]
+      },
+      "benign": {
+       "alerts": 1290,
+       "of": 1535366,
+       "rate": 0.0008401905474004244,
+       "wilson_95": [
+        0.0007955926197875683,
+        0.0008872862469916407
+       ]
+      }
+     },
+     "shifted": {
+      "attacks": {
+       "alerts": 192276,
+       "of": 192276,
+       "rate": 1.0,
+       "wilson_95": [
+        0.9999800215204458,
+        1.0
+       ]
+      },
+      "benign": {
+       "alerts": 1466452,
+       "of": 1466452,
+       "rate": 1.0,
+       "wilson_95": [
+        0.9999973804469438,
+        1.0
+       ]
+      }
+     }
+    },
+    "by_tamper_method": {
+     "commentbeforeparentheses": {
+      "alerts": 23389,
+      "of": 25654,
+      "rate": 0.9117096749044983
+     },
+     "equaltolike": {
+      "alerts": 57753,
+      "of": 59611,
+      "rate": 0.968831255976246
+     },
+     "lowercase": {
+      "alerts": 50714,
+      "of": 52101,
+      "rate": 0.9733786299687146
+     },
+     "multiplespaces": {
+      "alerts": 30725,
+      "of": 33146,
+      "rate": 0.9269595124600254
+     },
+     "randomcase": {
+      "alerts": 70964,
+      "of": 71566,
+      "rate": 0.9915881843333426
+     },
+     "sleep2getlock": {
+      "alerts": 38332,
+      "of": 38696,
+      "rate": 0.9905933429811867
+     },
+     "space2comment": {
+      "alerts": 28753,
+      "of": 29738,
+      "rate": 0.9668773959244065
+     },
+     "space2mysqlblank": {
+      "alerts": 22064,
+      "of": 23233,
+      "rate": 0.9496836396504972
+     }
+    }
+   },
+   "learned_anomaly": {
+    "attacks": {
+     "alerts": 228808,
+     "of": 333745,
+     "rate": 0.6855773120196558,
+     "wilson_95": [
+      0.6840000193119309,
+      0.6871503327268529
+     ]
+    },
+    "benign": {
+     "alerts": 7620,
+     "of": 3001818,
+     "rate": 0.002538461692214518,
+     "wilson_95": [
+      0.002482171575652873,
+      0.0025960250209422163
+     ]
+    },
+    "by_attack_stage": {
+     "exploit": {
+      "alerts": 158383,
+      "of": 159443,
+      "rate": 0.9933518561492195
+     },
+     "recon": {
+      "alerts": 70425,
+      "of": 174302,
+      "rate": 0.40404011428440295
+     }
+    },
+    "by_attack_status": {
+     "failure": {
+      "alerts": 25292,
+      "of": 75275,
+      "rate": 0.3359946861507805
+     },
+     "success": {
+      "alerts": 203516,
+      "of": 258470,
+      "rate": 0.7873873176770999
+     }
+    },
+    "by_attack_technique": {
+     "boolean": {
+      "alerts": 164069,
+      "of": 202945,
+      "rate": 0.8084407105373377
+     },
+     "error": {
+      "alerts": 29398,
+      "of": 40809,
+      "rate": 0.7203803082653336
+     },
+     "inline": {
+      "alerts": 879,
+      "of": 1388,
+      "rate": 0.6332853025936599
+     },
+     "stacked": {
+      "alerts": 9269,
+      "of": 24537,
+      "rate": 0.3777560418959123
+     },
+     "time": {
+      "alerts": 10470,
+      "of": 24613,
+      "rate": 0.4253849591679194
+     },
+     "union": {
+      "alerts": 14723,
+      "of": 39453,
+      "rate": 0.37317821204978074
+     }
+    },
+    "by_drift_set": {
+     "origin": {
+      "attacks": {
+       "alerts": 109260,
+       "of": 141469,
+       "rate": 0.7723246789049191,
+       "wilson_95": [
+        0.770132181056382,
+        0.7745023877092044
+       ]
+      },
+      "benign": {
+       "alerts": 7339,
+       "of": 1535366,
+       "rate": 0.004779967773156368,
+       "wilson_95": [
+        0.004672102559732963,
+        0.004890311044100021
+       ]
+      }
+     },
+     "shifted": {
+      "attacks": {
+       "alerts": 119548,
+       "of": 192276,
+       "rate": 0.6217520647402692,
+       "wilson_95": [
+        0.6195820360676104,
+        0.6239172285706559
+       ]
+      },
+      "benign": {
+       "alerts": 281,
+       "of": 1466452,
+       "rate": 0.0001916189551379793,
+       "wilson_95": [
+        0.00017048777438542388,
+        0.00021536868503470926
+       ]
+      }
+     }
+    },
+    "by_tamper_method": {
+     "commentbeforeparentheses": {
+      "alerts": 11722,
+      "of": 25654,
+      "rate": 0.4569267950417089
+     },
+     "equaltolike": {
+      "alerts": 47690,
+      "of": 59611,
+      "rate": 0.8000201305128248
+     },
+     "lowercase": {
+      "alerts": 40031,
+      "of": 52101,
+      "rate": 0.7683345809101553
+     },
+     "multiplespaces": {
+      "alerts": 20891,
+      "of": 33146,
+      "rate": 0.6302721293670428
+     },
+     "randomcase": {
+      "alerts": 56218,
+      "of": 71566,
+      "rate": 0.7855406198474135
+     },
+     "sleep2getlock": {
+      "alerts": 29038,
+      "of": 38696,
+      "rate": 0.7504134794293984
+     },
+     "space2comment": {
+      "alerts": 15163,
+      "of": 29738,
+      "rate": 0.5098863407088573
+     },
+     "space2mysqlblank": {
+      "alerts": 8055,
+      "of": 23233,
+      "rate": 0.3467051177204838
+     }
+    }
+   }
+  },
+  "drift-b": {
+   "fused": {
+    "attacks": {
+     "alerts": 334777,
+     "of": 336999,
+     "rate": 0.9934065086246546,
+     "wilson_95": [
+      0.9931275812644776,
+      0.9936741874101523
+     ]
+    },
+    "benign": {
+     "alerts": 1521140,
+     "of": 3016671,
+     "rate": 0.504244579538173,
+     "wilson_95": [
+      0.5036803674856692,
+      0.504808780780511
+     ]
+    },
+    "by_attack_stage": {
+     "exploit": {
+      "alerts": 287637,
+      "of": 287637,
+      "rate": 1.0
+     },
+     "recon": {
+      "alerts": 47140,
+      "of": 49362,
+      "rate": 0.9549856164661076
+     }
+    },
+    "by_attack_status": {
+     "failure": {
+      "alerts": 19889,
+      "of": 19908,
+      "rate": 0.9990456098051035
+     },
+     "success": {
+      "alerts": 314888,
+      "of": 317091,
+      "rate": 0.9930524675881687
+     }
+    },
+    "by_attack_technique": {
+     "boolean": {
+      "alerts": 278021,
+      "of": 278495,
+      "rate": 0.9982979945779996
+     },
+     "error": {
+      "alerts": 22278,
+      "of": 22988,
+      "rate": 0.9691143205150513
+     },
+     "inline": {
+      "alerts": 4731,
+      "of": 4739,
+      "rate": 0.9983118801434901
+     },
+     "stacked": {
+      "alerts": 6562,
+      "of": 6915,
+      "rate": 0.9489515545914678
+     },
+     "time": {
+      "alerts": 8087,
+      "of": 8582,
+      "rate": 0.942321137264041
+     },
+     "union": {
+      "alerts": 15098,
+      "of": 15280,
+      "rate": 0.9880890052356021
+     }
+    },
+    "by_drift_set": {
+     "origin": {
+      "attacks": {
+       "alerts": 170538,
+       "of": 172760,
+       "rate": 0.9871382264413059,
+       "wilson_95": [
+        0.986595958353698,
+        0.9876588311825726
+       ]
+      },
+      "benign": {
+       "alerts": 8544,
+       "of": 1504075,
+       "rate": 0.0056805677908348985,
+       "wilson_95": [
+        0.005561715745420103,
+        0.005801944847200869
+       ]
+      }
+     },
+     "shifted": {
+      "attacks": {
+       "alerts": 164239,
+       "of": 164239,
+       "rate": 1.0,
+       "wilson_95": [
+        0.9999766111031251,
+        0.9999999999999999
+       ]
+      },
+      "benign": {
+       "alerts": 1512596,
+       "of": 1512596,
+       "rate": 1.0,
+       "wilson_95": [
+        0.9999974603601188,
+        0.9999999999999999
+       ]
+      }
+     }
+    },
+    "by_tamper_method": {
+     "commentbeforeparentheses": {
+      "alerts": 4366,
+      "of": 4374,
+      "rate": 0.9981710105166895
+     },
+     "equaltolike": {
+      "alerts": 29710,
+      "of": 29978,
+      "rate": 0.9910601107478818
+     },
+     "lowercase": {
+      "alerts": 138063,
+      "of": 138309,
+      "rate": 0.9982213738802247
+     },
+     "multiplespaces": {
+      "alerts": 25749,
+      "of": 26549,
+      "rate": 0.9698670383065275
+     },
+     "randomcase": {
+      "alerts": 26386,
+      "of": 26919,
+      "rate": 0.9801998588357665
+     },
+     "sleep2getlock": {
+      "alerts": 50037,
+      "of": 50302,
+      "rate": 0.9947318198083576
+     },
+     "space2comment": {
+      "alerts": 40190,
+      "of": 40201,
+      "rate": 0.9997263749657969
+     },
+     "space2mysqlblank": {
+      "alerts": 20276,
+      "of": 20367,
+      "rate": 0.995531988019836
+     }
+    }
+   },
+   "input_novelty": {
+    "attacks": {
+     "alerts": 334777,
+     "of": 336999,
+     "rate": 0.9934065086246546,
+     "wilson_95": [
+      0.9931275812644776,
+      0.9936741874101523
+     ]
+    },
+    "benign": {
+     "alerts": 1512755,
+     "of": 3016671,
+     "rate": 0.5014650255198528,
+     "wilson_95": [
+      0.5009007990977781,
+      0.5020292482107762
+     ]
+    },
+    "by_attack_stage": {
+     "exploit": {
+      "alerts": 287637,
+      "of": 287637,
+      "rate": 1.0
+     },
+     "recon": {
+      "alerts": 47140,
+      "of": 49362,
+      "rate": 0.9549856164661076
+     }
+    },
+    "by_attack_status": {
+     "failure": {
+      "alerts": 19889,
+      "of": 19908,
+      "rate": 0.9990456098051035
+     },
+     "success": {
+      "alerts": 314888,
+      "of": 317091,
+      "rate": 0.9930524675881687
+     }
+    },
+    "by_attack_technique": {
+     "boolean": {
+      "alerts": 278021,
+      "of": 278495,
+      "rate": 0.9982979945779996
+     },
+     "error": {
+      "alerts": 22278,
+      "of": 22988,
+      "rate": 0.9691143205150513
+     },
+     "inline": {
+      "alerts": 4731,
+      "of": 4739,
+      "rate": 0.9983118801434901
+     },
+     "stacked": {
+      "alerts": 6562,
+      "of": 6915,
+      "rate": 0.9489515545914678
+     },
+     "time": {
+      "alerts": 8087,
+      "of": 8582,
+      "rate": 0.942321137264041
+     },
+     "union": {
+      "alerts": 15098,
+      "of": 15280,
+      "rate": 0.9880890052356021
+     }
+    },
+    "by_drift_set": {
+     "origin": {
+      "attacks": {
+       "alerts": 170538,
+       "of": 172760,
+       "rate": 0.9871382264413059,
+       "wilson_95": [
+        0.986595958353698,
+        0.9876588311825726
+       ]
+      },
+      "benign": {
+       "alerts": 159,
+       "of": 1504075,
+       "rate": 0.00010571281352326181,
+       "wilson_95": [
+        9.050941846958874e-05,
+        0.00012346969619512249
+       ]
+      }
+     },
+     "shifted": {
+      "attacks": {
+       "alerts": 164239,
+       "of": 164239,
+       "rate": 1.0,
+       "wilson_95": [
+        0.9999766111031251,
+        0.9999999999999999
+       ]
+      },
+      "benign": {
+       "alerts": 1512596,
+       "of": 1512596,
+       "rate": 1.0,
+       "wilson_95": [
+        0.9999974603601188,
+        0.9999999999999999
+       ]
+      }
+     }
+    },
+    "by_tamper_method": {
+     "commentbeforeparentheses": {
+      "alerts": 4366,
+      "of": 4374,
+      "rate": 0.9981710105166895
+     },
+     "equaltolike": {
+      "alerts": 29710,
+      "of": 29978,
+      "rate": 0.9910601107478818
+     },
+     "lowercase": {
+      "alerts": 138063,
+      "of": 138309,
+      "rate": 0.9982213738802247
+     },
+     "multiplespaces": {
+      "alerts": 25749,
+      "of": 26549,
+      "rate": 0.9698670383065275
+     },
+     "randomcase": {
+      "alerts": 26386,
+      "of": 26919,
+      "rate": 0.9801998588357665
+     },
+     "sleep2getlock": {
+      "alerts": 50037,
+      "of": 50302,
+      "rate": 0.9947318198083576
+     },
+     "space2comment": {
+      "alerts": 40190,
+      "of": 40201,
+      "rate": 0.9997263749657969
+     },
+     "space2mysqlblank": {
+      "alerts": 20276,
+      "of": 20367,
+      "rate": 0.995531988019836
+     }
+    }
+   },
+   "learned_anomaly": {
+    "attacks": {
+     "alerts": 265645,
+     "of": 336999,
+     "rate": 0.7882664340250268,
+     "wilson_95": [
+      0.7868838316488763,
+      0.7896424645654719
+     ]
+    },
+    "benign": {
+     "alerts": 8511,
+     "of": 3016671,
+     "rate": 0.002821321914123217,
+     "wilson_95": [
+      0.0027620971980599957,
+      0.0028818128531298433
+     ]
+    },
+    "by_attack_stage": {
+     "exploit": {
+      "alerts": 248629,
+      "of": 287637,
+      "rate": 0.8643846236749793
+     },
+     "recon": {
+      "alerts": 17016,
+      "of": 49362,
+      "rate": 0.34471860945666705
+     }
+    },
+    "by_attack_status": {
+     "failure": {
+      "alerts": 9483,
+      "of": 19908,
+      "rate": 0.47634116937914406
+     },
+     "success": {
+      "alerts": 256162,
+      "of": 317091,
+      "rate": 0.8078501124282934
+     }
+    },
+    "by_attack_technique": {
+     "boolean": {
+      "alerts": 238177,
+      "of": 278495,
+      "rate": 0.8552289987252913
+     },
+     "error": {
+      "alerts": 12145,
+      "of": 22988,
+      "rate": 0.5283191230207065
+     },
+     "inline": {
+      "alerts": 3240,
+      "of": 4739,
+      "rate": 0.683688541886474
+     },
+     "stacked": {
+      "alerts": 1795,
+      "of": 6915,
+      "rate": 0.25958062183658714
+     },
+     "time": {
+      "alerts": 2102,
+      "of": 8582,
+      "rate": 0.24493125145653694
+     },
+     "union": {
+      "alerts": 8186,
+      "of": 15280,
+      "rate": 0.5357329842931937
+     }
+    },
+    "by_drift_set": {
+     "origin": {
+      "attacks": {
+       "alerts": 129000,
+       "of": 172760,
+       "rate": 0.7467006251447095,
+       "wilson_95": [
+        0.7446443858142062,
+        0.7487458935417179
+       ]
+      },
+      "benign": {
+       "alerts": 8511,
+       "of": 1504075,
+       "rate": 0.005658627395575354,
+       "wilson_95": [
+        0.005540006244643423,
+        0.005779773669531211
+       ]
+      }
+     },
+     "shifted": {
+      "attacks": {
+       "alerts": 136645,
+       "of": 164239,
+       "rate": 0.8319887481048959,
+       "wilson_95": [
+        0.8301728235589224,
+        0.8337891429496832
+       ]
+      },
+      "benign": {
+       "alerts": 0,
+       "of": 1512596,
+       "rate": 0.0,
+       "wilson_95": [
+        0.0,
+        2.5396398809555388e-06
+       ]
+      }
+     }
+    },
+    "by_tamper_method": {
+     "commentbeforeparentheses": {
+      "alerts": 1454,
+      "of": 4374,
+      "rate": 0.3324188385916781
+     },
+     "equaltolike": {
+      "alerts": 24964,
+      "of": 29978,
+      "rate": 0.8327440122756689
+     },
+     "lowercase": {
+      "alerts": 125192,
+      "of": 138309,
+      "rate": 0.9051616308410877
+     },
+     "multiplespaces": {
+      "alerts": 23244,
+      "of": 26549,
+      "rate": 0.875513202003842
+     },
+     "randomcase": {
+      "alerts": 20302,
+      "of": 26919,
+      "rate": 0.7541884914001263
+     },
+     "sleep2getlock": {
+      "alerts": 39950,
+      "of": 50302,
+      "rate": 0.7942030137966681
+     },
+     "space2comment": {
+      "alerts": 16171,
+      "of": 40201,
+      "rate": 0.4022536752817094
+     },
+     "space2mysqlblank": {
+      "alerts": 14368,
+      "of": 20367,
+      "rate": 0.70545490253842
+     }
+    }
+   }
+  },
+  "drift-c": {
+   "fused": {
+    "attacks": {
+     "alerts": 336824,
+     "of": 336929,
+     "rate": 0.9996883616429574,
+     "wilson_95": [
+      0.9996227945460255,
+      0.9997425345861676
+     ]
+    },
+    "benign": {
+     "alerts": 1500783,
+     "of": 3016741,
+     "rate": 0.49748486860489516,
+     "wilson_95": [
+      0.49692065851368095,
+      0.49804908510153933
+     ]
+    },
+    "by_attack_stage": {
+     "exploit": {
+      "alerts": 308540,
+      "of": 308543,
+      "rate": 0.9999902768819905
+     },
+     "recon": {
+      "alerts": 28284,
+      "of": 28386,
+      "rate": 0.9964066793489749
+     }
+    },
+    "by_attack_status": {
+     "failure": {
+      "alerts": 11773,
+      "of": 11803,
+      "rate": 0.9974582733203423
+     },
+     "success": {
+      "alerts": 325051,
+      "of": 325126,
+      "rate": 0.999769320202014
+     }
+    },
+    "by_attack_technique": {
+     "boolean": {
+      "alerts": 278923,
+      "of": 278933,
+      "rate": 0.9999641490967365
+     },
+     "error": {
+      "alerts": 37695,
+      "of": 37697,
+      "rate": 0.999946945380269
+     },
+     "inline": {
+      "alerts": 3139,
+      "of": 3141,
+      "rate": 0.9993632601082458
+     },
+     "stacked": {
+      "alerts": 4846,
+      "of": 4889,
+      "rate": 0.9912047453466967
+     },
+     "time": {
+      "alerts": 6200,
+      "of": 6241,
+      "rate": 0.9934305399775677
+     },
+     "union": {
+      "alerts": 6021,
+      "of": 6028,
+      "rate": 0.9988387524883875
+     }
+    },
+    "by_drift_set": {
+     "origin": {
+      "attacks": {
+       "alerts": 152438,
+       "of": 152543,
+       "rate": 0.9993116694964699,
+       "wilson_95": [
+        0.9991668844941243,
+        0.9994313070066879
+       ]
+      },
+      "benign": {
+       "alerts": 8334,
+       "of": 1524292,
+       "rate": 0.005467456366627916,
+       "wilson_95": [
+        0.005351634115190567,
+        0.0055857712135052836
+       ]
+      }
+     },
+     "shifted": {
+      "attacks": {
+       "alerts": 184386,
+       "of": 184386,
+       "rate": 1.0,
+       "wilson_95": [
+        0.9999791666457819,
+        0.9999999999999999
+       ]
+      },
+      "benign": {
+       "alerts": 1492449,
+       "of": 1492449,
+       "rate": 1.0,
+       "wilson_95": [
+        0.9999974260768753,
+        1.0
+       ]
+      }
+     }
+    },
+    "by_tamper_method": {
+     "commentbeforeparentheses": {
+      "alerts": 2666,
+      "of": 2678,
+      "rate": 0.9955190440627334
+     },
+     "equaltolike": {
+      "alerts": 42640,
+      "of": 42650,
+      "rate": 0.9997655334114889
+     },
+     "lowercase": {
+      "alerts": 67827,
+      "of": 67841,
+      "rate": 0.9997936351174069
+     },
+     "multiplespaces": {
+      "alerts": 62203,
+      "of": 62217,
+      "rate": 0.9997749811144864
+     },
+     "randomcase": {
+      "alerts": 81595,
+      "of": 81619,
+      "rate": 0.9997059508202747
+     },
+     "sleep2getlock": {
+      "alerts": 33773,
+      "of": 33781,
+      "rate": 0.999763180486072
+     },
+     "space2comment": {
+      "alerts": 39063,
+      "of": 39075,
+      "rate": 0.9996928982725528
+     },
+     "space2mysqlblank": {
+      "alerts": 7057,
+      "of": 7068,
+      "rate": 0.9984436898698359
+     }
+    }
+   },
+   "input_novelty": {
+    "attacks": {
+     "alerts": 336824,
+     "of": 336929,
+     "rate": 0.9996883616429574,
+     "wilson_95": [
+      0.9996227945460255,
+      0.9997425345861676
+     ]
+    },
+    "benign": {
+     "alerts": 1492535,
+     "of": 3016741,
+     "rate": 0.49475079232854263,
+     "wilson_95": [
+      0.49418660967450007,
+      0.49531498835104454
+     ]
+    },
+    "by_attack_stage": {
+     "exploit": {
+      "alerts": 308540,
+      "of": 308543,
+      "rate": 0.9999902768819905
+     },
+     "recon": {
+      "alerts": 28284,
+      "of": 28386,
+      "rate": 0.9964066793489749
+     }
+    },
+    "by_attack_status": {
+     "failure": {
+      "alerts": 11773,
+      "of": 11803,
+      "rate": 0.9974582733203423
+     },
+     "success": {
+      "alerts": 325051,
+      "of": 325126,
+      "rate": 0.999769320202014
+     }
+    },
+    "by_attack_technique": {
+     "boolean": {
+      "alerts": 278923,
+      "of": 278933,
+      "rate": 0.9999641490967365
+     },
+     "error": {
+      "alerts": 37695,
+      "of": 37697,
+      "rate": 0.999946945380269
+     },
+     "inline": {
+      "alerts": 3139,
+      "of": 3141,
+      "rate": 0.9993632601082458
+     },
+     "stacked": {
+      "alerts": 4846,
+      "of": 4889,
+      "rate": 0.9912047453466967
+     },
+     "time": {
+      "alerts": 6200,
+      "of": 6241,
+      "rate": 0.9934305399775677
+     },
+     "union": {
+      "alerts": 6021,
+      "of": 6028,
+      "rate": 0.9988387524883875
+     }
+    },
+    "by_drift_set": {
+     "origin": {
+      "attacks": {
+       "alerts": 152438,
+       "of": 152543,
+       "rate": 0.9993116694964699,
+       "wilson_95": [
+        0.9991668844941243,
+        0.9994313070066879
+       ]
+      },
+      "benign": {
+       "alerts": 86,
+       "of": 1524292,
+       "rate": 5.641963613270948e-05,
+       "wilson_95": [
+        4.568934392880308e-05,
+        6.966979705855322e-05
+       ]
+      }
+     },
+     "shifted": {
+      "attacks": {
+       "alerts": 184386,
+       "of": 184386,
+       "rate": 1.0,
+       "wilson_95": [
+        0.9999791666457819,
+        0.9999999999999999
+       ]
+      },
+      "benign": {
+       "alerts": 1492449,
+       "of": 1492449,
+       "rate": 1.0,
+       "wilson_95": [
+        0.9999974260768753,
+        1.0
+       ]
+      }
+     }
+    },
+    "by_tamper_method": {
+     "commentbeforeparentheses": {
+      "alerts": 2666,
+      "of": 2678,
+      "rate": 0.9955190440627334
+     },
+     "equaltolike": {
+      "alerts": 42640,
+      "of": 42650,
+      "rate": 0.9997655334114889
+     },
+     "lowercase": {
+      "alerts": 67827,
+      "of": 67841,
+      "rate": 0.9997936351174069
+     },
+     "multiplespaces": {
+      "alerts": 62203,
+      "of": 62217,
+      "rate": 0.9997749811144864
+     },
+     "randomcase": {
+      "alerts": 81595,
+      "of": 81619,
+      "rate": 0.9997059508202747
+     },
+     "sleep2getlock": {
+      "alerts": 33773,
+      "of": 33781,
+      "rate": 0.999763180486072
+     },
+     "space2comment": {
+      "alerts": 39063,
+      "of": 39075,
+      "rate": 0.9996928982725528
+     },
+     "space2mysqlblank": {
+      "alerts": 7057,
+      "of": 7068,
+      "rate": 0.9984436898698359
+     }
+    }
+   },
+   "learned_anomaly": {
+    "attacks": {
+     "alerts": 112062,
+     "of": 336929,
+     "rate": 0.3325982625419599,
+     "wilson_95": [
+      0.33100931689449914,
+      0.3341910253708406
+     ]
+    },
+    "benign": {
+     "alerts": 8372,
+     "of": 3016741,
+     "rate": 0.0027751802358903202,
+     "wilson_95": [
+      0.002716446317750535,
+      0.0028351804651039715
+     ]
+    },
+    "by_attack_stage": {
+     "exploit": {
+      "alerts": 103543,
+      "of": 308543,
+      "rate": 0.3355869360186425
+     },
+     "recon": {
+      "alerts": 8519,
+      "of": 28386,
+      "rate": 0.30011273162826746
+     }
+    },
+    "by_attack_status": {
+     "failure": {
+      "alerts": 3734,
+      "of": 11803,
+      "rate": 0.3163602473947302
+     },
+     "success": {
+      "alerts": 108328,
+      "of": 325126,
+      "rate": 0.3331877487497155
+     }
+    },
+    "by_attack_technique": {
+     "boolean": {
+      "alerts": 89640,
+      "of": 278933,
+      "rate": 0.3213674968540832
+     },
+     "error": {
+      "alerts": 16526,
+      "of": 37697,
+      "rate": 0.43839032283736107
+     },
+     "inline": {
+      "alerts": 2276,
+      "of": 3141,
+      "rate": 0.7246099968163006
+     },
+     "stacked": {
+      "alerts": 692,
+      "of": 4889,
+      "rate": 0.14154223767641644
+     },
+     "time": {
+      "alerts": 1136,
+      "of": 6241,
+      "rate": 0.1820221118410511
+     },
+     "union": {
+      "alerts": 1792,
+      "of": 6028,
+      "rate": 0.2972793629727936
+     }
+    },
+    "by_drift_set": {
+     "origin": {
+      "attacks": {
+       "alerts": 105573,
+       "of": 152543,
+       "rate": 0.6920868214208453,
+       "wilson_95": [
+        0.689765433293332,
+        0.694398535226438
+       ]
+      },
+      "benign": {
+       "alerts": 8372,
+       "of": 1524292,
+       "rate": 0.005492385973291207,
+       "wilson_95": [
+        0.00537629856892109,
+        0.0056109658474484915
+       ]
+      }
+     },
+     "shifted": {
+      "attacks": {
+       "alerts": 6489,
+       "of": 184386,
+       "rate": 0.03519247665224041,
+       "wilson_95": [
+        0.03436104852093959,
+        0.036043271783095326
+       ]
+      },
+      "benign": {
+       "alerts": 0,
+       "of": 1492449,
+       "rate": 0.0,
+       "wilson_95": [
+        0.0,
+        2.5739231247943166e-06
+       ]
+      }
+     }
+    },
+    "by_tamper_method": {
+     "commentbeforeparentheses": {
+      "alerts": 1223,
+      "of": 2678,
+      "rate": 0.4566840926064227
+     },
+     "equaltolike": {
+      "alerts": 10592,
+      "of": 42650,
+      "rate": 0.24834701055099648
+     },
+     "lowercase": {
+      "alerts": 5613,
+      "of": 67841,
+      "rate": 0.08273757757108534
+     },
+     "multiplespaces": {
+      "alerts": 11933,
+      "of": 62217,
+      "rate": 0.1917964543452754
+     },
+     "randomcase": {
+      "alerts": 55568,
+      "of": 81619,
+      "rate": 0.6808218674573322
+     },
+     "sleep2getlock": {
+      "alerts": 20677,
+      "of": 33781,
+      "rate": 0.6120896361860217
+     },
+     "space2comment": {
+      "alerts": 4432,
+      "of": 39075,
+      "rate": 0.11342290467050543
+     },
+     "space2mysqlblank": {
+      "alerts": 2024,
+      "of": 7068,
+      "rate": 0.28636106395019806
+     }
+    }
+   }
+  },
+  "drift-d": {
+   "fused": {
+    "attacks": {
+     "alerts": 342583,
+     "of": 342778,
+     "rate": 0.9994311186832294,
+     "wilson_95": [
+      0.9993455030086922,
+      0.9995055403919586
+     ]
+    },
+    "benign": {
+     "alerts": 1438630,
+     "of": 3010892,
+     "rate": 0.4778085696863255,
+     "wilson_95": [
+      0.4772443863268986,
+      0.47837280967173457
+     ]
+    },
+    "by_attack_stage": {
+     "exploit": {
+      "alerts": 257475,
+      "of": 257475,
+      "rate": 1.0
+     },
+     "recon": {
+      "alerts": 85108,
+      "of": 85303,
+      "rate": 0.9977140311595137
+     }
+    },
+    "by_attack_status": {
+     "failure": {
+      "alerts": 33486,
+      "of": 33630,
+      "rate": 0.9957181088314006
+     },
+     "success": {
+      "alerts": 309097,
+      "of": 309148,
+      "rate": 0.9998350304708424
+     }
+    },
+    "by_attack_technique": {
+     "boolean": {
+      "alerts": 236773,
+      "of": 236784,
+      "rate": 0.9999535441583891
+     },
+     "error": {
+      "alerts": 47343,
+      "of": 47349,
+      "rate": 0.9998732813786986
+     },
+     "inline": {
+      "alerts": 5288,
+      "of": 5289,
+      "rate": 0.9998109283418416
+     },
+     "stacked": {
+      "alerts": 11099,
+      "of": 11184,
+      "rate": 0.9923998569384835
+     },
+     "time": {
+      "alerts": 23103,
+      "of": 23189,
+      "rate": 0.9962913450342835
+     },
+     "union": {
+      "alerts": 18977,
+      "of": 18983,
+      "rate": 0.9996839277248064
+     }
+    },
+    "by_drift_set": {
+     "origin": {
+      "attacks": {
+       "alerts": 97199,
+       "of": 97394,
+       "rate": 0.9979978232745343,
+       "wilson_95": [
+        0.9976967651241526,
+        0.9982595984565785
+       ]
+      },
+      "benign": {
+       "alerts": 7179,
+       "of": 1579441,
+       "rate": 0.004545278994277089,
+       "wilson_95": [
+        0.00444157434317864,
+        0.004651393693372568
+       ]
+      }
+     },
+     "shifted": {
+      "attacks": {
+       "alerts": 245384,
+       "of": 245384,
+       "rate": 1.0,
+       "wilson_95": [
+        0.9999843453577062,
+        1.0
+       ]
+      },
+      "benign": {
+       "alerts": 1431451,
+       "of": 1431451,
+       "rate": 1.0,
+       "wilson_95": [
+        0.9999973163953412,
+        0.9999999999999999
+       ]
+      }
+     }
+    },
+    "by_tamper_method": {
+     "commentbeforeparentheses": {
+      "alerts": 11105,
+      "of": 11125,
+      "rate": 0.9982022471910112
+     },
+     "equaltolike": {
+      "alerts": 95225,
+      "of": 95236,
+      "rate": 0.9998844974589441
+     },
+     "lowercase": {
+      "alerts": 18409,
+      "of": 18433,
+      "rate": 0.9986979873053762
+     },
+     "multiplespaces": {
+      "alerts": 33359,
+      "of": 33366,
+      "rate": 0.9997902055985135
+     },
+     "randomcase": {
+      "alerts": 102993,
+      "of": 103043,
+      "rate": 0.999514765680347
+     },
+     "sleep2getlock": {
+      "alerts": 49524,
+      "of": 49529,
+      "rate": 0.9998990490419755
+     },
+     "space2comment": {
+      "alerts": 17230,
+      "of": 17237,
+      "rate": 0.9995938968497998
+     },
+     "space2mysqlblank": {
+      "alerts": 14738,
+      "of": 14809,
+      "rate": 0.9952056182051455
+     }
+    }
+   },
+   "input_novelty": {
+    "attacks": {
+     "alerts": 342583,
+     "of": 342778,
+     "rate": 0.9994311186832294,
+     "wilson_95": [
+      0.9993455030086922,
+      0.9995055403919586
+     ]
+    },
+    "benign": {
+     "alerts": 1431530,
+     "of": 3010892,
+     "rate": 0.4754504645135063,
+     "wilson_95": [
+      0.4748864087967111,
+      0.47601458287347226
+     ]
+    },
+    "by_attack_stage": {
+     "exploit": {
+      "alerts": 257475,
+      "of": 257475,
+      "rate": 1.0
+     },
+     "recon": {
+      "alerts": 85108,
+      "of": 85303,
+      "rate": 0.9977140311595137
+     }
+    },
+    "by_attack_status": {
+     "failure": {
+      "alerts": 33486,
+      "of": 33630,
+      "rate": 0.9957181088314006
+     },
+     "success": {
+      "alerts": 309097,
+      "of": 309148,
+      "rate": 0.9998350304708424
+     }
+    },
+    "by_attack_technique": {
+     "boolean": {
+      "alerts": 236773,
+      "of": 236784,
+      "rate": 0.9999535441583891
+     },
+     "error": {
+      "alerts": 47343,
+      "of": 47349,
+      "rate": 0.9998732813786986
+     },
+     "inline": {
+      "alerts": 5288,
+      "of": 5289,
+      "rate": 0.9998109283418416
+     },
+     "stacked": {
+      "alerts": 11099,
+      "of": 11184,
+      "rate": 0.9923998569384835
+     },
+     "time": {
+      "alerts": 23103,
+      "of": 23189,
+      "rate": 0.9962913450342835
+     },
+     "union": {
+      "alerts": 18977,
+      "of": 18983,
+      "rate": 0.9996839277248064
+     }
+    },
+    "by_drift_set": {
+     "origin": {
+      "attacks": {
+       "alerts": 97199,
+       "of": 97394,
+       "rate": 0.9979978232745343,
+       "wilson_95": [
+        0.9976967651241526,
+        0.9982595984565785
+       ]
+      },
+      "benign": {
+       "alerts": 79,
+       "of": 1579441,
+       "rate": 5.001769613426522e-05,
+       "wilson_95": [
+        4.013755533947825e-05,
+        6.232975129454663e-05
+       ]
+      }
+     },
+     "shifted": {
+      "attacks": {
+       "alerts": 245384,
+       "of": 245384,
+       "rate": 1.0,
+       "wilson_95": [
+        0.9999843453577062,
+        1.0
+       ]
+      },
+      "benign": {
+       "alerts": 1431451,
+       "of": 1431451,
+       "rate": 1.0,
+       "wilson_95": [
+        0.9999973163953412,
+        0.9999999999999999
+       ]
+      }
+     }
+    },
+    "by_tamper_method": {
+     "commentbeforeparentheses": {
+      "alerts": 11105,
+      "of": 11125,
+      "rate": 0.9982022471910112
+     },
+     "equaltolike": {
+      "alerts": 95225,
+      "of": 95236,
+      "rate": 0.9998844974589441
+     },
+     "lowercase": {
+      "alerts": 18409,
+      "of": 18433,
+      "rate": 0.9986979873053762
+     },
+     "multiplespaces": {
+      "alerts": 33359,
+      "of": 33366,
+      "rate": 0.9997902055985135
+     },
+     "randomcase": {
+      "alerts": 102993,
+      "of": 103043,
+      "rate": 0.999514765680347
+     },
+     "sleep2getlock": {
+      "alerts": 49524,
+      "of": 49529,
+      "rate": 0.9998990490419755
+     },
+     "space2comment": {
+      "alerts": 17230,
+      "of": 17237,
+      "rate": 0.9995938968497998
+     },
+     "space2mysqlblank": {
+      "alerts": 14738,
+      "of": 14809,
+      "rate": 0.9952056182051455
+     }
+    }
+   },
+   "learned_anomaly": {
+    "attacks": {
+     "alerts": 281743,
+     "of": 342778,
+     "rate": 0.8219401478507956,
+     "wilson_95": [
+      0.8206558499679985,
+      0.823217229949729
+     ]
+    },
+    "benign": {
+     "alerts": 7358,
+     "of": 3010892,
+     "rate": 0.0024437940650146204,
+     "wilson_95": [
+      0.0023886551868118676,
+      0.002500202559841047
+     ]
+    },
+    "by_attack_stage": {
+     "exploit": {
+      "alerts": 246863,
+      "of": 257475,
+      "rate": 0.9587843479949509
+     },
+     "recon": {
+      "alerts": 34880,
+      "of": 85303,
+      "rate": 0.40889534951877426
+     }
+    },
+    "by_attack_status": {
+     "failure": {
+      "alerts": 9601,
+      "of": 33630,
+      "rate": 0.28548914659530183
+     },
+     "success": {
+      "alerts": 272142,
+      "of": 309148,
+      "rate": 0.8802968157646176
+     }
+    },
+    "by_attack_technique": {
+     "boolean": {
+      "alerts": 218657,
+      "of": 236784,
+      "rate": 0.9234449962835327
+     },
+     "error": {
+      "alerts": 37805,
+      "of": 47349,
+      "rate": 0.798432913049906
+     },
+     "inline": {
+      "alerts": 5035,
+      "of": 5289,
+      "rate": 0.9519757988277557
+     },
+     "stacked": {
+      "alerts": 3449,
+      "of": 11184,
+      "rate": 0.3083869814020029
+     },
+     "time": {
+      "alerts": 9274,
+      "of": 23189,
+      "rate": 0.3999310017680797
+     },
+     "union": {
+      "alerts": 7523,
+      "of": 18983,
+      "rate": 0.39630195438023497
+     }
+    },
+    "by_drift_set": {
+     "origin": {
+      "attacks": {
+       "alerts": 80198,
+       "of": 97394,
+       "rate": 0.8234388155327843,
+       "wilson_95": [
+        0.8210314042431152,
+        0.8258207133841292
+       ]
+      },
+      "benign": {
+       "alerts": 7358,
+       "of": 1579441,
+       "rate": 0.004658610229821817,
+       "wilson_95": [
+        0.004553611674355687,
+        0.004766018282006108
+       ]
+      }
+     },
+     "shifted": {
+      "attacks": {
+       "alerts": 201545,
+       "of": 245384,
+       "rate": 0.8213453199882633,
+       "wilson_95": [
+        0.8198246564214033,
+        0.822855922463049
+       ]
+      },
+      "benign": {
+       "alerts": 0,
+       "of": 1431451,
+       "rate": 0.0,
+       "wilson_95": [
+        0.0,
+        2.6836046587267392e-06
+       ]
+      }
+     }
+    },
+    "by_tamper_method": {
+     "commentbeforeparentheses": {
+      "alerts": 4051,
+      "of": 11125,
+      "rate": 0.36413483146067416
+     },
+     "equaltolike": {
+      "alerts": 89281,
+      "of": 95236,
+      "rate": 0.937471124364736
+     },
+     "lowercase": {
+      "alerts": 13989,
+      "of": 18433,
+      "rate": 0.7589106493788315
+     },
+     "multiplespaces": {
+      "alerts": 24852,
+      "of": 33366,
+      "rate": 0.7448300665347959
+     },
+     "randomcase": {
+      "alerts": 97410,
+      "of": 103043,
+      "rate": 0.9453335015478975
+     },
+     "sleep2getlock": {
+      "alerts": 41789,
+      "of": 49529,
+      "rate": 0.8437279169779321
+     },
+     "space2comment": {
+      "alerts": 6159,
+      "of": 17237,
+      "rate": 0.35731275744038987
+     },
+     "space2mysqlblank": {
+      "alerts": 4212,
+      "of": 14809,
+      "rate": 0.28442163549193056
+     }
+    }
+   }
+  },
+  "fewshot-b-500": {
+   "fused": {
+    "attacks": {
+     "alerts": 332070,
+     "of": 337638,
+     "rate": 0.9835089652231088,
+     "wilson_95": [
+      0.9830738598206699,
+      0.9839330685542369
+     ]
+    },
+    "benign": {
+     "alerts": 76577,
+     "of": 3016033,
+     "rate": 0.02538997418131698,
+     "wilson_95": [
+      0.025213045777197237,
+      0.025568111585853277
+     ]
+    },
+    "by_attack_stage": {
+     "exploit": {
+      "alerts": 287998,
+      "of": 288465,
+      "rate": 0.9983810860936335
+     },
+     "recon": {
+      "alerts": 44072,
+      "of": 49173,
+      "rate": 0.8962642100339617
+     }
+    },
+    "by_attack_status": {
+     "failure": {
+      "alerts": 18335,
+      "of": 20008,
+      "rate": 0.9163834466213514
+     },
+     "success": {
+      "alerts": 313735,
+      "of": 317630,
+      "rate": 0.9877373044107924
+     }
+    },
+    "by_attack_technique": {
+     "boolean": {
+      "alerts": 277131,
+      "of": 278654,
+      "rate": 0.9945344405606953
+     },
+     "error": {
+      "alerts": 22152,
+      "of": 22872,
+      "rate": 0.968520461699895
+     },
+     "inline": {
+      "alerts": 4807,
+      "of": 4825,
+      "rate": 0.9962694300518135
+     },
+     "insider": {
+      "alerts": 0,
+      "of": 388,
+      "rate": 0.0
+     },
+     "stacked": {
+      "alerts": 6103,
+      "of": 6856,
+      "rate": 0.8901691948658109
+     },
+     "time": {
+      "alerts": 7827,
+      "of": 8535,
+      "rate": 0.9170474516695958
+     },
+     "union": {
+      "alerts": 14050,
+      "of": 15508,
+      "rate": 0.9059840082538045
+     }
+    },
+    "by_tamper_method": {
+     "(none)": {
+      "alerts": 0,
+      "of": 388,
+      "rate": 0.0
+     },
+     "commentbeforeparentheses": {
+      "alerts": 4027,
+      "of": 4359,
+      "rate": 0.9238357421426933
+     },
+     "equaltolike": {
+      "alerts": 29074,
+      "of": 29910,
+      "rate": 0.9720494817786693
+     },
+     "lowercase": {
+      "alerts": 137240,
+      "of": 137916,
+      "rate": 0.9950984657327648
+     },
+     "multiplespaces": {
+      "alerts": 25851,
+      "of": 26864,
+      "rate": 0.9622915425848719
+     },
+     "randomcase": {
+      "alerts": 26093,
+      "of": 26865,
+      "rate": 0.9712637260375954
+     },
+     "sleep2getlock": {
+      "alerts": 49977,
+      "of": 50640,
+      "rate": 0.9869075829383887
+     },
+     "space2comment": {
+      "alerts": 40021,
+      "of": 40406,
+      "rate": 0.9904717121219621
+     },
+     "space2mysqlblank": {
+      "alerts": 19787,
+      "of": 20290,
+      "rate": 0.9752094627895515
+     }
+    }
+   },
+   "input_novelty": {
+    "attacks": {
+     "alerts": 260824,
+     "of": 337638,
+     "rate": 0.7724959868261274,
+     "wilson_95": [
+      0.7710788401697731,
+      0.7739069329350367
+     ]
+    },
+    "benign": {
+     "alerts": 0,
+     "of": 3016033,
+     "rate": 0.0,
+     "wilson_95": [
+      0.0,
+      1.273677704625735e-06
+     ]
+    },
+    "by_attack_stage": {
+     "exploit": {
+      "alerts": 235264,
+      "of": 288465,
+      "rate": 0.8155720798017091
+     },
+     "recon": {
+      "alerts": 25560,
+      "of": 49173,
+      "rate": 0.5197974498200232
+     }
+    },
+    "by_attack_status": {
+     "failure": {
+      "alerts": 9737,
+      "of": 20008,
+      "rate": 0.48665533786485404
+     },
+     "success": {
+      "alerts": 251087,
+      "of": 317630,
+      "rate": 0.7905015269338539
+     }
+    },
+    "by_attack_technique": {
+     "boolean": {
+      "alerts": 223240,
+      "of": 278654,
+      "rate": 0.8011368937822533
+     },
+     "error": {
+      "alerts": 17377,
+      "of": 22872,
+      "rate": 0.7597499125568381
+     },
+     "inline": {
+      "alerts": 2730,
+      "of": 4825,
+      "rate": 0.5658031088082901
+     },
+     "insider": {
+      "alerts": 0,
+      "of": 388,
+      "rate": 0.0
+     },
+     "stacked": {
+      "alerts": 3923,
+      "of": 6856,
+      "rate": 0.5721995332555426
+     },
+     "time": {
+      "alerts": 5207,
+      "of": 8535,
+      "rate": 0.6100761570005858
+     },
+     "union": {
+      "alerts": 8347,
+      "of": 15508,
+      "rate": 0.5382383286045912
+     }
+    },
+    "by_tamper_method": {
+     "(none)": {
+      "alerts": 0,
+      "of": 388,
+      "rate": 0.0
+     },
+     "commentbeforeparentheses": {
+      "alerts": 2257,
+      "of": 4359,
+      "rate": 0.517779307180546
+     },
+     "equaltolike": {
+      "alerts": 25098,
+      "of": 29910,
+      "rate": 0.8391173520561686
+     },
+     "lowercase": {
+      "alerts": 100296,
+      "of": 137916,
+      "rate": 0.7272252675541634
+     },
+     "multiplespaces": {
+      "alerts": 24299,
+      "of": 26864,
+      "rate": 0.9045190589636688
+     },
+     "randomcase": {
+      "alerts": 22673,
+      "of": 26865,
+      "rate": 0.8439605434580308
+     },
+     "sleep2getlock": {
+      "alerts": 32962,
+      "of": 50640,
+      "rate": 0.6509083728278041
+     },
+     "space2comment": {
+      "alerts": 36688,
+      "of": 40406,
+      "rate": 0.9079839627778052
+     },
+     "space2mysqlblank": {
+      "alerts": 16551,
+      "of": 20290,
+      "rate": 0.8157220305569246
+     }
+    }
+   },
+   "learned_anomaly": {
+    "attacks": {
+     "alerts": 324899,
+     "of": 337638,
+     "rate": 0.9622702420936032,
+     "wilson_95": [
+      0.9616222579206276,
+      0.9629077074747171
+     ]
+    },
+    "benign": {
+     "alerts": 89626,
+     "of": 3016033,
+     "rate": 0.0297165183537448,
+     "wilson_95": [
+      0.02952547998465325,
+      0.0299087547020072
+     ]
+    },
+    "by_attack_stage": {
+     "exploit": {
+      "alerts": 287486,
+      "of": 288465,
+      "rate": 0.9966061740592447
+     },
+     "recon": {
+      "alerts": 37413,
+      "of": 49173,
+      "rate": 0.7608443658105057
+     }
+    },
+    "by_attack_status": {
+     "failure": {
+      "alerts": 15261,
+      "of": 20008,
+      "rate": 0.7627449020391843
+     },
+     "success": {
+      "alerts": 309638,
+      "of": 317630,
+      "rate": 0.9748386487422472
+     }
+    },
+    "by_attack_technique": {
+     "boolean": {
+      "alerts": 274447,
+      "of": 278654,
+      "rate": 0.984902423794383
+     },
+     "error": {
+      "alerts": 21757,
+      "of": 22872,
+      "rate": 0.9512504372158097
+     },
+     "inline": {
+      "alerts": 4776,
+      "of": 4825,
+      "rate": 0.9898445595854922
+     },
+     "insider": {
+      "alerts": 0,
+      "of": 388,
+      "rate": 0.0
+     },
+     "stacked": {
+      "alerts": 5176,
+      "of": 6856,
+      "rate": 0.7549591598599766
+     },
+     "time": {
+      "alerts": 6825,
+      "of": 8535,
+      "rate": 0.7996485061511424
+     },
+     "union": {
+      "alerts": 11918,
+      "of": 15508,
+      "rate": 0.7685065772504514
+     }
+    },
+    "by_tamper_method": {
+     "(none)": {
+      "alerts": 0,
+      "of": 388,
+      "rate": 0.0
+     },
+     "commentbeforeparentheses": {
+      "alerts": 3636,
+      "of": 4359,
+      "rate": 0.8341362697866483
+     },
+     "equaltolike": {
+      "alerts": 28250,
+      "of": 29910,
+      "rate": 0.9445001671681712
+     },
+     "lowercase": {
+      "alerts": 136767,
+      "of": 137916,
+      "rate": 0.9916688419037675
+     },
+     "multiplespaces": {
+      "alerts": 25335,
+      "of": 26864,
+      "rate": 0.9430836807623586
+     },
+     "randomcase": {
+      "alerts": 25628,
+      "of": 26865,
+      "rate": 0.9539549599851107
+     },
+     "sleep2getlock": {
+      "alerts": 48807,
+      "of": 50640,
+      "rate": 0.963803317535545
+     },
+     "space2comment": {
+      "alerts": 38185,
+      "of": 40406,
+      "rate": 0.9450329159035786
+     },
+     "space2mysqlblank": {
+      "alerts": 18291,
+      "of": 20290,
+      "rate": 0.9014785608674224
+     }
+    }
+   }
+  },
+  "fewshot-b-5000": {
+   "fused": {
+    "attacks": {
+     "alerts": 334950,
+     "of": 337638,
+     "rate": 0.9920388107973629,
+     "wilson_95": [
+      0.9917334007308023,
+      0.9923330246990671
+     ]
+    },
+    "benign": {
+     "alerts": 30492,
+     "of": 3016033,
+     "rate": 0.010109968955909964,
+     "wilson_95": [
+      0.009997690097278846,
+      0.010223495738561602
+     ]
+    },
+    "by_attack_stage": {
+     "exploit": {
+      "alerts": 288074,
+      "of": 288465,
+      "rate": 0.9986445495987382
+     },
+     "recon": {
+      "alerts": 46876,
+      "of": 49173,
+      "rate": 0.953287373151933
+     }
+    },
+    "by_attack_status": {
+     "failure": {
+      "alerts": 19962,
+      "of": 20008,
+      "rate": 0.9977009196321471
+     },
+     "success": {
+      "alerts": 314988,
+      "of": 317630,
+      "rate": 0.9916821458930202
+     }
+    },
+    "by_attack_technique": {
+     "boolean": {
+      "alerts": 278197,
+      "of": 278654,
+      "rate": 0.9983599733002217
+     },
+     "error": {
+      "alerts": 22192,
+      "of": 22872,
+      "rate": 0.9702693249387898
+     },
+     "inline": {
+      "alerts": 4819,
+      "of": 4825,
+      "rate": 0.9987564766839379
+     },
+     "insider": {
+      "alerts": 0,
+      "of": 388,
+      "rate": 0.0
+     },
+     "stacked": {
+      "alerts": 6424,
+      "of": 6856,
+      "rate": 0.9369894982497082
+     },
+     "time": {
+      "alerts": 8012,
+      "of": 8535,
+      "rate": 0.9387229056824838
+     },
+     "union": {
+      "alerts": 15306,
+      "of": 15508,
+      "rate": 0.9869744647923653
+     }
+    },
+    "by_tamper_method": {
+     "(none)": {
+      "alerts": 0,
+      "of": 388,
+      "rate": 0.0
+     },
+     "commentbeforeparentheses": {
+      "alerts": 4323,
+      "of": 4359,
+      "rate": 0.9917412250516173
+     },
+     "equaltolike": {
+      "alerts": 29643,
+      "of": 29910,
+      "rate": 0.9910732196589769
+     },
+     "lowercase": {
+      "alerts": 137622,
+      "of": 137916,
+      "rate": 0.9978682676411729
+     },
+     "multiplespaces": {
+      "alerts": 26154,
+      "of": 26864,
+      "rate": 0.9735705777248362
+     },
+     "randomcase": {
+      "alerts": 26338,
+      "of": 26865,
+      "rate": 0.9803833984738507
+     },
+     "sleep2getlock": {
+      "alerts": 50315,
+      "of": 50640,
+      "rate": 0.9935821484992101
+     },
+     "space2comment": {
+      "alerts": 40384,
+      "of": 40406,
+      "rate": 0.9994555264069692
+     },
+     "space2mysqlblank": {
+      "alerts": 20171,
+      "of": 20290,
+      "rate": 0.9941350418925579
+     }
+    }
+   },
+   "input_novelty": {
+    "attacks": {
+     "alerts": 333999,
+     "of": 337638,
+     "rate": 0.9892221847066978,
+     "wilson_95": [
+      0.9888682912126429,
+      0.9895649461272026
+     ]
+    },
+    "benign": {
+     "alerts": 21846,
+     "of": 3016033,
+     "rate": 0.007243289446766664,
+     "wilson_95": [
+      0.007148213421796746,
+      0.007339620698208654
+     ]
+    },
+    "by_attack_stage": {
+     "exploit": {
+      "alerts": 288462,
+      "of": 288465,
+      "rate": 0.9999896001247985
+     },
+     "recon": {
+      "alerts": 45537,
+      "of": 49173,
+      "rate": 0.926056982490391
+     }
+    },
+    "by_attack_status": {
+     "failure": {
+      "alerts": 19388,
+      "of": 20008,
+      "rate": 0.9690123950419832
+     },
+     "success": {
+      "alerts": 314611,
+      "of": 317630,
+      "rate": 0.990495230299405
+     }
+    },
+    "by_attack_technique": {
+     "boolean": {
+      "alerts": 278157,
+      "of": 278654,
+      "rate": 0.9982164261054929
+     },
+     "error": {
+      "alerts": 21867,
+      "of": 22872,
+      "rate": 0.9560598111227702
+     },
+     "inline": {
+      "alerts": 4809,
+      "of": 4825,
+      "rate": 0.9966839378238342
+     },
+     "insider": {
+      "alerts": 388,
+      "of": 388,
+      "rate": 1.0
+     },
+     "stacked": {
+      "alerts": 6129,
+      "of": 6856,
+      "rate": 0.8939614935822637
+     },
+     "time": {
+      "alerts": 7630,
+      "of": 8535,
+      "rate": 0.8939660222612771
+     },
+     "union": {
+      "alerts": 15019,
+      "of": 15508,
+      "rate": 0.9684678875419138
+     }
+    },
+    "by_tamper_method": {
+     "(none)": {
+      "alerts": 388,
+      "of": 388,
+      "rate": 1.0
+     },
+     "commentbeforeparentheses": {
+      "alerts": 4268,
+      "of": 4359,
+      "rate": 0.9791236522138105
+     },
+     "equaltolike": {
+      "alerts": 29570,
+      "of": 29910,
+      "rate": 0.9886325643597459
+     },
+     "lowercase": {
+      "alerts": 137422,
+      "of": 137916,
+      "rate": 0.9964181095739436
+     },
+     "multiplespaces": {
+      "alerts": 26115,
+      "of": 26864,
+      "rate": 0.972118820726623
+     },
+     "randomcase": {
+      "alerts": 26056,
+      "of": 26865,
+      "rate": 0.9698864693839568
+     },
+     "sleep2getlock": {
+      "alerts": 50268,
+      "of": 50640,
+      "rate": 0.9926540284360189
+     },
+     "space2comment": {
+      "alerts": 40315,
+      "of": 40406,
+      "rate": 0.9977478592288274
+     },
+     "space2mysqlblank": {
+      "alerts": 19597,
+      "of": 20290,
+      "rate": 0.9658452439625431
+     }
+    }
+   },
+   "learned_anomaly": {
+    "attacks": {
+     "alerts": 288001,
+     "of": 337638,
+     "rate": 0.8529875191773438,
+     "wilson_95": [
+      0.8517890451887543,
+      0.8541779610628345
+     ]
+    },
+    "benign": {
+     "alerts": 16395,
+     "of": 3016033,
+     "rate": 0.005435948479343562,
+     "wilson_95": [
+      0.005353594018973238,
+      0.005519562770125748
+     ]
+    },
+    "by_attack_stage": {
+     "exploit": {
+      "alerts": 266963,
+      "of": 288465,
+      "rate": 0.9254606278057996
+     },
+     "recon": {
+      "alerts": 21038,
+      "of": 49173,
+      "rate": 0.4278364142923962
+     }
+    },
+    "by_attack_status": {
+     "failure": {
+      "alerts": 9785,
+      "of": 20008,
+      "rate": 0.4890543782487005
+     },
+     "success": {
+      "alerts": 278216,
+      "of": 317630,
+      "rate": 0.8759122249157825
+     }
+    },
+    "by_attack_technique": {
+     "boolean": {
+      "alerts": 252041,
+      "of": 278654,
+      "rate": 0.9044944626669633
+     },
+     "error": {
+      "alerts": 17135,
+      "of": 22872,
+      "rate": 0.749169289961525
+     },
+     "inline": {
+      "alerts": 4679,
+      "of": 4825,
+      "rate": 0.9697409326424871
+     },
+     "insider": {
+      "alerts": 0,
+      "of": 388,
+      "rate": 0.0
+     },
+     "stacked": {
+      "alerts": 2584,
+      "of": 6856,
+      "rate": 0.37689614935822635
+     },
+     "time": {
+      "alerts": 3487,
+      "of": 8535,
+      "rate": 0.40855301698886937
+     },
+     "union": {
+      "alerts": 8075,
+      "of": 15508,
+      "rate": 0.520698994067578
+     }
+    },
+    "by_tamper_method": {
+     "(none)": {
+      "alerts": 0,
+      "of": 388,
+      "rate": 0.0
+     },
+     "commentbeforeparentheses": {
+      "alerts": 2013,
+      "of": 4359,
+      "rate": 0.4618031658637302
+     },
+     "equaltolike": {
+      "alerts": 25957,
+      "of": 29910,
+      "rate": 0.8678368438649281
+     },
+     "lowercase": {
+      "alerts": 133838,
+      "of": 137916,
+      "rate": 0.970431277009194
+     },
+     "multiplespaces": {
+      "alerts": 24352,
+      "of": 26864,
+      "rate": 0.9064919594997022
+     },
+     "randomcase": {
+      "alerts": 23731,
+      "of": 26865,
+      "rate": 0.8833426391215335
+     },
+     "sleep2getlock": {
+      "alerts": 45716,
+      "of": 50640,
+      "rate": 0.9027646129541864
+     },
+     "space2comment": {
+      "alerts": 17348,
+      "of": 40406,
+      "rate": 0.4293421769044201
+     },
+     "space2mysqlblank": {
+      "alerts": 15046,
+      "of": 20290,
+      "rate": 0.7415475603745687
+     }
+    }
+   }
+  },
+  "fewshot-c-500": {
+   "fused": {
+    "attacks": {
+     "alerts": 331822,
+     "of": 337159,
+     "rate": 0.9841706731838687,
+     "wilson_95": [
+      0.9837438175614327,
+      0.9845864960262719
+     ]
+    },
+    "benign": {
+     "alerts": 15578,
+     "of": 3016512,
+     "rate": 0.005164242674983557,
+     "wilson_95": [
+      0.005083984205577138,
+      0.0052457614667716
+     ]
+    },
+    "by_attack_stage": {
+     "exploit": {
+      "alerts": 307640,
+      "of": 308399,
+      "rate": 0.9975389025256243
+     },
+     "recon": {
+      "alerts": 24182,
+      "of": 28760,
+      "rate": 0.8408205841446453
+     }
+    },
+    "by_attack_status": {
+     "failure": {
+      "alerts": 9433,
+      "of": 12151,
+      "rate": 0.7763147066085095
+     },
+     "success": {
+      "alerts": 322389,
+      "of": 325008,
+      "rate": 0.991941736818786
+     }
+    },
+    "by_attack_technique": {
+     "boolean": {
+      "alerts": 276925,
+      "of": 278204,
+      "rate": 0.9954026541674454
+     },
+     "error": {
+      "alerts": 37743,
+      "of": 37809,
+      "rate": 0.9982543838768547
+     },
+     "inline": {
+      "alerts": 3112,
+      "of": 3166,
+      "rate": 0.9829437776373974
+     },
+     "insider": {
+      "alerts": 0,
+      "of": 388,
+      "rate": 0.0
+     },
+     "stacked": {
+      "alerts": 4404,
+      "of": 5041,
+      "rate": 0.8736361832969649
+     },
+     "time": {
+      "alerts": 5709,
+      "of": 6350,
+      "rate": 0.8990551181102362
+     },
+     "union": {
+      "alerts": 3929,
+      "of": 6201,
+      "rate": 0.6336074826640864
+     }
+    },
+    "by_tamper_method": {
+     "(none)": {
+      "alerts": 0,
+      "of": 388,
+      "rate": 0.0
+     },
+     "commentbeforeparentheses": {
+      "alerts": 2220,
+      "of": 2661,
+      "rate": 0.8342728297632469
+     },
+     "equaltolike": {
+      "alerts": 43319,
+      "of": 44217,
+      "rate": 0.9796910690458421
+     },
+     "lowercase": {
+      "alerts": 65554,
+      "of": 66377,
+      "rate": 0.9876011268963647
+     },
+     "multiplespaces": {
+      "alerts": 60301,
+      "of": 60848,
+      "rate": 0.9910103865369445
+     },
+     "randomcase": {
+      "alerts": 82225,
+      "of": 82677,
+      "rate": 0.9945329414468352
+     },
+     "sleep2getlock": {
+      "alerts": 33447,
+      "of": 34244,
+      "rate": 0.9767258497839038
+     },
+     "space2comment": {
+      "alerts": 38233,
+      "of": 38544,
+      "rate": 0.991931299294313
+     },
+     "space2mysqlblank": {
+      "alerts": 6523,
+      "of": 7203,
+      "rate": 0.9055948910176316
+     }
+    }
+   },
+   "input_novelty": {
+    "attacks": {
+     "alerts": 313579,
+     "of": 337159,
+     "rate": 0.9300626707280542,
+     "wilson_95": [
+      0.9291968843011743,
+      0.9309186573320424
+     ]
+    },
+    "benign": {
+     "alerts": 0,
+     "of": 3016512,
+     "rate": 0.0,
+     "wilson_95": [
+      0.0,
+      1.2734754541975652e-06
+     ]
+    },
+    "by_attack_stage": {
+     "exploit": {
+      "alerts": 294187,
+      "of": 308399,
+      "rate": 0.953916841494298
+     },
+     "recon": {
+      "alerts": 19392,
+      "of": 28760,
+      "rate": 0.6742698191933241
+     }
+    },
+    "by_attack_status": {
+     "failure": {
+      "alerts": 6750,
+      "of": 12151,
+      "rate": 0.5555098345815159
+     },
+     "success": {
+      "alerts": 306829,
+      "of": 325008,
+      "rate": 0.9440659922217299
+     }
+    },
+    "by_attack_technique": {
+     "boolean": {
+      "alerts": 264804,
+      "of": 278204,
+      "rate": 0.9518339060545499
+     },
+     "error": {
+      "alerts": 34002,
+      "of": 37809,
+      "rate": 0.8993096881694834
+     },
+     "inline": {
+      "alerts": 3100,
+      "of": 3166,
+      "rate": 0.9791535060012634
+     },
+     "insider": {
+      "alerts": 0,
+      "of": 388,
+      "rate": 0.0
+     },
+     "stacked": {
+      "alerts": 4052,
+      "of": 5041,
+      "rate": 0.8038087681015671
+     },
+     "time": {
+      "alerts": 5130,
+      "of": 6350,
+      "rate": 0.8078740157480315
+     },
+     "union": {
+      "alerts": 2491,
+      "of": 6201,
+      "rate": 0.4017094017094017
+     }
+    },
+    "by_tamper_method": {
+     "(none)": {
+      "alerts": 0,
+      "of": 388,
+      "rate": 0.0
+     },
+     "commentbeforeparentheses": {
+      "alerts": 1829,
+      "of": 2661,
+      "rate": 0.6873355881247651
+     },
+     "equaltolike": {
+      "alerts": 40847,
+      "of": 44217,
+      "rate": 0.9237849695818351
+     },
+     "lowercase": {
+      "alerts": 64943,
+      "of": 66377,
+      "rate": 0.9783961311900207
+     },
+     "multiplespaces": {
+      "alerts": 58058,
+      "of": 60848,
+      "rate": 0.9541480410202472
+     },
+     "randomcase": {
+      "alerts": 71457,
+      "of": 82677,
+      "rate": 0.8642911571537428
+     },
+     "sleep2getlock": {
+      "alerts": 32246,
+      "of": 34244,
+      "rate": 0.9416540123817311
+     },
+     "space2comment": {
+      "alerts": 37985,
+      "of": 38544,
+      "rate": 0.9854970942299709
+     },
+     "space2mysqlblank": {
+      "alerts": 6214,
+      "of": 7203,
+      "rate": 0.8626960988477024
+     }
+    }
+   },
+   "learned_anomaly": {
+    "attacks": {
+     "alerts": 229225,
+     "of": 337159,
+     "rate": 0.6798721078185663,
+     "wilson_95": [
+      0.6782953361428549,
+      0.6814447807549086
+     ]
+    },
+    "benign": {
+     "alerts": 17656,
+     "of": 3016512,
+     "rate": 0.0058531177731101355,
+     "wilson_95": [
+      0.005767662390381225,
+      0.005939831723689613
+     ]
+    },
+    "by_attack_stage": {
+     "exploit": {
+      "alerts": 220970,
+      "of": 308399,
+      "rate": 0.71650686286272
+     },
+     "recon": {
+      "alerts": 8255,
+      "of": 28760,
+      "rate": 0.2870305980528512
+     }
+    },
+    "by_attack_status": {
+     "failure": {
+      "alerts": 3702,
+      "of": 12151,
+      "rate": 0.30466628261048473
+     },
+     "success": {
+      "alerts": 225523,
+      "of": 325008,
+      "rate": 0.6938998424654163
+     }
+    },
+    "by_attack_technique": {
+     "boolean": {
+      "alerts": 200939,
+      "of": 278204,
+      "rate": 0.722272145619761
+     },
+     "error": {
+      "alerts": 21857,
+      "of": 37809,
+      "rate": 0.5780898727816128
+     },
+     "inline": {
+      "alerts": 2882,
+      "of": 3166,
+      "rate": 0.9102969046114971
+     },
+     "insider": {
+      "alerts": 0,
+      "of": 388,
+      "rate": 0.0
+     },
+     "stacked": {
+      "alerts": 584,
+      "of": 5041,
+      "rate": 0.1158500297560008
+     },
+     "time": {
+      "alerts": 991,
+      "of": 6350,
+      "rate": 0.15606299212598426
+     },
+     "union": {
+      "alerts": 1972,
+      "of": 6201,
+      "rate": 0.318013223673601
+     }
+    },
+    "by_tamper_method": {
+     "(none)": {
+      "alerts": 0,
+      "of": 388,
+      "rate": 0.0
+     },
+     "commentbeforeparentheses": {
+      "alerts": 1238,
+      "of": 2661,
+      "rate": 0.46523863209319805
+     },
+     "equaltolike": {
+      "alerts": 6783,
+      "of": 44217,
+      "rate": 0.15340253748558247
+     },
+     "lowercase": {
+      "alerts": 61329,
+      "of": 66377,
+      "rate": 0.9239495608418579
+     },
+     "multiplespaces": {
+      "alerts": 56309,
+      "of": 60848,
+      "rate": 0.925404286089929
+     },
+     "randomcase": {
+      "alerts": 69235,
+      "of": 82677,
+      "rate": 0.8374154843547782
+     },
+     "sleep2getlock": {
+      "alerts": 28688,
+      "of": 34244,
+      "rate": 0.8377525989954444
+     },
+     "space2comment": {
+      "alerts": 3447,
+      "of": 38544,
+      "rate": 0.08943026151930261
+     },
+     "space2mysqlblank": {
+      "alerts": 2196,
+      "of": 7203,
+      "rate": 0.3048729695960017
+     }
+    }
+   }
+  },
+  "fewshot-c-5000": {
+   "fused": {
+    "attacks": {
+     "alerts": 336461,
+     "of": 337159,
+     "rate": 0.9979297601428406,
+     "wilson_95": [
+      0.9977705598099171,
+      0.9980776141679024
+     ]
+    },
+    "benign": {
+     "alerts": 18493,
+     "of": 3016512,
+     "rate": 0.006130590562875268,
+     "wilson_95": [
+      0.006043130392674812,
+      0.006219308594216717
+     ]
+    },
+    "by_attack_stage": {
+     "exploit": {
+      "alerts": 307998,
+      "of": 308399,
+      "rate": 0.9986997363804682
+     },
+     "recon": {
+      "alerts": 28463,
+      "of": 28760,
+      "rate": 0.989673157162726
+     }
+    },
+    "by_attack_status": {
+     "failure": {
+      "alerts": 12094,
+      "of": 12151,
+      "rate": 0.9953090280635338
+     },
+     "success": {
+      "alerts": 324367,
+      "of": 325008,
+      "rate": 0.9980277408556097
+     }
+    },
+    "by_attack_technique": {
+     "boolean": {
+      "alerts": 278179,
+      "of": 278204,
+      "rate": 0.9999101378844302
+     },
+     "error": {
+      "alerts": 37799,
+      "of": 37809,
+      "rate": 0.9997355127086144
+     },
+     "inline": {
+      "alerts": 3160,
+      "of": 3166,
+      "rate": 0.998104864181933
+     },
+     "insider": {
+      "alerts": 0,
+      "of": 388,
+      "rate": 0.0
+     },
+     "stacked": {
+      "alerts": 4906,
+      "of": 5041,
+      "rate": 0.973219599285856
+     },
+     "time": {
+      "alerts": 6236,
+      "of": 6350,
+      "rate": 0.9820472440944882
+     },
+     "union": {
+      "alerts": 6181,
+      "of": 6201,
+      "rate": 0.9967747137558458
+     }
+    },
+    "by_tamper_method": {
+     "(none)": {
+      "alerts": 0,
+      "of": 388,
+      "rate": 0.0
+     },
+     "commentbeforeparentheses": {
+      "alerts": 2636,
+      "of": 2661,
+      "rate": 0.9906050357008643
+     },
+     "equaltolike": {
+      "alerts": 44184,
+      "of": 44217,
+      "rate": 0.9992536807110387
+     },
+     "lowercase": {
+      "alerts": 66347,
+      "of": 66377,
+      "rate": 0.9995480362173644
+     },
+     "multiplespaces": {
+      "alerts": 60782,
+      "of": 60848,
+      "rate": 0.9989153300026296
+     },
+     "randomcase": {
+      "alerts": 82635,
+      "of": 82677,
+      "rate": 0.999491998983998
+     },
+     "sleep2getlock": {
+      "alerts": 34188,
+      "of": 34244,
+      "rate": 0.9983646770237122
+     },
+     "space2comment": {
+      "alerts": 38521,
+      "of": 38544,
+      "rate": 0.9994032793690328
+     },
+     "space2mysqlblank": {
+      "alerts": 7168,
+      "of": 7203,
+      "rate": 0.9951409135082604
+     }
+    }
+   },
+   "input_novelty": {
+    "attacks": {
+     "alerts": 336639,
+     "of": 337159,
+     "rate": 0.998457700966013,
+     "wilson_95": [
+      0.998319442355705,
+      0.9985846012382905
+     ]
+    },
+    "benign": {
+     "alerts": 13378,
+     "of": 3016512,
+     "rate": 0.0044349235143105676,
+     "wilson_95": [
+      0.004360567157988933,
+      0.004510542050553926
+     ]
+    },
+    "by_attack_stage": {
+     "exploit": {
+      "alerts": 308379,
+      "of": 308399,
+      "rate": 0.9999351489466568
+     },
+     "recon": {
+      "alerts": 28260,
+      "of": 28760,
+      "rate": 0.9826147426981919
+     }
+    },
+    "by_attack_status": {
+     "failure": {
+      "alerts": 12007,
+      "of": 12151,
+      "rate": 0.9881491235289277
+     },
+     "success": {
+      "alerts": 324632,
+      "of": 325008,
+      "rate": 0.9988431054004825
+     }
+    },
+    "by_attack_technique": {
+     "boolean": {
+      "alerts": 278147,
+      "of": 278204,
+      "rate": 0.9997951143765007
+     },
+     "error": {
+      "alerts": 37795,
+      "of": 37809,
+      "rate": 0.9996297177920601
+     },
+     "inline": {
+      "alerts": 3155,
+      "of": 3166,
+      "rate": 0.9965255843335439
+     },
+     "insider": {
+      "alerts": 388,
+      "of": 388,
+      "rate": 1.0
+     },
+     "stacked": {
+      "alerts": 4831,
+      "of": 5041,
+      "rate": 0.9583415988891093
+     },
+     "time": {
+      "alerts": 6144,
+      "of": 6350,
+      "rate": 0.9675590551181102
+     },
+     "union": {
+      "alerts": 6179,
+      "of": 6201,
+      "rate": 0.9964521851314304
+     }
+    },
+    "by_tamper_method": {
+     "(none)": {
+      "alerts": 388,
+      "of": 388,
+      "rate": 1.0
+     },
+     "commentbeforeparentheses": {
+      "alerts": 2597,
+      "of": 2661,
+      "rate": 0.9759488913942127
+     },
+     "equaltolike": {
+      "alerts": 44160,
+      "of": 44217,
+      "rate": 0.9987109030463397
+     },
+     "lowercase": {
+      "alerts": 66341,
+      "of": 66377,
+      "rate": 0.9994576434608373
+     },
+     "multiplespaces": {
+      "alerts": 60753,
+      "of": 60848,
+      "rate": 0.9984387325795425
+     },
+     "randomcase": {
+      "alerts": 82614,
+      "of": 82677,
+      "rate": 0.9992379984759969
+     },
+     "sleep2getlock": {
+      "alerts": 34141,
+      "of": 34244,
+      "rate": 0.9969921738114706
+     },
+     "space2comment": {
+      "alerts": 38494,
+      "of": 38544,
+      "rate": 0.9987027812370278
+     },
+     "space2mysqlblank": {
+      "alerts": 7151,
+      "of": 7203,
+      "rate": 0.9927807857837012
+     }
+    }
+   },
+   "learned_anomaly": {
+    "attacks": {
+     "alerts": 274481,
+     "of": 337159,
+     "rate": 0.8140995791303213,
+     "wilson_95": [
+      0.8127828671682101,
+      0.8154091337164141
+     ]
+    },
+    "benign": {
+     "alerts": 16031,
+     "of": 3016512,
+     "rate": 0.005314416120340314,
+     "wilson_95": [
+      0.005232996053398539,
+      0.00539709612717932
+     ]
+    },
+    "by_attack_stage": {
+     "exploit": {
+      "alerts": 262741,
+      "of": 308399,
+      "rate": 0.8519515303227313
+     },
+     "recon": {
+      "alerts": 11740,
+      "of": 28760,
+      "rate": 0.4082058414464534
+     }
+    },
+    "by_attack_status": {
+     "failure": {
+      "alerts": 4633,
+      "of": 12151,
+      "rate": 0.38128549090609826
+     },
+     "success": {
+      "alerts": 269848,
+      "of": 325008,
+      "rate": 0.8302811007729041
+     }
+    },
+    "by_attack_technique": {
+     "boolean": {
+      "alerts": 237760,
+      "of": 278204,
+      "rate": 0.8546246639156878
+     },
+     "error": {
+      "alerts": 28900,
+      "of": 37809,
+      "rate": 0.7643682721045254
+     },
+     "inline": {
+      "alerts": 2966,
+      "of": 3166,
+      "rate": 0.9368288060644346
+     },
+     "insider": {
+      "alerts": 0,
+      "of": 388,
+      "rate": 0.0
+     },
+     "stacked": {
+      "alerts": 848,
+      "of": 5041,
+      "rate": 0.1682205911525491
+     },
+     "time": {
+      "alerts": 1710,
+      "of": 6350,
+      "rate": 0.2692913385826772
+     },
+     "union": {
+      "alerts": 2297,
+      "of": 6201,
+      "rate": 0.3704241251411063
+     }
+    },
+    "by_tamper_method": {
+     "(none)": {
+      "alerts": 0,
+      "of": 388,
+      "rate": 0.0
+     },
+     "commentbeforeparentheses": {
+      "alerts": 1589,
+      "of": 2661,
+      "rate": 0.5971439308530627
+     },
+     "equaltolike": {
+      "alerts": 36729,
+      "of": 44217,
+      "rate": 0.8306533686138815
+     },
+     "lowercase": {
+      "alerts": 63250,
+      "of": 66377,
+      "rate": 0.9528903083899544
+     },
+     "multiplespaces": {
+      "alerts": 54227,
+      "of": 60848,
+      "rate": 0.8911878779910597
+     },
+     "randomcase": {
+      "alerts": 80686,
+      "of": 82677,
+      "rate": 0.9759183327890465
+     },
+     "sleep2getlock": {
+      "alerts": 30325,
+      "of": 34244,
+      "rate": 0.8855565938558579
+     },
+     "space2comment": {
+      "alerts": 4851,
+      "of": 38544,
+      "rate": 0.12585616438356165
+     },
+     "space2mysqlblank": {
+      "alerts": 2824,
+      "of": 7203,
+      "rate": 0.3920588643620714
+     }
+    }
+   }
+  },
+  "fewshot-d-500": {
+   "fused": {
+    "attacks": {
+     "alerts": 321618,
+     "of": 339132,
+     "rate": 0.9483563922012668,
+     "wilson_95": [
+      0.9476064694149445,
+      0.9490961577441824
+     ]
+    },
+    "benign": {
+     "alerts": 12357,
+     "of": 3014539,
+     "rate": 0.004099134229147475,
+     "wilson_95": [
+      0.004027637451288397,
+      0.004171894868815953
+     ]
+    },
+    "by_attack_stage": {
+     "exploit": {
+      "alerts": 251649,
+      "of": 254052,
+      "rate": 0.9905413065041803
+     },
+     "recon": {
+      "alerts": 69969,
+      "of": 85080,
+      "rate": 0.8223906911142455
+     }
+    },
+    "by_attack_status": {
+     "failure": {
+      "alerts": 23635,
+      "of": 33657,
+      "rate": 0.7022313337492944
+     },
+     "success": {
+      "alerts": 297983,
+      "of": 305475,
+      "rate": 0.9754742613961863
+     }
+    },
+    "by_attack_technique": {
+     "boolean": {
+      "alerts": 226683,
+      "of": 232354,
+      "rate": 0.9755932757774775
+     },
+     "error": {
+      "alerts": 46295,
+      "of": 47309,
+      "rate": 0.9785664461307574
+     },
+     "inline": {
+      "alerts": 5153,
+      "of": 5279,
+      "rate": 0.9761318431521121
+     },
+     "insider": {
+      "alerts": 0,
+      "of": 944,
+      "rate": 0.0
+     },
+     "stacked": {
+      "alerts": 8951,
+      "of": 11175,
+      "rate": 0.8009843400447427
+     },
+     "time": {
+      "alerts": 20168,
+      "of": 23061,
+      "rate": 0.8745501062399722
+     },
+     "union": {
+      "alerts": 14368,
+      "of": 19010,
+      "rate": 0.7558127301420305
+     }
+    },
+    "by_tamper_method": {
+     "(none)": {
+      "alerts": 0,
+      "of": 944,
+      "rate": 0.0
+     },
+     "commentbeforeparentheses": {
+      "alerts": 9593,
+      "of": 11112,
+      "rate": 0.863300935925126
+     },
+     "equaltolike": {
+      "alerts": 90976,
+      "of": 93011,
+      "rate": 0.9781208674242832
+     },
+     "lowercase": {
+      "alerts": 16202,
+      "of": 18224,
+      "rate": 0.8890474100087796
+     },
+     "multiplespaces": {
+      "alerts": 30704,
+      "of": 32953,
+      "rate": 0.931751282129093
+     },
+     "randomcase": {
+      "alerts": 98205,
+      "of": 100734,
+      "rate": 0.9748942760140569
+     },
+     "sleep2getlock": {
+      "alerts": 48860,
+      "of": 50285,
+      "rate": 0.9716615292830864
+     },
+     "space2comment": {
+      "alerts": 14122,
+      "of": 17066,
+      "rate": 0.8274932614555256
+     },
+     "space2mysqlblank": {
+      "alerts": 12956,
+      "of": 14803,
+      "rate": 0.8752279943254746
+     }
+    }
+   },
+   "input_novelty": {
+    "attacks": {
+     "alerts": 338400,
+     "of": 339132,
+     "rate": 0.9978415484236227,
+     "wilson_95": [
+      0.9976796139241221,
+      0.997992204623375
+     ]
+    },
+    "benign": {
+     "alerts": 142184,
+     "of": 3014539,
+     "rate": 0.047166084101084776,
+     "wilson_95": [
+      0.04692735043817546,
+      0.04740597186460534
+     ]
+    },
+    "by_attack_stage": {
+     "exploit": {
+      "alerts": 254033,
+      "of": 254052,
+      "rate": 0.9999252121612898
+     },
+     "recon": {
+      "alerts": 84367,
+      "of": 85080,
+      "rate": 0.9916196520921485
+     }
+    },
+    "by_attack_status": {
+     "failure": {
+      "alerts": 33295,
+      "of": 33657,
+      "rate": 0.9892444365213774
+     },
+     "success": {
+      "alerts": 305105,
+      "of": 305475,
+      "rate": 0.9987887715852362
+     }
+    },
+    "by_attack_technique": {
+     "boolean": {
+      "alerts": 232184,
+      "of": 232354,
+      "rate": 0.9992683577644457
+     },
+     "error": {
+      "alerts": 47294,
+      "of": 47309,
+      "rate": 0.9996829355936503
+     },
+     "inline": {
+      "alerts": 5273,
+      "of": 5279,
+      "rate": 0.9988634211024815
+     },
+     "insider": {
+      "alerts": 944,
+      "of": 944,
+      "rate": 1.0
+     },
+     "stacked": {
+      "alerts": 10997,
+      "of": 11175,
+      "rate": 0.9840715883668903
+     },
+     "time": {
+      "alerts": 22876,
+      "of": 23061,
+      "rate": 0.991977798013963
+     },
+     "union": {
+      "alerts": 18832,
+      "of": 19010,
+      "rate": 0.9906365071015255
+     }
+    },
+    "by_tamper_method": {
+     "(none)": {
+      "alerts": 944,
+      "of": 944,
+      "rate": 1.0
+     },
+     "commentbeforeparentheses": {
+      "alerts": 11084,
+      "of": 11112,
+      "rate": 0.9974802015838733
+     },
+     "equaltolike": {
+      "alerts": 92964,
+      "of": 93011,
+      "rate": 0.9994946834245412
+     },
+     "lowercase": {
+      "alerts": 18145,
+      "of": 18224,
+      "rate": 0.9956650570676031
+     },
+     "multiplespaces": {
+      "alerts": 32717,
+      "of": 32953,
+      "rate": 0.9928382848299092
+     },
+     "randomcase": {
+      "alerts": 100657,
+      "of": 100734,
+      "rate": 0.9992356106180634
+     },
+     "sleep2getlock": {
+      "alerts": 50244,
+      "of": 50285,
+      "rate": 0.9991846475091976
+     },
+     "space2comment": {
+      "alerts": 16990,
+      "of": 17066,
+      "rate": 0.9955467010430095
+     },
+     "space2mysqlblank": {
+      "alerts": 14655,
+      "of": 14803,
+      "rate": 0.9900020266162265
+     }
+    }
+   },
+   "learned_anomaly": {
+    "attacks": {
+     "alerts": 300982,
+     "of": 339132,
+     "rate": 0.8875069294551974,
+     "wilson_95": [
+      0.8864390983273306,
+      0.888565981847503
+     ]
+    },
+    "benign": {
+     "alerts": 10099,
+     "of": 3014539,
+     "rate": 0.003350097643453941,
+     "wilson_95": [
+      0.0032854989556616843,
+      0.003415962102063626
+     ]
+    },
+    "by_attack_stage": {
+     "exploit": {
+      "alerts": 247675,
+      "of": 254052,
+      "rate": 0.9748988396076393
+     },
+     "recon": {
+      "alerts": 53307,
+      "of": 85080,
+      "rate": 0.6265514809590973
+     }
+    },
+    "by_attack_status": {
+     "failure": {
+      "alerts": 15863,
+      "of": 33657,
+      "rate": 0.4713135454734528
+     },
+     "success": {
+      "alerts": 285119,
+      "of": 305475,
+      "rate": 0.9333627956461249
+     }
+    },
+    "by_attack_technique": {
+     "boolean": {
+      "alerts": 219056,
+      "of": 232354,
+      "rate": 0.9427683620682235
+     },
+     "error": {
+      "alerts": 44541,
+      "of": 47309,
+      "rate": 0.9414910482149274
+     },
+     "inline": {
+      "alerts": 5087,
+      "of": 5279,
+      "rate": 0.963629475279409
+     },
+     "insider": {
+      "alerts": 0,
+      "of": 944,
+      "rate": 0.0
+     },
+     "stacked": {
+      "alerts": 6112,
+      "of": 11175,
+      "rate": 0.5469351230425056
+     },
+     "time": {
+      "alerts": 14507,
+      "of": 23061,
+      "rate": 0.6290707254672391
+     },
+     "union": {
+      "alerts": 11679,
+      "of": 19010,
+      "rate": 0.61436086270384
+     }
+    },
+    "by_tamper_method": {
+     "(none)": {
+      "alerts": 0,
+      "of": 944,
+      "rate": 0.0
+     },
+     "commentbeforeparentheses": {
+      "alerts": 8024,
+      "of": 11112,
+      "rate": 0.7221022318214543
+     },
+     "equaltolike": {
+      "alerts": 89731,
+      "of": 93011,
+      "rate": 0.964735353882874
+     },
+     "lowercase": {
+      "alerts": 14114,
+      "of": 18224,
+      "rate": 0.7744732221246707
+     },
+     "multiplespaces": {
+      "alerts": 29221,
+      "of": 32953,
+      "rate": 0.88674779231026
+     },
+     "randomcase": {
+      "alerts": 96599,
+      "of": 100734,
+      "rate": 0.9589512974765223
+     },
+     "sleep2getlock": {
+      "alerts": 45433,
+      "of": 50285,
+      "rate": 0.9035099930396738
+     },
+     "space2comment": {
+      "alerts": 10382,
+      "of": 17066,
+      "rate": 0.6083440759404665
+     },
+     "space2mysqlblank": {
+      "alerts": 7478,
+      "of": 14803,
+      "rate": 0.5051678713774235
+     }
+    }
+   }
+  },
+  "fewshot-d-5000": {
+   "fused": {
+    "attacks": {
+     "alerts": 336738,
+     "of": 339132,
+     "rate": 0.992940801811684,
+     "wilson_95": [
+      0.9926533890521098,
+      0.9932170472949661
+     ]
+    },
+    "benign": {
+     "alerts": 9779,
+     "of": 3014539,
+     "rate": 0.0032439454258180104,
+     "wilson_95": [
+      0.0031803851479769757,
+      0.0033087717450179127
+     ]
+    },
+    "by_attack_stage": {
+     "exploit": {
+      "alerts": 253061,
+      "of": 254052,
+      "rate": 0.9960992237809583
+     },
+     "recon": {
+      "alerts": 83677,
+      "of": 85080,
+      "rate": 0.9835096379877762
+     }
+    },
+    "by_attack_status": {
+     "failure": {
+      "alerts": 32788,
+      "of": 33657,
+      "rate": 0.9741807053510414
+     },
+     "success": {
+      "alerts": 303950,
+      "of": 305475,
+      "rate": 0.9950077747769867
+     }
+    },
+    "by_attack_technique": {
+     "boolean": {
+      "alerts": 231987,
+      "of": 232354,
+      "rate": 0.9984205135267739
+     },
+     "error": {
+      "alerts": 47263,
+      "of": 47309,
+      "rate": 0.9990276691538608
+     },
+     "inline": {
+      "alerts": 5255,
+      "of": 5279,
+      "rate": 0.9954536844099261
+     },
+     "insider": {
+      "alerts": 0,
+      "of": 944,
+      "rate": 0.0
+     },
+     "stacked": {
+      "alerts": 10784,
+      "of": 11175,
+      "rate": 0.9650111856823266
+     },
+     "time": {
+      "alerts": 22725,
+      "of": 23061,
+      "rate": 0.9854299466631976
+     },
+     "union": {
+      "alerts": 18724,
+      "of": 19010,
+      "rate": 0.9849552866912151
+     }
+    },
+    "by_tamper_method": {
+     "(none)": {
+      "alerts": 0,
+      "of": 944,
+      "rate": 0.0
+     },
+     "commentbeforeparentheses": {
+      "alerts": 11012,
+      "of": 11112,
+      "rate": 0.9910007199424046
+     },
+     "equaltolike": {
+      "alerts": 92897,
+      "of": 93011,
+      "rate": 0.9987743385190999
+     },
+     "lowercase": {
+      "alerts": 18133,
+      "of": 18224,
+      "rate": 0.9950065847234416
+     },
+     "multiplespaces": {
+      "alerts": 32767,
+      "of": 32953,
+      "rate": 0.9943555973659455
+     },
+     "randomcase": {
+      "alerts": 100385,
+      "of": 100734,
+      "rate": 0.9965354299442095
+     },
+     "sleep2getlock": {
+      "alerts": 50150,
+      "of": 50285,
+      "rate": 0.9973153027741871
+     },
+     "space2comment": {
+      "alerts": 16836,
+      "of": 17066,
+      "rate": 0.9865229110512129
+     },
+     "space2mysqlblank": {
+      "alerts": 14558,
+      "of": 14803,
+      "rate": 0.9834493008174019
+     }
+    }
+   },
+   "input_novelty": {
+    "attacks": {
+     "alerts": 313179,
+     "of": 339132,
+     "rate": 0.9234722762818017,
+     "wilson_95": [
+      0.9225727560787944,
+      0.9243622029760268
+     ]
+    },
+    "benign": {
+     "alerts": 0,
+     "of": 3014539,
+     "rate": 0.0,
+     "wilson_95": [
+      1.0587911840678754e-22,
+      1.2743089361559494e-06
+     ]
+    },
+    "by_attack_stage": {
+     "exploit": {
+      "alerts": 248850,
+      "of": 254052,
+      "rate": 0.9795238770015587
+     },
+     "recon": {
+      "alerts": 64329,
+      "of": 85080,
+      "rate": 0.7561001410437236
+     }
+    },
+    "by_attack_status": {
+     "failure": {
+      "alerts": 21330,
+      "of": 33657,
+      "rate": 0.6337463232017114
+     },
+     "success": {
+      "alerts": 291849,
+      "of": 305475,
+      "rate": 0.955394058433587
+     }
+    },
+    "by_attack_technique": {
+     "boolean": {
+      "alerts": 225308,
+      "of": 232354,
+      "rate": 0.9696755812251995
+     },
+     "error": {
+      "alerts": 45115,
+      "of": 47309,
+      "rate": 0.9536240461645775
+     },
+     "inline": {
+      "alerts": 3507,
+      "of": 5279,
+      "rate": 0.6643303655995454
+     },
+     "insider": {
+      "alerts": 0,
+      "of": 944,
+      "rate": 0.0
+     },
+     "stacked": {
+      "alerts": 9250,
+      "of": 11175,
+      "rate": 0.8277404921700223
+     },
+     "time": {
+      "alerts": 18934,
+      "of": 23061,
+      "rate": 0.8210398508304063
+     },
+     "union": {
+      "alerts": 11065,
+      "of": 19010,
+      "rate": 0.582062072593372
+     }
+    },
+    "by_tamper_method": {
+     "(none)": {
+      "alerts": 0,
+      "of": 944,
+      "rate": 0.0
+     },
+     "commentbeforeparentheses": {
+      "alerts": 7761,
+      "of": 11112,
+      "rate": 0.6984341252699784
+     },
+     "equaltolike": {
+      "alerts": 89177,
+      "of": 93011,
+      "rate": 0.9587790691423596
+     },
+     "lowercase": {
+      "alerts": 16465,
+      "of": 18224,
+      "rate": 0.9034789288849868
+     },
+     "multiplespaces": {
+      "alerts": 26715,
+      "of": 32953,
+      "rate": 0.8107000880041271
+     },
+     "randomcase": {
+      "alerts": 95738,
+      "of": 100734,
+      "rate": 0.950404034387595
+     },
+     "sleep2getlock": {
+      "alerts": 48405,
+      "of": 50285,
+      "rate": 0.9626131052997912
+     },
+     "space2comment": {
+      "alerts": 15147,
+      "of": 17066,
+      "rate": 0.8875542013359897
+     },
+     "space2mysqlblank": {
+      "alerts": 13771,
+      "of": 14803,
+      "rate": 0.9302844018104438
+     }
+    }
+   },
+   "learned_anomaly": {
+    "attacks": {
+     "alerts": 280889,
+     "of": 339132,
+     "rate": 0.8282586131653751,
+     "wilson_95": [
+      0.8269855385190666,
+      0.8295242513109616
+     ]
+    },
+    "benign": {
+     "alerts": 9924,
+     "of": 3014539,
+     "rate": 0.0032920456494342915,
+     "wilson_95": [
+      0.0032280127490357676,
+      0.003357344468602593
+     ]
+    },
+    "by_attack_stage": {
+     "exploit": {
+      "alerts": 239279,
+      "of": 254052,
+      "rate": 0.9418504873018122
+     },
+     "recon": {
+      "alerts": 41610,
+      "of": 85080,
+      "rate": 0.4890691114245416
+     }
+    },
+    "by_attack_status": {
+     "failure": {
+      "alerts": 11331,
+      "of": 33657,
+      "rate": 0.33666102148141547
+     },
+     "success": {
+      "alerts": 269558,
+      "of": 305475,
+      "rate": 0.8824224568295278
+     }
+    },
+    "by_attack_technique": {
+     "boolean": {
+      "alerts": 217299,
+      "of": 232354,
+      "rate": 0.9352066243748762
+     },
+     "error": {
+      "alerts": 36267,
+      "of": 47309,
+      "rate": 0.766598321672409
+     },
+     "inline": {
+      "alerts": 3436,
+      "of": 5279,
+      "rate": 0.6508808486455768
+     },
+     "insider": {
+      "alerts": 0,
+      "of": 944,
+      "rate": 0.0
+     },
+     "stacked": {
+      "alerts": 4206,
+      "of": 11175,
+      "rate": 0.3763758389261745
+     },
+     "time": {
+      "alerts": 10782,
+      "of": 23061,
+      "rate": 0.46754260439703393
+     },
+     "union": {
+      "alerts": 8899,
+      "of": 19010,
+      "rate": 0.4681220410310363
+     }
+    },
+    "by_tamper_method": {
+     "(none)": {
+      "alerts": 0,
+      "of": 944,
+      "rate": 0.0
+     },
+     "commentbeforeparentheses": {
+      "alerts": 5178,
+      "of": 11112,
+      "rate": 0.4659827213822894
+     },
+     "equaltolike": {
+      "alerts": 88157,
+      "of": 93011,
+      "rate": 0.9478126243132533
+     },
+     "lowercase": {
+      "alerts": 15176,
+      "of": 18224,
+      "rate": 0.8327480245829675
+     },
+     "multiplespaces": {
+      "alerts": 24255,
+      "of": 32953,
+      "rate": 0.7360483112311474
+     },
+     "randomcase": {
+      "alerts": 93764,
+      "of": 100734,
+      "rate": 0.9308078702324935
+     },
+     "sleep2getlock": {
+      "alerts": 44258,
+      "of": 50285,
+      "rate": 0.8801431838520434
+     },
+     "space2comment": {
+      "alerts": 5606,
+      "of": 17066,
+      "rate": 0.3284893941169577
+     },
+     "space2mysqlblank": {
+      "alerts": 4495,
+      "of": 14803,
+      "rate": 0.3036546645950145
+     }
+    }
+   }
+  },
+  "indomain-a": {
+   "fused": {
+    "attacks": {
+     "alerts": 308190,
+     "of": 336281,
+     "rate": 0.9164656938691154,
+     "wilson_95": [
+      0.9155257663927687,
+      0.9173961065791614
+     ]
+    },
+    "benign": {
+     "alerts": 15881,
+     "of": 3017390,
+     "rate": 0.005263157894736842,
+     "wilson_95": [
+      0.005182144114004917,
+      0.005345431379263411
+     ]
+    },
+    "by_attack_stage": {
+     "exploit": {
+      "alerts": 161178,
+      "of": 161178,
+      "rate": 1.0
+     },
+     "recon": {
+      "alerts": 147012,
+      "of": 175103,
+      "rate": 0.8395744219116749
+     }
+    },
+    "by_attack_status": {
+     "failure": {
+      "alerts": 65376,
+      "of": 75607,
+      "rate": 0.8646818416284207
+     },
+     "success": {
+      "alerts": 242814,
+      "of": 260674,
+      "rate": 0.9314853034825107
+     }
+    },
+    "by_attack_technique": {
+     "boolean": {
+      "alerts": 198466,
+      "of": 203845,
+      "rate": 0.9736123034658687
+     },
+     "error": {
+      "alerts": 35350,
+      "of": 40995,
+      "rate": 0.8623002805220149
+     },
+     "inline": {
+      "alerts": 1250,
+      "of": 1389,
+      "rate": 0.8999280057595392
+     },
+     "insider": {
+      "alerts": 1089,
+      "of": 1089,
+      "rate": 1.0
+     },
+     "stacked": {
+      "alerts": 19612,
+      "of": 24659,
+      "rate": 0.7953282777079362
+     },
+     "time": {
+      "alerts": 18668,
+      "of": 24713,
+      "rate": 0.7553918990005261
+     },
+     "union": {
+      "alerts": 33755,
+      "of": 39591,
+      "rate": 0.8525927609810311
+     }
+    },
+    "by_tamper_method": {
+     "(none)": {
+      "alerts": 1089,
+      "of": 1089,
+      "rate": 1.0
+     },
+     "commentbeforeparentheses": {
+      "alerts": 18585,
+      "of": 25774,
+      "rate": 0.7210755024443237
+     },
+     "equaltolike": {
+      "alerts": 56526,
+      "of": 59853,
+      "rate": 0.9444138138439176
+     },
+     "lowercase": {
+      "alerts": 49767,
+      "of": 52363,
+      "rate": 0.9504230086129519
+     },
+     "multiplespaces": {
+      "alerts": 29076,
+      "of": 33387,
+      "rate": 0.8708778866025698
+     },
+     "randomcase": {
+      "alerts": 67460,
+      "of": 71630,
+      "rate": 0.9417841686444227
+     },
+     "sleep2getlock": {
+      "alerts": 38094,
+      "of": 38925,
+      "rate": 0.9786512524084778
+     },
+     "space2comment": {
+      "alerts": 27746,
+      "of": 29915,
+      "rate": 0.9274945679425037
+     },
+     "space2mysqlblank": {
+      "alerts": 19847,
+      "of": 23345,
+      "rate": 0.8501606339687299
+     }
+    }
+   },
+   "input_novelty": {
+    "attacks": {
+     "alerts": 301634,
+     "of": 336281,
+     "rate": 0.8969700934635022,
+     "wilson_95": [
+      0.8959380883978766,
+      0.897993029168258
+     ]
+    },
+    "benign": {
+     "alerts": 3222,
+     "of": 3017390,
+     "rate": 0.0010678102598603429,
+     "wilson_95": [
+      0.0010315891599940188,
+      0.0011053017457565632
+     ]
+    },
+    "by_attack_stage": {
+     "exploit": {
+      "alerts": 161125,
+      "of": 161178,
+      "rate": 0.9996711710034868
+     },
+     "recon": {
+      "alerts": 140509,
+      "of": 175103,
+      "rate": 0.802436280360702
+     }
+    },
+    "by_attack_status": {
+     "failure": {
+      "alerts": 60391,
+      "of": 75607,
+      "rate": 0.7987487931011679
+     },
+     "success": {
+      "alerts": 241243,
+      "of": 260674,
+      "rate": 0.9254586188112355
+     }
+    },
+    "by_attack_technique": {
+     "boolean": {
+      "alerts": 197022,
+      "of": 203845,
+      "rate": 0.9665284897839045
+     },
+     "error": {
+      "alerts": 35094,
+      "of": 40995,
+      "rate": 0.8560556165386023
+     },
+     "inline": {
+      "alerts": 1225,
+      "of": 1389,
+      "rate": 0.8819294456443485
+     },
+     "insider": {
+      "alerts": 1089,
+      "of": 1089,
+      "rate": 1.0
+     },
+     "stacked": {
+      "alerts": 19099,
+      "of": 24659,
+      "rate": 0.7745245143760898
+     },
+     "time": {
+      "alerts": 18225,
+      "of": 24713,
+      "rate": 0.737466110953749
+     },
+     "union": {
+      "alerts": 29880,
+      "of": 39591,
+      "rate": 0.7547169811320755
+     }
+    },
+    "by_tamper_method": {
+     "(none)": {
+      "alerts": 1089,
+      "of": 1089,
+      "rate": 1.0
+     },
+     "commentbeforeparentheses": {
+      "alerts": 16362,
+      "of": 25774,
+      "rate": 0.6348257934352448
+     },
+     "equaltolike": {
+      "alerts": 55360,
+      "of": 59853,
+      "rate": 0.9249327519088434
+     },
+     "lowercase": {
+      "alerts": 49558,
+      "of": 52363,
+      "rate": 0.9464316406622997
+     },
+     "multiplespaces": {
+      "alerts": 27559,
+      "of": 33387,
+      "rate": 0.8254410399257196
+     },
+     "randomcase": {
+      "alerts": 66786,
+      "of": 71630,
+      "rate": 0.9323747033365908
+     },
+     "sleep2getlock": {
+      "alerts": 37921,
+      "of": 38925,
+      "rate": 0.9742068079640334
+     },
+     "space2comment": {
+      "alerts": 27163,
+      "of": 29915,
+      "rate": 0.9080060170483035
+     },
+     "space2mysqlblank": {
+      "alerts": 19836,
+      "of": 23345,
+      "rate": 0.8496894409937888
+     }
+    }
+   },
+   "learned_anomaly": {
+    "attacks": {
+     "alerts": 248674,
+     "of": 336281,
+     "rate": 0.7394827540063221,
+     "wilson_95": [
+      0.7379965528371015,
+      0.7409634838426793
+     ]
+    },
+    "benign": {
+     "alerts": 16088,
+     "of": 3017390,
+     "rate": 0.005331760229867534,
+     "wilson_95": [
+      0.005250218860388321,
+      0.0054145611284654544
+     ]
+    },
+    "by_attack_stage": {
+     "exploit": {
+      "alerts": 159152,
+      "of": 161178,
+      "rate": 0.9874300462842324
+     },
+     "recon": {
+      "alerts": 89522,
+      "of": 175103,
+      "rate": 0.5112533765840677
+     }
+    },
+    "by_attack_status": {
+     "failure": {
+      "alerts": 35824,
+      "of": 75607,
+      "rate": 0.4738185617733808
+     },
+     "success": {
+      "alerts": 212850,
+      "of": 260674,
+      "rate": 0.8165371306689582
+     }
+    },
+    "by_attack_technique": {
+     "boolean": {
+      "alerts": 173376,
+      "of": 203845,
+      "rate": 0.8505285878976674
+     },
+     "error": {
+      "alerts": 32656,
+      "of": 40995,
+      "rate": 0.7965849493840712
+     },
+     "inline": {
+      "alerts": 960,
+      "of": 1389,
+      "rate": 0.6911447084233261
+     },
+     "insider": {
+      "alerts": 0,
+      "of": 1089,
+      "rate": 0.0
+     },
+     "stacked": {
+      "alerts": 10818,
+      "of": 24659,
+      "rate": 0.43870392148911147
+     },
+     "time": {
+      "alerts": 12248,
+      "of": 24713,
+      "rate": 0.4956095981871889
+     },
+     "union": {
+      "alerts": 18616,
+      "of": 39591,
+      "rate": 0.4702078755272663
+     }
+    },
+    "by_tamper_method": {
+     "(none)": {
+      "alerts": 0,
+      "of": 1089,
+      "rate": 0.0
+     },
+     "commentbeforeparentheses": {
+      "alerts": 13101,
+      "of": 25774,
+      "rate": 0.5083029409482425
+     },
+     "equaltolike": {
+      "alerts": 50150,
+      "of": 59853,
+      "rate": 0.8378861544116418
+     },
+     "lowercase": {
+      "alerts": 42339,
+      "of": 52363,
+      "rate": 0.8085671180031702
+     },
+     "multiplespaces": {
+      "alerts": 22378,
+      "of": 33387,
+      "rate": 0.670260879983227
+     },
+     "randomcase": {
+      "alerts": 59773,
+      "of": 71630,
+      "rate": 0.8344687979896691
+     },
+     "sleep2getlock": {
+      "alerts": 31120,
+      "of": 38925,
+      "rate": 0.7994861913937058
+     },
+     "space2comment": {
+      "alerts": 19552,
+      "of": 29915,
+      "rate": 0.6535851579475179
+     },
+     "space2mysqlblank": {
+      "alerts": 10261,
+      "of": 23345,
+      "rate": 0.43953737417005784
+     }
+    }
+   }
+  },
+  "indomain-b": {
+   "fused": {
+    "attacks": {
+     "alerts": 335404,
+     "of": 337638,
+     "rate": 0.9933834461760821,
+     "wilson_95": [
+      0.9931043148484056,
+      0.9936513507422116
+     ]
+    },
+    "benign": {
+     "alerts": 15179,
+     "of": 3016033,
+     "rate": 0.005032769866907955,
+     "wilson_95": [
+      0.0049535362641831004,
+      0.0051132643270838905
+     ]
+    },
+    "by_attack_stage": {
+     "exploit": {
+      "alerts": 288465,
+      "of": 288465,
+      "rate": 1.0
+     },
+     "recon": {
+      "alerts": 46939,
+      "of": 49173,
+      "rate": 0.9545685640493767
+     }
+    },
+    "by_attack_status": {
+     "failure": {
+      "alerts": 19993,
+      "of": 20008,
+      "rate": 0.999250299880048
+     },
+     "success": {
+      "alerts": 315411,
+      "of": 317630,
+      "rate": 0.9930138840789597
+     }
+    },
+    "by_attack_technique": {
+     "boolean": {
+      "alerts": 278208,
+      "of": 278654,
+      "rate": 0.9983994487787723
+     },
+     "error": {
+      "alerts": 22196,
+      "of": 22872,
+      "rate": 0.9704442112626792
+     },
+     "inline": {
+      "alerts": 4819,
+      "of": 4825,
+      "rate": 0.9987564766839379
+     },
+     "insider": {
+      "alerts": 388,
+      "of": 388,
+      "rate": 1.0
+     },
+     "stacked": {
+      "alerts": 6475,
+      "of": 6856,
+      "rate": 0.9444282380396732
+     },
+     "time": {
+      "alerts": 8012,
+      "of": 8535,
+      "rate": 0.9387229056824838
+     },
+     "union": {
+      "alerts": 15306,
+      "of": 15508,
+      "rate": 0.9869744647923653
+     }
+    },
+    "by_tamper_method": {
+     "(none)": {
+      "alerts": 388,
+      "of": 388,
+      "rate": 1.0
+     },
+     "commentbeforeparentheses": {
+      "alerts": 4347,
+      "of": 4359,
+      "rate": 0.9972470750172058
+     },
+     "equaltolike": {
+      "alerts": 29631,
+      "of": 29910,
+      "rate": 0.9906720160481445
+     },
+     "lowercase": {
+      "alerts": 137658,
+      "of": 137916,
+      "rate": 0.9981292960932742
+     },
+     "multiplespaces": {
+      "alerts": 26122,
+      "of": 26864,
+      "rate": 0.9723793924955331
+     },
+     "randomcase": {
+      "alerts": 26338,
+      "of": 26865,
+      "rate": 0.9803833984738507
+     },
+     "sleep2getlock": {
+      "alerts": 50350,
+      "of": 50640,
+      "rate": 0.9942733017377567
+     },
+     "space2comment": {
+      "alerts": 40389,
+      "of": 40406,
+      "rate": 0.9995792704053853
+     },
+     "space2mysqlblank": {
+      "alerts": 20181,
+      "of": 20290,
+      "rate": 0.9946278955150321
+     }
+    }
+   },
+   "input_novelty": {
+    "attacks": {
+     "alerts": 335404,
+     "of": 337638,
+     "rate": 0.9933834461760821,
+     "wilson_95": [
+      0.9931043148484056,
+      0.9936513507422116
+     ]
+    },
+    "benign": {
+     "alerts": 318,
+     "of": 3016033,
+     "rate": 0.00010543651213365371,
+     "wilson_95": [
+      9.44679003189633e-05,
+      0.00011767853306870034
+     ]
+    },
+    "by_attack_stage": {
+     "exploit": {
+      "alerts": 288465,
+      "of": 288465,
+      "rate": 1.0
+     },
+     "recon": {
+      "alerts": 46939,
+      "of": 49173,
+      "rate": 0.9545685640493767
+     }
+    },
+    "by_attack_status": {
+     "failure": {
+      "alerts": 19993,
+      "of": 20008,
+      "rate": 0.999250299880048
+     },
+     "success": {
+      "alerts": 315411,
+      "of": 317630,
+      "rate": 0.9930138840789597
+     }
+    },
+    "by_attack_technique": {
+     "boolean": {
+      "alerts": 278208,
+      "of": 278654,
+      "rate": 0.9983994487787723
+     },
+     "error": {
+      "alerts": 22196,
+      "of": 22872,
+      "rate": 0.9704442112626792
+     },
+     "inline": {
+      "alerts": 4819,
+      "of": 4825,
+      "rate": 0.9987564766839379
+     },
+     "insider": {
+      "alerts": 388,
+      "of": 388,
+      "rate": 1.0
+     },
+     "stacked": {
+      "alerts": 6475,
+      "of": 6856,
+      "rate": 0.9444282380396732
+     },
+     "time": {
+      "alerts": 8012,
+      "of": 8535,
+      "rate": 0.9387229056824838
+     },
+     "union": {
+      "alerts": 15306,
+      "of": 15508,
+      "rate": 0.9869744647923653
+     }
+    },
+    "by_tamper_method": {
+     "(none)": {
+      "alerts": 388,
+      "of": 388,
+      "rate": 1.0
+     },
+     "commentbeforeparentheses": {
+      "alerts": 4347,
+      "of": 4359,
+      "rate": 0.9972470750172058
+     },
+     "equaltolike": {
+      "alerts": 29631,
+      "of": 29910,
+      "rate": 0.9906720160481445
+     },
+     "lowercase": {
+      "alerts": 137658,
+      "of": 137916,
+      "rate": 0.9981292960932742
+     },
+     "multiplespaces": {
+      "alerts": 26122,
+      "of": 26864,
+      "rate": 0.9723793924955331
+     },
+     "randomcase": {
+      "alerts": 26338,
+      "of": 26865,
+      "rate": 0.9803833984738507
+     },
+     "sleep2getlock": {
+      "alerts": 50350,
+      "of": 50640,
+      "rate": 0.9942733017377567
+     },
+     "space2comment": {
+      "alerts": 40389,
+      "of": 40406,
+      "rate": 0.9995792704053853
+     },
+     "space2mysqlblank": {
+      "alerts": 20181,
+      "of": 20290,
+      "rate": 0.9946278955150321
+     }
+    }
+   },
+   "learned_anomaly": {
+    "attacks": {
+     "alerts": 290737,
+     "of": 337638,
+     "rate": 0.8610908724728852,
+     "wilson_95": [
+      0.8599201895575443,
+      0.8622533388962592
+     ]
+    },
+    "benign": {
+     "alerts": 15243,
+     "of": 3016033,
+     "rate": 0.00505398979387825,
+     "wilson_95": [
+      0.004974588837878685,
+      0.0051346515532741995
+     ]
+    },
+    "by_attack_stage": {
+     "exploit": {
+      "alerts": 266876,
+      "of": 288465,
+      "rate": 0.9251590314249563
+     },
+     "recon": {
+      "alerts": 23861,
+      "of": 49173,
+      "rate": 0.48524596831594574
+     }
+    },
+    "by_attack_status": {
+     "failure": {
+      "alerts": 11045,
+      "of": 20008,
+      "rate": 0.5520291883246702
+     },
+     "success": {
+      "alerts": 279692,
+      "of": 317630,
+      "rate": 0.8805591411390612
+     }
+    },
+    "by_attack_technique": {
+     "boolean": {
+      "alerts": 252356,
+      "of": 278654,
+      "rate": 0.9056248968254538
+     },
+     "error": {
+      "alerts": 17528,
+      "of": 22872,
+      "rate": 0.7663518712836657
+     },
+     "inline": {
+      "alerts": 4683,
+      "of": 4825,
+      "rate": 0.9705699481865285
+     },
+     "insider": {
+      "alerts": 0,
+      "of": 388,
+      "rate": 0.0
+     },
+     "stacked": {
+      "alerts": 3091,
+      "of": 6856,
+      "rate": 0.4508459743290548
+     },
+     "time": {
+      "alerts": 3710,
+      "of": 8535,
+      "rate": 0.434680726420621
+     },
+     "union": {
+      "alerts": 9369,
+      "of": 15508,
+      "rate": 0.6041397988135156
+     }
+    },
+    "by_tamper_method": {
+     "(none)": {
+      "alerts": 0,
+      "of": 388,
+      "rate": 0.0
+     },
+     "commentbeforeparentheses": {
+      "alerts": 2425,
+      "of": 4359,
+      "rate": 0.556320256939665
+     },
+     "equaltolike": {
+      "alerts": 26516,
+      "of": 29910,
+      "rate": 0.8865262454028753
+     },
+     "lowercase": {
+      "alerts": 134804,
+      "of": 137916,
+      "rate": 0.9774355404739117
+     },
+     "multiplespaces": {
+      "alerts": 24496,
+      "of": 26864,
+      "rate": 0.9118522930315665
+     },
+     "randomcase": {
+      "alerts": 24014,
+      "of": 26865,
+      "rate": 0.8938767913642286
+     },
+     "sleep2getlock": {
+      "alerts": 45522,
+      "of": 50640,
+      "rate": 0.8989336492890996
+     },
+     "space2comment": {
+      "alerts": 17269,
+      "of": 40406,
+      "rate": 0.42738702172944615
+     },
+     "space2mysqlblank": {
+      "alerts": 15691,
+      "of": 20290,
+      "rate": 0.7733366190241499
+     }
+    }
+   }
+  },
+  "indomain-c": {
+   "fused": {
+    "attacks": {
+     "alerts": 336912,
+     "of": 337159,
+     "rate": 0.9992674079588562,
+     "wilson_95": [
+      0.9991702153703658,
+      0.9993532237585513
+     ]
+    },
+    "benign": {
+     "alerts": 13325,
+     "of": 3016512,
+     "rate": 0.004417353552712537,
+     "wilson_95": [
+      0.0043431452350509445,
+      0.004492824095045682
+     ]
+    },
+    "by_attack_stage": {
+     "exploit": {
+      "alerts": 308390,
+      "of": 308399,
+      "rate": 0.9999708170259956
+     },
+     "recon": {
+      "alerts": 28522,
+      "of": 28760,
+      "rate": 0.9917246175243394
+     }
+    },
+    "by_attack_status": {
+     "failure": {
+      "alerts": 12096,
+      "of": 12151,
+      "rate": 0.9954736235700765
+     },
+     "success": {
+      "alerts": 324816,
+      "of": 325008,
+      "rate": 0.9994092453108847
+     }
+    },
+    "by_attack_technique": {
+     "boolean": {
+      "alerts": 278184,
+      "of": 278204,
+      "rate": 0.9999281103075441
+     },
+     "error": {
+      "alerts": 37800,
+      "of": 37809,
+      "rate": 0.9997619614377529
+     },
+     "inline": {
+      "alerts": 3161,
+      "of": 3166,
+      "rate": 0.9984207201516109
+     },
+     "insider": {
+      "alerts": 388,
+      "of": 388,
+      "rate": 1.0
+     },
+     "stacked": {
+      "alerts": 4933,
+      "of": 5041,
+      "rate": 0.9785756794286847
+     },
+     "time": {
+      "alerts": 6265,
+      "of": 6350,
+      "rate": 0.9866141732283464
+     },
+     "union": {
+      "alerts": 6181,
+      "of": 6201,
+      "rate": 0.9967747137558458
+     }
+    },
+    "by_tamper_method": {
+     "(none)": {
+      "alerts": 388,
+      "of": 388,
+      "rate": 1.0
+     },
+     "commentbeforeparentheses": {
+      "alerts": 2641,
+      "of": 2661,
+      "rate": 0.9924840285606915
+     },
+     "equaltolike": {
+      "alerts": 44187,
+      "of": 44217,
+      "rate": 0.9993215279191261
+     },
+     "lowercase": {
+      "alerts": 66350,
+      "of": 66377,
+      "rate": 0.999593232595628
+     },
+     "multiplespaces": {
+      "alerts": 60795,
+      "of": 60848,
+      "rate": 0.9991289771233237
+     },
+     "randomcase": {
+      "alerts": 82640,
+      "of": 82677,
+      "rate": 0.9995524752954268
+     },
+     "sleep2getlock": {
+      "alerts": 34203,
+      "of": 34244,
+      "rate": 0.9988027099637893
+     },
+     "space2comment": {
+      "alerts": 38526,
+      "of": 38544,
+      "rate": 0.9995330012453301
+     },
+     "space2mysqlblank": {
+      "alerts": 7182,
+      "of": 7203,
+      "rate": 0.9970845481049563
+     }
+    }
+   },
+   "input_novelty": {
+    "attacks": {
+     "alerts": 336912,
+     "of": 337159,
+     "rate": 0.9992674079588562,
+     "wilson_95": [
+      0.9991702153703658,
+      0.9993532237585513
+     ]
+    },
+    "benign": {
+     "alerts": 172,
+     "of": 3016512,
+     "rate": 5.7019498016251885e-05,
+     "wilson_95": [
+      4.911133233928745e-05,
+      6.620099392155161e-05
+     ]
+    },
+    "by_attack_stage": {
+     "exploit": {
+      "alerts": 308390,
+      "of": 308399,
+      "rate": 0.9999708170259956
+     },
+     "recon": {
+      "alerts": 28522,
+      "of": 28760,
+      "rate": 0.9917246175243394
+     }
+    },
+    "by_attack_status": {
+     "failure": {
+      "alerts": 12096,
+      "of": 12151,
+      "rate": 0.9954736235700765
+     },
+     "success": {
+      "alerts": 324816,
+      "of": 325008,
+      "rate": 0.9994092453108847
+     }
+    },
+    "by_attack_technique": {
+     "boolean": {
+      "alerts": 278184,
+      "of": 278204,
+      "rate": 0.9999281103075441
+     },
+     "error": {
+      "alerts": 37800,
+      "of": 37809,
+      "rate": 0.9997619614377529
+     },
+     "inline": {
+      "alerts": 3161,
+      "of": 3166,
+      "rate": 0.9984207201516109
+     },
+     "insider": {
+      "alerts": 388,
+      "of": 388,
+      "rate": 1.0
+     },
+     "stacked": {
+      "alerts": 4933,
+      "of": 5041,
+      "rate": 0.9785756794286847
+     },
+     "time": {
+      "alerts": 6265,
+      "of": 6350,
+      "rate": 0.9866141732283464
+     },
+     "union": {
+      "alerts": 6181,
+      "of": 6201,
+      "rate": 0.9967747137558458
+     }
+    },
+    "by_tamper_method": {
+     "(none)": {
+      "alerts": 388,
+      "of": 388,
+      "rate": 1.0
+     },
+     "commentbeforeparentheses": {
+      "alerts": 2641,
+      "of": 2661,
+      "rate": 0.9924840285606915
+     },
+     "equaltolike": {
+      "alerts": 44187,
+      "of": 44217,
+      "rate": 0.9993215279191261
+     },
+     "lowercase": {
+      "alerts": 66350,
+      "of": 66377,
+      "rate": 0.999593232595628
+     },
+     "multiplespaces": {
+      "alerts": 60795,
+      "of": 60848,
+      "rate": 0.9991289771233237
+     },
+     "randomcase": {
+      "alerts": 82640,
+      "of": 82677,
+      "rate": 0.9995524752954268
+     },
+     "sleep2getlock": {
+      "alerts": 34203,
+      "of": 34244,
+      "rate": 0.9988027099637893
+     },
+     "space2comment": {
+      "alerts": 38526,
+      "of": 38544,
+      "rate": 0.9995330012453301
+     },
+     "space2mysqlblank": {
+      "alerts": 7182,
+      "of": 7203,
+      "rate": 0.9970845481049563
+     }
+    }
+   },
+   "learned_anomaly": {
+    "attacks": {
+     "alerts": 312731,
+     "of": 337159,
+     "rate": 0.9275475369187831,
+     "wilson_95": [
+      0.9266676221763654,
+      0.9284177091505745
+     ]
+    },
+    "benign": {
+     "alerts": 13327,
+     "of": 3016512,
+     "rate": 0.0044180165701313305,
+     "wilson_95": [
+      0.0043438026606951955,
+      0.004493492702550346
+     ]
+    },
+    "by_attack_stage": {
+     "exploit": {
+      "alerts": 301650,
+      "of": 308399,
+      "rate": 0.9781160120493257
+     },
+     "recon": {
+      "alerts": 11081,
+      "of": 28760,
+      "rate": 0.3852920723226704
+     }
+    },
+    "by_attack_status": {
+     "failure": {
+      "alerts": 4125,
+      "of": 12151,
+      "rate": 0.3394782322442597
+     },
+     "success": {
+      "alerts": 308606,
+      "of": 325008,
+      "rate": 0.949533549943386
+     }
+    },
+    "by_attack_technique": {
+     "boolean": {
+      "alerts": 269371,
+      "of": 278204,
+      "rate": 0.9682499173268537
+     },
+     "error": {
+      "alerts": 35361,
+      "of": 37809,
+      "rate": 0.9352535110687932
+     },
+     "inline": {
+      "alerts": 3044,
+      "of": 3166,
+      "rate": 0.9614655716993051
+     },
+     "insider": {
+      "alerts": 0,
+      "of": 388,
+      "rate": 0.0
+     },
+     "stacked": {
+      "alerts": 937,
+      "of": 5041,
+      "rate": 0.1858758182900218
+     },
+     "time": {
+      "alerts": 1805,
+      "of": 6350,
+      "rate": 0.284251968503937
+     },
+     "union": {
+      "alerts": 2213,
+      "of": 6201,
+      "rate": 0.3568779229156588
+     }
+    },
+    "by_tamper_method": {
+     "(none)": {
+      "alerts": 0,
+      "of": 388,
+      "rate": 0.0
+     },
+     "commentbeforeparentheses": {
+      "alerts": 1482,
+      "of": 2661,
+      "rate": 0.5569334836527621
+     },
+     "equaltolike": {
+      "alerts": 40671,
+      "of": 44217,
+      "rate": 0.9198046000407083
+     },
+     "lowercase": {
+      "alerts": 63293,
+      "of": 66377,
+      "rate": 0.9535381231450654
+     },
+     "multiplespaces": {
+      "alerts": 58547,
+      "of": 60848,
+      "rate": 0.9621844596371286
+     },
+     "randomcase": {
+      "alerts": 80911,
+      "of": 82677,
+      "rate": 0.9786397668033431
+     },
+     "sleep2getlock": {
+      "alerts": 30279,
+      "of": 34244,
+      "rate": 0.8842132928396216
+     },
+     "space2comment": {
+      "alerts": 34696,
+      "of": 38544,
+      "rate": 0.9001660440016604
+     },
+     "space2mysqlblank": {
+      "alerts": 2852,
+      "of": 7203,
+      "rate": 0.395946133555463
+     }
+    }
+   }
+  },
+  "indomain-d": {
+   "fused": {
+    "attacks": {
+     "alerts": 338710,
+     "of": 339132,
+     "rate": 0.9987556467688098,
+     "wilson_95": [
+      0.9986312142132331,
+      0.998868780316292
+     ]
+    },
+    "benign": {
+     "alerts": 15417,
+     "of": 3014539,
+     "rate": 0.00511421481029106,
+     "wilson_95": [
+      0.00503432118088395,
+      0.005195369714455058
+     ]
+    },
+    "by_attack_stage": {
+     "exploit": {
+      "alerts": 254051,
+      "of": 254052,
+      "rate": 0.9999960637979626
+     },
+     "recon": {
+      "alerts": 84659,
+      "of": 85080,
+      "rate": 0.99505171603197
+     }
+    },
+    "by_attack_status": {
+     "failure": {
+      "alerts": 33504,
+      "of": 33657,
+      "rate": 0.9954541402977093
+     },
+     "success": {
+      "alerts": 305206,
+      "of": 305475,
+      "rate": 0.9991194042065635
+     }
+    },
+    "by_attack_technique": {
+     "boolean": {
+      "alerts": 232330,
+      "of": 232354,
+      "rate": 0.9998967093314511
+     },
+     "error": {
+      "alerts": 47296,
+      "of": 47309,
+      "rate": 0.9997252108478302
+     },
+     "inline": {
+      "alerts": 5274,
+      "of": 5279,
+      "rate": 0.9990528509187346
+     },
+     "insider": {
+      "alerts": 944,
+      "of": 944,
+      "rate": 1.0
+     },
+     "stacked": {
+      "alerts": 10994,
+      "of": 11175,
+      "rate": 0.9838031319910514
+     },
+     "time": {
+      "alerts": 22877,
+      "of": 23061,
+      "rate": 0.9920211612679416
+     },
+     "union": {
+      "alerts": 18995,
+      "of": 19010,
+      "rate": 0.9992109416096792
+     }
+    },
+    "by_tamper_method": {
+     "(none)": {
+      "alerts": 944,
+      "of": 944,
+      "rate": 1.0
+     },
+     "commentbeforeparentheses": {
+      "alerts": 11093,
+      "of": 11112,
+      "rate": 0.9982901367890569
+     },
+     "equaltolike": {
+      "alerts": 92997,
+      "of": 93011,
+      "rate": 0.9998494801690123
+     },
+     "lowercase": {
+      "alerts": 18167,
+      "of": 18224,
+      "rate": 0.9968722563652327
+     },
+     "multiplespaces": {
+      "alerts": 32942,
+      "of": 32953,
+      "rate": 0.999666191242072
+     },
+     "randomcase": {
+      "alerts": 100639,
+      "of": 100734,
+      "rate": 0.9990569221911172
+     },
+     "sleep2getlock": {
+      "alerts": 50252,
+      "of": 50285,
+      "rate": 0.9993437406781346
+     },
+     "space2comment": {
+      "alerts": 16999,
+      "of": 17066,
+      "rate": 0.9960740653931794
+     },
+     "space2mysqlblank": {
+      "alerts": 14677,
+      "of": 14803,
+      "rate": 0.9914882118489495
+     }
+    }
+   },
+   "input_novelty": {
+    "attacks": {
+     "alerts": 338710,
+     "of": 339132,
+     "rate": 0.9987556467688098,
+     "wilson_95": [
+      0.9986312142132331,
+      0.998868780316292
+     ]
+    },
+    "benign": {
+     "alerts": 207,
+     "of": 3014539,
+     "rate": 6.866721578324248e-05,
+     "wilson_95": [
+      5.9928617843284786e-05,
+      7.867994765286274e-05
+     ]
+    },
+    "by_attack_stage": {
+     "exploit": {
+      "alerts": 254051,
+      "of": 254052,
+      "rate": 0.9999960637979626
+     },
+     "recon": {
+      "alerts": 84659,
+      "of": 85080,
+      "rate": 0.99505171603197
+     }
+    },
+    "by_attack_status": {
+     "failure": {
+      "alerts": 33504,
+      "of": 33657,
+      "rate": 0.9954541402977093
+     },
+     "success": {
+      "alerts": 305206,
+      "of": 305475,
+      "rate": 0.9991194042065635
+     }
+    },
+    "by_attack_technique": {
+     "boolean": {
+      "alerts": 232330,
+      "of": 232354,
+      "rate": 0.9998967093314511
+     },
+     "error": {
+      "alerts": 47296,
+      "of": 47309,
+      "rate": 0.9997252108478302
+     },
+     "inline": {
+      "alerts": 5274,
+      "of": 5279,
+      "rate": 0.9990528509187346
+     },
+     "insider": {
+      "alerts": 944,
+      "of": 944,
+      "rate": 1.0
+     },
+     "stacked": {
+      "alerts": 10994,
+      "of": 11175,
+      "rate": 0.9838031319910514
+     },
+     "time": {
+      "alerts": 22877,
+      "of": 23061,
+      "rate": 0.9920211612679416
+     },
+     "union": {
+      "alerts": 18995,
+      "of": 19010,
+      "rate": 0.9992109416096792
+     }
+    },
+    "by_tamper_method": {
+     "(none)": {
+      "alerts": 944,
+      "of": 944,
+      "rate": 1.0
+     },
+     "commentbeforeparentheses": {
+      "alerts": 11093,
+      "of": 11112,
+      "rate": 0.9982901367890569
+     },
+     "equaltolike": {
+      "alerts": 92997,
+      "of": 93011,
+      "rate": 0.9998494801690123
+     },
+     "lowercase": {
+      "alerts": 18167,
+      "of": 18224,
+      "rate": 0.9968722563652327
+     },
+     "multiplespaces": {
+      "alerts": 32942,
+      "of": 32953,
+      "rate": 0.999666191242072
+     },
+     "randomcase": {
+      "alerts": 100639,
+      "of": 100734,
+      "rate": 0.9990569221911172
+     },
+     "sleep2getlock": {
+      "alerts": 50252,
+      "of": 50285,
+      "rate": 0.9993437406781346
+     },
+     "space2comment": {
+      "alerts": 16999,
+      "of": 17066,
+      "rate": 0.9960740653931794
+     },
+     "space2mysqlblank": {
+      "alerts": 14677,
+      "of": 14803,
+      "rate": 0.9914882118489495
+     }
+    }
+   },
+   "learned_anomaly": {
+    "attacks": {
+     "alerts": 295614,
+     "of": 339132,
+     "rate": 0.8716782845617636,
+     "wilson_95": [
+      0.8705484527315978,
+      0.8727996962447632
+     ]
+    },
+    "benign": {
+     "alerts": 15303,
+     "of": 3014539,
+     "rate": 0.00507639808275826,
+     "wilson_95": [
+      0.004996801226323458,
+      0.005157256310330338
+     ]
+    },
+    "by_attack_stage": {
+     "exploit": {
+      "alerts": 246166,
+      "of": 254052,
+      "rate": 0.9689591107332357
+     },
+     "recon": {
+      "alerts": 49448,
+      "of": 85080,
+      "rate": 0.5811941701927598
+     }
+    },
+    "by_attack_status": {
+     "failure": {
+      "alerts": 13254,
+      "of": 33657,
+      "rate": 0.39379623852393264
+     },
+     "success": {
+      "alerts": 282360,
+      "of": 305475,
+      "rate": 0.9243309599803584
+     }
+    },
+    "by_attack_technique": {
+     "boolean": {
+      "alerts": 218565,
+      "of": 232354,
+      "rate": 0.9406552071408282
+     },
+     "error": {
+      "alerts": 42813,
+      "of": 47309,
+      "rate": 0.904965228603437
+     },
+     "inline": {
+      "alerts": 5096,
+      "of": 5279,
+      "rate": 0.9653343436256867
+     },
+     "insider": {
+      "alerts": 0,
+      "of": 944,
+      "rate": 0.0
+     },
+     "stacked": {
+      "alerts": 5703,
+      "of": 11175,
+      "rate": 0.5103355704697986
+     },
+     "time": {
+      "alerts": 14051,
+      "of": 23061,
+      "rate": 0.6092970816530072
+     },
+     "union": {
+      "alerts": 9386,
+      "of": 19010,
+      "rate": 0.49374013677012096
+     }
+    },
+    "by_tamper_method": {
+     "(none)": {
+      "alerts": 0,
+      "of": 944,
+      "rate": 0.0
+     },
+     "commentbeforeparentheses": {
+      "alerts": 6424,
+      "of": 11112,
+      "rate": 0.578113750899928
+     },
+     "equaltolike": {
+      "alerts": 89335,
+      "of": 93011,
+      "rate": 0.9604777929492211
+     },
+     "lowercase": {
+      "alerts": 15478,
+      "of": 18224,
+      "rate": 0.8493195785776997
+     },
+     "multiplespaces": {
+      "alerts": 27617,
+      "of": 32953,
+      "rate": 0.8380724061542196
+     },
+     "randomcase": {
+      "alerts": 96738,
+      "of": 100734,
+      "rate": 0.9603311692179404
+     },
+     "sleep2getlock": {
+      "alerts": 45553,
+      "of": 50285,
+      "rate": 0.9058963905737297
+     },
+     "space2comment": {
+      "alerts": 8662,
+      "of": 17066,
+      "rate": 0.5075588890191023
+     },
+     "space2mysqlblank": {
+      "alerts": 5807,
+      "of": 14803,
+      "rate": 0.3922853475646828
+     }
+    }
+   }
+  },
+  "lodo-a": {
+   "fused": {
+    "attacks": {
+     "alerts": 336281,
+     "of": 336281,
+     "rate": 1.0,
+     "wilson_95": [
+      0.9999885767706193,
+      1.0
+     ]
+    },
+    "benign": {
+     "alerts": 3017390,
+     "of": 3017390,
+     "rate": 1.0,
+     "wilson_95": [
+      0.9999987268951013,
+      1.0
+     ]
+    },
+    "by_attack_stage": {
+     "exploit": {
+      "alerts": 161178,
+      "of": 161178,
+      "rate": 1.0
+     },
+     "recon": {
+      "alerts": 175103,
+      "of": 175103,
+      "rate": 1.0
+     }
+    },
+    "by_attack_status": {
+     "failure": {
+      "alerts": 75607,
+      "of": 75607,
+      "rate": 1.0
+     },
+     "success": {
+      "alerts": 260674,
+      "of": 260674,
+      "rate": 1.0
+     }
+    },
+    "by_attack_technique": {
+     "boolean": {
+      "alerts": 203845,
+      "of": 203845,
+      "rate": 1.0
+     },
+     "error": {
+      "alerts": 40995,
+      "of": 40995,
+      "rate": 1.0
+     },
+     "inline": {
+      "alerts": 1389,
+      "of": 1389,
+      "rate": 1.0
+     },
+     "insider": {
+      "alerts": 1089,
+      "of": 1089,
+      "rate": 1.0
+     },
+     "stacked": {
+      "alerts": 24659,
+      "of": 24659,
+      "rate": 1.0
+     },
+     "time": {
+      "alerts": 24713,
+      "of": 24713,
+      "rate": 1.0
+     },
+     "union": {
+      "alerts": 39591,
+      "of": 39591,
+      "rate": 1.0
+     }
+    },
+    "by_tamper_method": {
+     "(none)": {
+      "alerts": 1089,
+      "of": 1089,
+      "rate": 1.0
+     },
+     "commentbeforeparentheses": {
+      "alerts": 25774,
+      "of": 25774,
+      "rate": 1.0
+     },
+     "equaltolike": {
+      "alerts": 59853,
+      "of": 59853,
+      "rate": 1.0
+     },
+     "lowercase": {
+      "alerts": 52363,
+      "of": 52363,
+      "rate": 1.0
+     },
+     "multiplespaces": {
+      "alerts": 33387,
+      "of": 33387,
+      "rate": 1.0
+     },
+     "randomcase": {
+      "alerts": 71630,
+      "of": 71630,
+      "rate": 1.0
+     },
+     "sleep2getlock": {
+      "alerts": 38925,
+      "of": 38925,
+      "rate": 1.0
+     },
+     "space2comment": {
+      "alerts": 29915,
+      "of": 29915,
+      "rate": 1.0
+     },
+     "space2mysqlblank": {
+      "alerts": 23345,
+      "of": 23345,
+      "rate": 1.0
+     }
+    }
+   },
+   "input_novelty": {
+    "attacks": {
+     "alerts": 336281,
+     "of": 336281,
+     "rate": 1.0,
+     "wilson_95": [
+      0.9999885767706193,
+      1.0
+     ]
+    },
+    "benign": {
+     "alerts": 3017390,
+     "of": 3017390,
+     "rate": 1.0,
+     "wilson_95": [
+      0.9999987268951013,
+      1.0
+     ]
+    },
+    "by_attack_stage": {
+     "exploit": {
+      "alerts": 161178,
+      "of": 161178,
+      "rate": 1.0
+     },
+     "recon": {
+      "alerts": 175103,
+      "of": 175103,
+      "rate": 1.0
+     }
+    },
+    "by_attack_status": {
+     "failure": {
+      "alerts": 75607,
+      "of": 75607,
+      "rate": 1.0
+     },
+     "success": {
+      "alerts": 260674,
+      "of": 260674,
+      "rate": 1.0
+     }
+    },
+    "by_attack_technique": {
+     "boolean": {
+      "alerts": 203845,
+      "of": 203845,
+      "rate": 1.0
+     },
+     "error": {
+      "alerts": 40995,
+      "of": 40995,
+      "rate": 1.0
+     },
+     "inline": {
+      "alerts": 1389,
+      "of": 1389,
+      "rate": 1.0
+     },
+     "insider": {
+      "alerts": 1089,
+      "of": 1089,
+      "rate": 1.0
+     },
+     "stacked": {
+      "alerts": 24659,
+      "of": 24659,
+      "rate": 1.0
+     },
+     "time": {
+      "alerts": 24713,
+      "of": 24713,
+      "rate": 1.0
+     },
+     "union": {
+      "alerts": 39591,
+      "of": 39591,
+      "rate": 1.0
+     }
+    },
+    "by_tamper_method": {
+     "(none)": {
+      "alerts": 1089,
+      "of": 1089,
+      "rate": 1.0
+     },
+     "commentbeforeparentheses": {
+      "alerts": 25774,
+      "of": 25774,
+      "rate": 1.0
+     },
+     "equaltolike": {
+      "alerts": 59853,
+      "of": 59853,
+      "rate": 1.0
+     },
+     "lowercase": {
+      "alerts": 52363,
+      "of": 52363,
+      "rate": 1.0
+     },
+     "multiplespaces": {
+      "alerts": 33387,
+      "of": 33387,
+      "rate": 1.0
+     },
+     "randomcase": {
+      "alerts": 71630,
+      "of": 71630,
+      "rate": 1.0
+     },
+     "sleep2getlock": {
+      "alerts": 38925,
+      "of": 38925,
+      "rate": 1.0
+     },
+     "space2comment": {
+      "alerts": 29915,
+      "of": 29915,
+      "rate": 1.0
+     },
+     "space2mysqlblank": {
+      "alerts": 23345,
+      "of": 23345,
+      "rate": 1.0
+     }
+    }
+   },
+   "learned_anomaly": {
+    "attacks": {
+     "alerts": 227010,
+     "of": 336281,
+     "rate": 0.6750604405244424,
+     "wilson_95": [
+      0.6734754899630596,
+      0.6766413915746899
+     ]
+    },
+    "benign": {
+     "alerts": 4312,
+     "of": 3017390,
+     "rate": 0.0014290496090992547,
+     "wilson_95": [
+      0.0013870564988383034,
+      0.001472312185598932
+     ]
+    },
+    "by_attack_stage": {
+     "exploit": {
+      "alerts": 157362,
+      "of": 161178,
+      "rate": 0.9763243122510517
+     },
+     "recon": {
+      "alerts": 69648,
+      "of": 175103,
+      "rate": 0.39775446451517105
+     }
+    },
+    "by_attack_status": {
+     "failure": {
+      "alerts": 28317,
+      "of": 75607,
+      "rate": 0.3745288134696523
+     },
+     "success": {
+      "alerts": 198693,
+      "of": 260674,
+      "rate": 0.762227916861674
+     }
+    },
+    "by_attack_technique": {
+     "boolean": {
+      "alerts": 163143,
+      "of": 203845,
+      "rate": 0.8003286811057421
+     },
+     "error": {
+      "alerts": 31081,
+      "of": 40995,
+      "rate": 0.7581656299548726
+     },
+     "inline": {
+      "alerts": 888,
+      "of": 1389,
+      "rate": 0.6393088552915767
+     },
+     "insider": {
+      "alerts": 0,
+      "of": 1089,
+      "rate": 0.0
+     },
+     "stacked": {
+      "alerts": 6635,
+      "of": 24659,
+      "rate": 0.26907011638752587
+     },
+     "time": {
+      "alerts": 8829,
+      "of": 24713,
+      "rate": 0.357261360417594
+     },
+     "union": {
+      "alerts": 16434,
+      "of": 39591,
+      "rate": 0.41509433962264153
+     }
+    },
+    "by_tamper_method": {
+     "(none)": {
+      "alerts": 0,
+      "of": 1089,
+      "rate": 0.0
+     },
+     "commentbeforeparentheses": {
+      "alerts": 11729,
+      "of": 25774,
+      "rate": 0.4550710017847443
+     },
+     "equaltolike": {
+      "alerts": 46696,
+      "of": 59853,
+      "rate": 0.7801781030190633
+     },
+     "lowercase": {
+      "alerts": 39308,
+      "of": 52363,
+      "rate": 0.7506827339915589
+     },
+     "multiplespaces": {
+      "alerts": 20584,
+      "of": 33387,
+      "rate": 0.61652739090065
+     },
+     "randomcase": {
+      "alerts": 56220,
+      "of": 71630,
+      "rate": 0.784866675973754
+     },
+     "sleep2getlock": {
+      "alerts": 27584,
+      "of": 38925,
+      "rate": 0.7086448298008992
+     },
+     "space2comment": {
+      "alerts": 16431,
+      "of": 29915,
+      "rate": 0.5492562259735918
+     },
+     "space2mysqlblank": {
+      "alerts": 8458,
+      "of": 23345,
+      "rate": 0.36230456200471195
+     }
+    }
+   }
+  },
+  "lodo-b": {
+   "fused": {
+    "attacks": {
+     "alerts": 337638,
+     "of": 337638,
+     "rate": 1.0,
+     "wilson_95": [
+      0.9999886226811681,
+      1.0
+     ]
+    },
+    "benign": {
+     "alerts": 3016033,
+     "of": 3016033,
+     "rate": 1.0,
+     "wilson_95": [
+      0.9999987263222954,
+      1.0
+     ]
+    },
+    "by_attack_stage": {
+     "exploit": {
+      "alerts": 288465,
+      "of": 288465,
+      "rate": 1.0
+     },
+     "recon": {
+      "alerts": 49173,
+      "of": 49173,
+      "rate": 1.0
+     }
+    },
+    "by_attack_status": {
+     "failure": {
+      "alerts": 20008,
+      "of": 20008,
+      "rate": 1.0
+     },
+     "success": {
+      "alerts": 317630,
+      "of": 317630,
+      "rate": 1.0
+     }
+    },
+    "by_attack_technique": {
+     "boolean": {
+      "alerts": 278654,
+      "of": 278654,
+      "rate": 1.0
+     },
+     "error": {
+      "alerts": 22872,
+      "of": 22872,
+      "rate": 1.0
+     },
+     "inline": {
+      "alerts": 4825,
+      "of": 4825,
+      "rate": 1.0
+     },
+     "insider": {
+      "alerts": 388,
+      "of": 388,
+      "rate": 1.0
+     },
+     "stacked": {
+      "alerts": 6856,
+      "of": 6856,
+      "rate": 1.0
+     },
+     "time": {
+      "alerts": 8535,
+      "of": 8535,
+      "rate": 1.0
+     },
+     "union": {
+      "alerts": 15508,
+      "of": 15508,
+      "rate": 1.0
+     }
+    },
+    "by_tamper_method": {
+     "(none)": {
+      "alerts": 388,
+      "of": 388,
+      "rate": 1.0
+     },
+     "commentbeforeparentheses": {
+      "alerts": 4359,
+      "of": 4359,
+      "rate": 1.0
+     },
+     "equaltolike": {
+      "alerts": 29910,
+      "of": 29910,
+      "rate": 1.0
+     },
+     "lowercase": {
+      "alerts": 137916,
+      "of": 137916,
+      "rate": 1.0
+     },
+     "multiplespaces": {
+      "alerts": 26864,
+      "of": 26864,
+      "rate": 1.0
+     },
+     "randomcase": {
+      "alerts": 26865,
+      "of": 26865,
+      "rate": 1.0
+     },
+     "sleep2getlock": {
+      "alerts": 50640,
+      "of": 50640,
+      "rate": 1.0
+     },
+     "space2comment": {
+      "alerts": 40406,
+      "of": 40406,
+      "rate": 1.0
+     },
+     "space2mysqlblank": {
+      "alerts": 20290,
+      "of": 20290,
+      "rate": 1.0
+     }
+    }
+   },
+   "input_novelty": {
+    "attacks": {
+     "alerts": 337638,
+     "of": 337638,
+     "rate": 1.0,
+     "wilson_95": [
+      0.9999886226811681,
+      1.0
+     ]
+    },
+    "benign": {
+     "alerts": 3016033,
+     "of": 3016033,
+     "rate": 1.0,
+     "wilson_95": [
+      0.9999987263222954,
+      1.0
+     ]
+    },
+    "by_attack_stage": {
+     "exploit": {
+      "alerts": 288465,
+      "of": 288465,
+      "rate": 1.0
+     },
+     "recon": {
+      "alerts": 49173,
+      "of": 49173,
+      "rate": 1.0
+     }
+    },
+    "by_attack_status": {
+     "failure": {
+      "alerts": 20008,
+      "of": 20008,
+      "rate": 1.0
+     },
+     "success": {
+      "alerts": 317630,
+      "of": 317630,
+      "rate": 1.0
+     }
+    },
+    "by_attack_technique": {
+     "boolean": {
+      "alerts": 278654,
+      "of": 278654,
+      "rate": 1.0
+     },
+     "error": {
+      "alerts": 22872,
+      "of": 22872,
+      "rate": 1.0
+     },
+     "inline": {
+      "alerts": 4825,
+      "of": 4825,
+      "rate": 1.0
+     },
+     "insider": {
+      "alerts": 388,
+      "of": 388,
+      "rate": 1.0
+     },
+     "stacked": {
+      "alerts": 6856,
+      "of": 6856,
+      "rate": 1.0
+     },
+     "time": {
+      "alerts": 8535,
+      "of": 8535,
+      "rate": 1.0
+     },
+     "union": {
+      "alerts": 15508,
+      "of": 15508,
+      "rate": 1.0
+     }
+    },
+    "by_tamper_method": {
+     "(none)": {
+      "alerts": 388,
+      "of": 388,
+      "rate": 1.0
+     },
+     "commentbeforeparentheses": {
+      "alerts": 4359,
+      "of": 4359,
+      "rate": 1.0
+     },
+     "equaltolike": {
+      "alerts": 29910,
+      "of": 29910,
+      "rate": 1.0
+     },
+     "lowercase": {
+      "alerts": 137916,
+      "of": 137916,
+      "rate": 1.0
+     },
+     "multiplespaces": {
+      "alerts": 26864,
+      "of": 26864,
+      "rate": 1.0
+     },
+     "randomcase": {
+      "alerts": 26865,
+      "of": 26865,
+      "rate": 1.0
+     },
+     "sleep2getlock": {
+      "alerts": 50640,
+      "of": 50640,
+      "rate": 1.0
+     },
+     "space2comment": {
+      "alerts": 40406,
+      "of": 40406,
+      "rate": 1.0
+     },
+     "space2mysqlblank": {
+      "alerts": 20290,
+      "of": 20290,
+      "rate": 1.0
+     }
+    }
+   },
+   "learned_anomaly": {
+    "attacks": {
+     "alerts": 313229,
+     "of": 337638,
+     "rate": 0.9277065970062611,
+     "wilson_95": [
+      0.9268281937419977,
+      0.9285752679618832
+     ]
+    },
+    "benign": {
+     "alerts": 2267,
+     "of": 3016033,
+     "rate": 0.0007516496006509212,
+     "wilson_95": [
+      0.0007213493530300443,
+      0.0007832216112577477
+     ]
+    },
+    "by_attack_stage": {
+     "exploit": {
+      "alerts": 286495,
+      "of": 288465,
+      "rate": 0.9931707486176833
+     },
+     "recon": {
+      "alerts": 26734,
+      "of": 49173,
+      "rate": 0.5436723405120696
+     }
+    },
+    "by_attack_status": {
+     "failure": {
+      "alerts": 10660,
+      "of": 20008,
+      "rate": 0.5327868852459017
+     },
+     "success": {
+      "alerts": 302569,
+      "of": 317630,
+      "rate": 0.9525831942826559
+     }
+    },
+    "by_attack_technique": {
+     "boolean": {
+      "alerts": 270998,
+      "of": 278654,
+      "rate": 0.9725250669288795
+     },
+     "error": {
+      "alerts": 20903,
+      "of": 22872,
+      "rate": 0.9139122070654074
+     },
+     "inline": {
+      "alerts": 4696,
+      "of": 4825,
+      "rate": 0.9732642487046632
+     },
+     "insider": {
+      "alerts": 0,
+      "of": 388,
+      "rate": 0.0
+     },
+     "stacked": {
+      "alerts": 3355,
+      "of": 6856,
+      "rate": 0.4893523920653442
+     },
+     "time": {
+      "alerts": 3843,
+      "of": 8535,
+      "rate": 0.45026362038664325
+     },
+     "union": {
+      "alerts": 9434,
+      "of": 15508,
+      "rate": 0.6083311839050812
+     }
+    },
+    "by_tamper_method": {
+     "(none)": {
+      "alerts": 0,
+      "of": 388,
+      "rate": 0.0
+     },
+     "commentbeforeparentheses": {
+      "alerts": 2976,
+      "of": 4359,
+      "rate": 0.6827253957329663
+     },
+     "equaltolike": {
+      "alerts": 26586,
+      "of": 29910,
+      "rate": 0.8888665997993982
+     },
+     "lowercase": {
+      "alerts": 135406,
+      "of": 137916,
+      "rate": 0.981800516256272
+     },
+     "multiplespaces": {
+      "alerts": 24505,
+      "of": 26864,
+      "rate": 0.9121873138773079
+     },
+     "randomcase": {
+      "alerts": 24229,
+      "of": 26865,
+      "rate": 0.9018797692164526
+     },
+     "sleep2getlock": {
+      "alerts": 46297,
+      "of": 50640,
+      "rate": 0.91423775671406
+     },
+     "space2comment": {
+      "alerts": 37505,
+      "of": 40406,
+      "rate": 0.9282037321189922
+     },
+     "space2mysqlblank": {
+      "alerts": 15725,
+      "of": 20290,
+      "rate": 0.7750123213405619
+     }
+    }
+   }
+  },
+  "lodo-c": {
+   "fused": {
+    "attacks": {
+     "alerts": 337159,
+     "of": 337159,
+     "rate": 1.0,
+     "wilson_95": [
+      0.9999886065176559,
+      1.0
+     ]
+    },
+    "benign": {
+     "alerts": 3016512,
+     "of": 3016512,
+     "rate": 1.0,
+     "wilson_95": [
+      0.9999987265245457,
+      0.9999999999999999
+     ]
+    },
+    "by_attack_stage": {
+     "exploit": {
+      "alerts": 308399,
+      "of": 308399,
+      "rate": 1.0
+     },
+     "recon": {
+      "alerts": 28760,
+      "of": 28760,
+      "rate": 1.0
+     }
+    },
+    "by_attack_status": {
+     "failure": {
+      "alerts": 12151,
+      "of": 12151,
+      "rate": 1.0
+     },
+     "success": {
+      "alerts": 325008,
+      "of": 325008,
+      "rate": 1.0
+     }
+    },
+    "by_attack_technique": {
+     "boolean": {
+      "alerts": 278204,
+      "of": 278204,
+      "rate": 1.0
+     },
+     "error": {
+      "alerts": 37809,
+      "of": 37809,
+      "rate": 1.0
+     },
+     "inline": {
+      "alerts": 3166,
+      "of": 3166,
+      "rate": 1.0
+     },
+     "insider": {
+      "alerts": 388,
+      "of": 388,
+      "rate": 1.0
+     },
+     "stacked": {
+      "alerts": 5041,
+      "of": 5041,
+      "rate": 1.0
+     },
+     "time": {
+      "alerts": 6350,
+      "of": 6350,
+      "rate": 1.0
+     },
+     "union": {
+      "alerts": 6201,
+      "of": 6201,
+      "rate": 1.0
+     }
+    },
+    "by_tamper_method": {
+     "(none)": {
+      "alerts": 388,
+      "of": 388,
+      "rate": 1.0
+     },
+     "commentbeforeparentheses": {
+      "alerts": 2661,
+      "of": 2661,
+      "rate": 1.0
+     },
+     "equaltolike": {
+      "alerts": 44217,
+      "of": 44217,
+      "rate": 1.0
+     },
+     "lowercase": {
+      "alerts": 66377,
+      "of": 66377,
+      "rate": 1.0
+     },
+     "multiplespaces": {
+      "alerts": 60848,
+      "of": 60848,
+      "rate": 1.0
+     },
+     "randomcase": {
+      "alerts": 82677,
+      "of": 82677,
+      "rate": 1.0
+     },
+     "sleep2getlock": {
+      "alerts": 34244,
+      "of": 34244,
+      "rate": 1.0
+     },
+     "space2comment": {
+      "alerts": 38544,
+      "of": 38544,
+      "rate": 1.0
+     },
+     "space2mysqlblank": {
+      "alerts": 7203,
+      "of": 7203,
+      "rate": 1.0
+     }
+    }
+   },
+   "input_novelty": {
+    "attacks": {
+     "alerts": 337159,
+     "of": 337159,
+     "rate": 1.0,
+     "wilson_95": [
+      0.9999886065176559,
+      1.0
+     ]
+    },
+    "benign": {
+     "alerts": 3016512,
+     "of": 3016512,
+     "rate": 1.0,
+     "wilson_95": [
+      0.9999987265245457,
+      0.9999999999999999
+     ]
+    },
+    "by_attack_stage": {
+     "exploit": {
+      "alerts": 308399,
+      "of": 308399,
+      "rate": 1.0
+     },
+     "recon": {
+      "alerts": 28760,
+      "of": 28760,
+      "rate": 1.0
+     }
+    },
+    "by_attack_status": {
+     "failure": {
+      "alerts": 12151,
+      "of": 12151,
+      "rate": 1.0
+     },
+     "success": {
+      "alerts": 325008,
+      "of": 325008,
+      "rate": 1.0
+     }
+    },
+    "by_attack_technique": {
+     "boolean": {
+      "alerts": 278204,
+      "of": 278204,
+      "rate": 1.0
+     },
+     "error": {
+      "alerts": 37809,
+      "of": 37809,
+      "rate": 1.0
+     },
+     "inline": {
+      "alerts": 3166,
+      "of": 3166,
+      "rate": 1.0
+     },
+     "insider": {
+      "alerts": 388,
+      "of": 388,
+      "rate": 1.0
+     },
+     "stacked": {
+      "alerts": 5041,
+      "of": 5041,
+      "rate": 1.0
+     },
+     "time": {
+      "alerts": 6350,
+      "of": 6350,
+      "rate": 1.0
+     },
+     "union": {
+      "alerts": 6201,
+      "of": 6201,
+      "rate": 1.0
+     }
+    },
+    "by_tamper_method": {
+     "(none)": {
+      "alerts": 388,
+      "of": 388,
+      "rate": 1.0
+     },
+     "commentbeforeparentheses": {
+      "alerts": 2661,
+      "of": 2661,
+      "rate": 1.0
+     },
+     "equaltolike": {
+      "alerts": 44217,
+      "of": 44217,
+      "rate": 1.0
+     },
+     "lowercase": {
+      "alerts": 66377,
+      "of": 66377,
+      "rate": 1.0
+     },
+     "multiplespaces": {
+      "alerts": 60848,
+      "of": 60848,
+      "rate": 1.0
+     },
+     "randomcase": {
+      "alerts": 82677,
+      "of": 82677,
+      "rate": 1.0
+     },
+     "sleep2getlock": {
+      "alerts": 34244,
+      "of": 34244,
+      "rate": 1.0
+     },
+     "space2comment": {
+      "alerts": 38544,
+      "of": 38544,
+      "rate": 1.0
+     },
+     "space2mysqlblank": {
+      "alerts": 7203,
+      "of": 7203,
+      "rate": 1.0
+     }
+    }
+   },
+   "learned_anomaly": {
+    "attacks": {
+     "alerts": 319207,
+     "of": 337159,
+     "rate": 0.9467550918112819,
+     "wilson_95": [
+      0.9459921296431699,
+      0.9475078737868925
+     ]
+    },
+    "benign": {
+     "alerts": 70,
+     "of": 3016512,
+     "rate": 2.3205609657776928e-05,
+     "wilson_95": [
+      1.8369065981372418e-05,
+      2.9315569684830403e-05
+     ]
+    },
+    "by_attack_stage": {
+     "exploit": {
+      "alerts": 306128,
+      "of": 308399,
+      "rate": 0.9926361628928758
+     },
+     "recon": {
+      "alerts": 13079,
+      "of": 28760,
+      "rate": 0.4547635605006954
+     }
+    },
+    "by_attack_status": {
+     "failure": {
+      "alerts": 3624,
+      "of": 12151,
+      "rate": 0.2982470578553206
+     },
+     "success": {
+      "alerts": 315583,
+      "of": 325008,
+      "rate": 0.9710007138285827
+     }
+    },
+    "by_attack_technique": {
+     "boolean": {
+      "alerts": 271136,
+      "of": 278204,
+      "rate": 0.9745941826860864
+     },
+     "error": {
+      "alerts": 37602,
+      "of": 37809,
+      "rate": 0.994525113068317
+     },
+     "inline": {
+      "alerts": 3066,
+      "of": 3166,
+      "rate": 0.9684144030322173
+     },
+     "insider": {
+      "alerts": 0,
+      "of": 388,
+      "rate": 0.0
+     },
+     "stacked": {
+      "alerts": 2545,
+      "of": 5041,
+      "rate": 0.5048601467962706
+     },
+     "time": {
+      "alerts": 3340,
+      "of": 6350,
+      "rate": 0.525984251968504
+     },
+     "union": {
+      "alerts": 1518,
+      "of": 6201,
+      "rate": 0.2447992259313014
+     }
+    },
+    "by_tamper_method": {
+     "(none)": {
+      "alerts": 0,
+      "of": 388,
+      "rate": 0.0
+     },
+     "commentbeforeparentheses": {
+      "alerts": 1563,
+      "of": 2661,
+      "rate": 0.5873731679819617
+     },
+     "equaltolike": {
+      "alerts": 42231,
+      "of": 44217,
+      "rate": 0.9550851482461497
+     },
+     "lowercase": {
+      "alerts": 64285,
+      "of": 66377,
+      "rate": 0.9684830588908809
+     },
+     "multiplespaces": {
+      "alerts": 59349,
+      "of": 60848,
+      "rate": 0.9753648435445701
+     },
+     "randomcase": {
+      "alerts": 81534,
+      "of": 82677,
+      "rate": 0.9861751152073732
+     },
+     "sleep2getlock": {
+      "alerts": 31276,
+      "of": 34244,
+      "rate": 0.9133278822567457
+     },
+     "space2comment": {
+      "alerts": 35869,
+      "of": 38544,
+      "rate": 0.930598796180988
+     },
+     "space2mysqlblank": {
+      "alerts": 3100,
+      "of": 7203,
+      "rate": 0.43037623212550324
+     }
+    }
+   }
+  },
+  "lodo-d": {
+   "fused": {
+    "attacks": {
+     "alerts": 339132,
+     "of": 339132,
+     "rate": 1.0,
+     "wilson_95": [
+      0.9999886728018342,
+      0.9999999999999999
+     ]
+    },
+    "benign": {
+     "alerts": 3014539,
+     "of": 3014539,
+     "rate": 1.0,
+     "wilson_95": [
+      0.999998725691064,
+      1.0
+     ]
+    },
+    "by_attack_stage": {
+     "exploit": {
+      "alerts": 254052,
+      "of": 254052,
+      "rate": 1.0
+     },
+     "recon": {
+      "alerts": 85080,
+      "of": 85080,
+      "rate": 1.0
+     }
+    },
+    "by_attack_status": {
+     "failure": {
+      "alerts": 33657,
+      "of": 33657,
+      "rate": 1.0
+     },
+     "success": {
+      "alerts": 305475,
+      "of": 305475,
+      "rate": 1.0
+     }
+    },
+    "by_attack_technique": {
+     "boolean": {
+      "alerts": 232354,
+      "of": 232354,
+      "rate": 1.0
+     },
+     "error": {
+      "alerts": 47309,
+      "of": 47309,
+      "rate": 1.0
+     },
+     "inline": {
+      "alerts": 5279,
+      "of": 5279,
+      "rate": 1.0
+     },
+     "insider": {
+      "alerts": 944,
+      "of": 944,
+      "rate": 1.0
+     },
+     "stacked": {
+      "alerts": 11175,
+      "of": 11175,
+      "rate": 1.0
+     },
+     "time": {
+      "alerts": 23061,
+      "of": 23061,
+      "rate": 1.0
+     },
+     "union": {
+      "alerts": 19010,
+      "of": 19010,
+      "rate": 1.0
+     }
+    },
+    "by_tamper_method": {
+     "(none)": {
+      "alerts": 944,
+      "of": 944,
+      "rate": 1.0
+     },
+     "commentbeforeparentheses": {
+      "alerts": 11112,
+      "of": 11112,
+      "rate": 1.0
+     },
+     "equaltolike": {
+      "alerts": 93011,
+      "of": 93011,
+      "rate": 1.0
+     },
+     "lowercase": {
+      "alerts": 18224,
+      "of": 18224,
+      "rate": 1.0
+     },
+     "multiplespaces": {
+      "alerts": 32953,
+      "of": 32953,
+      "rate": 1.0
+     },
+     "randomcase": {
+      "alerts": 100734,
+      "of": 100734,
+      "rate": 1.0
+     },
+     "sleep2getlock": {
+      "alerts": 50285,
+      "of": 50285,
+      "rate": 1.0
+     },
+     "space2comment": {
+      "alerts": 17066,
+      "of": 17066,
+      "rate": 1.0
+     },
+     "space2mysqlblank": {
+      "alerts": 14803,
+      "of": 14803,
+      "rate": 1.0
+     }
+    }
+   },
+   "input_novelty": {
+    "attacks": {
+     "alerts": 339132,
+     "of": 339132,
+     "rate": 1.0,
+     "wilson_95": [
+      0.9999886728018342,
+      0.9999999999999999
+     ]
+    },
+    "benign": {
+     "alerts": 3014539,
+     "of": 3014539,
+     "rate": 1.0,
+     "wilson_95": [
+      0.999998725691064,
+      1.0
+     ]
+    },
+    "by_attack_stage": {
+     "exploit": {
+      "alerts": 254052,
+      "of": 254052,
+      "rate": 1.0
+     },
+     "recon": {
+      "alerts": 85080,
+      "of": 85080,
+      "rate": 1.0
+     }
+    },
+    "by_attack_status": {
+     "failure": {
+      "alerts": 33657,
+      "of": 33657,
+      "rate": 1.0
+     },
+     "success": {
+      "alerts": 305475,
+      "of": 305475,
+      "rate": 1.0
+     }
+    },
+    "by_attack_technique": {
+     "boolean": {
+      "alerts": 232354,
+      "of": 232354,
+      "rate": 1.0
+     },
+     "error": {
+      "alerts": 47309,
+      "of": 47309,
+      "rate": 1.0
+     },
+     "inline": {
+      "alerts": 5279,
+      "of": 5279,
+      "rate": 1.0
+     },
+     "insider": {
+      "alerts": 944,
+      "of": 944,
+      "rate": 1.0
+     },
+     "stacked": {
+      "alerts": 11175,
+      "of": 11175,
+      "rate": 1.0
+     },
+     "time": {
+      "alerts": 23061,
+      "of": 23061,
+      "rate": 1.0
+     },
+     "union": {
+      "alerts": 19010,
+      "of": 19010,
+      "rate": 1.0
+     }
+    },
+    "by_tamper_method": {
+     "(none)": {
+      "alerts": 944,
+      "of": 944,
+      "rate": 1.0
+     },
+     "commentbeforeparentheses": {
+      "alerts": 11112,
+      "of": 11112,
+      "rate": 1.0
+     },
+     "equaltolike": {
+      "alerts": 93011,
+      "of": 93011,
+      "rate": 1.0
+     },
+     "lowercase": {
+      "alerts": 18224,
+      "of": 18224,
+      "rate": 1.0
+     },
+     "multiplespaces": {
+      "alerts": 32953,
+      "of": 32953,
+      "rate": 1.0
+     },
+     "randomcase": {
+      "alerts": 100734,
+      "of": 100734,
+      "rate": 1.0
+     },
+     "sleep2getlock": {
+      "alerts": 50285,
+      "of": 50285,
+      "rate": 1.0
+     },
+     "space2comment": {
+      "alerts": 17066,
+      "of": 17066,
+      "rate": 1.0
+     },
+     "space2mysqlblank": {
+      "alerts": 14803,
+      "of": 14803,
+      "rate": 1.0
+     }
+    }
+   },
+   "learned_anomaly": {
+    "attacks": {
+     "alerts": 307220,
+     "of": 339132,
+     "rate": 0.9059009471238337,
+     "wilson_95": [
+      0.9049136991148009,
+      0.9068789996919392
+     ]
+    },
+    "benign": {
+     "alerts": 0,
+     "of": 3014539,
+     "rate": 0.0,
+     "wilson_95": [
+      1.0587911840678754e-22,
+      1.2743089361559494e-06
+     ]
+    },
+    "by_attack_stage": {
+     "exploit": {
+      "alerts": 248919,
+      "of": 254052,
+      "rate": 0.9797954749421378
+     },
+     "recon": {
+      "alerts": 58301,
+      "of": 85080,
+      "rate": 0.6852491772449459
+     }
+    },
+    "by_attack_status": {
+     "failure": {
+      "alerts": 15941,
+      "of": 33657,
+      "rate": 0.4736310425765814
+     },
+     "success": {
+      "alerts": 291279,
+      "of": 305475,
+      "rate": 0.9535281119567887
+     }
+    },
+    "by_attack_technique": {
+     "boolean": {
+      "alerts": 221226,
+      "of": 232354,
+      "rate": 0.9521075600161822
+     },
+     "error": {
+      "alerts": 47155,
+      "of": 47309,
+      "rate": 0.9967448054281426
+     },
+     "inline": {
+      "alerts": 5154,
+      "of": 5279,
+      "rate": 0.9763212729683652
+     },
+     "insider": {
+      "alerts": 0,
+      "of": 944,
+      "rate": 0.0
+     },
+     "stacked": {
+      "alerts": 7184,
+      "of": 11175,
+      "rate": 0.6428635346756152
+     },
+     "time": {
+      "alerts": 16938,
+      "of": 23061,
+      "rate": 0.7344867958891635
+     },
+     "union": {
+      "alerts": 9563,
+      "of": 19010,
+      "rate": 0.5030510257759074
+     }
+    },
+    "by_tamper_method": {
+     "(none)": {
+      "alerts": 0,
+      "of": 944,
+      "rate": 0.0
+     },
+     "commentbeforeparentheses": {
+      "alerts": 8188,
+      "of": 11112,
+      "rate": 0.7368610511159107
+     },
+     "equaltolike": {
+      "alerts": 89703,
+      "of": 93011,
+      "rate": 0.9644343142208986
+     },
+     "lowercase": {
+      "alerts": 15669,
+      "of": 18224,
+      "rate": 0.8598002633889377
+     },
+     "multiplespaces": {
+      "alerts": 28891,
+      "of": 32953,
+      "rate": 0.8767335295724213
+     },
+     "randomcase": {
+      "alerts": 97540,
+      "of": 100734,
+      "rate": 0.9682927313518772
+     },
+     "sleep2getlock": {
+      "alerts": 47108,
+      "of": 50285,
+      "rate": 0.9368201252858706
+     },
+     "space2comment": {
+      "alerts": 12422,
+      "of": 17066,
+      "rate": 0.7278799953123168
+     },
+     "space2mysqlblank": {
+      "alerts": 7699,
+      "of": 14803,
+      "rate": 0.5200972775788691
+     }
+    }
+   }
+  }
+ },
+ "schema": "predict-shield/superviz26-sql-test/1"
+}

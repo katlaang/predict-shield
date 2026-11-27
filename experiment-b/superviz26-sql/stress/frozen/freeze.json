@@ -1,0 +1,246 @@
+{
+ "arms": {
+  "matched-a-1": {
+   "member": "superviz26-lodo/a-a.csv",
+   "model_sha256": "1cc47672b0c3af1777ca677ca64adb1a25d6700d8122762da420477c90ef9c05",
+   "perturbed_train_rows": 3006,
+   "rate": 1,
+   "rows": {
+    "calibration": 117357,
+    "fit": 134122,
+    "threshold": 83827
+   },
+   "templates_seen": 65,
+   "threshold_split_alert_rate": 0.0049983895403628905,
+   "thresholds": {
+    "fused": 11.579323965203832,
+    "input_novelty": 0.0,
+    "learned_anomaly": 0.44831100502748744
+   },
+   "train_rows": 335306
+  },
+  "matched-a-20": {
+   "member": "superviz26-lodo/a-a.csv",
+   "model_sha256": "1947a990343a197601f7260a6c3dd843a02d9c6ea732ae39dade516e66cd36f7",
+   "perturbed_train_rows": 61987,
+   "rate": 20,
+   "rows": {
+    "calibration": 117357,
+    "fit": 134122,
+    "threshold": 83827
+   },
+   "templates_seen": 65,
+   "threshold_split_alert_rate": 0.004986460209717633,
+   "thresholds": {
+    "fused": 11.8155865366107,
+    "input_novelty": 0.0,
+    "learned_anomaly": 0.44387366623562646
+   },
+   "train_rows": 335306
+  },
+  "matched-a-5": {
+   "member": "superviz26-lodo/a-a.csv",
+   "model_sha256": "31b858ab3078fbb5f22682125a9a83f11a9c4a7c0740f575cd1b2e55b1cc78e0",
+   "perturbed_train_rows": 15791,
+   "rate": 5,
+   "rows": {
+    "calibration": 117357,
+    "fit": 134122,
+    "threshold": 83827
+   },
+   "templates_seen": 65,
+   "threshold_split_alert_rate": 0.0049983895403628905,
+   "thresholds": {
+    "fused": 11.647319182286672,
+    "input_novelty": 0.0,
+    "learned_anomaly": 0.4483866243508419
+   },
+   "train_rows": 335306
+  },
+  "matched-b-1": {
+   "member": "superviz26-lodo/b-b.csv",
+   "model_sha256": "21657082bcc26b68fe7e9b2bdcc54b30de2022a1f39b2255c030adda4d3e4762",
+   "perturbed_train_rows": 1871,
+   "rate": 1,
+   "rows": {
+    "calibration": 117357,
+    "fit": 134122,
+    "threshold": 83827
+   },
+   "templates_seen": 57,
+   "threshold_split_alert_rate": 0.0049983895403628905,
+   "thresholds": {
+    "fused": 10.86541705183885,
+    "input_novelty": 0.0,
+    "learned_anomaly": 0.5223901196775589
+   },
+   "train_rows": 335306
+  },
+  "matched-b-20": {
+   "member": "superviz26-lodo/b-b.csv",
+   "model_sha256": "53125df02ca23a89238d83bf2e580ca953d2c15626a7b26f2073c5cc13ec858f",
+   "perturbed_train_rows": 37590,
+   "rate": 20,
+   "rows": {
+    "calibration": 117357,
+    "fit": 134122,
+    "threshold": 83827
+   },
+   "templates_seen": 57,
+   "threshold_split_alert_rate": 0.0049268135564913456,
+   "thresholds": {
+    "fused": 10.91275654001066,
+    "input_novelty": 0.0,
+    "learned_anomaly": 0.5208858954977936
+   },
+   "train_rows": 335306
+  },
+  "matched-b-5": {
+   "member": "superviz26-lodo/b-b.csv",
+   "model_sha256": "ee98c69dcf54a8e336bfe11eeca375cf741160b3e9b80e78f4eab0a019b7bccb",
+   "perturbed_train_rows": 9509,
+   "rate": 5,
+   "rows": {
+    "calibration": 117357,
+    "fit": 134122,
+    "threshold": 83827
+   },
+   "templates_seen": 57,
+   "threshold_split_alert_rate": 0.0049983895403628905,
+   "thresholds": {
+    "fused": 11.019339134111108,
+    "input_novelty": 0.0,
+    "learned_anomaly": 0.5220900513461172
+   },
+   "train_rows": 335306
+  },
+  "matched-c-1": {
+   "member": "superviz26-lodo/c-c.csv",
+   "model_sha256": "d931819096b5cbca489ed05fb384098f2fff4e4358225f859054c9744b8f5ef6",
+   "perturbed_train_rows": 1985,
+   "rate": 1,
+   "rows": {
+    "calibration": 117357,
+    "fit": 134122,
+    "threshold": 83827
+   },
+   "templates_seen": 76,
+   "threshold_split_alert_rate": 0.004962601548427118,
+   "thresholds": {
+    "fused": 11.010935760403708,
+    "input_novelty": 0.0,
+    "learned_anomaly": 0.459367491415051
+   },
+   "train_rows": 335306
+  },
+  "matched-c-20": {
+   "member": "superviz26-lodo/c-c.csv",
+   "model_sha256": "17a4f3b3439340c4a11e9ed4c062a32ded55a46d0d5b2eec8da09601a5f7f223",
+   "perturbed_train_rows": 40945,
+   "rate": 20,
+   "rows": {
+    "calibration": 117357,
+    "fit": 134122,
+    "threshold": 83827
+   },
+   "templates_seen": 76,
+   "threshold_split_alert_rate": 0.004986460209717633,
+   "thresholds": {
+    "fused": 11.03201077100928,
+    "input_novelty": 0.0,
+    "learned_anomaly": 0.4506638780207535
+   },
+   "train_rows": 335306
+  },
+  "matched-c-5": {
+   "member": "superviz26-lodo/c-c.csv",
+   "model_sha256": "5b77ab5cf3c7385777c2cf8eb517f143332ab8de3b60592bf3fa1f66dca5060f",
+   "perturbed_train_rows": 10510,
+   "rate": 5,
+   "rows": {
+    "calibration": 117357,
+    "fit": 134122,
+    "threshold": 83827
+   },
+   "templates_seen": 76,
+   "threshold_split_alert_rate": 0.004986460209717633,
+   "thresholds": {
+    "fused": 10.932816888730535,
+    "input_novelty": 0.0,
+    "learned_anomaly": 0.4591616103942127
+   },
+   "train_rows": 335306
+  },
+  "matched-d-1": {
+   "member": "superviz26-lodo/d-d.csv",
+   "model_sha256": "1904df65716aa58077e11051e61f7ae5d35511b7ff23db1fc053f59a18b41920",
+   "perturbed_train_rows": 1341,
+   "rate": 1,
+   "rows": {
+    "calibration": 117357,
+    "fit": 134122,
+    "threshold": 83827
+   },
+   "templates_seen": 46,
+   "threshold_split_alert_rate": 0.004735944266167225,
+   "thresholds": {
+    "fused": 10.722499123874561,
+    "input_novelty": 0.0,
+    "learned_anomaly": 0.5066084653955734
+   },
+   "train_rows": 335306
+  },
+  "matched-d-20": {
+   "member": "superviz26-lodo/d-d.csv",
+   "model_sha256": "fb6220e1f29248a25b9e5eb12490b368bd2a6fde7b93bdd72a4fa6c243630b7b",
+   "perturbed_train_rows": 25971,
+   "rate": 20,
+   "rows": {
+    "calibration": 117357,
+    "fit": 134122,
+    "threshold": 83827
+   },
+   "templates_seen": 46,
+   "threshold_split_alert_rate": 0.0049983895403628905,
+   "thresholds": {
+    "fused": 10.682965042393008,
+    "input_novelty": 0.0,
+    "learned_anomaly": 0.4893407512475321
+   },
+   "train_rows": 335306
+  },
+  "matched-d-5": {
+   "member": "superviz26-lodo/d-d.csv",
+   "model_sha256": "fcf5f63027f65f831e0d547f64639f7572f0177e8dae806a134b5c7b72dd97fd",
+   "perturbed_train_rows": 6530,
+   "rate": 5,
+   "rows": {
+    "calibration": 117357,
+    "fit": 134122,
+    "threshold": 83827
+   },
+   "templates_seen": 46,
+   "threshold_split_alert_rate": 0.00490295489520083,
+   "thresholds": {
+    "fused": 10.528911160061394,
+    "input_novelty": 0.0,
+    "learned_anomaly": 0.500086416225874
+   },
+   "train_rows": 335306
+  }
+ },
+ "code_sha256": {
+  "dvwa-correlation-v3/model_v3.py": "8df890c22184e77ab42a520f0e99c341a9981f67a1dc93b151990b0fdf8d5cdd",
+  "stress/protocol.json": "4b6da8f15963fc69b389bcbeb6bb0a695e1e8cdfd60f863b384f6e781a179e7c",
+  "stress/stress.py": "d0595943fc853bc2f4f61b3dbc04eb2ea12f1708e106076e95f58c9ef551cab5",
+  "superviz25-sql/model_sql.py": "9e8cf0b66c1a34041f816173943c7ba014ceb5e6b8346c0eba861ee3eef864ba",
+  "superviz26-sql/model26.py": "8e0d09c29ed9af5d339674670180134b262d960ce86447bf0a7b90515d6f3ad0"
+ },
+ "faker": "37.12.0",
+ "freeze_sha256": "9ad4977c4d363d369faa031af3c9b8ba5333f250a55d94c712e50cac72bb6504",
+ "schema": "predict-shield/superviz26-stress-freeze/1",
+ "sklearn": "1.7.2",
+ "source_sha256": "9f19d1bb675a81d3baacc66f7d783c00f626cd5ad2297b049cfefe93ce2a6cc5",
+ "test_pool_sha256": "639c8ae8d24271d6de9bb273d4031c6e955879b4646d772925c70bb0757ac008",
+ "train_pool_sha256": "25307132c930fe0c10666df8fed748e93505b647ea92ce7f6d5f7231bb0802e5"
+}

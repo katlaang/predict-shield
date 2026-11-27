@@ -111,3 +111,11 @@ class LicenseAllowListTests(unittest.TestCase):
     def test_only_permissive_reuse_licenses_are_approved(self):
         import registry
         self.assertEqual(registry.APPROVED_LICENSES, {"CC-BY-4.0", "MIT"})
+
+
+class DownloadCapTests(unittest.TestCase):
+    def test_cap_is_bounded_at_4096_mb(self):
+        import registry
+        reg = registry.get_registry()
+        with self.assertRaises(ValueError):
+            registry.download(reg, "superviz26-sql", "superviz26.zip", Path("/tmp/never.zip"), max_mb=4097)

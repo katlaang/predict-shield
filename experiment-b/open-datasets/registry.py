@@ -95,8 +95,8 @@ def verify_file(path: Path, entry: dict) -> dict:
 def download(reg: dict, dataset_id: str, filename: str, output: Path,
              max_mb: int = 25, opener=None) -> dict:
     dataset, pinned = lookup(reg, dataset_id, filename)
-    if max_mb < 1 or max_mb > 2048:
-        raise ValueError("max download must be between 1 and 2048 MB")
+    if max_mb < 1 or max_mb > 4096:
+        raise ValueError("max download must be between 1 and 4096 MB")
     cap = max_mb * 1024 * 1024
     if pinned.get("approx_mb") is not None and pinned["approx_mb"] > max_mb:
         raise ValueError("file exceeds explicitly authorized download size")
