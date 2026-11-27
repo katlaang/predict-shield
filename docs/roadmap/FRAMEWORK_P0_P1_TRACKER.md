@@ -66,6 +66,8 @@
 
 ### Operational dataset admission update
 
+**PR #181 merged:** [source adapters and parsers](../../experiment-b/operational-sources/README.md) implemented and [local-normalization contracts CI 45922669555](https://github.com/katlaang/predict-shield/actions/runs/45922669555) passed (synthetic tests only). Data rights and actual source ingestion remain separate approval/verification steps.
+
 **P1 source integration:** [LANL, UGR'16 and MAWILab normalizers](../../experiment-b/operational-sources/README.md) and safety tests have been implemented on a separate research branch, not yet proven with real data. LANL's publisher describes a copyright waiver but still requires use-information submission before source download; UGR'16 reuse terms remain unclear; MAWILab anomaly annotations are not independently confirmed attacks and trace use terms require a separate review. No production or critical-infrastructure effectiveness is established. Claude retains ownership of SQL/attack detector work.
 
 ## Completed in this work session / to update upon merge
