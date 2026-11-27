@@ -62,7 +62,7 @@ jobs:
       - run: python experiment-b/real-logs-indonesia/inspect_archive.py "$RUNNER_TEMP/organization-x.zip" "$RUNNER_TEMP/organization-y.zip"
 
   run:
-    if: github.event_name == 'workflow_dispatch' && (github.event.inputs.stage == 'develop' || github.event.inputs.stage == 'test')
+    if: github.event_name == 'workflow_dispatch' && (github.event.inputs.stage == 'develop' || github.event.inputs.stage == 'test' || github.event.inputs.stage == 'diagnose')
     needs: unit-tests
     runs-on: ubuntu-latest
     timeout-minutes: 300
@@ -100,12 +100,16 @@ jobs:
           path: ${{ runner.temp }}/models
           retention-days: 90
       - uses: actions/download-artifact@v4
-        if: github.event.inputs.stage == 'test'
+        if: github.event.inputs.stage == 'test' || github.event.inputs.stage == 'diagnose'
         with:
           name: real-logs-models
           path: ${{ runner.temp }}/models
           run-id: ${{ github.event.inputs.develop_run_id }}
           github-token: ${{ github.token }}
+      - name: Exploratory breakdown of alerts (aggregate structure only)
+        if: github.event.inputs.stage == 'diagnose'
+        working-directory: experiment-b/real-logs-indonesia
+        run: python diagnose.py "$RUNNER_TEMP/models" "$RUNNER_TEMP/organization-x.zip" "$RUNNER_TEMP/organization-y.zip"
       - name: Score the test period once, then gather independent evidence
         if: github.event.inputs.stage == 'test'
         working-directory: experiment-b/real-logs-indonesia
