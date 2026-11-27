@@ -1,5 +1,14 @@
 # Development changelog
 
+## 2026-11-26: Superviz25-SQL baselines
+
+- Same fixed sample (302,430 benign, 84,294 attack queries).
+  - Frozen benign-only detector: 90.3% / 91.6% / 92.3% caught at 0.1% / 0.5% / 1% benign alerts.
+  - Supervised reference (sees attack labels): 91.1% / 91.9% / 92.6%.
+  - libinjection: 65.8% at 0%.
+  - OWASP CRS: 84.8% at 0.08% (level 1), 91.2% at 5.5% (level 2), 91.9% at 11.4% (level 3).
+- The first CRS run was void (client headers) and is kept on record. Run 45913812903. Evidence: `docs/evidence/MEASURED_SUPERVIZ25_SQL_BASELINES_2026_11_26.md`.
+
 ## 2026-11-26: DVWA v3 method on Superviz25-SQL (external)
 
 - First detection test on data generated outside this project: Superviz25-SQL (Télécom Paris, LAAS-CNRS, Inria; MIT license).
