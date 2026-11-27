@@ -17,6 +17,18 @@ services:
     image: docker.redpanda.com/redpandadata/redpanda:v24.3.10
     command: ["redpanda", "start", "--mode", "dev-container", "--smp", "1", "--memory", "512M", "--reserve-memory", "0M", "--overprovisioned", "--kafka-addr", "internal://0.0.0.0:9092", "--advertise-kafka-addr", "internal://broker:9092"]
     networks: [lab]
+  broker-observer:
+    build: ./java
+    # Separate read-only process: no oracle or mutation credential.
+    # Token is optional for legacy CI, where the endpoint then rejects all
+    # requests; new broker measurements require a distinct secret.
+    environment:
+      LAB_ROLE: broker-observer
+      LAB_OBSERVER_TOKEN: ${LAB_OBSERVER_TOKEN:-}
+      SPRING_KAFKA_BOOTSTRAP_SERVERS: broker:9092
+    depends_on: [broker]
+    ports: ["127.0.0.1:18287:8080"]
+    networks: [lab]
   authority:
     build: ./java
     environment:
