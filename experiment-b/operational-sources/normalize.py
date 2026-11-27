@@ -87,6 +87,11 @@ def _record(data: dict, *, dataset: str, key: bytes, source_digest: str,
         "source_sha256": source_digest,
         "source_line": line_number,
         "raw_line_sha256": raw_digest,
+        # An unlinkable scope reference lets a downstream graph refuse
+        # cross-source joins that were pseudonymized with different keys.
+        # The underlying secret key is never exported.
+        "pseudonym_scope_id": hmac.new(key, b"predict-shield-p1-graph-scope-v1",
+                                       hashlib.sha256).hexdigest()[:20],
         "label": "unknown",
         "truth_basis": "unverified",
         "verified_attack": False,
