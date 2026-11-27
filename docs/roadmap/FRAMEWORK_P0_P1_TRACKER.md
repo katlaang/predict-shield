@@ -2,7 +2,7 @@
 
 **Last reviewed:** 2026-11-26 America/Chicago (GitHub run timestamps may fall on November 27 UTC)  
 **Repository:** `katlaang/predict-shield`, research framework **only**. The separate commercial product/pilot repository must not be combined with this one.  
-**Status semantics:** `DONE` = demonstrably merged/reported; `IMPLEMENTED_UNVALIDATED` = implemented but not independently scored; `IN_PROGRESS` = active work; `READY_FOR_DATA` = protocol/harness exists, no accepted evaluation yet; `PENDING` = not started; `EXTERNAL_BLOCKED` = requires an independently authorized external actor.  
+**Status semantics:** `DONE` = demonstrably merged/reported; `IMPLEMENTED_UNVALIDATED` = implemented but not independently scored; `EXPLORATORY_MEASURED` = retrospective data analysis with direct measured outcomes but no new confirmatory evidence; `PARTIALLY_VALIDATED` = a bounded physical condition passed while other required conditions remain open; `IN_PROGRESS` = active work; `READY_FOR_DATA` = protocol/harness exists, no accepted evaluation yet; `PENDING` = not started; `EXTERNAL_BLOCKED` = requires an independently authorized external actor.  
 **Rule:** Do not convert a successful CI workflow, a scanner probe, a synthetically labeled event or a signed-up partner inquiry into evidence of verified cyber-defense effectiveness.
 
 ## Executive baseline
@@ -41,8 +41,8 @@
 | P0-07 | Superviz26-SQL cross-domain, drift and limited-adaptation tests | READY_FOR_DATA | [Publisher Zenodo record](https://zenodo.org/records/21068333). [Prospective protocol](../protocols/SUPERVIZ26_GENERALIZATION.md). | Publisher-verified archive; respect identical OurAirports data overlap; separate untouched target-domain test |
 | P0-08 | Second controlled vulnerable application (crAPI or VulnerableApp) | PENDING | Localhost or isolated owned environment only. | Frozen model(s), measured benign denominator, independently confirmed exploits, no public demo scanning |
 | P0-09 | Ablation and matched baseline superiority | PENDING | Predefine model + request-novelty + forest + supervised + WAF, separate calibration, grouped confidence intervals. | Per-family, per-campaign benefit; report harms and failure to outperform |
-| P0-10 | Learned AI defense selection versus fixed policies | READY_FOR_DATA | [Prospective action protocol](../protocols/AI_DEFENSE_DECISION_EVALUATION.md), [1,200 trial report](../evidence/MEASURED_MECHANISM_LAB_SCORED_CAMPAIGN_2026_11_21.md). | Freeze on configurations, same pre-action evidence, matched actions, policy validity, independent outcome measures |
-| P0-11 | Physical authority outage uncertainty and cold-restart durability | PENDING | [Issue #36](https://github.com/katlaang/predict-shield/issues/36), [Issue #132](https://github.com/katlaang/predict-shield/issues/132). | No false VERIFIED when authority down; survive real stop/start without stale permit |
+| P0-10 | Learned AI defense selection versus fixed policies | EXPLORATORY_MEASURED | [Historical paired report](../evidence/EXPLORATORY_PAIRED_DEFENSE_2026_11_26.md), [CI run 45920476469](https://github.com/katlaang/predict-shield/actions/runs/45920476469). On 20 prior groups/60 paired replays: AI cost 0.26764 vs restart-if-permitted 0.29750, **but security resolved 28/60 vs restart 45/60**. AI 94 failed legitimate requests and 0 budget breaches vs restart 700 and 7. [PR #178](https://github.com/katlaang/predict-shield/pull/178). **Prospective superiority remains unproven.** | Freeze on configurations, same pre-action evidence, matched actions, policy validity, independent outcome measures |
+| P0-11 | Physical authority outage uncertainty and cold-restart durability | PARTIALLY_VALIDATED | Existing durable store and [physical cold-restart CI 45920083955](https://github.com/katlaang/predict-shield/actions/runs/45920083955) passed, preserving trial/revision/revocation across Docker stop/start and **INDETERMINATE** outage status. [PR #178](https://github.com/katlaang/predict-shield/pull/178) adds replay/unrevocation and fsync hardening; [issue #132](https://github.com/katlaang/predict-shield/issues/132) still needs repeat/interrupted-write validation, and [outage issue #36](https://github.com/katlaang/predict-shield/issues/36) remains blocked. | No false VERIFIED when authority down; survive real stop/start without stale permit |
 | P0-12 | Prospective independent detection cohort | PENDING | [Issue #130](https://github.com/katlaang/predict-shield/issues/130). | New source-pinned cohort, independent labels where accuracy claimed, frozen test, full negative/abstention reporting |
 
 ## P1: operational data and independent validation
@@ -71,7 +71,9 @@
 - [ ] New third-party dataset actually acquired, checksum verified and accepted for evaluation.
 - [x] Candidate v4 fusion implementation and deterministic saturation tests added, without changing v3.
 - [ ] Candidate v4 fitted to real benign development data, frozen and prospectively evaluated.
-- [ ] AI-vs-fixed-defense experiment completed.
+- [ ] AI-vs-fixed-defense prospective experiment completed; **model superiority remains unproven**.
+- [x] Offline paired-defense evaluator passed its unit tests; prior physical records were replayed in [CI 45920476469](https://github.com/katlaang/predict-shield/actions/runs/45920476469), recording lower AI composite cost but fewer resolved exposures than fixed restart. See [permanent report](../evidence/EXPLORATORY_PAIRED_DEFENSE_2026_11_26.md); prospective test still pending.
+- [x] Lab authority cold-restart [CI 45920083955](https://github.com/katlaang/predict-shield/actions/runs/45920083955) passed. Store hardening in PR #178 added stale-revision, same-trial unrevocation and corrupted-state protections. Repeated fault-injected crash validation and outage action comparison remain pending.
 - [ ] Any external operator has signed participation and independent assessment.
 
 ## Source caveats and data governance

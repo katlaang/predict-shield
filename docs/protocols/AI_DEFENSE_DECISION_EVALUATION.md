@@ -1,6 +1,6 @@
 # AI-versus-fixed defense action selection: prospective plan
 
-**Status: NOT YET RUN.** Existing [1,200 trial campaign](../evidence/MEASURED_MECHANISM_LAB_SCORED_CAMPAIGN_2026_11_21.md) measures action outcomes, not AI selector superiority. The previous outcomes may be used as development data, never as fresh confirmation of a model developed from them.
+**Status: PROSPECTIVE CONFIRMATION NOT YET RUN.** A [retrospective, exploratory paired analysis](../evidence/EXPLORATORY_PAIRED_DEFENSE_2026_11_26.md) was added on the already-examined 1,200-trial campaign. The learned selector had lower measured composite cost but fewer resolved security exposures than the restart policy; this is not proof of prospective superiority. Existing [1,200 trial campaign](../evidence/MEASURED_MECHANISM_LAB_SCORED_CAMPAIGN_2026_11_21.md) measures action outcomes, not AI selector superiority. The previous outcomes may be used as development data, never as fresh confirmation of a model developed from them.
 
 ## Hypothesis
 Given the **same authenticated pre-action observations**, can a learned action selector choose a safer/more useful permitted defense than fixed policies, without additional false verification or production-style disruptions?
