@@ -42,6 +42,15 @@ class MainConfirmatoryTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,"No valid"):
             check_lock(d)
 
+    def test_registered_sample_size_formula_cannot_be_shrunk(self):
+        d=lock()
+        d["unbounded_n"]=300
+        d["main_n"]=40
+        with self.assertRaisesRegex(ValueError,"No valid"):
+            check_lock(d)
+        d["main_n"]=150
+        self.assertEqual(check_lock(d)["main_n"],150)
+
     def test_equal_security_and_disruption_never_claims_h2_superiority(self):
         result=evaluate([shard(0),shard(1)],lock())
         self.assertEqual(result["registered_n"],40)
