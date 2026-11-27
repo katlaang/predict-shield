@@ -1,0 +1,25 @@
+name: Superviz26-SQL cross-domain test
+
+on:
+  push:
+    branches: [feat/superviz26-sql]
+    paths: ['experiment-b/superviz26-sql/**', '.github/workflows/superviz26-sql.yml']
+  workflow_dispatch:
+    inputs:
+      stage:
+        description: 'metadata'
+        default: 'metadata'
+
+permissions:
+  contents: read
+
+jobs:
+  metadata:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python experiment-b/superviz26-sql/record_metadata.py 21068333
