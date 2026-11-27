@@ -1,6 +1,6 @@
 # Development-only control-plane publication-gap fault
 
-**Status:** Candidate disposable laboratory test, pending CI measurements. Not a frozen confirmatory AI study. This work intentionally does **not** refit the failed learned selector.
+**Status: MEASURED IN AN ISOLATED LAB ONLY.** [PR #190](https://github.com/katlaang/predict-shield/pull/190) merged. [Physical GitHub Actions #45930364871](https://github.com/katlaang/predict-shield/actions/runs/45930364871) succeeded. Both matched pre-action arms had a one-revision gap for all four enforcers, zero Kafka committed backlog, and 12/12 externally observed allowed test requests. After action, independently verified all-target revocation was **false for monitor-only** and **true for resync**. No AI model was tested, no service-disruption comparison was performed and the study was not a frozen confirmatory evaluation. See [combined historical/physical evidence](../evidence/POSTHOC_DEFENSE_ACTION_DISCRIMINABILITY_2026_11_27.md).
 
 ## Reason for this new fault
 
