@@ -15,8 +15,8 @@ import json
 import math
 from pathlib import Path
 
-from paired_defense_eval import ACTIONS, _eligible, _preaction, _finite, (
-    make_trusted_lab_model_policy
+from paired_defense_eval import (
+    ACTIONS, _eligible, _preaction, _finite, make_trusted_lab_model_policy,
 )
 from train import to_features
 
