@@ -1,0 +1,74 @@
+{
+ "arms": {
+  "v3-early.organization-x": {
+   "model_sha256": "7d55ea98fea69d9cf29bfd7eaccd68f634e5f908c067f772e3b4e85b23343df2",
+   "templates": 49,
+   "thresholds": {
+    "fused": 19.125010420578306,
+    "input_novelty": 10.0,
+    "learned_anomaly": 0.714976181284079
+   },
+   "train": 6836
+  },
+  "v3-early.organization-y": {
+   "model_sha256": "04daaefdb50088932b90178a418dc43486d54d8f64ebed5419b27c494b832974",
+   "templates": 1043,
+   "thresholds": {
+    "fused": 12.533227964695175,
+    "input_novelty": 10.0,
+    "learned_anomaly": 0.7502980962637406
+   },
+   "train": 26724
+  },
+  "v32-early.organization-x": {
+   "model_sha256": "deb494596c9d42459e2556b6e0aadd2a5f4cae8349ce5841d045d4a42ff8a55c",
+   "templates": 49,
+   "thresholds": {
+    "fused": 21.54790005890758,
+    "input_novelty": 7.189824558880018,
+    "learned_anomaly": 0.714976181284079
+   },
+   "train": 6836
+  },
+  "v32-early.organization-y": {
+   "model_sha256": "606e187171618d2c9a8f6c8e32e7f55f9956cc44d35610a67a76c031da90a651",
+   "templates": 1043,
+   "thresholds": {
+    "fused": 14.922190195890717,
+    "input_novelty": 1.0,
+    "learned_anomaly": 0.7502980962637406
+   },
+   "train": 26724
+  },
+  "v32-original.organization-x": {
+   "model_sha256": "a8cbcd18638ffc2720f76b1ca6479c4f7351b89f7c728bcb26df8c2036bd5fd8",
+   "templates": 113,
+   "thresholds": {
+    "fused": 17.89297511854386,
+    "input_novelty": 2.0,
+    "learned_anomaly": 0.6715710438200693
+   },
+   "train": 10298
+  },
+  "v32-original.organization-y": {
+   "model_sha256": "64dfe66b5b7d6229f46ebef141fd3d3728ddc1be76686ac0e262f4b33e1d041a",
+   "templates": 4804,
+   "thresholds": {
+    "fused": 10.951334852085933,
+    "input_novelty": 0.0,
+    "learned_anomaly": 0.7598536702801151
+   },
+   "train": 584741
+  }
+ },
+ "code_sha256": {
+  "model_logs.py": "d1adb00b2313339fc457c19045a2753d25720c2507578a80dad807ad084b47f0",
+  "model_sql.py": "9e8cf0b66c1a34041f816173943c7ba014ceb5e6b8346c0eba861ee3eef864ba",
+  "model_v3.py": "8df890c22184e77ab42a520f0e99c341a9981f67a1dc93b151990b0fdf8d5cdd",
+  "model_v32.py": "18f8cdf6d4c582a1ee2fa347b0a6cb2ed1dfb74d3e0c468a3e073d3ab94f4fe6",
+  "protocol.json": "81af8c119f48eaeea2c4018b4d1dcc6a034a8fcf6e9759ac9541a71e422d0009",
+  "protocol_v32.json": "f3c61d655aa3017722aaacf6d6742fc9fd4990b9125b72b5503a7b29a9e3d341"
+ },
+ "freeze_sha256": "f776d2a4f8da8577aabb61e44626923db83f14bf54760d500d18ba479031fa4f",
+ "schema": "predict-shield/real-logs-v32-freeze/1"
+}
