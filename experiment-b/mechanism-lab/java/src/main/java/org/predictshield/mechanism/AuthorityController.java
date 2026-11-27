@@ -38,6 +38,10 @@ public final class AuthorityController {
     private volatile PolicyRevision current = new PolicyRevision(0, false);
     @Value("${lab.authority-state-file:}")
     private String stateFile = "";
+    // Independent read-only control-plane revision metadata, never revocation
+    // truth or a private oracle credential.
+    @Value("${lab.observer-token:}")
+    private String observerToken = "";
     private AuthorityPolicyStore durableStore;
 
     /**
@@ -102,6 +106,41 @@ public final class AuthorityController {
         if (!authorized(token, controlToken)) return denied();
         commitPolicy(new PolicyRevision(Math.addExact(sequence.get(), 1L), true, current.trialId()));
         return publish(current);
+    }
+
+    /**
+     * Development-only physical fault: persist a new revoked revision without
+     * sending any Kafka event. This models lost control-plane publication.
+     * The endpoint is available ONLY in the localhost disposable lab role.
+     * No user-facing system should ever expose this mutation.
+     */
+    @PostMapping("/control/revoke-withheld")
+    public synchronized ResponseEntity<Map<String, Object>> revokeWithheld(
+            @RequestHeader(value = "X-Lab-Control", required = false) String credential) {
+        if (!authorized(credential, controlToken)) return denied();
+        commitPolicy(new PolicyRevision(Math.addExact(sequence.get(), 1L),
+                true, current.trialId()));
+        // Crucially: do NOT call publish() here.
+        return ResponseEntity.accepted().body(Map.of(
+                "revision", current.revision(),
+                "publication_queued", false,
+                "lab_only", true));
+    }
+
+    /**
+     * Read-only desired policy revision metadata. It never discloses
+     * revocation truth, private oracle probes or fault injection status.
+     * A revision mismatch is an operational signal, not proof of a fix.
+     */
+    @GetMapping("/operator/desired-revision")
+    public synchronized ResponseEntity<Map<String, Object>> operatorDesiredRevision(
+            @RequestHeader(value = "X-Lab-Observer", required = false) String credential) {
+        if (!authorized(credential, observerToken)) return denied();
+        return ResponseEntity.ok(Map.of(
+                "observation_type", "authority_operator_revision_v1",
+                "desired_revision", current.revision(),
+                "observed_at_epoch_ms", System.currentTimeMillis(),
+                "security_outcome_verified", false));
     }
 
     /**
