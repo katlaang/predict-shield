@@ -29,7 +29,7 @@ def _selected(configs: list[dict]) -> dict:
 
 
 def load_new_paired(registered_plan: Path, records: Path, *,
-                    expected_seed: int = 20261128) -> tuple[list[dict], dict]:
+                    expected_seed: int = 20261129) -> tuple[list[dict], dict]:
     # Independently regenerate, rather than trusting an attacker-writable
     # manifest for a "fresh" label or selected test configuration.
     from plan import create_plan
@@ -74,6 +74,19 @@ def load_new_paired(registered_plan: Path, records: Path, *,
             raise ValueError("Oracle/post-action features have polluted the pre-action record")
         if any(name in pre["features"] for name in ("fault_mode", "fault_target", "oracle_truth")):
             raise ValueError("Hidden fault information leaked into model features")
+        # Never interpret a v2 schema mismatch, absent collector results, or
+        # out-of-range zero-imputed telemetry as a valid AI decision trial.
+        # Missing operator measurements are an inconclusive measurement
+        # failure, not evidence that an AI intentionally chose to abstain.
+        observations = pre.get("operator_observations")
+        if (not isinstance(observations, list) or len(observations) != 4
+                or {row.get("node") for row in observations if isinstance(row, dict)}
+                   != {"enforcer-a", "enforcer-b", "enforcer-c", "enforcer-hidden"}
+                or any(not isinstance(row, dict)
+                       or row.get("observed") is not True
+                       or row.get("operator_schema") != "operator_pre_action_v2"
+                       for row in observations)):
+            raise ValueError("Incomplete v2 operator telemetry: experiment INCONCLUSIVE")
         meta = pre.get("decision_policy_metadata", {})
         if type(meta.get("restart_permitted")) is not bool or type(meta.get("absolute_error_budget_requests")) is not int:
             raise ValueError("No verified action authorization metadata")
