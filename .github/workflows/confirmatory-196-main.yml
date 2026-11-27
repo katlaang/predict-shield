@@ -1,0 +1,190 @@
+name: Confirmatory defense-selection #196 - gated MAIN physical cohort
+
+# Main cannot run on the pilot PR or on documentation-only changes.
+# It requires a *committed* pilot-derived size-lock JSON from a separate PR.
+on:
+  pull_request:
+    paths:
+      - 'docs/protocols/CONFIRMATORY_196_MAIN_LOCK.json'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  frozen-cohort:
+    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.lock.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: lock
+        name: Refuse main without committed, complete 16-configuration pilot sample-size lock
+        run: |
+          python - <<'PY'
+          import json, math, os
+          from pathlib import Path
+          import sys
+          sys.path.insert(0,"experiment-b/mechanism-lab")
+          from confirmatory_196_main import check_lock
+          source=Path("docs/protocols/CONFIRMATORY_196_MAIN_LOCK.json")
+          if not source.is_file() or source.is_symlink():
+              raise RuntimeError("MAIN BLOCKED: no committed pilot-derived size lock")
+          lock=check_lock(json.loads(source.read_text()))
+          n=lock["main_n"]
+          shard_count=math.ceil(n/20)
+          with open(os.environ["GITHUB_OUTPUT"],"a") as f:
+              f.write("matrix="+json.dumps(list(range(shard_count)))+"\n")
+          print("Frozen registered main cohort",n,"groups across",shard_count,"isolated shards")
+          PY
+
+  measured-physical-main-shards:
+    needs: frozen-cohort
+    runs-on: ubuntu-latest
+    timeout-minutes: 330
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix:
+        shard: ${{ fromJson(needs.frozen-cohort.outputs.matrix) }}
+    defaults:
+      run:
+        working-directory: experiment-b/mechanism-lab
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install frozen original-model runtime
+        run: python -m pip install "scikit-learn==1.7.2" "numpy==2.3.4" "joblib==1.5.2"
+      - name: Retrieve original 1200 measured training/calibration records
+        uses: actions/download-artifact@v4
+        with:
+          name: mechanism-scored-records
+          repository: katlaang/predict-shield
+          run-id: 44879497946
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/historical
+      - name: Freeze registered historical model and audited metadata
+        run: |
+          mkdir -p reports
+          python train.py --records "$RUNNER_TEMP/historical/results/scored" \
+            --report "reports/main-training-${{ matrix.shard }}.json" \
+            --export-model "$RUNNER_TEMP/main-model.joblib"
+          actual="$(sha256sum "$RUNNER_TEMP/main-model.joblib" | cut -d' ' -f1)"
+          test "$actual" = "87208240dbea19b34c4a5ac067639ac9cdb484b2de8f1985dbbcd143d4fe3b39"
+      - name: Freeze main shard plan and selection before any physical outcome
+        run: |
+          python confirmatory_196_plan.py --phase main --shard ${{ matrix.shard }} \
+            --output "plans/confirm196-main-${{ matrix.shard }}"
+          python - <<'PY'
+          from pathlib import Path
+          from confirmatory_196_main import check_lock
+          import json
+          lock=check_lock(json.loads(Path("../../docs/protocols/CONFIRMATORY_196_MAIN_LOCK.json").read_text()))
+          shard=int("${{ matrix.shard }}")
+          count=min(20,lock["main_n"]-20*shard)
+          if not 1<=count<=20: raise RuntimeError("Wrong registered shard allocation")
+          p=Path(f"plans/confirm196-main-{shard}/selected.json")
+          rows=json.loads(p.read_text())["selected"][:count]
+          with open(f"reports/shard-{shard}-starts.txt","x") as f:
+              for item in rows:
+                  f.write(f"{item['id']} {item['start_index']}\n")
+          print("Locked main shard",shard,"configuration groups",count)
+          PY
+      - name: Allocate disposable separate physical lab credentials
+        run: |
+          for name in LAB_CONTROL_TOKEN LAB_ORACLE_TOKEN LAB_INTERNAL_TOKEN; do
+            value="$(python -c 'import secrets;print(secrets.token_urlsafe(32))')"
+            echo "::add-mask::$value"
+            echo "$name=$value" >> "$GITHUB_ENV"
+          done
+      - name: Start physical four-enforcer Kafka laboratory
+        run: docker compose up --build -d
+      - name: Fail closed on missing or malformed v2 operator telemetry
+        run: |
+          python - <<'PY'
+          import os
+          from pilot import ENFORCERS, operator_telemetry, wait_ready
+          wait_ready()
+          observations=operator_telemetry(os.environ["LAB_CONTROL_TOKEN"])
+          if len(observations)!=4 or not all(x["observed"] for x in observations):
+              raise RuntimeError("VOID: v2 operator telemetry incomplete")
+          print("Four real v2 operator feeds verified")
+          PY
+      - name: Physically execute every locked configuration, four arms and three repeats
+        run: |
+          while read -r config start; do
+            python campaign.py --execute-lab \
+              --plan "plans/confirm196-main-${{ matrix.shard }}" \
+              --records "results/confirm196-main-${{ matrix.shard }}" \
+              --start "$start" --max-trials 12 > "reports/main-$config.json"
+            python - "$config" <<'PY'
+          import json,sys
+          d=json.load(open("reports/main-"+sys.argv[1]+".json"))
+          assert d["newly_executed_trials"]==12 and d["partial"]==0 and d["invalid"]==0
+          assert not d["newly_excluded"]
+          PY
+          done < "reports/shard-${{ matrix.shard }}-starts.txt"
+      - name: Audit measured outcomes, authorization and held-out model proposals
+        env:
+          PYTHONPATH: ${{ github.workspace }}/engine
+        run: |
+          python confirmatory_196_score.py --phase main --shard ${{ matrix.shard }} \
+            --plan "plans/confirm196-main-${{ matrix.shard }}" \
+            --records "results/confirm196-main-${{ matrix.shard }}" \
+            --model "$RUNNER_TEMP/main-model.joblib" \
+            --model-sha256 87208240dbea19b34c4a5ac067639ac9cdb484b2de8f1985dbbcd143d4fe3b39 \
+            --training-report "reports/main-training-${{ matrix.shard }}.json" \
+            --output "reports/shard-${{ matrix.shard }}.json"
+      - name: Preserve raw physical observations, including partial/void experiments
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: confirm-196-main-raw-${{ matrix.shard }}
+          path: experiment-b/mechanism-lab/results/confirm196-main-${{ matrix.shard }}/
+          retention-days: 60
+          if-no-files-found: warn
+      - name: Preserve measured shard outcomes and fixed plan
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: confirm-196-main-report-${{ matrix.shard }}
+          path: |
+            experiment-b/mechanism-lab/reports/
+            experiment-b/mechanism-lab/plans/confirm196-main-${{ matrix.shard }}/
+          retention-days: 90
+          if-no-files-found: warn
+      - name: Destroy disposable laboratory and ephemeral state
+        if: always()
+        run: docker compose down --volumes --remove-orphans
+
+  locked-confirmatory-h1-h2:
+    needs: [frozen-cohort, measured-physical-main-shards]
+    if: success()
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install pinned stats analysis for predeclared Wilcoxon test
+        run: python -m pip install "scipy==1.16.3"
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: confirm-196-main-report-*
+          merge-multiple: true
+          path: downloaded-shards
+      - name: Run one preregistered configuration bootstrap and gated Wilcoxon
+        run: |
+          python experiment-b/mechanism-lab/confirmatory_196_main.py \
+            --committed-lock docs/protocols/CONFIRMATORY_196_MAIN_LOCK.json \
+            --shard-report downloaded-shards/shard-*.json \
+            --output confirmatory-196-main-result.json
+      - name: Preserve positive, negative, inconclusive result without fabrication
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: confirmatory-196-main-locked-h1-h2
+          path: confirmatory-196-main-result.json
+          if-no-files-found: warn
+          retention-days: 90
