@@ -120,11 +120,15 @@ class OutageIntervalTests(unittest.TestCase):
         for a in r["results"][1:3]:
             a["timed_observations"]["revoked_gateway_exposure"].update({
                 "exposure_fraction_lower_bound": 1.0,
-                "exposure_fraction_upper_bound": 1.0})
+                "exposure_fraction_upper_bound": 1.0,
+                "exposure_seconds_lower_bound": 6.0,
+                "exposure_seconds_upper_bound": 6.0})
         top = r["results"][3]
         top["timed_observations"]["revoked_gateway_exposure"].update({
             "exposure_fraction_lower_bound": 0.0,
-            "exposure_fraction_upper_bound": 0.0})
+            "exposure_fraction_upper_bound": 0.0,
+            "exposure_seconds_lower_bound": 0.0,
+            "exposure_seconds_upper_bound": 0.0})
         top["timed_observations"]["authorized_protected"] = {
             "requests": 10, "non_200_requests": 0, "http_status_counts": {"200": 10}}
         report = evaluate(r, error_budget_requests=25, restart_permitted=True)
