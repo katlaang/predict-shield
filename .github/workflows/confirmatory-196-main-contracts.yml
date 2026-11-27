@@ -1,0 +1,30 @@
+name: Confirmatory #196 main statistical and admission contract tests
+
+on:
+  pull_request:
+    paths:
+      - "experiment-b/mechanism-lab/confirmatory_196_main.py"
+      - "experiment-b/mechanism-lab/test_confirmatory_196_main.py"
+      - "experiment-b/mechanism-lab/confirmatory_196_plan.py"
+      - ".github/workflows/confirmatory-196-main-contracts.yml"
+  push:
+    branches: [master]
+    paths:
+      - "experiment-b/mechanism-lab/confirmatory_196_main.py"
+      - "experiment-b/mechanism-lab/test_confirmatory_196_main.py"
+
+permissions:
+  contents: read
+
+jobs:
+  frozen-math-contracts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Lock gate, grouped noninferiority, no false disruption superiority
+        working-directory: experiment-b/mechanism-lab
+        run: python -m unittest -v test_confirmatory_196_main test_confirmatory_196
