@@ -29,7 +29,7 @@ Each score is turned into a tail probability against benign calibration data, an
 |---|---|---|
 | **Fused (pass/fail)** | **15,881 of 3,017,390 (0.53%)** | **308,190 of 336,281 (91.6%)** |
 | Input novelty alone | 3,222 (0.11%) | 89.7% |
-| Isolation forest alone | 16,088 (0.53%) | 74.0% |
+| Isolation forest alone | 16,088 (0.53%) | 73.9% |
 
 Checks:
 
