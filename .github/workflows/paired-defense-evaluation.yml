@@ -64,6 +64,7 @@ jobs:
       - name: Refit historical training groups only and evaluate paired policy choices
         working-directory: experiment-b/mechanism-lab
         run: |
+          export PYTHONPATH="$GITHUB_WORKSPACE/engine"
           python train.py \
             --records "$RUNNER_TEMP/measured/results/scored" \
             --report "$RUNNER_TEMP/historical-model-report.json" \
