@@ -9,13 +9,19 @@ on:
       stage:
         description: 'metadata, inspect, develop or test'
         default: 'metadata'
+      freeze_sha256:
+        description: 'test stage only'
+        default: ''
+      develop_run_id:
+        description: 'test stage only'
+        default: ''
 
 permissions:
   contents: read
 
 jobs:
   metadata:
-    if: github.event_name == 'push' || github.event.inputs.stage == 'metadata'
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.stage == 'metadata'
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
@@ -24,6 +30,18 @@ jobs:
         with:
           python-version: '3.12'
       - run: python experiment-b/real-logs-indonesia/record_metadata.py 20001206
+
+  unit-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install 'scikit-learn==1.7.2' 'numpy==2.3.4'
+      - working-directory: experiment-b/real-logs-indonesia
+        run: python -m unittest test_model_logs -v
 
   inspect:
     if: github.event_name == 'workflow_dispatch' && github.event.inputs.stage == 'inspect'
@@ -42,3 +60,83 @@ jobs:
             sha256sum "$RUNNER_TEMP/$f"
           done
       - run: python experiment-b/real-logs-indonesia/inspect_archive.py "$RUNNER_TEMP/organization-x.zip" "$RUNNER_TEMP/organization-y.zip"
+
+  run:
+    if: github.event_name == 'workflow_dispatch' && (github.event.inputs.stage == 'develop' || github.event.inputs.stage == 'test')
+    needs: unit-tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install 'scikit-learn==1.7.2' 'numpy==2.3.4' 'libinjection-python==1.1.6'
+      - name: Download with publisher checksums
+        run: |
+          for f in organization-x.zip organization-y.zip; do
+            python experiment-b/open-datasets/registry.py download --dataset real-web-logs-indonesia \
+              --file $f --output "$RUNNER_TEMP/$f" --max-mb 400
+          done
+      - name: Develop on the training period and freeze
+        if: github.event.inputs.stage == 'develop'
+        working-directory: experiment-b/real-logs-indonesia
+        run: |
+          test ! -f frozen/freeze.json
+          python model_logs.py develop --zips "$RUNNER_TEMP/organization-x.zip" "$RUNNER_TEMP/organization-y.zip" \
+            --out-dir frozen --models-dir "$RUNNER_TEMP/models"
+          git config user.name katlaang
+          git config user.email katlaang@users.noreply.github.com
+          git add frozen/freeze.json
+          git commit -m "real-logs-indonesia: record the freeze from run ${{ github.run_id }} before any test-period request is scored"
+          git push origin HEAD:${{ github.ref_name }}
+      - uses: actions/upload-artifact@v4
+        if: github.event.inputs.stage == 'develop'
+        with:
+          name: real-logs-models
+          path: ${{ runner.temp }}/models
+          retention-days: 90
+      - uses: actions/download-artifact@v4
+        if: github.event.inputs.stage == 'test'
+        with:
+          name: real-logs-models
+          path: ${{ runner.temp }}/models
+          run-id: ${{ github.event.inputs.develop_run_id }}
+          github-token: ${{ github.token }}
+      - name: Score the test period once, then gather independent evidence
+        if: github.event.inputs.stage == 'test'
+        working-directory: experiment-b/real-logs-indonesia
+        run: |
+          test ! -f frozen/test-report.json
+          W="$RUNNER_TEMP/work"
+          python model_logs.py test --zips "$RUNNER_TEMP/organization-x.zip" "$RUNNER_TEMP/organization-y.zip" \
+            --frozen-dir frozen --models-dir "$RUNNER_TEMP/models" \
+            --expected-freeze-sha256 "${{ github.event.inputs.freeze_sha256 }}" --work "$W"
+          python model_logs.py libinj --work "$W"
+          mkdir -p /tmp/backend && echo ok > /tmp/backend/index.html
+          (cd /tmp/backend && python -m http.server 8000 >/dev/null 2>&1 &)
+          docker pull owasp/modsecurity-crs:nginx
+          docker inspect --format '{{index .RepoDigests 0}}' owasp/modsecurity-crs:nginx
+          for L in 1 2; do
+            docker rm -f crs >/dev/null 2>&1 || true
+            docker run -d --name crs --network host -e PORT=8080 -e BACKEND=http://127.0.0.1:8000 \
+              -e BLOCKING_PARANOIA=$L -e DETECTION_PARANOIA=$L -e PARANOIA=$L -e ANOMALY_INBOUND=5 \
+              owasp/modsecurity-crs:nginx
+            for i in $(seq 1 60); do curl -s -o /dev/null -w '%{http_code}' 'http://127.0.0.1:8080/?q=Jakarta' | grep -q 200 && break; sleep 2; done
+            python model_logs.py crs --work "$W" --level $L --url http://127.0.0.1:8080
+          done
+          python model_logs.py report --work "$W" --frozen-dir frozen --output frozen/test-report.json --review "$W/review"
+          git config user.name katlaang
+          git config user.email katlaang@users.noreply.github.com
+          git add frozen/test-report.json
+          git commit -m "real-logs-indonesia: record the single test run (run ${{ github.run_id }})"
+          git push origin HEAD:${{ github.ref_name }}
+      - uses: actions/upload-artifact@v4
+        if: github.event.inputs.stage == 'test'
+        with:
+          name: real-logs-review-sample
+          path: ${{ runner.temp }}/work/review
+          retention-days: 90
