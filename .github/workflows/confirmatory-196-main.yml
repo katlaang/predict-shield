@@ -3,7 +3,8 @@ name: Confirmatory defense-selection #196 - gated MAIN physical cohort
 # Main cannot run on the pilot PR or on documentation-only changes.
 # It requires a *committed* pilot-derived size-lock JSON from a separate PR.
 on:
-  pull_request:
+  push:
+    branches: [master]
     paths:
       - 'docs/protocols/CONFIRMATORY_196_MAIN_LOCK.json'
   workflow_dispatch:
@@ -14,7 +15,10 @@ permissions:
 
 jobs:
   frozen-cohort:
-    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)
+    # A main cohort starts only after the separately committed, reviewed
+    # pilot-derived N lock is merged to master (or explicitly dispatched with
+    # the same existing immutable lock).
+    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && github.ref == 'refs/heads/master')
     runs-on: ubuntu-latest
     outputs:
       matrix: ${{ steps.lock.outputs.matrix }}
