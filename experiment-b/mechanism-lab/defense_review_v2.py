@@ -40,11 +40,15 @@ def inspect_operator_evidence(pre_action: dict, *, now_monotonic: float | None =
         raise ValueError("Invalid monotonic decision time")
     names, seen, paused = set(), set(), []
     revisions, handled = [], []
+    signals = []
     for item in observations:
         if not isinstance(item, dict) or item.get("node") not in EXPECTED_NODES:
             reasons.append("INVALID_OPERATOR_NODE_ID")
             continue
         node = item["node"]
+        if set(item) & {"fault_mode", "fault_target", "oracle", "oracle_truth",
+                        "actual_revoked_access_denied", "post_action"}:
+            reasons.append("PRIVILEGED_TELEMETRY_PRESENT")
         if node in names:
             reasons.append("DUPLICATE_OPERATOR_NODE")
         names.add(node)
@@ -72,6 +76,10 @@ def inspect_operator_evidence(pre_action: dict, *, now_monotonic: float | None =
                 reasons.append("INVALID_OPERATOR_TELEMETRY")
         if type(item.get("refresh_failed")) is not bool:
             reasons.append("UNKNOWN_REFRESH_HEALTH")
+        elif item["refresh_failed"]:
+            signals.append("REFRESH_FAILURE_OBSERVED")
+        if type(item.get("scheduled_callbacks_pending")) is int and item["scheduled_callbacks_pending"] > 0:
+            signals.append("PENDING_CALLBACKS_OBSERVED")
         if type(item.get("applied_revision")) is int and item["applied_revision"] >= 0:
             revisions.append(item["applied_revision"])
         if type(item.get("handled_events")) is int and item["handled_events"] >= 0:
@@ -83,10 +91,11 @@ def inspect_operator_evidence(pre_action: dict, *, now_monotonic: float | None =
     if len(seen) != len(EXPECTED_NODES):
         reasons.append("OBSERVATION_COVERAGE_INCOMPLETE")
     if len(revisions) == len(EXPECTED_NODES) and max(revisions) != min(revisions):
-        reasons.append("REVISION_DIVERGENCE_OBSERVED")
+        signals.append("REVISION_DIVERGENCE_OBSERVED")
     return {
-        "status": "COMPLETE_WITH_WARNINGS" if reasons else "COMPLETE",
+        "status": "INSUFFICIENT" if reasons else "COMPLETE",
         "reasons": sorted(set(reasons)),
+        "pre_action_signals": sorted(set(signals)),
         "observed_nodes": len(seen),
         "paused_nodes": sorted(paused),
         "observed_revision_spread": (max(revisions) - min(revisions)) if revisions else None,
