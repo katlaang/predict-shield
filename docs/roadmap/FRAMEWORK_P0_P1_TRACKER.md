@@ -76,6 +76,8 @@
 
 ### Newly tested adaptive-defense configuration
 
+**Merged in [PR #184](https://github.com/katlaang/predict-shield/pull/184), conflict-free integration of [the executed study](https://github.com/katlaang/predict-shield/actions/runs/45922944490); subsequent unit tests [run 45923445514](https://github.com/katlaang/predict-shield/actions/runs/45923445514) passed. The original protocol is retained and future physical repetitions require explicit workflow dispatch.**
+
 **Measured negative result, not a model pass.** [Preregistered physical new-configuration experiment](../evidence/MEASURED_NEW_CONFIG_AI_DEFENSE_PILOT_2026_11_26.md) completed 12 physical actions across a single new configuration and three repeats in [CI run 45922944490](https://github.com/katlaang/predict-shield/actions/runs/45922944490). Learned selector resolved 0/3 repeated exposure cases; fixed restart resolved 3/3 with 50 failed legitimate requests but no registered disruption-budget breaches. AI composite cost 0.40784 compared to restart 0.27005. One group cannot establish broad superiority or inferiority; do not train on this result and then call it an untouched confirmation.
 
 ## Completed in this work session / to update upon merge
