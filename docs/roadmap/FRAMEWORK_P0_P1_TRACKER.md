@@ -45,6 +45,10 @@
 | P0-11 | Physical authority outage uncertainty and cold-restart durability | PARTIALLY_VALIDATED | Existing durable store and [physical cold-restart CI 45920083955](https://github.com/katlaang/predict-shield/actions/runs/45920083955) passed, preserving trial/revision/revocation across Docker stop/start and **INDETERMINATE** outage status. [PR #178](https://github.com/katlaang/predict-shield/pull/178) adds replay/unrevocation and fsync hardening; [issue #132](https://github.com/katlaang/predict-shield/issues/132) still needs repeat/interrupted-write validation, and [outage issue #36](https://github.com/katlaang/predict-shield/issues/36) remains blocked. | No false VERIFIED when authority down; survive real stop/start without stale permit |
 | P0-12 | Prospective independent detection cohort | PENDING | [Issue #130](https://github.com/katlaang/predict-shield/issues/130). | New source-pinned cohort, independent labels where accuracy claimed, frozen test, full negative/abstention reporting |
 
+### P0-11b: Independent authority-outage witness integrity
+
+**Status: IMPLEMENTED_UNVALIDATED until PR CI.** [Exact-scope witness v2](../evidence/AUTHORITY_OUTAGE_SCOPE_WITNESS_V2_2026_11_26.md) freezes precise observed target identifiers in the pre-outage witness, rejects altered commitments, and treats an HTTP 403 conflicting with the node's non-revoked policy as UNKNOWN rather than verified denial. [Code and tests](../../experiment-b/mechanism-lab/authority_outage_witness.py) are on the `research/outage-witness-scope-v2` branch. The full four-action outage campaign still requires independent offline scoring and remains blocked under [issue #36](https://github.com/katlaang/predict-shield/issues/36). No operator field evidence.
+
 ## P1: operational data and independent validation
 
 | ID | Work item | Status | Source / next step | Acceptance gate |
