@@ -1,5 +1,15 @@
 # Development changelog
 
+## 2026-11-26: DVWA v3 method on OWASP Juice Shop with ZAP and sqlmap attacks
+
+- The method was carried over unchanged to Juice Shop v19.2.1, refitted on benign traffic only, then tested once.
+  - Attacks: ZAP active scan (each request labelled with its scan rule) and sqlmap. No attack strings were written by us.
+  - Runs: develop 45913186927, test 45913538168.
+- **Inconclusive by the registered rule:** only 10 confirmed attack requests (30 required).
+  - 9 of 10 confirmed attacks caught; 6 of 2,298 benign requests alerted (0.26%).
+- All scanner requests: 78.8% caught in families seen on DVWA, 40.0% in unseen families. Spread is wide: template, include and code injection probes are mostly caught; header fuzzing and hidden-file probes are missed.
+- **Design weakness found:** varied JSON responses saturated the response score and raised the fused threshold, so one rare signal cannot alert alone. Evidence: `docs/evidence/MEASURED_JUICESHOP_V3_2026_11_26.md`.
+
 ## 2026-11-26: DVWA v3 method on Superviz25-SQL (external)
 
 - First detection test on data generated outside this project: Superviz25-SQL (Télécom Paris, LAAS-CNRS, Inria; MIT license).

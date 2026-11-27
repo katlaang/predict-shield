@@ -1,0 +1,3737 @@
+[
+ {
+  "pluginId": "10098",
+  "alert": "Cross-Domain Misconfiguration",
+  "risk": "Medium",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/search?q=fruit",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10098",
+  "alert": "Cross-Domain Misconfiguration",
+  "risk": "Medium",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/api/Products",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10036",
+  "alert": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+  "risk": "Low",
+  "confidence": "High",
+  "url": "http://127.0.0.1:9002/rest/products/search?q=fruit",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10036",
+  "alert": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+  "risk": "Low",
+  "confidence": "High",
+  "url": "http://127.0.0.1:9002/api/Products",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10096",
+  "alert": "Timestamp Disclosure - Unix",
+  "risk": "Low",
+  "confidence": "Low",
+  "url": "http://127.0.0.1:9002/api/Products",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10096",
+  "alert": "Timestamp Disclosure - Unix",
+  "risk": "Low",
+  "confidence": "Low",
+  "url": "http://127.0.0.1:9002/api/Products",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10098",
+  "alert": "Cross-Domain Misconfiguration",
+  "risk": "Medium",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/api/Quantitys/",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10036",
+  "alert": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+  "risk": "Low",
+  "confidence": "High",
+  "url": "http://127.0.0.1:9002/api/Quantitys/",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10098",
+  "alert": "Cross-Domain Misconfiguration",
+  "risk": "Medium",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/api/Products/24",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10036",
+  "alert": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+  "risk": "Low",
+  "confidence": "High",
+  "url": "http://127.0.0.1:9002/api/Products/24",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10096",
+  "alert": "Timestamp Disclosure - Unix",
+  "risk": "Low",
+  "confidence": "Low",
+  "url": "http://127.0.0.1:9002/rest/products/search?q=",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10096",
+  "alert": "Timestamp Disclosure - Unix",
+  "risk": "Low",
+  "confidence": "Low",
+  "url": "http://127.0.0.1:9002/rest/products/search?q=",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10098",
+  "alert": "Cross-Domain Misconfiguration",
+  "risk": "Medium",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/api/Products/13",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10036",
+  "alert": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+  "risk": "Low",
+  "confidence": "High",
+  "url": "http://127.0.0.1:9002/api/Products/13",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10098",
+  "alert": "Cross-Domain Misconfiguration",
+  "risk": "Medium",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/37/reviews",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10036",
+  "alert": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+  "risk": "Low",
+  "confidence": "High",
+  "url": "http://127.0.0.1:9002/rest/products/37/reviews",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10098",
+  "alert": "Cross-Domain Misconfiguration",
+  "risk": "Medium",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/api/Products/21",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10036",
+  "alert": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+  "risk": "Low",
+  "confidence": "High",
+  "url": "http://127.0.0.1:9002/api/Products/21",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10098",
+  "alert": "Cross-Domain Misconfiguration",
+  "risk": "Medium",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/api/Products/23",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10036",
+  "alert": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+  "risk": "Low",
+  "confidence": "High",
+  "url": "http://127.0.0.1:9002/api/Products/23",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10098",
+  "alert": "Cross-Domain Misconfiguration",
+  "risk": "Medium",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/captcha/",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10098",
+  "alert": "Cross-Domain Misconfiguration",
+  "risk": "Medium",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/api/Feedbacks/",
+  "param": "",
+  "method": "POST"
+ },
+ {
+  "pluginId": "10036",
+  "alert": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+  "risk": "Low",
+  "confidence": "High",
+  "url": "http://127.0.0.1:9002/rest/captcha/",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10036",
+  "alert": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+  "risk": "Low",
+  "confidence": "High",
+  "url": "http://127.0.0.1:9002/api/Feedbacks/",
+  "param": "",
+  "method": "POST"
+ },
+ {
+  "pluginId": "10098",
+  "alert": "Cross-Domain Misconfiguration",
+  "risk": "Medium",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/25/reviews",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10036",
+  "alert": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+  "risk": "Low",
+  "confidence": "High",
+  "url": "http://127.0.0.1:9002/rest/products/25/reviews",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10098",
+  "alert": "Cross-Domain Misconfiguration",
+  "risk": "Medium",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/api/Products/2",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10111",
+  "alert": "Authentication Request Identified",
+  "risk": "Informational",
+  "confidence": "Low",
+  "url": "http://127.0.0.1:9002/api/Users",
+  "param": "email",
+  "method": "POST"
+ },
+ {
+  "pluginId": "10036",
+  "alert": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+  "risk": "Low",
+  "confidence": "High",
+  "url": "http://127.0.0.1:9002/api/Products/2",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10098",
+  "alert": "Cross-Domain Misconfiguration",
+  "risk": "Medium",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/api/Users",
+  "param": "",
+  "method": "POST"
+ },
+ {
+  "pluginId": "10036",
+  "alert": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+  "risk": "Low",
+  "confidence": "High",
+  "url": "http://127.0.0.1:9002/api/Users",
+  "param": "",
+  "method": "POST"
+ },
+ {
+  "pluginId": "10111",
+  "alert": "Authentication Request Identified",
+  "risk": "Informational",
+  "confidence": "High",
+  "url": "http://127.0.0.1:9002/rest/user/login",
+  "param": "email",
+  "method": "POST"
+ },
+ {
+  "pluginId": "10112",
+  "alert": "Session Management Response Identified",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/user/login",
+  "param": "authentication.token",
+  "method": "POST"
+ },
+ {
+  "pluginId": "10098",
+  "alert": "Cross-Domain Misconfiguration",
+  "risk": "Medium",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/user/login",
+  "param": "",
+  "method": "POST"
+ },
+ {
+  "pluginId": "10036",
+  "alert": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+  "risk": "Low",
+  "confidence": "High",
+  "url": "http://127.0.0.1:9002/rest/user/login",
+  "param": "",
+  "method": "POST"
+ },
+ {
+  "pluginId": "10098",
+  "alert": "Cross-Domain Misconfiguration",
+  "risk": "Medium",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/14/reviews",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10036",
+  "alert": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+  "risk": "Low",
+  "confidence": "High",
+  "url": "http://127.0.0.1:9002/rest/products/14/reviews",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10098",
+  "alert": "Cross-Domain Misconfiguration",
+  "risk": "Medium",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/api/Products/3",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10036",
+  "alert": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+  "risk": "Low",
+  "confidence": "High",
+  "url": "http://127.0.0.1:9002/api/Products/3",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10111",
+  "alert": "Authentication Request Identified",
+  "risk": "Informational",
+  "confidence": "Low",
+  "url": "http://127.0.0.1:9002/api/Users",
+  "param": "email",
+  "method": "POST"
+ },
+ {
+  "pluginId": "10111",
+  "alert": "Authentication Request Identified",
+  "risk": "Informational",
+  "confidence": "High",
+  "url": "http://127.0.0.1:9002/rest/user/login",
+  "param": "email",
+  "method": "POST"
+ },
+ {
+  "pluginId": "10098",
+  "alert": "Cross-Domain Misconfiguration",
+  "risk": "Medium",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/api/Products/4",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10036",
+  "alert": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+  "risk": "Low",
+  "confidence": "High",
+  "url": "http://127.0.0.1:9002/api/Products/4",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10098",
+  "alert": "Cross-Domain Misconfiguration",
+  "risk": "Medium",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/basket/13",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10098",
+  "alert": "Cross-Domain Misconfiguration",
+  "risk": "Medium",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/api/BasketItems/",
+  "param": "",
+  "method": "POST"
+ },
+ {
+  "pluginId": "10036",
+  "alert": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+  "risk": "Low",
+  "confidence": "High",
+  "url": "http://127.0.0.1:9002/api/BasketItems/",
+  "param": "",
+  "method": "POST"
+ },
+ {
+  "pluginId": "10036",
+  "alert": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+  "risk": "Low",
+  "confidence": "High",
+  "url": "http://127.0.0.1:9002/rest/basket/13",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10098",
+  "alert": "Cross-Domain Misconfiguration",
+  "risk": "Medium",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/api/Products/17",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10036",
+  "alert": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+  "risk": "Low",
+  "confidence": "High",
+  "url": "http://127.0.0.1:9002/api/Products/17",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10098",
+  "alert": "Cross-Domain Misconfiguration",
+  "risk": "Medium",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/basket/14",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10036",
+  "alert": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+  "risk": "Low",
+  "confidence": "High",
+  "url": "http://127.0.0.1:9002/rest/basket/14",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10096",
+  "alert": "Timestamp Disclosure - Unix",
+  "risk": "Low",
+  "confidence": "Low",
+  "url": "http://127.0.0.1:9002/rest/basket/14",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10098",
+  "alert": "Cross-Domain Misconfiguration",
+  "risk": "Medium",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/api/Products/8",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10036",
+  "alert": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+  "risk": "Low",
+  "confidence": "High",
+  "url": "http://127.0.0.1:9002/api/Products/8",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10098",
+  "alert": "Cross-Domain Misconfiguration",
+  "risk": "Medium",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/25/reviews",
+  "param": "",
+  "method": "PUT"
+ },
+ {
+  "pluginId": "10036",
+  "alert": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+  "risk": "Low",
+  "confidence": "High",
+  "url": "http://127.0.0.1:9002/rest/products/25/reviews",
+  "param": "",
+  "method": "PUT"
+ },
+ {
+  "pluginId": "10098",
+  "alert": "Cross-Domain Misconfiguration",
+  "risk": "Medium",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/track-order/c00f-7e86c07371b7e375",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10036",
+  "alert": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+  "risk": "Low",
+  "confidence": "High",
+  "url": "http://127.0.0.1:9002/rest/track-order/c00f-7e86c07371b7e375",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10098",
+  "alert": "Cross-Domain Misconfiguration",
+  "risk": "Medium",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/24/reviews",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10036",
+  "alert": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+  "risk": "Low",
+  "confidence": "High",
+  "url": "http://127.0.0.1:9002/rest/products/24/reviews",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10098",
+  "alert": "Cross-Domain Misconfiguration",
+  "risk": "Medium",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/32/reviews",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10036",
+  "alert": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+  "risk": "Low",
+  "confidence": "High",
+  "url": "http://127.0.0.1:9002/rest/products/32/reviews",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10098",
+  "alert": "Cross-Domain Misconfiguration",
+  "risk": "Medium",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/api/Products/43",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10036",
+  "alert": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+  "risk": "Low",
+  "confidence": "High",
+  "url": "http://127.0.0.1:9002/api/Products/43",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10098",
+  "alert": "Cross-Domain Misconfiguration",
+  "risk": "Medium",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/api/Products/30",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10036",
+  "alert": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+  "risk": "Low",
+  "confidence": "High",
+  "url": "http://127.0.0.1:9002/api/Products/30",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10098",
+  "alert": "Cross-Domain Misconfiguration",
+  "risk": "Medium",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/track-order/690c-fc0e0628194fd4f3",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10036",
+  "alert": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+  "risk": "Low",
+  "confidence": "High",
+  "url": "http://127.0.0.1:9002/rest/track-order/690c-fc0e0628194fd4f3",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10098",
+  "alert": "Cross-Domain Misconfiguration",
+  "risk": "Medium",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/26/reviews",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10036",
+  "alert": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+  "risk": "Low",
+  "confidence": "High",
+  "url": "http://127.0.0.1:9002/rest/products/26/reviews",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10098",
+  "alert": "Cross-Domain Misconfiguration",
+  "risk": "Medium",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/track-order/0e72-4f44e6b8abaef4b4",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10098",
+  "alert": "Cross-Domain Misconfiguration",
+  "risk": "Medium",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/track-order/ee34-428479a3aab06ba3",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10036",
+  "alert": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+  "risk": "Low",
+  "confidence": "High",
+  "url": "http://127.0.0.1:9002/rest/track-order/0e72-4f44e6b8abaef4b4",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10036",
+  "alert": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+  "risk": "Low",
+  "confidence": "High",
+  "url": "http://127.0.0.1:9002/rest/track-order/ee34-428479a3aab06ba3",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10098",
+  "alert": "Cross-Domain Misconfiguration",
+  "risk": "Medium",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/api/Products/9",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10036",
+  "alert": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+  "risk": "Low",
+  "confidence": "High",
+  "url": "http://127.0.0.1:9002/api/Products/9",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10098",
+  "alert": "Cross-Domain Misconfiguration",
+  "risk": "Medium",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/api/Products/20",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10036",
+  "alert": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+  "risk": "Low",
+  "confidence": "High",
+  "url": "http://127.0.0.1:9002/api/Products/20",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10098",
+  "alert": "Cross-Domain Misconfiguration",
+  "risk": "Medium",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/track-order/5ef9-af7a69813d99afc9",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10036",
+  "alert": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+  "risk": "Low",
+  "confidence": "High",
+  "url": "http://127.0.0.1:9002/rest/track-order/5ef9-af7a69813d99afc9",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10111",
+  "alert": "Authentication Request Identified",
+  "risk": "Informational",
+  "confidence": "Low",
+  "url": "http://127.0.0.1:9002/api/Users",
+  "param": "email",
+  "method": "POST"
+ },
+ {
+  "pluginId": "10111",
+  "alert": "Authentication Request Identified",
+  "risk": "Informational",
+  "confidence": "High",
+  "url": "http://127.0.0.1:9002/rest/user/login",
+  "param": "email",
+  "method": "POST"
+ },
+ {
+  "pluginId": "10098",
+  "alert": "Cross-Domain Misconfiguration",
+  "risk": "Medium",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/api/Products/15",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10036",
+  "alert": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+  "risk": "Low",
+  "confidence": "High",
+  "url": "http://127.0.0.1:9002/api/Products/15",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10098",
+  "alert": "Cross-Domain Misconfiguration",
+  "risk": "Medium",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/user/whoami",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10036",
+  "alert": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+  "risk": "Low",
+  "confidence": "High",
+  "url": "http://127.0.0.1:9002/rest/user/whoami",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10111",
+  "alert": "Authentication Request Identified",
+  "risk": "Informational",
+  "confidence": "Low",
+  "url": "http://127.0.0.1:9002/api/Users",
+  "param": "email",
+  "method": "POST"
+ },
+ {
+  "pluginId": "10111",
+  "alert": "Authentication Request Identified",
+  "risk": "Informational",
+  "confidence": "High",
+  "url": "http://127.0.0.1:9002/rest/user/login",
+  "param": "email",
+  "method": "POST"
+ },
+ {
+  "pluginId": "10098",
+  "alert": "Cross-Domain Misconfiguration",
+  "risk": "Medium",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/38/reviews",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10036",
+  "alert": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+  "risk": "Low",
+  "confidence": "High",
+  "url": "http://127.0.0.1:9002/rest/products/38/reviews",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10111",
+  "alert": "Authentication Request Identified",
+  "risk": "Informational",
+  "confidence": "High",
+  "url": "http://127.0.0.1:9002/rest/user/login",
+  "param": "email",
+  "method": "POST"
+ },
+ {
+  "pluginId": "10111",
+  "alert": "Authentication Request Identified",
+  "risk": "Informational",
+  "confidence": "Low",
+  "url": "http://127.0.0.1:9002/api/Users",
+  "param": "email",
+  "method": "POST"
+ },
+ {
+  "pluginId": "10098",
+  "alert": "Cross-Domain Misconfiguration",
+  "risk": "Medium",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/api/Products/7",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10036",
+  "alert": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+  "risk": "Low",
+  "confidence": "High",
+  "url": "http://127.0.0.1:9002/api/Products/7",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10111",
+  "alert": "Authentication Request Identified",
+  "risk": "Informational",
+  "confidence": "Low",
+  "url": "http://127.0.0.1:9002/api/Users",
+  "param": "email",
+  "method": "POST"
+ },
+ {
+  "pluginId": "10098",
+  "alert": "Cross-Domain Misconfiguration",
+  "risk": "Medium",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/api/Products/32",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10036",
+  "alert": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+  "risk": "Low",
+  "confidence": "High",
+  "url": "http://127.0.0.1:9002/api/Products/32",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10111",
+  "alert": "Authentication Request Identified",
+  "risk": "Informational",
+  "confidence": "High",
+  "url": "http://127.0.0.1:9002/rest/user/login",
+  "param": "email",
+  "method": "POST"
+ },
+ {
+  "pluginId": "10098",
+  "alert": "Cross-Domain Misconfiguration",
+  "risk": "Medium",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/track-order/b49e-7a8b44014fb323c0",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10036",
+  "alert": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+  "risk": "Low",
+  "confidence": "High",
+  "url": "http://127.0.0.1:9002/rest/track-order/b49e-7a8b44014fb323c0",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10098",
+  "alert": "Cross-Domain Misconfiguration",
+  "risk": "Medium",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/api/Products/5",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10036",
+  "alert": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+  "risk": "Low",
+  "confidence": "High",
+  "url": "http://127.0.0.1:9002/api/Products/5",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10098",
+  "alert": "Cross-Domain Misconfiguration",
+  "risk": "Medium",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/api/Products/18",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10036",
+  "alert": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+  "risk": "Low",
+  "confidence": "High",
+  "url": "http://127.0.0.1:9002/api/Products/18",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10098",
+  "alert": "Cross-Domain Misconfiguration",
+  "risk": "Medium",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/api/Products/41",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10036",
+  "alert": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+  "risk": "Low",
+  "confidence": "High",
+  "url": "http://127.0.0.1:9002/api/Products/41",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10098",
+  "alert": "Cross-Domain Misconfiguration",
+  "risk": "Medium",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/5/reviews",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10036",
+  "alert": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+  "risk": "Low",
+  "confidence": "High",
+  "url": "http://127.0.0.1:9002/rest/products/5/reviews",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10098",
+  "alert": "Cross-Domain Misconfiguration",
+  "risk": "Medium",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/23/reviews",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10036",
+  "alert": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+  "risk": "Low",
+  "confidence": "High",
+  "url": "http://127.0.0.1:9002/rest/products/23/reviews",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10098",
+  "alert": "Cross-Domain Misconfiguration",
+  "risk": "Medium",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/basket/16",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10036",
+  "alert": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+  "risk": "Low",
+  "confidence": "High",
+  "url": "http://127.0.0.1:9002/rest/basket/16",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10098",
+  "alert": "Cross-Domain Misconfiguration",
+  "risk": "Medium",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/23/reviews",
+  "param": "",
+  "method": "PUT"
+ },
+ {
+  "pluginId": "10036",
+  "alert": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+  "risk": "Low",
+  "confidence": "High",
+  "url": "http://127.0.0.1:9002/rest/products/23/reviews",
+  "param": "",
+  "method": "PUT"
+ },
+ {
+  "pluginId": "10098",
+  "alert": "Cross-Domain Misconfiguration",
+  "risk": "Medium",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/track-order/33b8-f2fe12888998b4eb",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10036",
+  "alert": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+  "risk": "Low",
+  "confidence": "High",
+  "url": "http://127.0.0.1:9002/rest/track-order/33b8-f2fe12888998b4eb",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10111",
+  "alert": "Authentication Request Identified",
+  "risk": "Informational",
+  "confidence": "Low",
+  "url": "http://127.0.0.1:9002/api/Users",
+  "param": "email",
+  "method": "POST"
+ },
+ {
+  "pluginId": "10111",
+  "alert": "Authentication Request Identified",
+  "risk": "Informational",
+  "confidence": "High",
+  "url": "http://127.0.0.1:9002/rest/user/login",
+  "param": "email",
+  "method": "POST"
+ },
+ {
+  "pluginId": "10111",
+  "alert": "Authentication Request Identified",
+  "risk": "Informational",
+  "confidence": "Low",
+  "url": "http://127.0.0.1:9002/api/Users",
+  "param": "email",
+  "method": "POST"
+ },
+ {
+  "pluginId": "10111",
+  "alert": "Authentication Request Identified",
+  "risk": "Informational",
+  "confidence": "High",
+  "url": "http://127.0.0.1:9002/rest/user/login",
+  "param": "email",
+  "method": "POST"
+ },
+ {
+  "pluginId": "10098",
+  "alert": "Cross-Domain Misconfiguration",
+  "risk": "Medium",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/api/Products/19",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10036",
+  "alert": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+  "risk": "Low",
+  "confidence": "High",
+  "url": "http://127.0.0.1:9002/api/Products/19",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10111",
+  "alert": "Authentication Request Identified",
+  "risk": "Informational",
+  "confidence": "Low",
+  "url": "http://127.0.0.1:9002/api/Users",
+  "param": "email",
+  "method": "POST"
+ },
+ {
+  "pluginId": "10111",
+  "alert": "Authentication Request Identified",
+  "risk": "Informational",
+  "confidence": "High",
+  "url": "http://127.0.0.1:9002/rest/user/login",
+  "param": "email",
+  "method": "POST"
+ },
+ {
+  "pluginId": "10098",
+  "alert": "Cross-Domain Misconfiguration",
+  "risk": "Medium",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/basket/17",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10036",
+  "alert": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+  "risk": "Low",
+  "confidence": "High",
+  "url": "http://127.0.0.1:9002/rest/basket/17",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10098",
+  "alert": "Cross-Domain Misconfiguration",
+  "risk": "Medium",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/basket/18",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10036",
+  "alert": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+  "risk": "Low",
+  "confidence": "High",
+  "url": "http://127.0.0.1:9002/rest/basket/18",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10098",
+  "alert": "Cross-Domain Misconfiguration",
+  "risk": "Medium",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/2/reviews",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10036",
+  "alert": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+  "risk": "Low",
+  "confidence": "High",
+  "url": "http://127.0.0.1:9002/rest/products/2/reviews",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10098",
+  "alert": "Cross-Domain Misconfiguration",
+  "risk": "Medium",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/basket/24",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10036",
+  "alert": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+  "risk": "Low",
+  "confidence": "High",
+  "url": "http://127.0.0.1:9002/rest/basket/24",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10098",
+  "alert": "Cross-Domain Misconfiguration",
+  "risk": "Medium",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/track-order/4e52-eb9f8baefb4d1256",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10036",
+  "alert": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+  "risk": "Low",
+  "confidence": "High",
+  "url": "http://127.0.0.1:9002/rest/track-order/4e52-eb9f8baefb4d1256",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10098",
+  "alert": "Cross-Domain Misconfiguration",
+  "risk": "Medium",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/api/Products/45",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10036",
+  "alert": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+  "risk": "Low",
+  "confidence": "High",
+  "url": "http://127.0.0.1:9002/api/Products/45",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "90022",
+  "alert": "Application Error Disclosure",
+  "risk": "Low",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/api/BasketItems/",
+  "param": "",
+  "method": "POST"
+ },
+ {
+  "pluginId": "10098",
+  "alert": "Cross-Domain Misconfiguration",
+  "risk": "Medium",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/33/reviews",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10036",
+  "alert": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+  "risk": "Low",
+  "confidence": "High",
+  "url": "http://127.0.0.1:9002/rest/products/33/reviews",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10111",
+  "alert": "Authentication Request Identified",
+  "risk": "Informational",
+  "confidence": "Low",
+  "url": "http://127.0.0.1:9002/api/Users",
+  "param": "email",
+  "method": "POST"
+ },
+ {
+  "pluginId": "10111",
+  "alert": "Authentication Request Identified",
+  "risk": "Informational",
+  "confidence": "High",
+  "url": "http://127.0.0.1:9002/rest/user/login",
+  "param": "email",
+  "method": "POST"
+ },
+ {
+  "pluginId": "10098",
+  "alert": "Cross-Domain Misconfiguration",
+  "risk": "Medium",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/9/reviews",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10036",
+  "alert": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+  "risk": "Low",
+  "confidence": "High",
+  "url": "http://127.0.0.1:9002/rest/products/9/reviews",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10098",
+  "alert": "Cross-Domain Misconfiguration",
+  "risk": "Medium",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/track-order/4308-5d60e6c940935cc6",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10036",
+  "alert": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+  "risk": "Low",
+  "confidence": "High",
+  "url": "http://127.0.0.1:9002/rest/track-order/4308-5d60e6c940935cc6",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10098",
+  "alert": "Cross-Domain Misconfiguration",
+  "risk": "Medium",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/basket/23",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10036",
+  "alert": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+  "risk": "Low",
+  "confidence": "High",
+  "url": "http://127.0.0.1:9002/rest/basket/23",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10098",
+  "alert": "Cross-Domain Misconfiguration",
+  "risk": "Medium",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/api/Products/6",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10036",
+  "alert": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+  "risk": "Low",
+  "confidence": "High",
+  "url": "http://127.0.0.1:9002/api/Products/6",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10098",
+  "alert": "Cross-Domain Misconfiguration",
+  "risk": "Medium",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/41/reviews",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10098",
+  "alert": "Cross-Domain Misconfiguration",
+  "risk": "Medium",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/32/reviews",
+  "param": "",
+  "method": "PUT"
+ },
+ {
+  "pluginId": "10036",
+  "alert": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+  "risk": "Low",
+  "confidence": "High",
+  "url": "http://127.0.0.1:9002/rest/products/32/reviews",
+  "param": "",
+  "method": "PUT"
+ },
+ {
+  "pluginId": "10036",
+  "alert": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+  "risk": "Low",
+  "confidence": "High",
+  "url": "http://127.0.0.1:9002/rest/products/41/reviews",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10098",
+  "alert": "Cross-Domain Misconfiguration",
+  "risk": "Medium",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/api/Products/36",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10036",
+  "alert": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+  "risk": "Low",
+  "confidence": "High",
+  "url": "http://127.0.0.1:9002/api/Products/36",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10096",
+  "alert": "Timestamp Disclosure - Unix",
+  "risk": "Low",
+  "confidence": "Low",
+  "url": "http://127.0.0.1:9002/api/Products/36",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10098",
+  "alert": "Cross-Domain Misconfiguration",
+  "risk": "Medium",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/api/Products/25",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10036",
+  "alert": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+  "risk": "Low",
+  "confidence": "High",
+  "url": "http://127.0.0.1:9002/api/Products/25",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10098",
+  "alert": "Cross-Domain Misconfiguration",
+  "risk": "Medium",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/track-order/4b3a-8e7fa6d190a35678",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10036",
+  "alert": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+  "risk": "Low",
+  "confidence": "High",
+  "url": "http://127.0.0.1:9002/rest/track-order/4b3a-8e7fa6d190a35678",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10098",
+  "alert": "Cross-Domain Misconfiguration",
+  "risk": "Medium",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/api/Products/26",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10036",
+  "alert": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+  "risk": "Low",
+  "confidence": "High",
+  "url": "http://127.0.0.1:9002/api/Products/26",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10098",
+  "alert": "Cross-Domain Misconfiguration",
+  "risk": "Medium",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/basket/25",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10036",
+  "alert": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+  "risk": "Low",
+  "confidence": "High",
+  "url": "http://127.0.0.1:9002/rest/basket/25",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10098",
+  "alert": "Cross-Domain Misconfiguration",
+  "risk": "Medium",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/43/reviews",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10036",
+  "alert": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+  "risk": "Low",
+  "confidence": "High",
+  "url": "http://127.0.0.1:9002/rest/products/43/reviews",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10098",
+  "alert": "Cross-Domain Misconfiguration",
+  "risk": "Medium",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/45/reviews",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10036",
+  "alert": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+  "risk": "Low",
+  "confidence": "High",
+  "url": "http://127.0.0.1:9002/rest/products/45/reviews",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10098",
+  "alert": "Cross-Domain Misconfiguration",
+  "risk": "Medium",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/track-order/43de-b370c05d68b868d0",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10036",
+  "alert": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+  "risk": "Low",
+  "confidence": "High",
+  "url": "http://127.0.0.1:9002/rest/track-order/43de-b370c05d68b868d0",
+  "param": "",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10098",
+  "alert": "Cross-Domain Misconfiguration",
+  "risk": "Medium",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/14/reviews",
+  "param": "",
+  "method": "PUT"
+ },
+ {
+  "pluginId": "10036",
+  "alert": "Server Leaks Version Information via \"Server\" HTTP Response Header Field",
+  "risk": "Low",
+  "confidence": "High",
+  "url": "http://127.0.0.1:9002/rest/products/14/reviews",
+  "param": "",
+  "method": "PUT"
+ },
+ {
+  "pluginId": "40014",
+  "alert": "Cross Site Scripting Weakness (Persistent in JSON Response)",
+  "risk": "Low",
+  "confidence": "Low",
+  "url": "http://127.0.0.1:9002/api/Feedbacks",
+  "param": "rating",
+  "method": "GET"
+ },
+ {
+  "pluginId": "40018",
+  "alert": "SQL Injection",
+  "risk": "High",
+  "confidence": "Low",
+  "url": "http://127.0.0.1:9002/rest/user/login",
+  "param": "email",
+  "method": "POST"
+ },
+ {
+  "pluginId": "40018",
+  "alert": "SQL Injection",
+  "risk": "High",
+  "confidence": "Low",
+  "url": "http://127.0.0.1:9002/rest/products/search?q=%27%28",
+  "param": "q",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/captcha/",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/captcha/",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/captcha/",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/captcha/",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/captcha/",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/captcha/",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/captcha/",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/captcha/",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/captcha/",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/captcha/",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/captcha/",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/captcha/",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/api/BasketItems/",
+  "param": "Header User-Agent",
+  "method": "POST"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/api/Feedbacks/",
+  "param": "Header User-Agent",
+  "method": "POST"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/api/BasketItems/",
+  "param": "Header User-Agent",
+  "method": "POST"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/api/Feedbacks/",
+  "param": "Header User-Agent",
+  "method": "POST"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/api/BasketItems/",
+  "param": "Header User-Agent",
+  "method": "POST"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/api/Feedbacks/",
+  "param": "Header User-Agent",
+  "method": "POST"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/api/BasketItems/",
+  "param": "Header User-Agent",
+  "method": "POST"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/api/Feedbacks/",
+  "param": "Header User-Agent",
+  "method": "POST"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/api/BasketItems/",
+  "param": "Header User-Agent",
+  "method": "POST"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/api/Feedbacks/",
+  "param": "Header User-Agent",
+  "method": "POST"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/api/BasketItems/",
+  "param": "Header User-Agent",
+  "method": "POST"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/api/Feedbacks/",
+  "param": "Header User-Agent",
+  "method": "POST"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/api/BasketItems/",
+  "param": "Header User-Agent",
+  "method": "POST"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/api/Feedbacks/",
+  "param": "Header User-Agent",
+  "method": "POST"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/api/BasketItems/",
+  "param": "Header User-Agent",
+  "method": "POST"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/api/Feedbacks/",
+  "param": "Header User-Agent",
+  "method": "POST"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/api/BasketItems/",
+  "param": "Header User-Agent",
+  "method": "POST"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/api/Feedbacks/",
+  "param": "Header User-Agent",
+  "method": "POST"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/api/BasketItems/",
+  "param": "Header User-Agent",
+  "method": "POST"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/api/Feedbacks/",
+  "param": "Header User-Agent",
+  "method": "POST"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/api/BasketItems/",
+  "param": "Header User-Agent",
+  "method": "POST"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/api/Feedbacks/",
+  "param": "Header User-Agent",
+  "method": "POST"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/api/BasketItems/",
+  "param": "Header User-Agent",
+  "method": "POST"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/api/Feedbacks/",
+  "param": "Header User-Agent",
+  "method": "POST"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/api/Users",
+  "param": "Header User-Agent",
+  "method": "POST"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/api/Users",
+  "param": "Header User-Agent",
+  "method": "POST"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/api/Users",
+  "param": "Header User-Agent",
+  "method": "POST"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/api/Users",
+  "param": "Header User-Agent",
+  "method": "POST"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/api/Users",
+  "param": "Header User-Agent",
+  "method": "POST"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/api/Users",
+  "param": "Header User-Agent",
+  "method": "POST"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/api/Users",
+  "param": "Header User-Agent",
+  "method": "POST"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/api/Users",
+  "param": "Header User-Agent",
+  "method": "POST"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/api/Users",
+  "param": "Header User-Agent",
+  "method": "POST"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/api/Users",
+  "param": "Header User-Agent",
+  "method": "POST"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/api/Users",
+  "param": "Header User-Agent",
+  "method": "POST"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/api/Users",
+  "param": "Header User-Agent",
+  "method": "POST"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/user/login",
+  "param": "Header User-Agent",
+  "method": "POST"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/user/login",
+  "param": "Header User-Agent",
+  "method": "POST"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/user/login",
+  "param": "Header User-Agent",
+  "method": "POST"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/user/login",
+  "param": "Header User-Agent",
+  "method": "POST"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/user/login",
+  "param": "Header User-Agent",
+  "method": "POST"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/user/login",
+  "param": "Header User-Agent",
+  "method": "POST"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/user/login",
+  "param": "Header User-Agent",
+  "method": "POST"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/user/login",
+  "param": "Header User-Agent",
+  "method": "POST"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/user/login",
+  "param": "Header User-Agent",
+  "method": "POST"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/user/login",
+  "param": "Header User-Agent",
+  "method": "POST"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/user/login",
+  "param": "Header User-Agent",
+  "method": "POST"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/user/login",
+  "param": "Header User-Agent",
+  "method": "POST"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/captcha",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/captcha",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/captcha",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/captcha",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/captcha",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/captcha",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/captcha",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/captcha",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/captcha",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/captcha",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/captcha",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/captcha",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/14/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/14/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/14/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/14/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/14/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/14/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/14/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/14/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/14/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/14/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/14/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/14/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/2/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/2/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/2/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/2/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/2/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/2/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/2/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/2/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/2/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/2/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/2/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/2/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/23/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/23/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/23/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/23/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/23/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/23/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/23/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/23/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/23/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/23/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/23/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/23/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/24/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/24/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/24/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/24/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/24/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/24/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/24/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/24/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/24/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/24/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/24/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/24/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/25/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/25/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/25/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/25/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/25/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/25/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/25/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/25/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/25/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/25/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/25/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/25/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/26/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/26/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/26/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/26/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/26/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/26/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/26/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/26/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/26/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/26/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/26/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/26/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/32/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/32/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/32/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/32/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/32/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/32/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/32/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/32/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/32/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/32/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/32/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/32/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/33/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/33/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/33/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/33/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/33/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/33/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/33/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/33/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/33/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/33/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/33/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/33/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/37/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/37/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/37/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/37/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/37/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/37/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/37/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/37/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/37/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/37/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/37/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/37/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/38/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/38/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/38/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/38/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/38/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/38/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/38/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/38/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/38/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/38/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/38/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/38/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/41/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/41/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/41/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/41/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/41/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/41/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/41/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/41/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/41/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/41/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/41/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/41/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/43/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/43/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/43/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/43/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/43/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/43/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/43/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/43/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/43/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/43/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/43/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/43/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/5/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/5/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/5/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/5/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/5/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/5/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/5/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/5/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/5/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/5/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/5/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/5/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/9/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/9/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/9/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/9/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/9/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/9/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/9/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/9/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/9/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/9/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/9/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ },
+ {
+  "pluginId": "10104",
+  "alert": "User Agent Fuzzer",
+  "risk": "Informational",
+  "confidence": "Medium",
+  "url": "http://127.0.0.1:9002/rest/products/9/reviews",
+  "param": "Header User-Agent",
+  "method": "GET"
+ }
+]

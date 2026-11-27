@@ -1,0 +1,73 @@
+name: Juice Shop v3-method test
+
+# stage=smoke    harness check only (labels, plugin ids, system-call join); no detector runs
+# stage=develop  benign-only session, fit and freeze; commits the freeze
+# stage=test     one fresh session with ZAP and sqlmap attacks; scores once; commits the report
+
+on:
+  push:
+    branches: [feat/juiceshop-v3]
+    paths: ['experiment-b/juiceshop-v3/**', '.github/workflows/juiceshop-v3.yml']
+  workflow_dispatch:
+    inputs:
+      stage:
+        description: 'smoke, develop or test'
+        default: 'smoke'
+      freeze_sha256:
+        description: 'test stage only'
+        default: ''
+
+permissions:
+  contents: read
+
+jobs:
+  unit-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install 'scikit-learn==1.7.2' 'numpy==2.3.4'
+      - working-directory: experiment-b/juiceshop-v3
+        run: python -m unittest test_juiceshop -v
+
+  lab:
+    if: github.event_name == 'workflow_dispatch'
+    needs: unit-tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install tools
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y strace
+          pip install 'scikit-learn==1.7.2' 'numpy==2.3.4'
+      - name: Run stage
+        working-directory: experiment-b/juiceshop-v3
+        env:
+          FREEZE: ${{ github.event.inputs.freeze_sha256 }}
+        run: |
+          case "${{ github.event.inputs.stage }}" in
+            develop) test ! -f frozen/freeze.json ;;
+            test) test ! -f frozen/test-report.json ;;
+          esac
+          ./lab.sh "${{ github.event.inputs.stage }}"
+      - name: Commit freeze or report
+        if: github.event.inputs.stage == 'develop' || github.event.inputs.stage == 'test'
+        working-directory: experiment-b/juiceshop-v3
+        run: |
+          git config user.name katlaang
+          git config user.email katlaang@users.noreply.github.com
+          git add frozen
+          git commit -m "juiceshop-v3: record the ${{ github.event.inputs.stage }} stage (run ${{ github.run_id }})"
+          git push origin HEAD:${{ github.ref_name }}
