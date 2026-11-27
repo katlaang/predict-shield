@@ -1,5 +1,13 @@
 # Development changelog
 
+## 2026-11-26: Superviz25-SQL fixed-sample baselines and corrected CRS rerun
+
+- On 302,430 benign and 84,294 generated attack queries, benign-only frozen detector caught 90.3% / 91.6% / 92.3% at *evaluation-sample-calibrated* 0.1% / 0.5% / 1% benign alerts, respectively.
+- Supervised reference caught 91.1% / 91.9% / 92.6%; libinjection 65.8% at 0%; OWASP CRS level 1 84.8% at 0.08%, level 2 91.2% at 5.5%, level 3 91.9% at 11.4%, level 4 99.7% at 72.8%.
+- First CRS measurements void due unrepresentative client headers (run 45906319077). A harness-preflight rerun stopped before scoring (45911603634). Corrected rerun 45913812903 completed successfully with frozen metadata and image digest.
+- **Interpretation limits:** continuous thresholds chosen from evaluation benign scores are *oracle operating-point comparisons*, not independently calibrated deployment rates; CRS tested an encoded GET parameter, not the entire original HTTP request; benign data are template-generated.
+- The earlier single registered test is unchanged. Evidence: `docs/evidence/MEASURED_SUPERVIZ25_SQL_BASELINES_2026_11_26.md`.
+
 ## 2026-11-26: DVWA v3 method on OWASP Juice Shop with ZAP and sqlmap attacks
 
 - The method was carried over unchanged to Juice Shop v19.2.1, refitted on benign traffic only, then tested once.
