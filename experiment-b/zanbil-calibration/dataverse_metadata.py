@@ -5,7 +5,8 @@ import urllib.request
 
 DOI = sys.argv[1]
 url = f"https://dataverse.harvard.edu/api/datasets/:persistentId/?persistentId={DOI}"
-d = json.load(urllib.request.urlopen(url, timeout=60))["data"]["latestVersion"]
+req = urllib.request.Request(url, headers={"User-Agent": "predict-shield-research/1.0 (dataset metadata check)", "Accept": "application/json"})
+d = json.load(urllib.request.urlopen(req, timeout=60))["data"]["latestVersion"]
 print("VERSION", d.get("versionNumber"), d.get("versionMinorNumber"), d.get("releaseTime"))
 print("LICENSE", json.dumps(d.get("license")), "TERMS", json.dumps(d.get("termsOfUse"))[:400])
 for f in d.get("files", []):
