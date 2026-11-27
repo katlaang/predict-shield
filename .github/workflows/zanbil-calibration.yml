@@ -1,0 +1,25 @@
+name: Calibration comparison on real e-commerce logs (zanbil.ir)
+
+on:
+  push:
+    branches: [feat/zanbil-calibration]
+    paths: ['experiment-b/zanbil-calibration/dataverse_metadata.py']
+  workflow_dispatch:
+    inputs:
+      stage:
+        description: 'metadata'
+        default: 'metadata'
+
+permissions:
+  contents: read
+
+jobs:
+  metadata:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python experiment-b/zanbil-calibration/dataverse_metadata.py doi:10.7910/DVN/3QBYB5
