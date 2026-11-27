@@ -356,6 +356,26 @@
    ],
    "status": "publisher_verified_not_ingested",
    "notes": "Real production traffic with real attacks. Labels come from regex rules, so benign-labeled entries can hold unlabeled attacks."
+  },
+  {
+   "id": "biblio-us17",
+   "title": "Labeled HTTP requests dataset: Biblio-US17 (University of Seville library web server, Jan to Jul 2017)",
+   "publisher": "Diaz-Verdejo, Estepa, Estepa, Munoz-Calle, Madinabeitia; Universidad de Sevilla and Universidad de Granada",
+   "country": "Spain",
+   "url": "https://hdl.handle.net/11441/148254",
+   "license": "CC-BY-NC-ND-4.0",
+   "license_evidence": "https://idus.us.es/handle/11441/148254 and the dataset README",
+   "license_terms": "Research use only. Cite Diaz-Verdejo et al., Future Generation Computer Systems 109 (2020) 67-82, and Diaz-Verdejo et al., Cybersecurity 8 (2025) 38. No derivatives distributed.",
+   "access": "restricted; requested by the owner through the repository's form",
+   "redistribution": "never",
+   "collection_environment": "real-production-university-library-web-server",
+   "kind": "labeled-http-uri-requests",
+   "evaluation_role": "calibration selection on early time bins and a single test on later bins, with human-reviewed labels",
+   "ground_truth": "semi-automated: Snort, Nemesida and ModSecurity CRS PL1 and PL2 flags with analyst review; comparisons with CRS are biased in CRS's favour",
+   "benign_baseline_available": true,
+   "files": [],
+   "status": "access_requested_not_ingested",
+   "notes": "Not used in CI. Archive Biblio-US17.tar.gz (1.139 GB) is analysed only from the owner's copy; hash pinned on receipt; only aggregate results are committed."
   }
  ]
 }
