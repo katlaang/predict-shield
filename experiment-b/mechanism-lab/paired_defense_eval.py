@@ -129,8 +129,12 @@ def make_trusted_lab_model_policy(bundle: dict) -> Callable:
         raise ValueError("Bundle is not an eligible calibrated lab-only model")
     models = bundle.get("models")
     bounds = bundle.get("numeric_feature_bounds")
-    if not isinstance(models, dict) or not isinstance(bounds, dict):
-        raise ValueError("Model estimates or OOD bounds missing")
+    radii = bundle.get("radii")
+    if not isinstance(models, dict) or not isinstance(bounds, dict) or not isinstance(radii, dict):
+        raise ValueError("Model estimates, grouped calibration radii or OOD bounds missing")
+    disruption_radius = radii.get("label_absolute_failed_requests")
+    if not _finite(disruption_radius) or disruption_radius < 0:
+        raise ValueError("No valid calibrated disruption uncertainty bound")
     if any(label not in models for label in LABELS):
         raise ValueError("Model does not predict all outcome dimensions")
     for feature in REQUIRED_PRE[:-1]:
@@ -166,8 +170,15 @@ def make_trusted_lab_model_policy(bundle: dict) -> Callable:
                 max(0., min(1., path)), max(0., min(1., security)),
                 max(0., failures),
             )
+            # A mean prediction never authorizes a potentially disruptive
+            # action. Screen predicted failed requests plus the independently
+            # calibrated absolute-error radius against the declared allowance.
+            # This is research gating, not the production authority/selector.
+            if action != "monitor_only" and failures + disruption_radius > budget:
+                continue
             estimates[action] = 0.5 * path + 0.25 * security + 0.25 * failures / budget
-        return min(eligible, key=lambda action: (estimates[action], ACTIONS.index(action)))
+        return (min(estimates, key=lambda action: (estimates[action], ACTIONS.index(action)))
+                if estimates else None)
     return choose
 
 
@@ -223,7 +234,10 @@ def evaluate_paired(rows: list[dict], choose: Callable, *,
             ent.append({"cost": cost, "regret": cost - oracle_best,
                         "success": row["label_security_exposure"] == 0,
                         "action": action,
-                        "service_failures": row["label_absolute_failed_requests"]})
+                        "service_failures": row["label_absolute_failed_requests"],
+                        "exceeded_disruption_budget": (
+                            row["label_absolute_failed_requests"]
+                            > row["absolute_error_budget_requests"])})
         evidence.append({
             "configuration_id": group, "repeat": repeat, "allowed_actions": list(eligible),
             "selected_actions": choices, "oracle_best_cost_analysis_only": oracle_best,
@@ -237,6 +251,7 @@ def evaluate_paired(rows: list[dict], choose: Callable, *,
             "successful_replays": sum(r["success"] for r in v),
             "replays": len(v),
             "failed_legitimate_requests": sum(r["service_failures"] for r in v),
+            "observed_disruption_budget_breaches": sum(r["exceeded_disruption_budget"] for r in v),
         } for group, v in sorted(groups.items())]
         report_policies[name] = {
             "configuration_groups": len(groups),
@@ -245,6 +260,7 @@ def evaluate_paired(rows: list[dict], choose: Callable, *,
             "mean_configuration_regret": sum(x["mean_regret"] for x in means)/len(means),
             "successful_replays": sum(x["successful_replays"] for x in means),
             "failed_legitimate_requests": sum(x["failed_legitimate_requests"] for x in means),
+            "observed_disruption_budget_breaches": sum(x["observed_disruption_budget_breaches"] for x in means),
             "per_configuration": means,
             "abstentions": abstentions[name],
             "prohibited_recommendations": policy_violations[name],
