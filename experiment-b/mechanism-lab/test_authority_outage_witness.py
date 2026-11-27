@@ -1,6 +1,7 @@
 """Tests for fail-closed authority-outage witness and uncertainty bounds."""
 import unittest
 from datetime import datetime, timezone
+from dataclasses import replace
 
 from authority_outage_witness import capture_witness, observe_offline
 
@@ -58,6 +59,47 @@ class WitnessTests(unittest.TestCase):
         r = observe_offline(post, self.witness())
         self.assertEqual(r["unknown_target_count"], 1)
         self.assertEqual(r["observed_allow_fraction_upper_bound"], 0.25)
+
+    def test_offline_targets_must_match_exact_pre_outage_inventory(self):
+        post = after((403, 403, 403, 403))
+        post["targets"][3]["node"] = "unexpected-enforcer"
+        with self.assertRaisesRegex(ValueError, "frozen pre-outage witness"):
+            observe_offline(post, self.witness())
+
+    def test_forged_or_modified_witness_cannot_be_admitted(self):
+        witness = self.witness()
+        tampered = replace(witness, trial_id="different-trial")
+        with self.assertRaisesRegex(ValueError, "witness commitment"):
+            observe_offline(after(), tampered)
+        reordered = replace(witness, expected_nodes=tuple(reversed(witness.expected_nodes)))
+        with self.assertRaisesRegex(ValueError, "witness commitment"):
+            observe_offline(after(), reordered)
+
+    def test_denial_from_allowed_policy_is_unknown_not_verified_denial(self):
+        post = after((403, 403, 403, 403))
+        post["targets"][0]["admin"]["revoked"] = False
+        result = observe_offline(post, self.witness())
+        self.assertEqual(result["observed_deny_count"], 3)
+        self.assertEqual(result["unknown_target_count"], 1)
+        self.assertEqual(result["observed_allow_fraction_upper_bound"], 0.25)
+        self.assertEqual(result["verification_status"], "INDETERMINATE")
+
+    def test_immutable_witness_includes_exact_inventory(self):
+        witness = self.witness()
+        self.assertEqual(witness.expected_nodes, ("a", "b", "c", "hidden"))
+        result = observe_offline(after(), witness)
+        self.assertEqual(result["schema"], "predict-shield/authority-outage-observation/2")
+        self.assertTrue(result["witness_inventory_identical_to_pre_outage"])
+
+    def test_capture_rejects_duplicate_or_nonstring_target_id(self):
+        snapshot = before()
+        snapshot["targets"][3]["node"] = "a"
+        with self.assertRaisesRegex(ValueError, "distinct physical"):
+            capture_witness(snapshot, observed_at=datetime.now(timezone.utc))
+        snapshot = before()
+        snapshot["targets"][0]["node"] = ["not-a-real-id"]
+        with self.assertRaisesRegex(ValueError, "four-node"):
+            capture_witness(snapshot, observed_at=datetime.now(timezone.utc))
 
     def test_no_witness_when_authority_offline_or_not_revoked(self):
         a = before()
