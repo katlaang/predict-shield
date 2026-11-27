@@ -146,6 +146,7 @@ class PairedDefenseEvaluationTests(unittest.TestCase):
             "training_group_count": 60, "calibration_group_count": 20,
             "not_certified_for_automatic_execution": True,
             "numeric_feature_bounds": bounds,
+            "radii": {"label_absolute_failed_requests": 2.0},
             "models": {
                 "label_path_exposure": FakeModel({
                     "resync_policy": .7, "restart_enforcer": .1,
@@ -162,6 +163,39 @@ class PairedDefenseEvaluationTests(unittest.TestCase):
         r = compare(sample_rows(), chooser)
         self.assertEqual(r["choices"][0]["selected_actions"]["learned_policy"], "restart_enforcer")
 
+    def test_calibrated_disruption_bound_blocks_risky_restart(self):
+        bounds = {k: [float(PRE[k]) - 1., float(PRE[k]) + 1.]
+                  for k in PRE if k != "routing_profile"}
+        models = {
+            "label_path_exposure": FakeModel({a: 0. for a in ACTIONS}),
+            "label_security_exposure": FakeModel({a: 0. for a in ACTIONS}),
+            "label_absolute_failed_requests": FakeModel({
+                "resync_policy": 0., "restart_enforcer": 19.,
+                "gateway_restrict": 20., "monitor_only": 0.}),
+        }
+        bundle = {
+            "schema": "predict-shield/mechanism-model-bundle/1",
+            "training_group_count": 60, "calibration_group_count": 20,
+            "not_certified_for_automatic_execution": True,
+            "numeric_feature_bounds": bounds,
+            "radii": {"label_absolute_failed_requests": 3.0},
+            "models": models,
+        }
+        r = compare(sample_rows(), make_trusted_lab_model_policy(bundle))
+        self.assertNotEqual(r["choices"][0]["selected_actions"]["learned_policy"], "restart_enforcer")
+        self.assertEqual(r["policies"]["learned_policy"]["prohibited_recommendations"], 0)
+
+    def test_actual_disruption_breaches_are_recorded(self):
+        r = compare(sample_rows(), lambda *_: "gateway_restrict")
+        self.assertEqual(r["policies"]["learned_policy"]["observed_disruption_budget_breaches"], 0)
+        worse = sample_rows()
+        for row in worse:
+            if row["action"] == "gateway_restrict":
+                row["label_absolute_failed_requests"] = 40.
+        r = compare(worse, lambda *_: "gateway_restrict")
+        self.assertEqual(r["policies"]["learned_policy"]["observed_disruption_budget_breaches"], 1)
+        self.assertEqual(r["policies"]["monitor_only"]["observed_disruption_budget_breaches"], 0)
+
     def test_ood_learned_policy_abstains(self):
         bounds = {k: [0., 1.] for k in PRE if k != "routing_profile"}
         bundle = {
@@ -169,6 +203,7 @@ class PairedDefenseEvaluationTests(unittest.TestCase):
             "training_group_count": 60, "calibration_group_count": 20,
             "not_certified_for_automatic_execution": True,
             "numeric_feature_bounds": bounds,
+            "radii": {"label_absolute_failed_requests": 2.0},
             "models": {k: FakeModel({a: 0. for a in ACTIONS})
                        for k in ("label_path_exposure", "label_security_exposure",
                                  "label_absolute_failed_requests")},
