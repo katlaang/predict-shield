@@ -1,0 +1,25 @@
+{
+ "name": "v3 SQL method on Superviz26-SQL (four application domains, France)",
+ "registered": "2026-11-27, after reading only the archive member list, column names and per-file (split, label) row counts and train template counts; before any model was fitted, any user_inputs value was read or any test row was examined",
+ "question": "When the v3 SQL method is learned from a new application's own benign queries, does it detect sqlmap SQL injection in that application at a low benign alert rate? And how does it behave when it gets little or no benign data from that application?",
+ "source": {
+  "dataset": "Superviz26-SQL, Zenodo 21068333, CC-BY-4.0 (Quetel, Gimenez, Pautet, Robert; Telecom Paris and Inria Rennes)",
+  "file": "superviz26.zip",
+  "md5": "9fd0668bd5c229b1e63771d9d50972bd",
+  "sha256": "9f19d1bb675a81d3baacc66f7d783c00f626cd5ad2297b049cfefe93ce2a6cc5",
+  "domains": {"a": "OurAirports", "b": "sakila", "c": "AdventureWorks", "d": "OHR"},
+  "observed_before_registration": "lodo/x-x.csv: 335,306 benign train rows and about 3.35 million test rows (about 10% attacks) per domain; train templates a 65, b 57, c 76, d 46. cd/x.csv: 167,653 benign train rows from about half of the templates. Train splits are all benign. Domain A matches Superviz25-SQL v2 row for row in its counts."
+ },
+ "method_carried_over": "Unchanged from experiment-b/superviz25-sql: profiles, input_novelty, vector and evidence are imported from model_sql.py, and tail_p, fused, normal_threshold and wilson from the DVWA v3 code. IsolationForest(n_estimators=300, random_state=2026112801). Each arm fits its own model from its own benign training rows: shuffle with seed 2026112801, 40% fit profiles and forest, 35% calibrate tail probabilities, 25% set the fused threshold at 0.5%. No setting is tuned on this dataset.",
+ "arms": {
+  "indomain-a|b|c|d": "Train on lodo/x-x.csv train split (all of it); test on its test split. B, C and D are the primary tests. A is a replication of the Superviz25 result, not new-domain evidence.",
+  "fewshot-b|c|d-500|5000": "Train on the first N rows of lodo/x-x.csv train after shuffling with seed 2026112801 + N; test on the same test split as indomain. Descriptive.",
+  "lodo-a|b|c|d": "Train on lodo/<other three>-x.csv train split (other domains' benign queries only); test on its test split (domain x). Registered expected failure: per-template profiles treat every template of the new domain as unseen, so nearly all benign queries should alert.",
+  "drift-a|b|c|d": "Train on cd/x.csv train split (origin templates); test on its test split, reported separately for each drift_set value. Registered expectation: origin-template test rows behave like indomain; shifted-template rows mostly alert, benign included."
+ },
+ "pass_condition": "Primary, per domain B, C and D, for the fused detector of indomain-x, all three: (1) at most 1% of benign test queries alert; (2) at least 90% of attack test queries alert; (3) every attack_technique value with at least 1,000 attack test queries has at least 75% alerting. Headline: the number of domains (of B, C, D) that pass. Indomain-a is reported against the same condition as a replication. Fewshot, lodo and drift arms have no pass condition; their benign alert rates and detection rates are reported, with the lodo and drift expectations above checked as stated.",
+ "reported_beside": "Each component alone; detection by attack technique, stage, campaign status and tamper script; Wilson 95% intervals.",
+ "execution": "Develop reads only train-split rows and writes freeze.json (committed) and one model file per arm (kept as a workflow artifact, hashes in freeze.json). Test verifies the zip SHA-256, the code hashes and every model hash against the committed freeze, then reads test rows and writes one report. The test runs once; a void run is kept on record with its reason.",
+ "known_limits": "Benign queries are synthetic, generated from per-domain templates and value pools, so in-domain benign test traffic resembles training closely. SQL queries and user inputs only. Attacks are sqlmap only.",
+ "not_claimed": "Real user traffic; attacks other than sqlmap; HTTP, host or response evidence; transfer between applications without benign data from the target."
+}
