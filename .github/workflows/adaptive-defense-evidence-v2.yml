@@ -10,9 +10,11 @@ on:
       - 'experiment-b/mechanism-lab/test_lab_ai_decision.py'
       - 'experiment-b/mechanism-lab/test_lab_autonomous_execution.py'
       - 'experiment-b/mechanism-lab/operator_telemetry_v2.py'
+      - 'experiment-b/mechanism-lab/test_operator_telemetry_v2.py'
       - 'experiment-b/mechanism-lab/physical_ai_execution_pilot.py'
       - 'experiment-b/mechanism-lab/operator_health_v2_smoke.py'
       - 'experiment-b/mechanism-lab/java/src/main/java/org/predictshield/mechanism/EnforcementController.java'
+      - 'experiment-b/mechanism-lab/java/src/test/java/org/predictshield/mechanism/EnforcementControllerEpochTest.java'
       - 'docs/protocols/ADAPTIVE_DEFENSE_EVIDENCE_V2.md'
       - '.github/workflows/adaptive-defense-evidence-v2.yml'
   push:
@@ -22,8 +24,10 @@ on:
       - 'experiment-b/mechanism-lab/lab_ai_decision.py'
       - 'experiment-b/mechanism-lab/lab_autonomous_execution.py'
       - 'experiment-b/mechanism-lab/operator_telemetry_v2.py'
+      - 'experiment-b/mechanism-lab/test_operator_telemetry_v2.py'
       - 'experiment-b/mechanism-lab/physical_ai_execution_pilot.py'
       - 'experiment-b/mechanism-lab/java/src/main/java/org/predictshield/mechanism/EnforcementController.java'
+      - 'experiment-b/mechanism-lab/java/src/test/java/org/predictshield/mechanism/EnforcementControllerEpochTest.java'
       - '.github/workflows/adaptive-defense-evidence-v2.yml'
 
 permissions:
@@ -46,7 +50,7 @@ jobs:
           PYTHONPATH: ${{ github.workspace }}/engine
         working-directory: experiment-b/mechanism-lab
         run: |
-          python -m unittest test_defense_review_v2 test_lab_ai_decision test_lab_autonomous_execution test_model_adapter test_operator_evidence -v
+          python -m unittest test_defense_review_v2 test_operator_telemetry_v2 test_lab_ai_decision test_lab_autonomous_execution test_model_adapter test_operator_evidence -v
 
   physical-consumer-health:
     needs: synthetic-contracts
