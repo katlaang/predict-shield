@@ -155,7 +155,9 @@ class OutageIntervalTests(unittest.TestCase):
     def test_unobserved_duration_does_not_become_safe_denial(self):
         r = sample_report()
         ex = r["results"][0]["timed_observations"]["revoked_gateway_exposure"]
+        ex["exposure_fraction_lower_bound"] = 0.0
         ex["exposure_fraction_upper_bound"] = 0.0
+        ex["exposure_seconds_lower_bound"] = 0.0
         ex["exposure_seconds_upper_bound"] = 0.0
         ex["window_seconds"] = 0.0
         with self.assertRaisesRegex(ValueError, "Inconsistent measured exposure"):
