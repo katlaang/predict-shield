@@ -3,6 +3,9 @@ name: Superviz26-SQL baselines
 # Comparison only (experiment-b/superviz26-sql/baselines/protocol.json). One job per domain, then one commit.
 
 on:
+  push:
+    branches: [feat/superviz26-baselines]
+    paths: ['.github/workflows/superviz26-baselines.yml']
   workflow_dispatch:
 
 permissions:
