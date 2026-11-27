@@ -4,7 +4,8 @@
 
 - `cohort_guard.py`: validates source rights review, publisher/provenance digests, local source bytes, capture group split isolation and independently reviewed event labels. `BLOCKED` is not a failed model; it means **no scientific metric is admissible yet**.
 - `frozen_evaluator.py`: sets a strict greater-than alert threshold on 1000+ confirmed benign calibration scores **only**; never reads final-test scores to set the operating point; reports known attack, known benign and excluded unknown/scenario-only events separately.
-- `test_cohort_guard.py` and `test_frozen_evaluator.py`: deterministic synthetic software tests only. They do **not** imply real-world performance or a model evaluation.
+- `candidate_v4_fusion.py`: isolated candidate combining separately calibrated model/evidence signals so an over-saturated response-shift score cannot prevent a strong independent signal from alerting. This is NOT the original v3 detector or a trained v4 model.
+- `test_cohort_guard.py`, `test_frozen_evaluator.py`, `test_candidate_v4_fusion.py`: deterministic synthetic software tests only. They do **not** imply real-world performance or a model evaluation.
 - `source_candidates.json`: candidates with pending permission/provenance checks. It is not a dataset import manifest.
 
 ### Run tests
