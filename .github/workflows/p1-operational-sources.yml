@@ -1,0 +1,33 @@
+name: P1 operational telemetry parser contracts
+
+on:
+  pull_request:
+    paths:
+      - "experiment-b/operational-sources/**"
+      - ".github/workflows/p1-operational-sources.yml"
+  push:
+    branches: [master]
+    paths:
+      - "experiment-b/operational-sources/**"
+      - ".github/workflows/p1-operational-sources.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  local-normalization-contracts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Compile parser
+        run: python -m py_compile experiment-b/operational-sources/normalize.py
+      - name: Test only synthetic source-format and refusal fixtures
+        working-directory: experiment-b/operational-sources
+        run: python -m unittest discover -s . -p "test_*.py" -v
+      - name: Verify public CI has no downloader and cannot call active services
+        run: |
+          ! grep -E 'urllib.request|requests.get|subprocess.run|socket.connect|curl |wget ' experiment-b/operational-sources/normalize.py
