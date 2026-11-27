@@ -330,22 +330,13 @@ def operator_telemetry(control_token: str) -> list[dict]:
         status, payload, latency = request(
             node, "/operator/telemetry", token=control_token, timeout=1.5
         )
-        valid_source = (
-            status == 200
-            and payload.get("instance") == node
-            and payload.get("observation_type") in
-                ("operator_pre_action", "operator_pre_action_v2")
-        )
-        if not valid_source:
+        if status != 200 or payload.get("observation_type") != "operator_pre_action":
             samples.append({"node": node, "observed": False,
-                            "consumer_state_observed": False,
                             "latency_ms": latency})
         else:
-            v2 = payload.get("observation_type") == "operator_pre_action_v2"
             samples.append({
                 "node": node, "observed": True,
                 "observed_at_monotonic": time.monotonic(),
-                "observed_at_epoch_ms": payload.get("observed_at_epoch_ms") if v2 else None,
                 "applied_revision": payload["applied_revision"],
                 "cache_age_ms": payload["cache_age_ms"],
                 "cache_ttl_ms": payload["cache_ttl_ms"],
@@ -353,11 +344,6 @@ def operator_telemetry(control_token: str) -> list[dict]:
                 "handled_events": payload["handled_events"],
                 "refresh_failed": payload["refresh_failed"],
                 "scheduled_callbacks_pending": payload["scheduled_callbacks_pending"],
-                "consumer_state_observed": payload.get("consumer_state_observed") if v2 else False,
-                "consumer_running": payload.get("consumer_running") if v2 else None,
-                "consumer_paused": payload.get("consumer_paused") if v2 else None,
-                "consumer_pause_requested": payload.get("consumer_pause_requested") if v2 else None,
-                "broker_consumer_lag_measured": False,
                 "latency_ms": latency,
             })
     return samples
