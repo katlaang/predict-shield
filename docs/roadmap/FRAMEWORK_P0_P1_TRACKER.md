@@ -72,7 +72,7 @@
 
 ### P1-05a: Read-only multi-source asset evidence correlation
 
-**Status: IMPLEMENTED_UNVALIDATED.** A conservative [HMAC-bound context graph](../../experiment-b/operational-sources/context_graph.py) correlates authorized LANL auth, DNS, flow and red-team records and UGR flows as *observed events*, not confirmed attack paths or complete inventories. It rejects mixed pseudonymization keys and contradictory labels. [Graph tests](../../experiment-b/operational-sources/test_context_graph.py) are deterministic and synthetic only. This does not complete P1-05's authenticated **live** ingestion, streaming inference or operational model scoring. No real site data admitted; no detection or critical-infrastructure effect measured.
+**Status: IMPLEMENTED_UNVALIDATED, implementation merged in [PR #183](https://github.com/katlaang/predict-shield/pull/183), with [synthetic parser/graph CI #45923168041](https://github.com/katlaang/predict-shield/actions/runs/45923168041) passed.** A conservative [HMAC-bound context graph](../../experiment-b/operational-sources/context_graph.py) correlates authorized LANL auth, DNS, flow and red-team records and UGR flows as *observed events*, not confirmed attack paths or complete inventories. It rejects mixed pseudonymization keys and contradictory labels. [Graph tests](../../experiment-b/operational-sources/test_context_graph.py) are deterministic and synthetic only. This does not complete P1-05's authenticated **live** ingestion, streaming inference or operational model scoring. No real site data admitted; no detection or critical-infrastructure effect measured.
 
 ## Completed in this work session / to update upon merge
 
