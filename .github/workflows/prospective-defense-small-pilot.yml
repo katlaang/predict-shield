@@ -9,6 +9,9 @@ on:
       - "experiment-b/mechanism-lab/PROSPECTIVE_SMALL_PILOT_V1.md"
       - "experiment-b/mechanism-lab/new_configuration_pilot.py"
       - "experiment-b/mechanism-lab/test_new_configuration_pilot.py"
+      - "experiment-b/mechanism-lab/pilot.py"
+      - "experiment-b/mechanism-lab/test_pilot.py"
+      - "experiment-b/mechanism-lab/paired_defense_eval.py"
       - ".github/workflows/prospective-defense-small-pilot.yml"
 
 permissions:
@@ -25,7 +28,7 @@ jobs:
           python-version: "3.12"
       - name: Check new-configuration data join and all negative fixtures
         working-directory: experiment-b/mechanism-lab
-        run: python -m unittest test_new_configuration_pilot -v
+        run: python -m unittest test_new_configuration_pilot test_pilot -v
 
   new-configuration-physical-pilot:
     if: github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)
@@ -64,13 +67,13 @@ jobs:
           test -s "$RUNNER_TEMP/frozen-model.sha256"
       - name: Generate and independently verify new deterministic plan
         run: |
-          python plan.py --version v3.1 --seed 20261128 --output plans/new-disjoint-test
+          python plan.py --version v3.1 --seed 20261129 --output plans/new-disjoint-test
           python - <<'PY'
           from collect import load_plan
           from plan import create_plan
           import hashlib,json, pathlib
           cs,ts=load_plan(pathlib.Path("plans/new-disjoint-test"))
-          a,b=create_plan(seed=20261128,version="v3.1")
+          a,b=create_plan(seed=20261129,version="v3.1")
           assert (cs,ts)==(a,b)
           chosen=min((c for c in cs if c["partition"]=="test"),
                      key=lambda c:c["configuration_id"])
@@ -90,6 +93,24 @@ jobs:
           done
       - name: Start isolated 4-JVM authorization laboratory
         run: docker compose up --build -d
+      - name: Verify live Java v2 telemetry reaches Python before physical trials
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+          from pilot import ENFORCERS, wait_ready, operator_telemetry
+          wait_ready()
+          readings = operator_telemetry(os.environ["LAB_CONTROL_TOKEN"])
+          Path("reports").mkdir(exist_ok=True)
+          Path("reports/operator-telemetry-preflight.json").write_text(
+              json.dumps({"expected": len(ENFORCERS),
+                          "observed": sum(x["observed"] for x in readings),
+                          "records": readings}, indent=2) + "\\n")
+          if len(readings) != len(ENFORCERS) or not all(x["observed"] for x in readings):
+              raise RuntimeError("V2 telemetry integration failed; physical AI trial invalid")
+          print("Observed live v2 operator telemetry from", len(readings), "enforcers")
+          PY
       - name: Measure twelve NEW physical action replays and preserve negative outcomes
         run: |
           FIRST="$(cat reports/new-config-start-index.txt)"
@@ -121,6 +142,7 @@ jobs:
           assert d["status"]=="SMALL_NEW_CONFIGURATION_PILOT_NOT_SUPERIORITY_PROOF"
           assert d["paired_replays"]==3 and d["configuration_groups"]==1
           assert d["prospective_superiority_established"] is False
+          print("AI abstention reasons:",d.get("abstention_reasons"))
           print("New-config pilot:",d["status"])
           for name, value in sorted(d["policies"].items()):
             print(name,round(value["mean_configuration_cost"],5),
@@ -129,18 +151,19 @@ jobs:
                   "budget_breaches:",value["observed_disruption_budget_breaches"])
           PY
       - name: Archive aggregate result and model training metadata, not raw oracle data
-        if: success()
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: new-config-physical-defense-pilot-report
           path: |
             experiment-b/mechanism-lab/reports/new-configuration-pilot.json
             experiment-b/mechanism-lab/reports/new-config-batch.json
+            experiment-b/mechanism-lab/reports/operator-telemetry-preflight.json
             ${{ runner.temp }}/training-report.json
             ${{ runner.temp }}/frozen-model.sha256
           retention-days: 90
       - name: Archive restricted disposable lab streams separately
-        if: success()
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: new-config-disposable-lab-physical-streams
