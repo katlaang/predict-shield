@@ -11,7 +11,8 @@ import json
 import os
 from pathlib import Path
 
-from pilot import wait_ready, setup_fault, gateway_probes, operator_telemetry
+from pilot import wait_ready, setup_fault, gateway_probes
+from operator_telemetry_v2 import operator_telemetry_v2
 from model_adapter import load_local_bundle
 from lab_ai_decision import select_lab_defense
 from lab_autonomous_execution import execute_lab_recommendation
@@ -45,7 +46,7 @@ def run(*, project: str, model: Path, trusted_sha256: str, control_token: str,
             "visible_enforcement_processes":4,
         },
         "external_deny_observations":gateway_probes(24),
-        "operator_observations":operator_telemetry(control_token),
+        "operator_observations":operator_telemetry_v2(control_token),
     }
     snapshot, scope, inventory=collect_live_scope(
         project=project, token=control_token, case_id=pre["run_id"])
