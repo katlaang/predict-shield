@@ -80,6 +80,14 @@
 
 **Measured negative result, not a model pass.** [Preregistered physical new-configuration experiment](../evidence/MEASURED_NEW_CONFIG_AI_DEFENSE_PILOT_2026_11_26.md) completed 12 physical actions across a single new configuration and three repeats in [CI run 45922944490](https://github.com/katlaang/predict-shield/actions/runs/45922944490). Learned selector resolved 0/3 repeated exposure cases; fixed restart resolved 3/3 with 50 failed legitimate requests but no registered disruption-budget breaches. AI composite cost 0.40784 compared to restart 0.27005. One group cannot establish broad superiority or inferiority; do not train on this result and then call it an untouched confirmation.
 
+### P0-11c: Four physical actions under stopped authority
+
+**PARTIALLY_VALIDATED:** [PR #185](https://github.com/katlaang/predict-shield/pull/185) was merged after [physical CI run #45923676494](https://github.com/katlaang/predict-shield/actions/runs/45923676494) passed. The action comparator now checks real physical action-status receipts and validates the match between timed exposure seconds, fractions and recorded observation-window duration. Four real lab interventions were executed and independently sampled. Offline resync was `TRANSPORT_UNAVAILABLE`, restart was observed, and gateway restriction was accepted. **Policy truth remains UNKNOWN and verification INDETERMINATE during authority outage; the interval comparison reported no unique definite best action.** [Physical evidence](../evidence/AUTHORITY_OUTAGE_ACTION_INTEGRITY_2026_11_26.md). This **does not close [issue #36](https://github.com/katlaang/predict-shield/issues/36)**, because a complete preregistered, full-truth AI-vs-fixed action campaign during actual authority outage remains blocked.
+
+### Protocol provenance (#41)
+
+**BLOCKED, VERIFIED PERMISSION FAILURE:** [PR #186](https://github.com/katlaang/predict-shield/pull/186) merged, and the master [tag-workflow run #45923785011](https://github.com/katlaang/predict-shield/actions/runs/45923785011) confirmed the historical protocol's original commit/blob, then **failed remote annotated tag creation**: GitHub rejected the App token for missing `workflows` permission over historical workflow files. The `protocol-v3` tag was **not** created. Repository owner with authorized workflow-capable credentials must perform the documented tag command in [issue #41](https://github.com/katlaang/predict-shield/issues/41); do not backdate.
+
 ## Completed in this work session / to update upon merge
 
 - [x] PR #171 merged. Evidence rounding corrected.
