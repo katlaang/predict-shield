@@ -41,8 +41,8 @@
 | P0-07 | Superviz26-SQL cross-domain, drift and limited-adaptation tests | READY_FOR_DATA | [Publisher Zenodo record](https://zenodo.org/records/21068333). [Prospective protocol](../protocols/SUPERVIZ26_GENERALIZATION.md). | Publisher-verified archive; respect identical OurAirports data overlap; separate untouched target-domain test |
 | P0-08 | Second controlled vulnerable application (crAPI or VulnerableApp) | PENDING | Localhost or isolated owned environment only. | Frozen model(s), measured benign denominator, independently confirmed exploits, no public demo scanning |
 | P0-09 | Ablation and matched baseline superiority | PENDING | Predefine model + request-novelty + forest + supervised + WAF, separate calibration, grouped confidence intervals. | Per-family, per-campaign benefit; report harms and failure to outperform |
-| P0-10 | Learned AI defense selection versus fixed policies | READY_FOR_DATA | [Prospective action protocol](../protocols/AI_DEFENSE_DECISION_EVALUATION.md), [1,200 trial report](../evidence/MEASURED_MECHANISM_LAB_SCORED_CAMPAIGN_2026_11_21.md). | Freeze on configurations, same pre-action evidence, matched actions, policy validity, independent outcome measures |
-| P0-11 | Physical authority outage uncertainty and cold-restart durability | PENDING | [Issue #36](https://github.com/katlaang/predict-shield/issues/36), [Issue #132](https://github.com/katlaang/predict-shield/issues/132). | No false VERIFIED when authority down; survive real stop/start without stale permit |
+| P0-10 | Learned AI defense selection versus fixed policies | IMPLEMENTED_UNVALIDATED | Read-only [paired decision evaluator](../../experiment-b/mechanism-lab/paired_defense_eval.py) and independent unit tests, in [PR #178](https://github.com/katlaang/predict-shield/pull/178); prior [1,200-trial mechanism report](../evidence/MEASURED_MECHANISM_LAB_SCORED_CAMPAIGN_2026_11_21.md) has no learned-selector superiority result. Prospective protocol remains [here](../protocols/AI_DEFENSE_DECISION_EVALUATION.md). | Freeze on configurations, same pre-action evidence, matched actions, policy validity, independent outcome measures |
+| P0-11 | Physical authority outage uncertainty and cold-restart durability | IMPLEMENTED_UNVALIDATED | `AuthorityPolicyStore.java` and `authority_cold_restart_smoke.py` already exist. [PR #178](https://github.com/katlaang/predict-shield/pull/178) hardens revisions and corruption tests; actual new cold-restart CI result pending. [Outage issue #36](https://github.com/katlaang/predict-shield/issues/36) and [cold-restart issue #132](https://github.com/katlaang/predict-shield/issues/132) remain open. | No false VERIFIED when authority down; survive real stop/start without stale permit |
 | P0-12 | Prospective independent detection cohort | PENDING | [Issue #130](https://github.com/katlaang/predict-shield/issues/130). | New source-pinned cohort, independent labels where accuracy claimed, frozen test, full negative/abstention reporting |
 
 ## P1: operational data and independent validation
@@ -71,7 +71,9 @@
 - [ ] New third-party dataset actually acquired, checksum verified and accepted for evaluation.
 - [x] Candidate v4 fusion implementation and deterministic saturation tests added, without changing v3.
 - [ ] Candidate v4 fitted to real benign development data, frozen and prospectively evaluated.
-- [ ] AI-vs-fixed-defense experiment completed.
+- [ ] AI-vs-fixed-defense prospective experiment completed; **model superiority remains unproven**.
+- [x] Offline paired-defense evaluator and policy-bounded learned decision comparison implemented on research branch, **unit tests / independent physical measurement pending**.
+- [x] Existing lab authority persistence discovered and strengthened to reject replayed revisions, same-trial unrevocation and malformed overwrite attempts, **physical cold-restart validation pending**.
 - [ ] Any external operator has signed participation and independent assessment.
 
 ## Source caveats and data governance
