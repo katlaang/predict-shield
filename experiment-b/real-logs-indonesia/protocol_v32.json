@@ -1,0 +1,19 @@
+{
+ "name": "v3.2: unseen-page fallback, tested on real web logs in a period never used as a test period",
+ "registered": "2026-11-27, after the v3 real-log test (run 46018576222) and its aggregate breakdown (run 46030936812) showed that most Organization Y alerts came from page and parameter templates absent from training; before any v3.2 model was fitted and before any request in the new test windows was scored",
+ "change": "Only input novelty for a template absent from training changes. v3 gave it the maximum score (10). v3.2 scores the input against the pooled profile of the same site and method (union of character classes; minimum and maximum length over all of that site and method's training templates). If the site and method are also unseen, the score stays 10. Everything else is v3 as registered in protocol.json, including the isolation forest, tail probabilities, Fisher fusion, splits and the 0.5% threshold.",
+ "why_new_windows": "The v3 test period (Organization X from 2025-10-01, Organization Y from 2025-04-22) has been scored and examined, so a v3.2 result there could reflect choices made after seeing it. The primary test uses earlier windows that were only ever training data for v3 and were never scored.",
+ "arms": {
+  "v3-early": "v3 unchanged. Train and test in the early windows. The like-for-like comparison.",
+  "v32-early": "v3.2. Train and test in the early windows. Primary.",
+  "v32-original": "v3.2. Train and test on the original v3 split. Secondary, reported as not confirmatory, because that period has been examined."
+ },
+ "early_windows": {
+  "organization-x": "train 2025-09-23 00:00 to 2025-09-28 00:00 +07:00; test 2025-09-28 00:00 to 2025-10-01 00:00 +07:00",
+  "organization-y": "train from the first entry to 2025-04-15 00:00 +07:00; test 2025-04-15 00:00 to 2025-04-22 00:00 +07:00"
+ },
+ "independent_evidence": "As in protocol.json: OWASP CRS paranoia levels 1 and 2 and libinjection, applied to every test request of every window.",
+ "pass_condition": "Primary, v32-early, per organization: alerts without independent evidence at most 1% of in-scope test requests. Headline: organizations passing out of 2. Reported beside: the same for v3-early, and the detection proxy (share of independently flagged requests that alert) for both, so any gain in alert burden is shown with its cost in detection.",
+ "expectations_registered": "v3.2 lowers unconfirmed alerts mainly on unseen templates. It may also lower the detection proxy, because attacks on new pages are judged against a broader site profile.",
+ "not_claimed": "As in protocol.json."
+}

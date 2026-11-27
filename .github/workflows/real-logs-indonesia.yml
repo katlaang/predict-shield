@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
     inputs:
       stage:
-        description: 'metadata, inspect, develop or test'
+        description: 'metadata, inspect, develop, test, diagnose, develop32 or test32'
         default: 'metadata'
       freeze_sha256:
         description: 'test stage only'
@@ -41,7 +41,7 @@ jobs:
           python-version: '3.12'
       - run: pip install 'scikit-learn==1.7.2' 'numpy==2.3.4'
       - working-directory: experiment-b/real-logs-indonesia
-        run: python -m unittest test_model_logs -v
+        run: python -m unittest test_model_logs test_model_v32 -v
 
   inspect:
     if: github.event_name == 'workflow_dispatch' && github.event.inputs.stage == 'inspect'
@@ -144,3 +144,77 @@ jobs:
           name: real-logs-review-sample
           path: ${{ runner.temp }}/work/review
           retention-days: 90
+
+  v32:
+    if: github.event_name == 'workflow_dispatch' && (github.event.inputs.stage == 'develop32' || github.event.inputs.stage == 'test32')
+    needs: unit-tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install 'scikit-learn==1.7.2' 'numpy==2.3.4' 'libinjection-python==1.1.6'
+      - name: Download with publisher checksums
+        run: |
+          for f in organization-x.zip organization-y.zip; do
+            python experiment-b/open-datasets/registry.py download --dataset real-web-logs-indonesia \
+              --file $f --output "$RUNNER_TEMP/$f" --max-mb 400
+          done
+      - name: Develop every arm and freeze
+        if: github.event.inputs.stage == 'develop32'
+        working-directory: experiment-b/real-logs-indonesia
+        run: |
+          test ! -f frozen-v32/freeze.json
+          python model_v32.py develop --zips "$RUNNER_TEMP/organization-x.zip" "$RUNNER_TEMP/organization-y.zip" \
+            --out-dir frozen-v32 --models-dir "$RUNNER_TEMP/models"
+          git config user.name katlaang
+          git config user.email katlaang@users.noreply.github.com
+          git add frozen-v32/freeze.json
+          git commit -m "real-logs-indonesia: record the v3.2 freeze from run ${{ github.run_id }} before any new window is scored"
+          git push origin HEAD:${{ github.ref_name }}
+      - uses: actions/upload-artifact@v4
+        if: github.event.inputs.stage == 'develop32'
+        with:
+          name: real-logs-v32-models
+          path: ${{ runner.temp }}/models
+          retention-days: 90
+      - uses: actions/download-artifact@v4
+        if: github.event.inputs.stage == 'test32'
+        with:
+          name: real-logs-v32-models
+          path: ${{ runner.temp }}/models
+          run-id: ${{ github.event.inputs.develop_run_id }}
+          github-token: ${{ github.token }}
+      - name: Score every window once, gather independent evidence, report
+        if: github.event.inputs.stage == 'test32'
+        working-directory: experiment-b/real-logs-indonesia
+        run: |
+          test ! -f frozen-v32/test-report.json
+          W="$RUNNER_TEMP/work"
+          python model_v32.py test --zips "$RUNNER_TEMP/organization-x.zip" "$RUNNER_TEMP/organization-y.zip" \
+            --frozen-dir frozen-v32 --models-dir "$RUNNER_TEMP/models" \
+            --expected-freeze-sha256 "${{ github.event.inputs.freeze_sha256 }}" --work "$W"
+          python model_logs.py libinj --work "$W"
+          mkdir -p /tmp/backend && echo ok > /tmp/backend/index.html
+          (cd /tmp/backend && python -m http.server 8000 >/dev/null 2>&1 &)
+          docker pull owasp/modsecurity-crs:nginx
+          docker inspect --format '{{index .RepoDigests 0}}' owasp/modsecurity-crs:nginx
+          for L in 1 2; do
+            docker rm -f crs >/dev/null 2>&1 || true
+            docker run -d --name crs --network host -e PORT=8080 -e BACKEND=http://127.0.0.1:8000 \
+              -e BLOCKING_PARANOIA=$L -e DETECTION_PARANOIA=$L -e PARANOIA=$L -e ANOMALY_INBOUND=5 \
+              owasp/modsecurity-crs:nginx
+            for i in $(seq 1 60); do curl -s -o /dev/null -w '%{http_code}' 'http://127.0.0.1:8080/?q=Jakarta' | grep -q 200 && break; sleep 2; done
+            python model_logs.py crs --work "$W" --level $L --url http://127.0.0.1:8080
+          done
+          python model_v32.py report --work "$W" --frozen-dir frozen-v32 --output frozen-v32/test-report.json
+          git config user.name katlaang
+          git config user.email katlaang@users.noreply.github.com
+          git add frozen-v32/test-report.json
+          git commit -m "real-logs-indonesia: record the single v3.2 test run (run ${{ github.run_id }})"
+          git push origin HEAD:${{ github.ref_name }}
