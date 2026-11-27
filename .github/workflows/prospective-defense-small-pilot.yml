@@ -67,13 +67,13 @@ jobs:
           test -s "$RUNNER_TEMP/frozen-model.sha256"
       - name: Generate and independently verify new deterministic plan
         run: |
-          python plan.py --version v3.1 --seed 20261129 --output plans/new-disjoint-test
+          python plan.py --version v3.1 --seed 20261130 --output plans/new-disjoint-test
           python - <<'PY'
           from collect import load_plan
           from plan import create_plan
           import hashlib,json, pathlib
           cs,ts=load_plan(pathlib.Path("plans/new-disjoint-test"))
-          a,b=create_plan(seed=20261129,version="v3.1")
+          a,b=create_plan(seed=20261130,version="v3.1")
           assert (cs,ts)==(a,b)
           chosen=min((c for c in cs if c["partition"]=="test"),
                      key=lambda c:c["configuration_id"])
@@ -106,7 +106,7 @@ jobs:
           Path("reports/operator-telemetry-preflight.json").write_text(
               json.dumps({"expected": len(ENFORCERS),
                           "observed": sum(x["observed"] for x in readings),
-                          "records": readings}, indent=2) + "\\n")
+                          "records": readings}, indent=2))
           if len(readings) != len(ENFORCERS) or not all(x["observed"] for x in readings):
               raise RuntimeError("V2 telemetry integration failed; physical AI trial invalid")
           print("Observed live v2 operator telemetry from", len(readings), "enforcers")
