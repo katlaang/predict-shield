@@ -68,7 +68,7 @@ def audit(manifest: dict, *, dataset_root: Path | None = None) -> dict:
         if not isinstance(url, str) or not url.startswith("https://"):
             errors.append(f"{sid}: official HTTPS source URL required")
         rights = s.get("rights_status")
-        if rights not in RIGHTS:
+        if not isinstance(rights, str) or rights not in RIGHTS:
             errors.append(f"{sid}: invalid rights status")
         elif rights != "approved":
             blockers.append(f"{sid}: rights are {rights}, ingestion not authorized")
@@ -109,11 +109,12 @@ def audit(manifest: dict, *, dataset_root: Path | None = None) -> dict:
             errors.append(f"row {idx}: duplicate/missing event ID")
         else:
             seen_ids.add(uid)
-        if sid not in source_by_id:
+        if not isinstance(sid, str) or sid not in source_by_id:
             errors.append(f"row {idx}: unknown source")
         if not isinstance(group, str) or not group:
             errors.append(f"row {idx}: capture group missing")
-        if role not in ROLES or label not in LABELS or basis not in BASES:
+            continue
+        if not isinstance(role, str) or role not in ROLES or not isinstance(label, str) or label not in LABELS or not isinstance(basis, str) or basis not in BASES:
             errors.append(f"row {idx}: invalid role/label/truth basis")
             continue
         if label == "unknown" and basis == "independently_reviewed_event":
