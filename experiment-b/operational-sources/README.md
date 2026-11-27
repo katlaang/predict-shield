@@ -81,3 +81,17 @@ This is a useful building block for **automated risk assessment** after the actu
 **LANL:** Submit use form, retrieve selected files (start with `redteam.txt.gz` and a permitted, bounded auth subset), verify sizes/hash, record source receipt and source-appropriate permissions. **UGR'16:** establish reuse terms and obtain a suitably sized weekly CSV from official publisher. **MAWILab:** record permission and pin one annotation file, with separately licensed trace needed for actual traffic validation. Then perform an independent human-labeled cohort review before any calibrated AI accuracy report.
 
 Tracked in `docs/roadmap/FRAMEWORK_P0_P1_TRACKER.md`.
+
+## Crash-durable normalized adapter receipts (2026-11-26)
+
+After using `normalize.py` with documented publisher/operator authorization, the optional local `ingestion_receipt.py` stage verifies the **entire normalized output** rather than trusting a workflow check or a selected row sample. It checks the original source digest on every event, unique increasing source line identities, stable secret-derived pseudonymization scope, per-source schema, and the **UNKNOWN** vs partial LANL red-team truth boundary.
+
+```bash
+python ingestion_receipt.py \
+  --input /private/results/lanl-auth-normalized.jsonl \
+  --output /private/results/lanl-auth-admission-receipt.json
+```
+
+The receipt is published with exclusive, atomic local file creation and filesystem synchronization, refusing overwrite. A crash leaving a temporary file is not a committed receipt; an earlier valid receipt is never silently replaced. It records source and normalized SHA-256, event counts, pseudonym scope, and explicit `independent_attack_ground_truth_established=false`. This is an ingestion integrity control, **not** a production storage service, publisher signature, license attestation or cybersecurity accuracy claim.
+
+**Current data access remains externally blocked:** No authentic publisher bytes or approved rights receipts are present in this repository. The LANL/UGR'16/MAWILab CI demonstrations use deliberately synthetic fixtures. Authentic P1 detection accuracy and operational asset-risk impact are **not established**.
