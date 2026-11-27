@@ -179,7 +179,7 @@ jobs:
         run: |
           python experiment-b/mechanism-lab/confirmatory_196_main.py \
             --committed-lock docs/protocols/CONFIRMATORY_196_MAIN_LOCK.json \
-            --shard-report downloaded-shards/shard-*.json \
+            --shard-report downloaded-shards/reports/shard-*.json \
             --output confirmatory-196-main-result.json
       - name: Preserve positive, negative, inconclusive result without fabrication
         if: always()
