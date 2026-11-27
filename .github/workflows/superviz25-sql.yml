@@ -11,7 +11,7 @@ on:
   workflow_dispatch:
     inputs:
       stage:
-        description: 'inspect, develop or test'
+        description: 'inspect, develop, test, baselines or baselines-rerun'
         default: 'inspect'
       freeze_sha256:
         description: 'test stage only'
@@ -46,8 +46,9 @@ jobs:
         with:
           python-version: '3.12'
       - run: pip install 'scikit-learn==1.7.2' 'numpy==2.3.4'
+      - run: pip install 'libinjection-python==1.1.6'
       - working-directory: experiment-b/superviz25-sql
-        run: python -m unittest test_model_sql -v
+        run: python -m unittest test_model_sql test_baselines -v
 
   run:
     if: github.event_name == 'workflow_dispatch' && (github.event.inputs.stage == 'develop' || github.event.inputs.stage == 'test')
@@ -88,4 +89,64 @@ jobs:
           git config user.email katlaang@users.noreply.github.com
           git add frozen/test-report.json
           git commit -m "superviz25-sql: record the single test run (run ${{ github.run_id }})"
+          git push origin HEAD:${{ github.ref_name }}
+
+  baselines:
+    if: github.event_name == 'workflow_dispatch' && (github.event.inputs.stage == 'baselines' || github.event.inputs.stage == 'baselines-rerun')
+    needs: unit-tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 240
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install 'scikit-learn==1.7.2' 'numpy==2.3.4' 'libinjection-python==1.1.6'
+      - name: Download with publisher checksum
+        run: |
+          python experiment-b/open-datasets/registry.py download --dataset superviz25-sql-v2 \
+            --file dataset.csv --output "$RUNNER_TEMP/superviz.csv" --max-mb 1200
+      - name: Fixed sample, frozen detector, libinjection, supervised reference
+        working-directory: experiment-b/superviz25-sql
+        run: |
+          test ! -f reports/baselines-rerun.json
+          mkdir -p "$RUNNER_TEMP/b"
+          D="$RUNNER_TEMP/superviz.csv"; B="$RUNNER_TEMP/b"
+          python baselines.py sample --data "$D" --out "$B/sample.npz"
+          python baselines.py ours --data "$D" --frozen-dir frozen \
+            --expected-freeze-sha256 e3423d8bcba6624e85a9ca08f37608d159e8bb9a7153b855a7f9fe3018f0d8aa --out "$B/frozen_v3_method.npz"
+          python baselines.py libinj --data "$D" --out "$B/libinjection.npz"
+          python baselines.py supervised --data "$D" --sample "$B/sample.npz" --out "$B/supervised_reference.npz"
+      - name: OWASP CRS at paranoia levels 1 to 4
+        working-directory: experiment-b/superviz25-sql
+        run: |
+          D="$RUNNER_TEMP/superviz.csv"; B="$RUNNER_TEMP/b"
+          mkdir -p /tmp/backend && echo ok > /tmp/backend/index.html
+          (cd /tmp/backend && python -m http.server 8000 >/dev/null 2>&1 &)
+          docker pull owasp/modsecurity-crs:nginx
+          docker inspect --format '{{index .RepoDigests 0}}' owasp/modsecurity-crs:nginx | tee "$B/crs-image-digest.txt"
+          for L in 1 2 3 4; do
+            docker rm -f crs >/dev/null 2>&1 || true
+            docker run -d --name crs --network host -e PORT=8080 -e BACKEND=http://127.0.0.1:8000 \
+              -e BLOCKING_PARANOIA=$L -e DETECTION_PARANOIA=$L -e PARANOIA=$L -e ANOMALY_INBOUND=5 \
+              owasp/modsecurity-crs:nginx
+            for i in $(seq 1 60); do curl -s -o /dev/null -w '%{http_code}' 'http://127.0.0.1:8080/?q=Vieques' | grep -q 200 && break; sleep 2; done
+            echo "level $L probe: $(curl -s -o /dev/null -w '%{http_code}' 'http://127.0.0.1:8080/?q=Vieques') / $(curl -s -o /dev/null -w '%{http_code}' 'http://127.0.0.1:8080/?q=1%27%20OR%20%271%27%3D%271')"
+            python baselines.py crs --data "$D" --sample "$B/sample.npz" --url http://127.0.0.1:8080/ --level $L --out "$B/owasp_crs_pl$L.npz"
+          done
+      - name: Report and commit
+        working-directory: experiment-b/superviz25-sql
+        run: |
+          D="$RUNNER_TEMP/superviz.csv"; B="$RUNNER_TEMP/b"
+          mkdir -p reports
+          python baselines.py report --data "$D" --sample "$B/sample.npz" --inputs "$B"/frozen_v3_method.npz \
+            "$B"/libinjection.npz "$B"/supervised_reference.npz "$B"/owasp_crs_pl1.npz "$B"/owasp_crs_pl2.npz \
+            "$B"/owasp_crs_pl3.npz "$B"/owasp_crs_pl4.npz --output reports/baselines-rerun.json
+          cp "$B/crs-image-digest.txt" reports/crs-image-digest-rerun.txt
+          git config user.name katlaang
+          git config user.email katlaang@users.noreply.github.com
+          git add reports
+          git commit -m "superviz25-sql: record the baseline comparison rerun with fixed client headers (run ${{ github.run_id }})"
           git push origin HEAD:${{ github.ref_name }}
