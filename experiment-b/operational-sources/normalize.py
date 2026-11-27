@@ -25,12 +25,15 @@ LANL_DNS = ("time", "source_computer", "resolved_computer")
 LANL_REDTEAM = ("time", "user", "source_computer", "destination_computer")
 # From the publisher's described UGR'16 nfdump CSV projection.
 UGR_FLOW = ("te", "td", "sa", "da", "sp", "dp", "pr", "flg", "fwd", "stos", "pkt", "byt")
+MAWILAB = ("anomalyid", "srcip", "srcport", "dstip", "dstport",
+           "taxonomy", "heuristic", "distance", "nbdetectors", "label")
 DATASETS = {
     "lanl-auth": LANL_AUTH,
     "lanl-flow": LANL_FLOW,
     "lanl-dns": LANL_DNS,
     "lanl-redteam": LANL_REDTEAM,
     "ugr16-flow": UGR_FLOW,
+    "mawilab-annotation": MAWILAB,
 }
 SOURCE_URL = {
     "lanl-auth": "https://csr.lanl.gov/data/cyber1/",
@@ -38,6 +41,7 @@ SOURCE_URL = {
     "lanl-dns": "https://csr.lanl.gov/data/cyber1/",
     "lanl-redteam": "https://csr.lanl.gov/data/cyber1/",
     "ugr16-flow": "https://nesg.ugr.es/nesg-ugr16/",
+    "mawilab-annotation": "https://www.fukuda-lab.org/mawilab/",
 }
 HEX = frozenset("0123456789abcdef")
 MAX_RAW_LINE = 1_000_000
@@ -137,6 +141,23 @@ def _record(data: dict, *, dataset: str, key: bytes, source_digest: str,
             flags=data["flg"][:48], forwarding=data["fwd"][:48],
             type_of_service=data["stos"][:48],
             packets=_int(data["pkt"], "pkt"), bytes=_int(data["byt"], "byt"))
+    elif dataset == "mawilab-annotation":
+        category = data["label"].strip().lower()
+        if category not in ("anomalous", "suspicious", "notice", "benign"):
+            raise ValueError("Invalid MAWILab detector-derived category")
+        common.update(event_type="published_network_anomaly_annotation",
+            source_anomaly_id=_pseudonym(key, data["anomalyid"]),
+            source_asset_id=_pseudonym(key, data["srcip"]),
+            destination_asset_id=_pseudonym(key, data["dstip"]),
+            source_port_token=_pseudonym(key, data["srcport"]),
+            destination_port_token=_pseudonym(key, data["dstport"]),
+            published_taxonomy=data["taxonomy"][:80],
+            published_heuristic=data["heuristic"][:64],
+            publisher_anomaly_category=category,
+            publisher_detector_count=_int(data["nbdetectors"], "nbDetectors"),
+            publisher_distance_string=data["distance"][:32],
+            label="unknown", truth_basis="unverified",
+            verified_attack=False)
     else:
         raise ValueError("Unsupported dataset")
     return common
@@ -171,7 +192,7 @@ def normalized_rows(source: Path, *, dataset: str, expected_sha256: str,
         expected = DATASETS[dataset]
         header = tuple(x.strip().lstrip("#").strip().lower() for x in
                        next(csv.reader([first]))) if first else ()
-        if dataset == "ugr16-flow" and header == expected:
+        if dataset in ("ugr16-flow", "mawilab-annotation") and header == expected:
             start_line = 2
         else:
             start_line = 1
