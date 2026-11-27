@@ -87,7 +87,10 @@ jobs:
               print(name, "mean grouped cost:", round(r["mean_configuration_cost"],5),
                     "regret:",round(r["mean_configuration_regret"],5),
                     "abstained:",r["abstentions"],
-                    "prohibited:",r["prohibited_recommendations"])
+                    "prohibited:",r["prohibited_recommendations"],
+                    "observed_budget_breaches:",r["observed_disruption_budget_breaches"],
+                    "failed_requests:",r["failed_legitimate_requests"],
+                    "successful_replays:",r["successful_replays"])
           PY
       - name: Archive aggregate historical research reports only
         if: success()
