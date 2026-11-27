@@ -32,6 +32,18 @@ def _number(value: object, label: str) -> float:
 def interval_cost(action: dict, *, error_budget_requests: int) -> dict:
     if type(error_budget_requests) is not int or error_budget_requests <= 0:
         raise ValueError("Positive preregistered absolute request allowance required")
+    action_id = action.get("action")
+    witnessed_status = {
+        "resync_policy": "TRANSPORT_UNAVAILABLE",
+        "restart_enforcer": "JVM_RESTART_OBSERVED",
+        "gateway_restrict": "GATEWAY_RESTRICTION_ACCEPTED",
+        "monitor_only": "NO_ACTION",
+    }
+    observation = action.get("action_observation")
+    if (action_id not in witnessed_status
+            or not isinstance(observation, dict)
+            or observation.get("action_status") != witnessed_status[action_id]):
+        raise ValueError("Physical action acknowledgement does not match the registered action")
     if (action.get("policy_truth") != "UNKNOWN" or
             action.get("verification_status") != "INDETERMINATE"):
         raise ValueError("The authority-outage diagnostic cannot use a VERIFIED oracle")
@@ -49,6 +61,13 @@ def interval_cost(action: dict, *, error_budget_requests: int) -> dict:
     high = _number(exposure.get("exposure_fraction_upper_bound"), "gateway upper")
     if not 0 <= low <= high <= 1:
         raise ValueError("Invalid exposure intervals")
+    duration = _number(exposure.get("window_seconds"), "measurement duration")
+    seconds_low = _number(exposure.get("exposure_seconds_lower_bound"), "exposure seconds lower")
+    seconds_high = _number(exposure.get("exposure_seconds_upper_bound"), "exposure seconds upper")
+    if (not 0 < duration <= 30 or not 0 <= seconds_low <= seconds_high <= duration
+            or abs(seconds_low / duration - low) > 1e-8
+            or abs(seconds_high / duration - high) > 1e-8):
+        raise ValueError("Inconsistent measured exposure seconds and fractions")
     target_count = action.get("observed_allow_count")
     deny_count = action.get("observed_deny_count")
     unknown_count = action.get("unknown_target_count")
