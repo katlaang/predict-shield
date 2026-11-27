@@ -27,6 +27,16 @@ def execute_lab_recommendation(recommendation: dict, *, scope_assessment: dict,
     if recommendation.get("abstained") is not False or recommendation.get("action_executed") is not False:
         raise ValueError("No fresh policy-eligible, unexecuted model selection")
     selected = recommendation.get("selected_action")
+    review = recommendation.get("decision_review")
+    if (not isinstance(review, dict)
+            or review.get("schema") != "predict-shield/lab-defense-evidence-review/2"
+            or review.get("status") != "ELIGIBLE_FOR_LAB_REVIEWED_ACTION"
+            or review.get("requires_human_review") is not False
+            or review.get("may_proceed_to_independent_lab_policy_gate") is not True
+            or review.get("original_proposal") != selected
+            or review.get("model_reliability", {}).get("status") != "LAB_RELIABILITY_SCREEN_PASSED"
+            or review.get("operator_evidence", {}).get("status") != "COMPLETE"):
+        raise ValueError("Independent pre-action decision review has not authorized lab execution")
     screening = recommendation.get("screened", {}).get(selected, {})
     if screening.get("decision") != "ELIGIBLE_AUTOMATIC":
         raise ValueError("Policy gate has not authorized the selected action")

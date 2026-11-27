@@ -18,7 +18,8 @@ import json
 from collections import Counter, defaultdict
 from pathlib import Path
 
-from train import ACTIONS, FAULTS, load_executed_dataset
+from train import ACTIONS, load_executed_dataset
+from plan import FAULTS_V31
 
 
 def quality_summary(rows: list[dict]) -> dict:
@@ -37,7 +38,7 @@ def quality_summary(rows: list[dict]) -> dict:
     for item in rows:
         grouped[(item["group"], item["action"])].append(item)
         by_fault[item["fault"]].append(item)
-    if len(grouped) != 100 * len(ACTIONS) or set(by_fault) != set(FAULTS):
+    if len(grouped) != 100 * len(ACTIONS) or set(by_fault) != set(FAULTS_V31):
         raise ValueError("Missing configuration/action groups or injected fault families")
     variable_exposure = 0
     variable_disruption = 0

@@ -175,7 +175,13 @@ final class EnforcementControllerEpochTest {
                 .getStatusCode().value());
         Map<?, ?> visible = (Map<?, ?>) controller.operatorTelemetry("test-control")
                 .getBody();
-        assertEquals("operator_pre_action", visible.get("observation_type"));
+        assertEquals("operator_pre_action_v2", visible.get("observation_type"));
+        // This unit fixture has no registered Kafka listener. A missing
+        // listener is explicitly UNKNOWN, not proof that the consumer is healthy.
+        assertEquals(Boolean.FALSE, visible.get("consumer_state_observed"));
+        assertEquals(Boolean.FALSE, visible.get("consumer_running"));
+        assertEquals(Boolean.FALSE, visible.get("broker_consumer_lag_measured"));
+        assertTrue(visible.containsKey("observed_at_epoch_ms"));
         assertTrue(!visible.containsKey("fault"));
         assertTrue(!visible.containsKey("revoked"));
     }

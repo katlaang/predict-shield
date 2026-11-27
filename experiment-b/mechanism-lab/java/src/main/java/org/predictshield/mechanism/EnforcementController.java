@@ -544,16 +544,29 @@ public final class EnforcementController {
                     .body(Map.of("instance", identity, "error", "operator feed unavailable"));
         }
         long cacheAge = Math.max(0L, System.currentTimeMillis() - refreshedAtMs);
-        return ResponseEntity.ok(Map.of(
-                "instance", identity,
-                "applied_revision", cached.revision(),
-                "cache_age_ms", cacheAge,
-                "cache_ttl_ms", cacheTtlMs,
-                "legitimate_service_latency_ms", legitimateLatencyMs,
-                "handled_events", handledEvents,
-                "refresh_failed", lastRefreshFailed,
-                "scheduled_callbacks_pending", scheduledCallbacks.get(),
-                "observation_type", "operator_pre_action"));
+        // Actual listener health is observable before a response. This is
+        // NOT a trusted broker-offset/consumer-lag measurement and it does
+        // NOT disclose the experiment's injected fault label.
+        MessageListenerContainer listener = listenerRegistry == null ? null
+                : listenerRegistry.getListenerContainer("lab-policy-consumer");
+        boolean listenerObserved = listener != null;
+        return ResponseEntity.ok(Map.ofEntries(
+                Map.entry("instance", identity),
+                Map.entry("applied_revision", cached.revision()),
+                Map.entry("cache_age_ms", cacheAge),
+                Map.entry("cache_ttl_ms", cacheTtlMs),
+                Map.entry("legitimate_service_latency_ms", legitimateLatencyMs),
+                Map.entry("handled_events", handledEvents),
+                Map.entry("refresh_failed", lastRefreshFailed),
+                Map.entry("scheduled_callbacks_pending", scheduledCallbacks.get()),
+                Map.entry("consumer_state_observed", listenerObserved),
+                Map.entry("consumer_running", listenerObserved && listener.isRunning()),
+                Map.entry("consumer_paused", listenerObserved && listener.isContainerPaused()),
+                Map.entry("consumer_pause_requested",
+                        listenerObserved && listener.isPauseRequested()),
+                Map.entry("observed_at_epoch_ms", System.currentTimeMillis()),
+                Map.entry("broker_consumer_lag_measured", false),
+                Map.entry("observation_type", "operator_pre_action_v2")));
     }
 
     /**

@@ -35,8 +35,13 @@ class RunnerTests(unittest.TestCase):
         result = select_lab_defense(self.fixtures.bundle, self.fixtures.pre,
                                     snapshot, remaining_budget=50,
                                     restart_permitted=True)
-        self.assertFalse(result["abstained"])
-        self.assertIsNotNone(result["selected_action"])
+        # A successful legacy model ranking is not an approval: these v1
+        # synthetic fixtures have no trusted v2 Kafka health or independently
+        # verified held-out model reliability report.
+        self.assertTrue(result["abstained"])
+        self.assertIsNone(result["selected_action"])
+        self.assertIsNotNone(result["model_proposed_action"])
+        self.assertEqual(result["decision_review"]["status"], "HUMAN_REVIEW_REQUIRED")
         self.assertFalse(result["action_executed"])
         self.assertFalse(result["independently_verified_post_action"])
 

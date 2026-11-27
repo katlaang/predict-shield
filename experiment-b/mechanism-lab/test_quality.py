@@ -1,7 +1,7 @@
 """No-network unit tests of measured-only fault and repeat quality accounting."""
 import unittest
 
-from plan import ACTIONS, FAULTS
+from plan import ACTIONS, FAULTS_V31
 from quality import quality_summary
 
 
@@ -17,7 +17,7 @@ class MeasuredQualityTests(unittest.TestCase):
                     results.append({
                         "group": f"unit-config-{config}",
                         "action": action,
-                        "fault": FAULTS[config % len(FAULTS)],
+                        "fault": FAULTS_V31[config % len(FAULTS_V31)],
                         "partition": ("train" if config < 60 else
                                       "calibration" if config < 80 else "test"),
                         "label_security_exposure": float(
@@ -40,7 +40,7 @@ class MeasuredQualityTests(unittest.TestCase):
 
     def test_missing_fault_family_is_rejected(self):
         """A manifest can never replace missing measured fault families."""
-        rows = [r for r in self.rows() if r["fault"] != "reorder"]
+        rows = [r for r in self.rows() if r["fault"] != "consumer_paused"]
         with self.assertRaises(ValueError):
             quality_summary(rows)
 
