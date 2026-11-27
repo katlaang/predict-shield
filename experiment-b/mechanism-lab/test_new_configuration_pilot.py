@@ -9,7 +9,7 @@ from plan import create_plan
 
 
 def provision(root, *, alter=None):
-    cfg, trials = create_plan(seed=20261127, version="v3.1")
+    cfg, trials = create_plan(seed=20261128, version="v3.1")
     plan = root / "plan"
     plan.mkdir()
     (plan / "configurations.jsonl").write_text(
@@ -65,7 +65,7 @@ class NewPhysicalPilotAdmissionTests(unittest.TestCase):
         self.assertEqual(len({r["group"] for r in rows}), 1)
         self.assertEqual(len({r["repeat"] for r in rows}), 3)
         self.assertEqual(meta["trial_count"], 12)
-        self.assertEqual(meta["pre_registered_seed"], 20261127)
+        self.assertEqual(meta["pre_registered_seed"], 20261128)
         self.assertEqual(set(r["action"] for r in rows),
                          {"resync_policy", "restart_enforcer", "gateway_restrict", "monitor_only"})
         self.assertTrue(all("fault_mode" not in r["pre_action"] for r in rows))
