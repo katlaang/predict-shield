@@ -75,6 +75,19 @@ public final class AuthorityPolicyStore {
         Path tmp = null;
         try {
             Files.createDirectories(path.getParent());
+            if (Files.exists(path, LinkOption.NOFOLLOW_LINKS)) {
+                // Refuse stale or corrupt state before any replacement.
+                // A later new-trial reset may clear revocation, but the same
+                // trial may not silently restore access.
+                PolicyRevision existing = loadOrInitialize();
+                if (policy.revision() <= existing.revision()) {
+                    throw new IllegalStateException("Refusing stale or replayed authority revision");
+                }
+                if (existing.revoked() && !policy.revoked()
+                        && existing.trialId().equals(policy.trialId())) {
+                    throw new IllegalStateException("Revoked trial cannot be silently unrevoked");
+                }
+            }
             String data = HEADER + "\nrevision=" + policy.revision() +
                     "\nrevoked=" + policy.revoked() +
                     "\ntrial=" + policy.trialId() + "\n";
@@ -91,6 +104,12 @@ public final class AuthorityPolicyStore {
             }
             Files.move(tmp, path, StandardCopyOption.ATOMIC_MOVE,
                     StandardCopyOption.REPLACE_EXISTING);
+            // A durable rename also needs the parent directory synced.
+            // If this fails, do not acknowledge or publish the mutation.
+            try (FileChannel directory = FileChannel.open(path.getParent(),
+                    StandardOpenOption.READ)) {
+                directory.force(true);
+            }
         } catch (AtomicMoveNotSupportedException ex) {
             throw new IllegalStateException("Atomic state replacement not supported", ex);
         } catch (IOException ex) {
