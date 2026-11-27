@@ -13,14 +13,15 @@ import time
 from pathlib import Path
 
 from defense_review_v2 import EXPECTED_NODES, inspect_operator_evidence
-from pilot import operator_telemetry, request, wait_ready
+from pilot import request, wait_ready
+from operator_telemetry_v2 import operator_telemetry_v2
 
 
 def _poll(token: str, *, paused: bool, timeout: float = 18.) -> dict:
     started = time.monotonic()
     last = {}
     while time.monotonic() - started < timeout:
-        rows = operator_telemetry(token)
+        rows = operator_telemetry_v2(token)
         report = inspect_operator_evidence(
             {"operator_observations": rows}, now_monotonic=time.monotonic())
         last = report
