@@ -30,3 +30,70 @@ jobs:
       - name: Test paired action scoring on synthetic fixtures only
         working-directory: experiment-b/mechanism-lab
         run: python -m unittest test_paired_defense_eval -v
+
+  historical-paired-measured-evaluation:
+    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+    needs: paired-policy-unit-tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install fixed research model dependencies
+        run: pip install 'scikit-learn==1.7.2' 'numpy==2.3.4' 'joblib==1.5.2'
+      - name: Retrieve historical 1200-trial physical records from the original run
+        uses: actions/download-artifact@v4
+        with:
+          name: mechanism-scored-records
+          repository: katlaang/predict-shield
+          run-id: 44879497946
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/measured
+      - name: Fail if source data or independent streams are absent
+        run: |
+          for stream in pre_action operations oracle verification; do
+            test -d "$RUNNER_TEMP/measured/results/scored/$stream" || {
+              echo "::error::Four-stream historical source is unavailable"; exit 1;
+            }
+          done
+      - name: Refit historical training groups only and evaluate paired policy choices
+        working-directory: experiment-b/mechanism-lab
+        run: |
+          python train.py \
+            --records "$RUNNER_TEMP/measured/results/scored" \
+            --report "$RUNNER_TEMP/historical-model-report.json" \
+            --export-model "$RUNNER_TEMP/historical-model.joblib"
+          MODEL_SHA="$(sha256sum "$RUNNER_TEMP/historical-model.joblib" | cut -d' ' -f1)"
+          python paired_defense_eval.py \
+            --records "$RUNNER_TEMP/measured/results/scored" \
+            --model "$RUNNER_TEMP/historical-model.joblib" \
+            --trusted-model-sha256 "$MODEL_SHA" \
+            --output "$RUNNER_TEMP/historical-paired-actions.json"
+      - name: Print only aggregated exploratory results, never raw evidence
+        run: |
+          python - <<'PY'
+          import json, os, pathlib
+          p=pathlib.Path(os.environ["RUNNER_TEMP"])/"historical-paired-actions.json"
+          d=json.loads(p.read_text())
+          print("Status:",d["status"],"configurations:",d["configuration_groups"])
+          print("Prospective superiority proven:",d["prospective_superiority_established"])
+          for name, r in sorted(d["policies"].items()):
+              print(name, "mean grouped cost:", round(r["mean_configuration_cost"],5),
+                    "regret:",round(r["mean_configuration_regret"],5),
+                    "abstained:",r["abstentions"],
+                    "prohibited:",r["prohibited_recommendations"])
+          PY
+      - name: Archive aggregate historical research reports only
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: historical-paired-defense-comparison
+          path: |
+            ${{ runner.temp }}/historical-model-report.json
+            ${{ runner.temp }}/historical-paired-actions.json
+          retention-days: 30
