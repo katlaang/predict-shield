@@ -1,0 +1,173 @@
+name: Four-family physical AI defense evaluation (exploratory)
+
+on:
+  pull_request:
+    paths:
+      - "experiment-b/mechanism-lab/multi_family_physical_eval.py"
+      - "experiment-b/mechanism-lab/test_multi_family_physical_eval.py"
+      - ".github/workflows/four-family-physical-defense.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-protocol:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Validate four families and fixed baseline before lab creation
+        working-directory: experiment-b/mechanism-lab
+        run: python -m unittest -v test_multi_family_physical_eval.py test_pilot.py
+
+  four-family-physical-evaluation:
+    needs: validate-protocol
+    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)
+    runs-on: ubuntu-latest
+    timeout-minutes: 160
+    defaults:
+      run:
+        working-directory: experiment-b/mechanism-lab
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install frozen historical model runtime
+        run: python -m pip install "scikit-learn==1.7.2" "numpy==2.3.4" "joblib==1.5.2"
+      - name: Retrieve historical physical training streams
+        uses: actions/download-artifact@v4
+        with:
+          name: mechanism-scored-records
+          repository: katlaang/predict-shield
+          run-id: 44879497946
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/historical
+      - name: Freeze model and calibration report before new physical outcomes
+        run: |
+          test -d "$RUNNER_TEMP/historical/results/scored/pre_action"
+          mkdir -p reports
+          python train.py \
+            --records "$RUNNER_TEMP/historical/results/scored" \
+            --report reports/historical-training-report.json \
+            --export-model "$RUNNER_TEMP/frozen-multifamily-model.joblib"
+          sha256sum "$RUNNER_TEMP/frozen-multifamily-model.joblib" | cut -d' ' -f1 > reports/model.sha256
+          python - <<'PY'
+          import json
+          d=json.load(open("reports/historical-training-report.json"))
+          for label in ("label_security_exposure", "label_absolute_failed_requests"):
+              m=d["metrics"][label]
+              print(label, "90% nominal, measured heldout group coverage",
+                    m["heldout_configuration_group_coverage"])
+          PY
+      - name: Freeze four family groups from one test plan before physical execution
+        run: |
+          python plan.py --version v3.1 --seed 20261201 --output plans/four-family
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from collect import load_plan
+          from multi_family_physical_eval import SEED, select_families
+          from plan import create_plan
+          configs, trials = load_plan(Path("plans/four-family"))
+          want_config, want_trials = create_plan(seed=SEED, version="v3.1")
+          assert (configs, trials)==(want_config, want_trials)
+          chosen=select_families(configs)
+          Path("reports/groups.json").write_text(json.dumps([
+              {"family": name, "configuration_id": c["configuration_id"],
+               "start_index": next(i for i,t in enumerate(trials)
+                                   if t["configuration_id"]==c["configuration_id"])}
+              for name,c in chosen
+          ], indent=2)+"\n")
+          with open("reports/four-family-indices.txt","w") as f:
+              for name,c in chosen:
+                  indices=[i for i,t in enumerate(trials)
+                           if t["configuration_id"]==c["configuration_id"]]
+                  assert len(indices)==12 and indices==list(range(indices[0],indices[0]+12))
+                  f.write(name+" "+str(indices[0])+"\n")
+          print("Frozen test families", json.dumps(json.loads(Path("reports/groups.json").read_text())))
+          PY
+      - name: Create distinct disposable local-only lab credentials
+        run: |
+          for name in LAB_CONTROL_TOKEN LAB_ORACLE_TOKEN LAB_INTERNAL_TOKEN; do
+            value="$(python -c 'import secrets;print(secrets.token_urlsafe(32))')"
+            echo "::add-mask::$value"
+            echo "$name=$value" >> "$GITHUB_ENV"
+          done
+      - name: Start physical Kafka four-enforcer testbed
+        run: docker compose up --build -d
+      - name: Require real v2 telemetry before any lab actions
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from pilot import operator_telemetry, ENFORCERS, wait_ready
+          import json,os
+          wait_ready()
+          rows=operator_telemetry(os.environ["LAB_CONTROL_TOKEN"])
+          Path("reports/operator-preflight.json").write_text(json.dumps({
+              "observed": sum(r["observed"] for r in rows),
+              "expected": len(ENFORCERS), "operator_readings": rows}, indent=2)+"\n")
+          if len(rows)!=len(ENFORCERS) or not all(r["observed"] for r in rows):
+              raise RuntimeError("Incomplete physical operator evidence: STOP")
+          print("Physical preflight",len(rows),"of",len(ENFORCERS),"v2 operator nodes observed")
+          PY
+      - name: Physically execute four actions times three repeats across four fault families
+        run: |
+          while read -r family start; do
+            echo "Physical fault family: $family starting at registered trial index $start"
+            python campaign.py --execute-lab \
+              --plan plans/four-family \
+              --records results/four-family \
+              --start "$start" --max-trials 12 > "reports/physical-$family.json"
+            python - "$family" <<'PY'
+          import json,sys
+          report=json.load(open("reports/physical-"+sys.argv[1]+".json"))
+          assert report["newly_executed_trials"]==12, "Incomplete 12-action physical family"
+          assert report["partial"]==0 and report["invalid"]==0 and not report["newly_excluded"]
+          print("PHYSICALLY EXECUTED",sys.argv[1],report["newly_executed_trials"])
+          PY
+          done < reports/four-family-indices.txt
+      - name: Evaluate fixed AI versus four measured-action baselines
+        env:
+          PYTHONPATH: ${{ github.workspace }}/engine
+        run: |
+          python multi_family_physical_eval.py \
+            --plan plans/four-family \
+            --records results/four-family \
+            --historical-model "$RUNNER_TEMP/frozen-multifamily-model.joblib" \
+            --historical-model-sha256 "$(cat reports/model.sha256)" \
+            --training-report reports/historical-training-report.json \
+            --output reports/four-family-physical-evaluation.json
+          python - <<'PY'
+          import json
+          d=json.load(open("reports/four-family-physical-evaluation.json"))
+          assert d["paired_replays"]==12 and d["configuration_groups"]==4
+          assert d["new_measurement_provenance"]["physical_action_arms"]==48
+          assert d["prospective_superiority_established"] is False
+          print("Physical evidence complete. AI superiority NOT claimed.")
+          PY
+      - name: Preserve ALL measurement and negative-result reporting artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: four-family-physical-defense-reports
+          path: |
+            experiment-b/mechanism-lab/reports/
+            experiment-b/mechanism-lab/plans/four-family/
+          retention-days: 90
+          if-no-files-found: warn
+      - name: Preserve independently collected raw physical streams separately
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: four-family-disposable-lab-raw-records
+          path: experiment-b/mechanism-lab/results/four-family/
+          retention-days: 30
+          if-no-files-found: warn
+      - name: Dispose of all isolated lab containers, volumes and credentials
+        if: always()
+        run: docker compose down --remove-orphans --volumes
