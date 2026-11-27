@@ -1,5 +1,12 @@
 # Development changelog
 
+## 2026-11-26: Juice Shop v3.1 (Cauchy fusion, exact multi-source confirmation)
+
+- Registered before any v3.1 session. Develop run 45918879749; test run 45919350931.
+- **Inconclusive:** 20 confirmed attacks from 5 families (30 required).
+- **Benign alerts failed the ceiling:** 56 of 2,257 (2.5%), against 0.27% in development.
+- Cauchy and Fisher fusion performed alike, so the fusion change had no measurable effect. No further Juice Shop iterations under this design. Evidence: `docs/evidence/MEASURED_JUICESHOP_V31_2026_11_26.md`.
+
 ## 2026-11-26: Superviz25-SQL fixed-sample baselines and corrected CRS rerun
 
 - On 302,430 benign and 84,294 generated attack queries, benign-only frozen detector caught 90.3% / 91.6% / 92.3% at *evaluation-sample-calibrated* 0.1% / 0.5% / 1% benign alerts, respectively.
