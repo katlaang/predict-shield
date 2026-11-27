@@ -39,7 +39,7 @@ jobs:
         run: python -m unittest test_model26 -v
 
   inspect:
-    if: github.event_name == 'workflow_dispatch' && github.event.inputs.stage == 'inspect'
+    if: github.event_name == 'workflow_dispatch' && (github.event.inputs.stage == 'inspect' || github.event.inputs.stage == 'values')
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
@@ -54,6 +54,9 @@ jobs:
             --file superviz26.zip --output "$RUNNER_TEMP/s26.zip" --max-mb 2500
           sha256sum "$RUNNER_TEMP/s26.zip"
       - run: python experiment-b/superviz26-sql/inspect_archive.py "$RUNNER_TEMP/s26.zip"
+        if: github.event.inputs.stage == 'inspect'
+      - run: python experiment-b/superviz26-sql/inspect_values.py "$RUNNER_TEMP/s26.zip"
+        if: github.event.inputs.stage == 'values'
 
   run:
     if: github.event_name == 'workflow_dispatch' && (github.event.inputs.stage == 'develop' || github.event.inputs.stage == 'test')
