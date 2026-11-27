@@ -8,6 +8,7 @@ from defense_review_v2 import (
     EXPECTED_NODES, inspect_operator_evidence, check_model_reliability,
     review_recommendation,
 )
+from test_broker_observer_v1 import valid_broker
 
 
 def observations(*, now=100.0, paused=False, divergent=False):
@@ -66,7 +67,10 @@ def predictions(*, resync=.05, restart=.01, restart_impact=30):
 def assess(*, rows=None, evaluation=None, selected="resync_policy",
            model_predictions=None, now=100., budget=25., eligible=None):
     return review_recommendation(
-        pre_action={"operator_observations": observations() if rows is None else rows},
+        pre_action={
+            "operator_observations": observations() if rows is None else rows,
+            "broker_observation": valid_broker(now=now),
+        },
         selected_action=selected,
         predictions=predictions() if model_predictions is None else model_predictions,
         eligible_actions=tuple(eligible or ("resync_policy", "restart_enforcer",
@@ -162,6 +166,36 @@ class EvidenceReviewTests(unittest.TestCase):
     def test_no_bounded_effective_option_escalates(self):
         x = assess(model_predictions=predictions(resync=.5,restart=.2))
         self.assertIn("NO_BOUNDED_EFFECTIVE_AUTOMATIC_OPTION", x["reasons"])
+
+    def test_missing_broker_evidence_escalates(self):
+        result = review_recommendation(
+            pre_action={"operator_observations": observations()},
+            selected_action="resync_policy",
+            predictions=predictions(),
+            eligible_actions=("resync_policy", "restart_enforcer",
+                              "gateway_restrict", "monitor_only"),
+            bundle={"training_fingerprint": "synthetic-123"},
+            model_evaluation=report(), remaining_budget=25.,
+            now_monotonic=100.)
+        self.assertIn("INDEPENDENT_BROKER_EVIDENCE_UNAVAILABLE", result["reasons"])
+        self.assertTrue(result["requires_human_review"])
+
+    def test_positive_broker_backlog_is_preaction_signal_not_success(self):
+        from test_broker_observer_v1 import valid_broker
+        result = review_recommendation(
+            pre_action={
+                "operator_observations": observations(),
+                "broker_observation": valid_broker(now=100., lag=4),
+            }, selected_action="resync_policy", predictions=predictions(),
+            eligible_actions=("resync_policy", "restart_enforcer",
+                              "gateway_restrict", "monitor_only"),
+            bundle={"training_fingerprint": "synthetic-123"},
+            model_evaluation=report(), remaining_budget=25.,
+            now_monotonic=100.)
+        self.assertEqual(result["broker_offset_evidence"]["status"], "MEASURED")
+        self.assertIn("BROKER_COMMITTED_BACKLOG_OBSERVED",
+                      result["operator_evidence"]["pre_action_signals"])
+        self.assertFalse(result["post_action_resolution_verified"])
 
     def test_false_broker_lag_claim_is_rejected(self):
         rows = observations()
