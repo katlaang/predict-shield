@@ -1,0 +1,114 @@
+name: Repeated authority outage and durable cold-restart physical checks
+
+on:
+  pull_request:
+    paths:
+      - 'experiment-b/mechanism-lab/authority_durability_stress.py'
+      - 'experiment-b/mechanism-lab/java/src/test/java/org/predictshield/mechanism/AuthorityPolicyStoreTest.java'
+      - '.github/workflows/p1-outage-durability.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  physical-durable-restarts:
+    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Create separate ephemeral credentials
+        run: |
+          for name in LAB_CONTROL_TOKEN LAB_ORACLE_TOKEN LAB_INTERNAL_TOKEN; do
+            value="$(python -c 'import secrets;print(secrets.token_urlsafe(32))')"
+            echo "::add-mask::$value"
+            echo "$name=$value" >> "$GITHUB_ENV"
+          done
+      - name: Build isolated Kafka and four JVM consumers
+        working-directory: experiment-b/mechanism-lab
+        run: docker compose up --build -d
+      - name: Physically stop and restart authority three times and witness INDETERMINATE
+        working-directory: experiment-b/mechanism-lab
+        run: |
+          python authority_durability_stress.py --execute-isolated-lab \
+            --cycles 3 --output-dir reports/durable-restarts
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('reports/durable-restarts/summary.json').read_text())
+          assert r['physical_restarts']==3
+          assert r['observed_revision_increase']==2
+          assert r['all_restarts_retained_revocation']
+          assert r['all_outage_truth_indeterminate']
+          assert len(list(Path('reports/durable-restarts').glob('restart-cycle-*.json')))==3
+          print('Physical durability witness accepted, NOT production recovery certification')
+          PY
+      - name: Archive completed and partial physical evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: repeated-authority-durable-recovery-physical
+          path: experiment-b/mechanism-lab/reports/durable-restarts/
+          if-no-files-found: warn
+          retention-days: 90
+      - name: Destroy lab and state volume
+        if: always()
+        working-directory: experiment-b/mechanism-lab
+        run: docker compose down --remove-orphans --volumes
+
+  physical-authority-outage-unknown:
+    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate existing outage witness and interval protections
+        working-directory: experiment-b/mechanism-lab
+        run: python -m unittest test_repeated_outage_pilot test_authority_outage_actions test_authority_outage_witness test_outage_interval_diagnostic test_outage_timed_measure -v
+      - name: Allocate disposable separate oracle and control credentials
+        run: |
+          for name in LAB_CONTROL_TOKEN LAB_ORACLE_TOKEN LAB_INTERNAL_TOKEN; do
+            value="$(python -c 'import secrets;print(secrets.token_urlsafe(32))')"
+            echo "::add-mask::$value"
+            echo "$name=$value" >> "$GITHUB_ENV"
+          done
+      - name: Start disposable Kafka authority outage lab
+        working-directory: experiment-b/mechanism-lab
+        run: docker compose up --build -d
+      - name: Run two independent physical four-action outage batches
+        working-directory: experiment-b/mechanism-lab
+        run: |
+          python repeated_outage_pilot.py --execute-lab --batches 2 \
+            --output reports/p1-outage-repeats.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('reports/p1-outage-repeats.json').read_text())
+          assert r['physical_action_replays']==8
+          assert r['independent_fault_configuration_count']==1
+          assert all(a['policy_truth']=='UNKNOWN' and
+                     a['verification_status']=='INDETERMINATE'
+                     for b in r['batch_records'] for a in b['actions'])
+          print('Physical outage uncertainty preserved, no false VERIFIED outcome')
+          PY
+      - name: Preserve physical outage outcomes
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: repeated-authority-outage-unknown-physical
+          path: |
+            experiment-b/mechanism-lab/reports/p1-outage-repeats.json
+            experiment-b/mechanism-lab/reports/physical-batch-*.json
+          retention-days: 90
+          if-no-files-found: warn
+      - name: Destroy isolated lab
+        if: always()
+        working-directory: experiment-b/mechanism-lab
+        run: docker compose down --remove-orphans --volumes
