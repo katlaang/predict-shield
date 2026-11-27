@@ -13,6 +13,21 @@
 - **Negative evidence to retain:** flow detector v3 42/30,174 attack flows detected across HIKARI (0.14%); 1.36% normal alerts. [Report](../evidence/MEASURED_CROSS_DATASET_FLOW_DETECTOR_V3_2026_11_23.md). Frozen DVWA request novelty flagged essentially every request on unrelated real web logs, but labels were unavailable, so not a measured false-positive rate. [Applicability report](../evidence/MEASURED_REAL_WEB_REQUEST_BURDEN_2026_11_26.md).
 - **Critical-infrastructure field effectiveness and AI action superiority remain unproven.**
 
+## Workstream ownership and next non-detection mission (2026-11-26)
+
+**Coordination:** Detection model development, new detector experiments, Superviz26, and Juice Shop are being handled separately by Claude, as reported by the project owner. This assignment is not evidence that those tests have completed; their technical statuses remain unchanged until an auditable run is available.
+
+**Next in-repo focus, excluding detection:**
+1. **AI defense selection superiority (P0-10):** implement and evaluate a policy-gated learned action selector against fixed policies on disjoint fault configurations with independent post-action outcomes. Do not train and claim victory on the old 1,200-trial campaign.
+2. **Crash-safe authorization (P0-11, #132):** persist and correctly restore policy revision/revocation after real cold restart. Fail closed when the recovered revision is missing or corrupt.
+3. **Authority-outage uncertainty (P0-11, #36):** independently measure action outcomes without fabricating an oracle outcome when authority cannot be reached; keep INDETERMINATE.
+4. **Independent verification coverage:** reduce abstentions by adding trusted scope/route/telemetry evidence, never by weakening the correct-verdict standard.
+5. **Asset discovery/risk assessment integration:** validate discovery of runtime identity, missing inventory, service dependencies, exposure assessment and evidence-bound remediation planning on a separate lab.
+6. **Operational P1 data and external assessor:** safely integrate authorized public telemetry; partner and consent remain prerequisites to field claims.
+7. **Provenance:** resolve historical protocol-v3 tag (#41), recording its actual creation date and target.
+
+**Boundary:** Keep all research work in this repository. Product UX, customer onboarding and commercialization live in the separate product pilot repository. AI defense-selection research and policy enforcement remain owned by this non-detection stream.
+
 ## P0: scientific validity, detector generalization, safe defense
 
 | ID | Work item | Status | Completion evidence / next step | Acceptance gate |
