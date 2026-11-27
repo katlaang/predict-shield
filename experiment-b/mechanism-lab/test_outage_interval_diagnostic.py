@@ -6,8 +6,15 @@ from outage_interval_diagnostic import evaluate, interval_cost
 
 def arm(action, witness, *, lower=0.1, upper=0.3,
         direct_allows=0, failed=1):
+    status = {
+        "resync_policy": "TRANSPORT_UNAVAILABLE",
+        "restart_enforcer": "JVM_RESTART_OBSERVED",
+        "gateway_restrict": "GATEWAY_RESTRICTION_ACCEPTED",
+        "monitor_only": "NO_ACTION",
+    }[action]
     return {
         "action": action,
+        "action_observation": {"action_status": status},
         "witness_sha256": witness * 64,
         "policy_truth": "UNKNOWN",
         "verification_status": "INDETERMINATE",
@@ -19,6 +26,9 @@ def arm(action, witness, *, lower=0.1, upper=0.3,
             "policy_verification_from_this_measurement": "NOT_EVALUATED",
             "revoked_gateway_exposure": {
                 "method": "monotonic_http_step_integral", "valid_probe_count": 6,
+                "window_seconds": 6.0,
+                "exposure_seconds_lower_bound": lower * 6.0,
+                "exposure_seconds_upper_bound": upper * 6.0,
                 "exposure_fraction_lower_bound": lower,
                 "exposure_fraction_upper_bound": upper,
             },
@@ -110,16 +120,48 @@ class OutageIntervalTests(unittest.TestCase):
         for a in r["results"][1:3]:
             a["timed_observations"]["revoked_gateway_exposure"].update({
                 "exposure_fraction_lower_bound": 1.0,
-                "exposure_fraction_upper_bound": 1.0})
+                "exposure_fraction_upper_bound": 1.0,
+                "exposure_seconds_lower_bound": 6.0,
+                "exposure_seconds_upper_bound": 6.0})
         top = r["results"][3]
         top["timed_observations"]["revoked_gateway_exposure"].update({
             "exposure_fraction_lower_bound": 0.0,
-            "exposure_fraction_upper_bound": 0.0})
+            "exposure_fraction_upper_bound": 0.0,
+            "exposure_seconds_lower_bound": 0.0,
+            "exposure_seconds_upper_bound": 0.0})
         top["timed_observations"]["authorized_protected"] = {
             "requests": 10, "non_200_requests": 0, "http_status_counts": {"200": 10}}
         report = evaluate(r, error_budget_requests=25, restart_permitted=True)
         self.assertEqual(report["unique_definite_best_action"], "monitor_only")
         self.assertNotIn("resync_policy", report["feasible_actions_for_offline_comparison"])
+
+    def test_wrong_or_missing_physical_action_receipt_fails_closed(self):
+        r = sample_report()
+        r["results"][1]["action_observation"]["action_status"] = "NO_ACTION"
+        with self.assertRaisesRegex(ValueError, "action acknowledgement"):
+            evaluate(r, error_budget_requests=25, restart_permitted=True)
+        r = sample_report()
+        del r["results"][2]["action_observation"]
+        with self.assertRaisesRegex(ValueError, "action acknowledgement"):
+            evaluate(r, error_budget_requests=25, restart_permitted=True)
+
+    def test_exposure_seconds_must_match_reported_fractions(self):
+        r = sample_report()
+        r["results"][0]["timed_observations"]["revoked_gateway_exposure"][
+            "exposure_seconds_upper_bound"] = 0.0
+        with self.assertRaisesRegex(ValueError, "Inconsistent measured exposure"):
+            evaluate(r, error_budget_requests=25, restart_permitted=True)
+
+    def test_unobserved_duration_does_not_become_safe_denial(self):
+        r = sample_report()
+        ex = r["results"][0]["timed_observations"]["revoked_gateway_exposure"]
+        ex["exposure_fraction_lower_bound"] = 0.0
+        ex["exposure_fraction_upper_bound"] = 0.0
+        ex["exposure_seconds_lower_bound"] = 0.0
+        ex["exposure_seconds_upper_bound"] = 0.0
+        ex["window_seconds"] = 0.0
+        with self.assertRaisesRegex(ValueError, "Inconsistent measured exposure"):
+            evaluate(r, error_budget_requests=25, restart_permitted=True)
 
     def test_nan_exposure_and_zero_budget_rejected(self):
         r = sample_report()
