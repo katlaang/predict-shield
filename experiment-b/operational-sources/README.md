@@ -49,6 +49,23 @@ python normalize.py \
 
 The tool never marks non-redteam authentication events benign, never converts MAWILab anomalies into attacks, and never labels UGR flows benign or malicious based on an unverified source campaign. For evaluation, independent reviewers must label and admit a separate cohort under `experiment-b/framework-readiness/cohort_guard.py`. The public data record alone is not production telemetry or evidence of effectiveness on a US critical-infrastructure site.
 
+## Read-only cross-source asset-context correlation
+
+Once two or more authorized source files have been normalized with **the same persistent secret**, the derived records carry a keyed `pseudonym_scope_id`. This prevents the framework from claiming it has joined the same asset when different data sources were normalized with different pseudonymization keys.
+
+```bash
+python context_graph.py \
+  --input /private/results/lanl-auth-normalized.jsonl \
+          /private/results/lanl-dns-normalized.jsonl \
+          /private/results/lanl-flows-normalized.jsonl \
+  --max-records 100000 \
+  --output /private/results/pseudonymous-observed-graph.json
+```
+
+The graph reports only observed pseudonymous endpoints, directional event counts and selected evidence categories. It does not call any AI model, invent a complete inventory, label non-redteam activity benign, or convert MAWILab anomaly labels into verified attacks. An IAM/authentication failure or published red-team event is investigation evidence, **not authorization for remediation**. All input provenance must be complete; mixed secret scopes, duplicate events and malformed labels are rejected rather than silently joined.
+
+This is a useful building block for **automated risk assessment** after the actual operator's asset owner, criticality, service dependencies and permissions have been independently validated.
+
 ## Implementation and test limitations
 
 - Only LANL auth, flow, DNS and redteam formats and UGR'16 nfdump CSV and MAWILab anomaly-annotation CSV are supported. Other formats fail closed.
