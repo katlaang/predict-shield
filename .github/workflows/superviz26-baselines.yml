@@ -1,0 +1,102 @@
+name: Superviz26-SQL baselines
+
+# Comparison only (experiment-b/superviz26-sql/baselines/protocol.json). One job per domain, then one commit.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  domain:
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    permissions:
+      contents: read
+      actions: read
+    strategy:
+      fail-fast: false
+      matrix:
+        domain: [b, c, d]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install 'scikit-learn==1.7.2' 'numpy==2.3.4' 'libinjection-python==1.1.6'
+      - name: Download with publisher checksum
+        run: |
+          python experiment-b/open-datasets/registry.py download --dataset superviz26-sql \
+            --file superviz26.zip --output "$RUNNER_TEMP/s26.zip" --max-mb 2500
+      - name: Fetch the frozen indomain models
+        uses: actions/download-artifact@v4
+        with:
+          name: superviz26-models
+          path: ${{ runner.temp }}/models
+          run-id: 45928319914
+          github-token: ${{ github.token }}
+      - name: Frozen detector, libinjection, supervised reference
+        working-directory: experiment-b/superviz26-sql/baselines
+        run: |
+          B="$RUNNER_TEMP/b"; mkdir -p "$B"; D="$B/test.csv"; X=${{ matrix.domain }}
+          S25=../../superviz25-sql/baselines.py
+          python baselines26.py extract --zip "$RUNNER_TEMP/s26.zip" --domain $X --out "$D"
+          python baselines26.py ours --zip "$RUNNER_TEMP/s26.zip" --domain $X --data "$D" --frozen-dir ../frozen \
+            --models-dir "$RUNNER_TEMP/models" \
+            --expected-freeze-sha256 b739c5846f913c5e786b105f2038b7f030b72f992d9fb18f64dc77db64dced35 \
+            --out "$B/frozen_v3_method.npz"
+          python $S25 sample --data "$D" --out "$B/sample.npz"
+          python $S25 libinj --data "$D" --out "$B/libinjection.npz"
+          python $S25 supervised --data "$D" --sample "$B/sample.npz" --out "$B/supervised_reference.npz"
+      - name: OWASP CRS at paranoia levels 1 to 4
+        working-directory: experiment-b/superviz26-sql/baselines
+        run: |
+          B="$RUNNER_TEMP/b"; D="$B/test.csv"; S25=../../superviz25-sql/baselines.py
+          mkdir -p /tmp/backend && echo ok > /tmp/backend/index.html
+          (cd /tmp/backend && python -m http.server 8000 >/dev/null 2>&1 &)
+          docker pull owasp/modsecurity-crs:nginx
+          docker inspect --format '{{index .RepoDigests 0}}' owasp/modsecurity-crs:nginx | tee "$B/crs-image-digest.txt"
+          for L in 1 2 3 4; do
+            docker rm -f crs >/dev/null 2>&1 || true
+            docker run -d --name crs --network host -e PORT=8080 -e BACKEND=http://127.0.0.1:8000 \
+              -e BLOCKING_PARANOIA=$L -e DETECTION_PARANOIA=$L -e PARANOIA=$L -e ANOMALY_INBOUND=5 \
+              owasp/modsecurity-crs:nginx
+            for i in $(seq 1 60); do curl -s -o /dev/null -w '%{http_code}' 'http://127.0.0.1:8080/?q=Vieques' | grep -q 200 && break; sleep 2; done
+            python $S25 crs --data "$D" --sample "$B/sample.npz" --url http://127.0.0.1:8080/ --level $L --out "$B/owasp_crs_pl$L.npz"
+          done
+      - name: Report
+        working-directory: experiment-b/superviz26-sql/baselines
+        run: |
+          B="$RUNNER_TEMP/b"; D="$B/test.csv"; S25=../../superviz25-sql/baselines.py
+          mkdir -p "$B/out"
+          python $S25 report --data "$D" --sample "$B/sample.npz" --inputs "$B"/frozen_v3_method.npz \
+            "$B"/libinjection.npz "$B"/supervised_reference.npz "$B"/owasp_crs_pl1.npz "$B"/owasp_crs_pl2.npz \
+            "$B"/owasp_crs_pl3.npz "$B"/owasp_crs_pl4.npz --output "$B/out/baselines-${{ matrix.domain }}.json"
+          cp "$B/crs-image-digest.txt" "$B/out/crs-image-digest-${{ matrix.domain }}.txt"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: superviz26-baselines-${{ matrix.domain }}
+          path: ${{ runner.temp }}/b/out
+          retention-days: 90
+
+  commit:
+    needs: domain
+    if: always()
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: superviz26-baselines-*
+          merge-multiple: true
+          path: experiment-b/superviz26-sql/baselines/reports
+      - run: |
+          ls experiment-b/superviz26-sql/baselines/reports
+          git config user.name katlaang
+          git config user.email katlaang@users.noreply.github.com
+          git add experiment-b/superviz26-sql/baselines/reports
+          git commit -m "superviz26-sql: record the baseline comparison (run ${{ github.run_id }})"
+          git push origin HEAD:${{ github.ref_name }}

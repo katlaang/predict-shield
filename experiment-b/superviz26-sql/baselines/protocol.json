@@ -1,0 +1,10 @@
+{
+ "name": "Baselines on Superviz26-SQL domains B, C and D, beside the frozen per-domain v3 models",
+ "registered": "2026-11-27, before any baseline was run on any Superviz26-SQL row",
+ "relation_to_the_registered_test": "The single Superviz26 test (run 45929721027, freeze b739c584) stands unchanged. This is a comparison: the frozen indomain-b, indomain-c and indomain-d models are re-scored for their continuous fused statistic; nothing is refitted. Domain A is not repeated because it is the Superviz25 data, whose baselines are already recorded (experiment-b/superviz25-sql/reports/baselines-rerun.json).",
+ "design": "Identical to experiment-b/superviz25-sql/protocol_baselines.json with both amendments, and run with that file's code unchanged (baselines.py), applied per domain to the test split of superviz26-lodo/x-x.csv, extracted to a CSV with the columns baselines.py reads.",
+ "evaluation_sample": "Per domain, fixed by seed 2026112901 before any scoring: 10% of benign test rows and 25% of attack test rows, sampled independently per row.",
+ "detectors": "frozen_v3_method (per-domain indomain model), libinjection-python 1.1.6, OWASP CRS paranoia levels 1 to 4 (owasp/modsecurity-crs:nginx, digest recorded, browser headers, single-token client probes), supervised reference (TF-IDF character 1-4-grams with logistic regression, five folds grouped by attack_id).",
+ "measures": "As in the Superviz25 baseline protocol: ROC AUC and detection at benign alert rates of 0.1%, 0.5% and 1% for continuous scores (oracle thresholds on the sample, alike for every continuous detector); single operating point for binary detectors; breakdown by technique and stage; Wilson 95% intervals. The frozen detector is also reported at its own frozen threshold.",
+ "not_claimed": "Production false-alarm rates; benign queries remain template-generated."
+}
