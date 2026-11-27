@@ -116,7 +116,19 @@ def selected(configs, *, phase):
     return result
 
 
-def save(path: Path, *, phase: str, shard: int):
+def save(path: Path, *, phase: str, shard: int, main_lock: Path | None = None):
+    # The pilot-only runner cannot publish executable main plans. A future
+    # main plan is permitted only AFTER a distinct pilot-derived sample-size
+    # lock is committed and independently checked.
+    if phase=="main":
+        if main_lock is None or main_lock.is_symlink() or not main_lock.is_file():
+            raise ValueError("MAIN BLOCKED: committed pilot sample-size lock required")
+        from confirmatory_196_main import check_lock
+        lock=check_lock(json.loads(main_lock.read_text()))
+        if shard >= (lock["main_n"]+19)//20:
+            raise ValueError("MAIN BLOCKED: shard exceeds pilot-locked N")
+    elif main_lock is not None:
+        raise ValueError("Pilot must not accept a main sample-size lock")
     if path.exists():
         raise FileExistsError("Refuse to replace a frozen source plan")
     c,t=make_plan(phase=phase, shard=shard)
@@ -145,7 +157,8 @@ if __name__=="__main__":
     p=argparse.ArgumentParser()
     p.add_argument("--phase",choices=("pilot","main"),required=True)
     p.add_argument("--shard",type=int,default=0)
+    p.add_argument("--main-lock",type=Path)
     p.add_argument("--output",type=Path,required=True)
     a=p.parse_args()
-    save(a.output,phase=a.phase,shard=a.shard)
+    save(a.output,phase=a.phase,shard=a.shard,main_lock=a.main_lock)
     print("Frozen",a.phase,"plan at",a.output)
