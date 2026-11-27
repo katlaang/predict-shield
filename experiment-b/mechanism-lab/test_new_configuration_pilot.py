@@ -9,7 +9,7 @@ from plan import create_plan
 
 
 def provision(root, *, alter=None):
-    cfg, trials = create_plan(seed=20261128, version="v3.1")
+    cfg, trials = create_plan(seed=20261129, version="v3.1")
     plan = root / "plan"
     plan.mkdir()
     (plan / "configurations.jsonl").write_text(
@@ -36,7 +36,14 @@ def provision(root, *, alter=None):
             decision_policy_metadata={"restart_permitted": chosen["restart_permitted"],
                                       "absolute_error_budget_requests": 25},
             external_deny_observations=[{"http_status": 200}, {"http_status": 403}],
-            operator_observations=[])
+            operator_observations=[
+                {"node": node, "observed": True,
+                 "operator_schema": "operator_pre_action_v2",
+                 "applied_revision": 3, "cache_age_ms": 100,
+                 "legitimate_service_latency_ms": 15,
+                 "handled_events": 4, "refresh_failed": False,
+                 "scheduled_callbacks_pending": 0}
+                for node in ("enforcer-a", "enforcer-b", "enforcer-c", "enforcer-hidden")])
         ops = dict(base, failed_requests=5, observed_requests=100)
         oracle = dict(base, oracle_role="separate_process_admin_plus_direct_probe",
                       after={"inventory_complete": True, "all_revoked_access_denied": True})
@@ -65,7 +72,7 @@ class NewPhysicalPilotAdmissionTests(unittest.TestCase):
         self.assertEqual(len({r["group"] for r in rows}), 1)
         self.assertEqual(len({r["repeat"] for r in rows}), 3)
         self.assertEqual(meta["trial_count"], 12)
-        self.assertEqual(meta["pre_registered_seed"], 20261128)
+        self.assertEqual(meta["pre_registered_seed"], 20261129)
         self.assertEqual(set(r["action"] for r in rows),
                          {"resync_policy", "restart_enforcer", "gateway_restrict", "monitor_only"})
         self.assertTrue(all("fault_mode" not in r["pre_action"] for r in rows))
@@ -117,6 +124,19 @@ class NewPhysicalPilotAdmissionTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "differs from newly registered"):
             load_new_paired(plan, records)
 
+
+    def test_absent_operator_telemetry_fails_admission(self):
+        plan, records = provision(self.root, alter=("pre_action",
+            lambda r: r.update(operator_observations=[])))
+        with self.assertRaisesRegex(ValueError, "Incomplete v2 operator telemetry"):
+            load_new_paired(plan, records)
+
+    def test_legacy_schema_fails_admission(self):
+        plan, records = provision(self.root, alter=("pre_action",
+            lambda r: r["operator_observations"][0].update(
+                operator_schema="operator_pre_action")))
+        with self.assertRaisesRegex(ValueError, "Incomplete v2 operator telemetry"):
+            load_new_paired(plan, records)
 
 if __name__ == "__main__":
     unittest.main()
