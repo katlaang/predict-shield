@@ -7,19 +7,25 @@ on:
   workflow_dispatch:
     inputs:
       stage:
-        description: 'metadata'
-        default: 'metadata'
+        description: 'inspect'
+        default: 'inspect'
 
 permissions:
   contents: read
 
 jobs:
-  metadata:
+  inspect:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: python experiment-b/superviz26-sql/record_metadata.py 21068333
+      - run: pip install 'pandas==2.3.3'
+      - name: Download with publisher checksum
+        run: |
+          python experiment-b/open-datasets/registry.py download --dataset superviz26-sql \
+            --file superviz26.zip --output "$RUNNER_TEMP/s26.zip" --max-mb 2500
+          sha256sum "$RUNNER_TEMP/s26.zip"
+      - run: python experiment-b/superviz26-sql/inspect_archive.py "$RUNNER_TEMP/s26.zip"
