@@ -1,6 +1,6 @@
 # PREDICT-SHIELD: Evidence-first adaptive defense v2 (no retraining)
 
-**Status:** New implementation under review; synthetic contract and isolated physical measurement must pass before claiming validation.
+**Status: Implementation merged in [PR #187](https://github.com/katlaang/predict-shield/pull/187).** The [v2 GitHub Actions run 45926575073](https://github.com/katlaang/predict-shield/actions/runs/45926575073) passed the synthetic tests and the isolated physical Kafka listener pause/resume test. The standard Python, Java and model-adapter integration checks passed on the final PR revision. This verifies the telemetry/safety-contract behavior, **not AI decision accuracy or superiority**. The historical preregistration hash mismatch remains open as [issue #188](https://github.com/katlaang/predict-shield/issues/188). The new v2 collector is separate from locked `pilot.py`.
 
 ## Change in engineering objective
 
