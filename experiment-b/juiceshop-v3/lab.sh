@@ -63,14 +63,31 @@ zap_seed_and_scan() {   # $1 = max scan minutes
   echo "active scan status: $P"
   curl -s "http://127.0.0.1:8090/JSON/core/view/alerts/?baseurl=http://127.0.0.1:9002" > "$S/alerts.json"
   curl -s "http://127.0.0.1:8090/JSON/ascan/view/scanners/" > "$S/scanners.json"
-  docker rm -f zap >/dev/null
+}
+
+zap_messages() {   # the exact request behind each Medium/High alert, from ZAP's message API
+  python - "$S" <<'PY'
+import json, sys, urllib.request
+S = sys.argv[1]
+alerts = json.load(open(S + "/alerts.json")).get("alerts", [])
+out, seen = [], set()
+for a in alerts:
+    if a.get("risk") not in ("High", "Medium") or not a.get("messageId") or a["messageId"] in seen:
+        continue
+    seen.add(a["messageId"])
+    m = json.load(urllib.request.urlopen(f"http://127.0.0.1:8090/JSON/core/view/message/?id={a['messageId']}"))["message"]
+    out.append({"pluginId": a.get("pluginId"), "risk": a.get("risk"), "alert": a.get("alert"),
+                "requestHeader": m.get("requestHeader", ""), "requestBody": m.get("requestBody", "")})
+json.dump(out, open(S + "/messages.json", "w"))
+print("zap alert messages fetched:", len(out))
+PY
 }
 
 case "$STAGE" in
   smoke)
     install_app; start_app smoke
     python benign.py --base http://127.0.0.1:9001 --seed 11 --max-requests 300
-    start_zap; zap_seed_and_scan 3
+    start_zap; zap_seed_and_scan 3; docker rm -f zap >/dev/null
     stop_app
     python - "$S" <<'PY'
 import json, sys, collections
@@ -103,7 +120,7 @@ PY
     python benign.py --base http://127.0.0.1:9001 --seed 2026112903 --max-requests 20000 --stop-file "$W/stop" --pause 0.25 \
       > "$S/benign.log" 2>&1 &
     BPID=$!
-    start_zap; zap_seed_and_scan 25
+    start_zap; zap_seed_and_scan 25; docker rm -f zap >/dev/null
     pip install -q 'sqlmap==1.9.11'
     timeout 900 sqlmap -u "http://127.0.0.1:9002/rest/products/search?q=apple" --batch --level 2 --risk 1 --threads 1 \
       --flush-session --output-dir "$W/sqlmap" > "$S/sqlmap.txt" 2>&1 || true
@@ -122,6 +139,43 @@ S = sys.argv[1]
 a = json.load(open(S + "/alerts.json")).get("alerts", [])
 json.dump([{k: x.get(k) for k in ("pluginId", "alert", "risk", "confidence", "url", "param", "method")} for x in a],
           open("frozen/zap-alerts-summary.json", "w"), indent=1)
+PY
+    ;;
+  develop31)
+    install_app; start_app dev31
+    python benign.py --base http://127.0.0.1:9001 --seed 2026112904 --max-requests 3000
+    stop_app
+    python model_js.py develop --log "$S/proxy.jsonl" --trace "$S/trace.txt" --docroot "$W/app" --out-dir frozen-v31
+    cp "$W/app-sha256.txt" frozen-v31/app-sha256.txt
+    ;;
+  test31)
+    install_app; start_app test31
+    rm -f "$W/stop"
+    python benign.py --base http://127.0.0.1:9001 --seed 2026112905 --max-requests 30000 --stop-file "$W/stop" --pause 0.25 \
+      > "$S/benign.log" 2>&1 &
+    BPID=$!
+    start_zap; zap_seed_and_scan 40; zap_messages; docker rm -f zap >/dev/null
+    pip install -q 'sqlmap==1.9.11'
+    for target in "-u http://127.0.0.1:9002/rest/products/search?q=apple" \
+                  "-u http://127.0.0.1:9002/rest/user/login --data {\"email\":\"shopper@example.com\",\"password\":\"Garden42!\"}" \
+                  "-u http://127.0.0.1:9002/rest/track-order/5267-f9cd5882f54c75a3*"; do
+      eval timeout 900 sqlmap $target --batch --level 3 --risk 2 --threads 1 --flush-session --output-dir "$W/sqlmap" \
+        >> "$S/sqlmap.txt" 2>&1 || true
+    done
+    touch "$W/stop"; wait $BPID || true
+    cat "$S/benign.log"
+    curl -s http://127.0.0.1:3000/api/Challenges/ > "$S/challenges.json"
+    stop_app
+    python model_js.py test31 --log "$S/proxy.jsonl" --trace "$S/trace.txt" --docroot "$W/app" --alerts "$S/alerts.json" \
+      --scanners "$S/scanners.json" --sqlmap-log "$S/sqlmap.txt" --messages "$S/messages.json" --challenges "$S/challenges.json" \
+      --frozen-dir frozen-v31 --expected-freeze-sha256 "$FREEZE" --output frozen-v31/test-report.json
+    cp "$S/zap-digest.txt" frozen-v31/zap-digest.txt
+    python - "$S" <<'PY'
+import json, sys
+S = sys.argv[1]
+ch = json.load(open(S + "/challenges.json")).get("data", [])
+json.dump([{k: c.get(k) for k in ("key", "name", "category", "difficulty", "solved", "updatedAt")} for c in ch if c.get("solved")],
+          open("frozen-v31/challenges-solved.json", "w"), indent=1)
 PY
     ;;
 esac

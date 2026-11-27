@@ -11,7 +11,7 @@ on:
   workflow_dispatch:
     inputs:
       stage:
-        description: 'smoke, develop or test'
+        description: 'smoke, develop, test, develop31 or test31'
         default: 'smoke'
       freeze_sha256:
         description: 'test stage only'
@@ -37,7 +37,7 @@ jobs:
     if: github.event_name == 'workflow_dispatch'
     needs: unit-tests
     runs-on: ubuntu-latest
-    timeout-minutes: 150
+    timeout-minutes: 180
     permissions:
       contents: write
     steps:
@@ -60,14 +60,16 @@ jobs:
           case "${{ github.event.inputs.stage }}" in
             develop) test ! -f frozen/freeze.json ;;
             test) test ! -f frozen/test-report.json ;;
+            develop31) test ! -f frozen-v31/freeze.json ;;
+            test31) test ! -f frozen-v31/test-report.json ;;
           esac
           ./lab.sh "${{ github.event.inputs.stage }}"
       - name: Commit freeze or report
-        if: github.event.inputs.stage == 'develop' || github.event.inputs.stage == 'test'
+        if: contains(fromJSON('["develop","test","develop31","test31"]'), github.event.inputs.stage)
         working-directory: experiment-b/juiceshop-v3
         run: |
           git config user.name katlaang
           git config user.email katlaang@users.noreply.github.com
-          git add frozen
+          git add frozen frozen-v31 2>/dev/null || git add frozen
           git commit -m "juiceshop-v3: record the ${{ github.event.inputs.stage }} stage (run ${{ github.run_id }})"
           git push origin HEAD:${{ github.ref_name }}

@@ -85,3 +85,40 @@ class ProxyTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class V31Tests(unittest.TestCase):
+    def test_cauchy_lets_one_rare_signal_alert(self):
+        import numpy as np
+        cal = np.column_stack([np.zeros(999), np.random.default_rng(0).random(999), np.random.default_rng(1).random(999),
+                               np.random.default_rng(2).random(999)])
+        rare = np.array([[5.0, 0.2, 0.2, 0.2]])
+        common = np.array([[0.0, 0.2, 0.2, 0.2]])
+        self.assertEqual(m.cauchy(common, cal)[0], 0.0)          # nothing unusual: exactly zero
+        self.assertGreater(m.cauchy(rare, cal)[0], 50.0)          # one never-seen signal dominates
+        mixed = np.array([[5.0, 0.0, 0.0, 0.0]])                  # others at p = 1 do not cancel it
+        self.assertAlmostEqual(m.cauchy(mixed, cal)[0], m.cauchy(rare, cal)[0])
+
+    def test_zap_exact_match(self):
+        import confirm
+        recs = [{"source": "attack", "method": "GET", "path": "/rest/products/search?q=X1", "body": ""},
+                {"source": "attack", "method": "GET", "path": "/rest/products/search?q=X2", "body": ""}]
+        msgs = [{"pluginId": "40018", "risk": "High", "family": "sqli",
+                 "requestHeader": "GET http://127.0.0.1:9002/rest/products/search?q=X2 HTTP/1.1\r\nHost: x", "requestBody": ""}]
+        self.assertEqual(confirm.zap_confirmed(recs, msgs, {"40018"}), {1: "sqli"})
+        self.assertEqual(confirm.zap_confirmed(recs, msgs, {"10202"}), {})
+
+    def test_challenge_window(self):
+        import confirm
+        recs = [{"source": "attack", "t_send": 1000.0, "t_recv": 1000.2}, {"source": "benign", "t_send": 1000.3, "t_recv": 1000.4}]
+        ch = [{"solved": True, "category": "Injection", "updatedAt": "1970-01-01T00:16:40.100Z"},
+              {"solved": True, "category": "XSS", "updatedAt": "1970-01-01T00:16:40.350Z"}]
+        self.assertEqual(confirm.challenge_confirmed(recs, ch), {0: "challenge: Injection"})
+
+    def test_sqlmap_payloads(self):
+        import confirm
+        log = "Parameter: q (GET)\n    Type: boolean-based blind\n    Payload: q=apple' AND 1=1-- abcd\n"
+        p = confirm.sqlmap_payloads(log)
+        recs = [{"path": "/s?q=apple%27%20AND%201%3D1--%20abcd", "body": ""}]
+        self.assertEqual(confirm.sqlmap_confirmed(recs, ["sqlmap"], ["apple' AND 1=1-- abcd"]), {0: "sqli (seen in DVWA)"})
+        self.assertEqual(p, ["q=apple' AND 1=1-- abcd"])

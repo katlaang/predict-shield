@@ -1,0 +1,34 @@
+{
+ "code_sha256": {
+  "benign.py": "29018fbbf644a517e9d196097d79ae07afecd97598b041520b98ba2325711d2c",
+  "confirm.py": "71387804b916ec0f308c8fae6993daff5dfc9a9f265919c05c2878181f43cab0",
+  "detector.py": "cff106a84e57a9fa05f8ebe9c85a5070ac91a2211e8c27da6cd13009f5e75051",
+  "lab.py": "85e41e385ae39c8435e3110ba824cb72009ac4cfbcf22d2ae527971ace8b458b",
+  "model_js.py": "65474b4cedacd8d34687b6813ec709d6bf95dc7d7ca74eaf8460a6dc54b642fb",
+  "model_v3.py": "8df890c22184e77ab42a520f0e99c341a9981f67a1dc93b151990b0fdf8d5cdd",
+  "protocol.json": "9d225ed243da765da3cfedff2a10df354827b7a12671da9b761d880dd08db38f",
+  "protocol_v31.json": "7ff38910b8faa00ab5c8bb88833e644232b750cd91fbc1b4e73235c0c178b10b",
+  "serial_proxy.py": "2ebe0bd38d0a073a9420ae665ddf955dd3d920e820410dad11059a08a1c7085d"
+ },
+ "freeze_sha256": "fd5d1b9314c3d2e0e14d7ccb62a63d7eb5cec0c05e34f3aa4adae09bb4550447",
+ "model_sha256": "c20af88709641e95adc4ae7a9c28b07558c30fe2c8f18ca633aecdb9b0e76d35",
+ "rows": {
+  "calibration": 1050,
+  "fit": 1200,
+  "threshold": 751
+ },
+ "schema": "predict-shield/juiceshop-v3-freeze/1",
+ "sklearn": "1.7.2",
+ "threshold_split_alert_rate": 0.0039946737683089215,
+ "threshold_split_alert_rate_cauchy": 0.002663115845539281,
+ "thresholds": {
+  "cauchy": 21.270439120732213,
+  "cauchy_without_learned_anomaly": 11.148134874565427,
+  "fused": 16.86229947197726,
+  "fused_without_learned_anomaly": 10.601349679213884,
+  "host_novelty": 0.0,
+  "learned_anomaly": 0.6185971643464222,
+  "request_novelty": 1.0,
+  "response_shift": 50.0
+ }
+}

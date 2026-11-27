@@ -25,12 +25,28 @@ sys.path.insert(0, str(V1))
 sys.path.insert(0, str(V3))
 import lab  # noqa: E402
 import model_v3 as v3  # noqa: E402
+import confirm  # noqa: E402
 
 SEED = 2026112901
 FIT, CAL = 0.40, 0.35
 BUDGET, CEILING, DETECT, MIN_CONFIRMED = 0.005, 0.01, 0.90, 30
 CODE = {"model_js.py": HERE, "serial_proxy.py": HERE, "benign.py": HERE, "protocol.json": HERE,
+        "protocol_v31.json": HERE, "confirm.py": HERE,
         "model_v3.py": V3, "lab.py": V1, "detector.py": V1}
+
+
+def cauchy(raw: np.ndarray, calibration: np.ndarray, columns=range(4)) -> np.ndarray:
+    """Cauchy combination of tail probabilities (Liu and Xie, 2020), with each p capped at 0.5.
+
+    One very small p carries the decision. The cap makes an unremarkable signal (p >= 0.5)
+    contribute exactly zero; uncapped, a p near 1 adds a large negative term that cancels a
+    strong signal elsewhere, which is the failure this change exists to remove."""
+    t = 0.0
+    cols = list(columns)
+    for j in cols:
+        p = np.clip(v3.tail_p(raw[:, j], calibration[:, j]), 1e-12, 0.5)
+        t = t + np.tan((0.5 - p) * np.pi)
+    return t / len(cols)
 
 
 def sha256(b: bytes) -> str:
@@ -105,7 +121,9 @@ def develop(a) -> None:
     raw = v3.evidence(ex, per, docroot, state, model)
     cal, thr = raw[n1:n2], raw[n2:]
     state["calibration"] = cal.tolist()
-    th = {"fused": v3.v1.normal_threshold(v3.fused(thr, cal), BUDGET),
+    th = {"cauchy": v3.v1.normal_threshold(cauchy(thr, cal), BUDGET),
+          "cauchy_without_learned_anomaly": v3.v1.normal_threshold(cauchy(thr, cal, range(3)), BUDGET),
+          "fused": v3.v1.normal_threshold(v3.fused(thr, cal), BUDGET),
           "fused_without_learned_anomaly": v3.v1.normal_threshold(v3.fused(thr, cal, range(3)), BUDGET)}
     for j, name in enumerate(v3.COMPONENTS):
         th[name] = v3.v1.normal_threshold(thr[:, j], BUDGET)
@@ -116,6 +134,7 @@ def develop(a) -> None:
     freeze = {"schema": "predict-shield/juiceshop-v3-freeze/1", "model_sha256": sha256(blob), "code_sha256": code_hashes(),
               "thresholds": th, "rows": {"fit": n1, "calibration": n2 - n1, "threshold": len(ex) - n2},
               "threshold_split_alert_rate": float((v3.fused(thr, cal) > th["fused"]).mean()),
+              "threshold_split_alert_rate_cauchy": float((cauchy(thr, cal) > th["cauchy"]).mean()),
               "sklearn": __import__("sklearn").__version__}
     freeze["freeze_sha256"] = sha256(json.dumps(freeze, sort_keys=True).encode())
     (a.out_dir / "freeze.json").write_text(json.dumps(freeze, indent=1, sort_keys=True) + "\n")
@@ -236,9 +255,84 @@ def test(a) -> None:
     print(json.dumps(checks), outcome.upper())
 
 
+MIN_FAMILIES = 2
+
+
+def test31(a) -> None:
+    """The v3.1 test: Cauchy fusion as the registered detector, exact multi-source confirmation."""
+    if a.output.exists():
+        raise SystemExit("a test report already exists; the test runs once")
+    freeze, bundle = verify(a.frozen_dir, a.expected_freeze_sha256)
+    recs, ex, per = load(a.log, a.trace)
+    scanners = {str(s["id"]): s["name"] for s in json.loads(a.scanners.read_text()).get("scanners", [])}
+    labels = label(recs, scanners)
+    if not any(l.startswith("zap:") for l in labels):
+        raise SystemExit("harness check failed: no request carried a ZAP plugin id")
+    messages = json.loads(a.messages.read_text())
+    for m in messages:
+        m["family"] = family(scanners.get(str(m.get("pluginId")), "plugin " + str(m.get("pluginId"))))
+    challenges = json.loads(a.challenges.read_text()).get("data", [])
+    sqltext = a.sqlmap_log.read_text(errors="replace") if a.sqlmap_log and a.sqlmap_log.exists() else ""
+    sources = {"zap": confirm.zap_confirmed(recs, messages, set(scanners)),
+               "challenge": confirm.challenge_confirmed(recs, challenges),
+               "sqlmap": confirm.sqlmap_confirmed(recs, labels, confirm.sqlmap_payloads(sqltext))}
+    conf_family = {}
+    for src in ("sqlmap", "challenge", "zap"):
+        conf_family.update(sources[src])
+    raw = v3.evidence(ex, per, str(a.docroot), bundle["state"], bundle["model"])
+    cal, th = np.asarray(bundle["state"]["calibration"]), bundle["state"]["thresholds"]
+    alerts_by = {"cauchy": cauchy(raw, cal) > th["cauchy"],
+                 "cauchy_without_learned_anomaly": cauchy(raw, cal, range(3)) > th["cauchy_without_learned_anomaly"],
+                 "fused_fisher_v3": v3.fused(raw, cal) > th["fused"],
+                 "fused_fisher_without_learned_anomaly": v3.fused(raw, cal, range(3)) > th["fused_without_learned_anomaly"]}
+    for j, name in enumerate(v3.COMPONENTS):
+        alerts_by[name] = raw[:, j] > th[name]
+    lab_arr = np.array(labels)
+    benign = lab_arr == "benign"
+    attack = np.array([l.startswith("zap:") or l == "sqlmap" for l in labels])
+    conf = np.zeros(len(recs), dtype=bool)
+    conf[list(conf_family)] = True
+    cfam = np.array([conf_family.get(i, "") for i in range(len(recs))])
+    afam = np.array([("sqli (seen in DVWA)" if l == "sqlmap" else family(scanners.get(l[4:], "plugin " + l[4:])))
+                     if (l.startswith("zap:") or l == "sqlmap") else "" for l in labels])
+
+    def rate(al, mask):
+        k, n = int((al & mask).sum()), int(mask.sum())
+        return {"alerts": k, "of": n, "rate": k / n if n else None, "wilson_95": v3.v1.wilson(k, n)}
+
+    results = {}
+    for name, al in alerts_by.items():
+        results[name] = {"benign": rate(al, benign), "attack_attempts": rate(al, attack), "confirmed_attacks": rate(al, conf),
+                         "confirmed_by_family": {f: rate(al, conf & (cfam == f)) for f in sorted(set(cfam[conf]))},
+                         "attempts_by_family": {f: rate(al, attack & (afam == f)) for f in sorted(set(afam[attack]))}}
+    r = results["cauchy"]
+    n_conf, n_fam = int(conf.sum()), len(set(cfam[conf]))
+    checks = {"benign_alert_rate_at_most_1pct": r["benign"]["rate"] is not None and r["benign"]["rate"] <= CEILING,
+              "confirmed_attacks_at_least_90pct": (r["confirmed_attacks"]["rate"] or 0) >= DETECT,
+              "at_least_30_confirmed": n_conf >= MIN_CONFIRMED,
+              "at_least_2_confirmed_families": n_fam >= MIN_FAMILIES}
+    enough = checks["at_least_30_confirmed"] and checks["at_least_2_confirmed_families"]
+    outcome = "inconclusive" if not enough else (
+        "passed" if checks["benign_alert_rate_at_most_1pct"] and checks["confirmed_attacks_at_least_90pct"] else "failed")
+    report = {"schema": "predict-shield/juiceshop-v31-test/1", "freeze_sha256": freeze["freeze_sha256"],
+              "requests": len(recs), "label_counts": {k: int((lab_arr == k).sum()) for k in ("benign", "unknown", "sqlmap")},
+              "zap_requests": int(sum(1 for l in labels if l.startswith("zap:"))),
+              "confirmed": n_conf, "confirmed_families": n_fam,
+              "confirmed_by_source": {k: len(v) for k, v in sources.items()},
+              "challenges_solved": sum(1 for c in challenges if c.get("solved")),
+              "results": results, "checks": checks, "outcome": outcome,
+              "pass_condition": json.loads((HERE / "protocol_v31.json").read_text())["pass_condition"]}
+    a.output.write_text(json.dumps(report, indent=1, sort_keys=True) + "\n")
+    for name, x in results.items():
+        print(name, "benign", x["benign"]["alerts"], "/", x["benign"]["of"], "attempts", x["attack_attempts"]["alerts"], "/",
+              x["attack_attempts"]["of"], "confirmed", x["confirmed_attacks"]["alerts"], "/", x["confirmed_attacks"]["of"])
+    print("confirmed by source", report["confirmed_by_source"], "families", sorted(set(cfam[conf])))
+    print(json.dumps(checks), outcome.upper())
+
+
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("stage", choices=("develop", "test"))
+    ap.add_argument("stage", choices=("develop", "test", "test31"))
     ap.add_argument("--log", type=Path, required=True)
     ap.add_argument("--trace", type=Path, required=True)
     ap.add_argument("--docroot", type=Path, required=True)
@@ -249,8 +343,10 @@ def main():
     ap.add_argument("--scanners", type=Path)
     ap.add_argument("--sqlmap-log", type=Path)
     ap.add_argument("--output", type=Path)
+    ap.add_argument("--messages", type=Path)
+    ap.add_argument("--challenges", type=Path)
     a = ap.parse_args()
-    develop(a) if a.stage == "develop" else test(a)
+    {"develop": develop, "test": test, "test31": test31}[a.stage](a)
 
 
 if __name__ == "__main__":
