@@ -1,0 +1,256 @@
+{
+ "freeze_sha256": "7a5c6510735c80c7f93ab8f7efe507772bbc1731672421c2867e581e6a56e788",
+ "orgs": {
+  "organization-x": {
+   "days": 7,
+   "forest": {
+    "alert_rate": 0.01745675848814862,
+    "alert_rate_seen_templates": 0.009744438315866888,
+    "alert_rate_unseen_templates": 0.06956521739130435,
+    "alerts": 109,
+    "alerts_per_day": 15.571428571428571,
+    "alerts_with_independent_evidence": 109,
+    "alerts_without_independent_evidence": 0,
+    "detection_proxy": 0.25829383886255924,
+    "detection_proxy_crs_pl1": 0.2809917355371901,
+    "unconfirmed_alert_rate": 0.0
+   },
+   "fused": {
+    "alert_rate": 0.014894298526585522,
+    "alert_rate_seen_templates": 0.00441257584114727,
+    "alert_rate_unseen_templates": 0.08571428571428572,
+    "alerts": 93,
+    "alerts_per_day": 13.285714285714286,
+    "alerts_with_independent_evidence": 93,
+    "alerts_without_independent_evidence": 0,
+    "by_day": {
+     "2025-10-01": {
+      "alerts": 6,
+      "requests": 1470
+     },
+     "2025-10-02": {
+      "alerts": 2,
+      "requests": 1134
+     },
+     "2025-10-03": {
+      "alerts": 18,
+      "requests": 822
+     },
+     "2025-10-04": {
+      "alerts": 24,
+      "requests": 330
+     },
+     "2025-10-05": {
+      "alerts": 30,
+      "requests": 435
+     },
+     "2025-10-06": {
+      "alerts": 13,
+      "requests": 1726
+     },
+     "2025-10-07": {
+      "alerts": 0,
+      "requests": 327
+     }
+    },
+    "by_site": {
+     "site-00": {
+      "alerts": 93,
+      "requests": 6244
+     }
+    },
+    "detection_proxy": 0.22037914691943128,
+    "detection_proxy_crs_pl1": 0.2396694214876033,
+    "unconfirmed_alert_rate": 0.0
+   },
+   "independent_evidence": {
+    "any": 422,
+    "crs_pl1": 363,
+    "crs_pl2": 422,
+    "libinjection": 112
+   },
+   "novelty": {
+    "alert_rate": 0.0014413837283792441,
+    "alert_rate_seen_templates": 0.001654715940430226,
+    "alert_rate_unseen_templates": 0.0,
+    "alerts": 9,
+    "alerts_per_day": 1.2857142857142858,
+    "alerts_with_independent_evidence": 9,
+    "alerts_without_independent_evidence": 0,
+    "detection_proxy": 0.02132701421800948,
+    "detection_proxy_crs_pl1": 0.024793388429752067,
+    "unconfirmed_alert_rate": 0.0
+   },
+   "passed": true,
+   "test_requests": 6244,
+   "unseen_template_share": 0.1289237668161435
+  },
+  "organization-y": {
+   "days": 10,
+   "forest": {
+    "alert_rate": 0.3269491640687357,
+    "alert_rate_seen_templates": 0.39979515943277627,
+    "alert_rate_unseen_templates": 0.007611523268137585,
+    "alerts": 91346,
+    "alerts_per_day": 9134.6,
+    "alerts_with_independent_evidence": 86504,
+    "alerts_without_independent_evidence": 4842,
+    "detection_proxy": 0.9966702383832797,
+    "detection_proxy_crs_pl1": 0.5175879396984925,
+    "unconfirmed_alert_rate": 0.017330675151849214
+   },
+   "fused": {
+    "alert_rate": 0.03165121031966183,
+    "alert_rate_seen_templates": 0.011692616068995226,
+    "alert_rate_unseen_templates": 0.11914442624530301,
+    "alerts": 8843,
+    "alerts_per_day": 884.3,
+    "alerts_with_independent_evidence": 724,
+    "alerts_without_independent_evidence": 8119,
+    "by_day": {
+     "2025-04-22": {
+      "alerts": 419,
+      "requests": 26354
+     },
+     "2025-04-23": {
+      "alerts": 1237,
+      "requests": 26204
+     },
+     "2025-04-24": {
+      "alerts": 398,
+      "requests": 27153
+     },
+     "2025-04-25": {
+      "alerts": 2347,
+      "requests": 25647
+     },
+     "2025-04-26": {
+      "alerts": 854,
+      "requests": 36772
+     },
+     "2025-04-27": {
+      "alerts": 787,
+      "requests": 26337
+     },
+     "2025-04-28": {
+      "alerts": 486,
+      "requests": 26909
+     },
+     "2025-04-29": {
+      "alerts": 980,
+      "requests": 48899
+     },
+     "2025-04-30": {
+      "alerts": 1018,
+      "requests": 32376
+     },
+     "2025-05-01": {
+      "alerts": 317,
+      "requests": 2738
+     }
+    },
+    "by_site": {
+     "site-00": {
+      "alerts": 28,
+      "requests": 126
+     },
+     "site-01": {
+      "alerts": 516,
+      "requests": 25930
+     },
+     "site-02": {
+      "alerts": 124,
+      "requests": 5410
+     },
+     "site-03": {
+      "alerts": 98,
+      "requests": 3815
+     },
+     "site-04": {
+      "alerts": 49,
+      "requests": 3971
+     },
+     "site-05": {
+      "alerts": 3001,
+      "requests": 36094
+     },
+     "site-06": {
+      "alerts": 180,
+      "requests": 3671
+     },
+     "site-07": {
+      "alerts": 52,
+      "requests": 2317
+     },
+     "site-08": {
+      "alerts": 452,
+      "requests": 11044
+     },
+     "site-09": {
+      "alerts": 71,
+      "requests": 3614
+     },
+     "site-10": {
+      "alerts": 1072,
+      "requests": 37953
+     },
+     "site-11": {
+      "alerts": 253,
+      "requests": 33190
+     },
+     "site-12": {
+      "alerts": 189,
+      "requests": 361
+     },
+     "site-13": {
+      "alerts": 49,
+      "requests": 2954
+     },
+     "site-14": {
+      "alerts": 65,
+      "requests": 6778
+     },
+     "site-15": {
+      "alerts": 9,
+      "requests": 89
+     },
+     "site-16": {
+      "alerts": 448,
+      "requests": 13559
+     },
+     "site-17": {
+      "alerts": 2187,
+      "requests": 88513
+     }
+    },
+    "detection_proxy": 0.008341686541541368,
+    "detection_proxy_crs_pl1": 0.6934673366834171,
+    "unconfirmed_alert_rate": 0.02905984129654353
+   },
+   "independent_evidence": {
+    "any": 86793,
+    "crs_pl1": 199,
+    "crs_pl2": 86793,
+    "libinjection": 5
+   },
+   "novelty": {
+    "alert_rate": 0.0004617218287047808,
+    "alert_rate_seen_templates": 0.0005670479221430016,
+    "alert_rate_unseen_templates": 0.0,
+    "alerts": 129,
+    "alerts_per_day": 12.9,
+    "alerts_with_independent_evidence": 126,
+    "alerts_without_independent_evidence": 3,
+    "detection_proxy": 0.0014517299782240503,
+    "detection_proxy_crs_pl1": 0.07537688442211055,
+    "unconfirmed_alert_rate": 1.073771694662281e-05
+   },
+   "passed": false,
+   "test_requests": 279389,
+   "unseen_template_share": 0.18574460698166356
+  }
+ },
+ "orgs_passed": 1,
+ "pass_condition": "Per organization: alerts without independent evidence are at most 1% of in-scope test requests. Headline: organizations passing out of 2.",
+ "schema": "predict-shield/real-logs-test/1"
+}
