@@ -14,7 +14,6 @@ from pathlib import Path
 from collect import load_plan
 from train import _read_stream, summarize_operator_telemetry, ROUTING_PROFILES
 from paired_defense_eval import ACTIONS, evaluate_paired, make_trusted_lab_model_policy
-from model_adapter import load_local_bundle
 
 
 def _hash_json(obj: object) -> str:
@@ -142,6 +141,7 @@ def main():
     if args.output.exists():
         p.error("Refusing to overwrite results")
     rows, provenance = load_new_paired(args.plan, args.records)
+    from model_adapter import load_local_bundle
     model = load_local_bundle(args.historical_model,
                               trusted_sha256=args.historical_model_sha256)
     report = evaluate_paired(
