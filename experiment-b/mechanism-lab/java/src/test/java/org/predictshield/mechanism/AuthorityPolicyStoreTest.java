@@ -101,4 +101,44 @@ class AuthorityPolicyStoreTest {
         assertEquals(new PolicyRevision(3, true, trial),
                 new AuthorityPolicyStore(file).loadOrInitialize());
     }
+    @Test
+    void orphanedIncompleteTempWriteCannotReplaceValidCommittedPolicy() throws Exception {
+        Path file = dir.resolve("policy.txt");
+        AuthorityPolicyStore store = new AuthorityPolicyStore(file);
+        store.loadOrInitialize();
+        String trial = "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee";
+        PolicyRevision committed = new PolicyRevision(9, true, trial);
+        store.save(committed);
+        String original = Files.readString(file);
+
+        // Crash before the atomic replacement: incomplete temporary bytes
+        // must not become a new authority policy or silently revoke access.
+        Path tornTmp = dir.resolve("policy.txt.interrupted.tmp");
+        Files.writeString(tornTmp, "PREDICT_SHIELD_AUTHORITY_V1\\nrevision=10\\n");
+        assertEquals(committed, new AuthorityPolicyStore(file).loadOrInitialize());
+        assertEquals(original, Files.readString(file));
+        assertTrue(Files.exists(tornTmp));
+    }
+
+    @Test
+    void multipleRestartsAndOrderedReaffirmationsNeverUnrevoke() throws Exception {
+        Path file = dir.resolve("policy.txt");
+        AuthorityPolicyStore state = new AuthorityPolicyStore(file);
+        state.loadOrInitialize();
+        String trial = "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee";
+        for (long revision = 1; revision <= 8; revision++) {
+            state.save(new PolicyRevision(revision, true, trial));
+            state = new AuthorityPolicyStore(file);
+            PolicyRevision recovered = state.loadOrInitialize();
+            assertEquals(revision, recovered.revision());
+            assertTrue(recovered.revoked());
+            assertEquals(trial, recovered.trialId());
+        }
+        AuthorityPolicyStore finalState = state;
+        assertThrows(IllegalStateException.class,
+            () -> finalState.save(new PolicyRevision(9, false, trial)));
+        assertEquals(new PolicyRevision(8, true, trial),
+            new AuthorityPolicyStore(file).loadOrInitialize());
+    }
+
 }
