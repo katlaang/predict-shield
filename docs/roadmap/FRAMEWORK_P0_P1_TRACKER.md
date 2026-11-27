@@ -70,6 +70,10 @@
 
 **P1 source integration:** [LANL, UGR'16 and MAWILab normalizers](../../experiment-b/operational-sources/README.md) and safety tests have been implemented on a separate research branch, not yet proven with real data. LANL's publisher describes a copyright waiver but still requires use-information submission before source download; UGR'16 reuse terms remain unclear; MAWILab anomaly annotations are not independently confirmed attacks and trace use terms require a separate review. No production or critical-infrastructure effectiveness is established. Claude retains ownership of SQL/attack detector work.
 
+### P1-05a: Read-only multi-source asset evidence correlation
+
+**Status: IMPLEMENTED_UNVALIDATED.** A conservative [HMAC-bound context graph](../../experiment-b/operational-sources/context_graph.py) correlates authorized LANL auth, DNS, flow and red-team records and UGR flows as *observed events*, not confirmed attack paths or complete inventories. It rejects mixed pseudonymization keys and contradictory labels. [Graph tests](../../experiment-b/operational-sources/test_context_graph.py) are deterministic and synthetic only. This does not complete P1-05's authenticated **live** ingestion, streaming inference or operational model scoring. No real site data admitted; no detection or critical-infrastructure effect measured.
+
 ## Completed in this work session / to update upon merge
 
 - [x] PR #171 merged. Evidence rounding corrected.
