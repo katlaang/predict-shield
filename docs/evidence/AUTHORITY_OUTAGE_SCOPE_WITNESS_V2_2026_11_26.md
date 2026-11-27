@@ -1,6 +1,6 @@
 # Authority outage witness: exact-scope and denial-evidence integrity (2026-11-26)
 
-**Status:** Code and test changes in review; physical outage smoke result is required before marking the new checks validated. The measured outcomes during a stopped authority remain **INDETERMINATE**, not VERIFIED. This is a disposable Docker laboratory experiment, not a production control or a U.S. critical-infrastructure pilot.
+**Status:** [PR #180](https://github.com/katlaang/predict-shield/pull/180) merged, and [physical witness workflow #45920913347](https://github.com/katlaang/predict-shield/actions/runs/45920913347) completed successfully: unit tests, actual Docker authority outage observation, conservative bounds checks, and cleanup passed. The measured outcomes during a stopped authority remain **INDETERMINATE**, not VERIFIED. This is a disposable Docker laboratory experiment, not a production control or a U.S. critical-infrastructure pilot.
 
 ## Why this was needed
 
@@ -16,7 +16,7 @@ Existing `authority_outage_witness.py` correctly retained `INDETERMINATE` while 
 
 ## Acceptance and remaining limitations
 
-- Software unit tests must pass on GitHub Actions, followed by the real physical `authority-outage-witness.yml` stop/start smoke.
+- **Confirmed for this implementation:** software unit tests and the real Docker authority outage witness smoke passed in [run 45920913347](https://github.com/katlaang/predict-shield/actions/runs/45920913347).
 - This witness digest detects unintended modification of one in-memory record. It **does not authenticate** a malicious source or prove independently managed custody. The independent source still needs to be trusted and scoped.
 - A 403 corroborated by the node's own revoked metadata is only an observed local denial, **not** an independently verified authoritative policy verdict.
 - Unknown responses retain upper/lower bounds rather than optimistic success.
