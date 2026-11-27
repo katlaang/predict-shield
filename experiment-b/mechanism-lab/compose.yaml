@@ -34,6 +34,7 @@ services:
     environment:
       LAB_ROLE: authority
       LAB_AUTHORITY_STATE_FILE: /lab-authority-state/policy.txt
+      LAB_OBSERVER_TOKEN: ${LAB_OBSERVER_TOKEN:-}
       LAB_CONTROL_TOKEN: ${LAB_CONTROL_TOKEN:?Provide control token}
       LAB_INTERNAL_TOKEN: ${LAB_INTERNAL_TOKEN:?Provide internal token}
       SPRING_KAFKA_BOOTSTRAP_SERVERS: broker:9092
