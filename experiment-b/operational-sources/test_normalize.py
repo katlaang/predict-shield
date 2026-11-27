@@ -86,6 +86,24 @@ class OperationalSourceTests(unittest.TestCase):
         rows, _ = self.normalize(UGR_HEADER + UGR_LINE, "ugr16-flow", compressed=True)
         self.assertEqual(rows[0]["source_line"], 2)
 
+    def test_mawilab_categories_are_not_verified_attack_truth(self):
+        header = "anomalyID,srcIP,srcPort,dstIP,dstPort,taxonomy,heuristic,distance,nbDetectors,label\n"
+        row = "A13,192.0.2.1,33001,198.51.100.2,443,DDoS,heur,1.25,5,anomalous\n"
+        rows, _ = self.normalize(header + row, "mawilab-annotation")
+        self.assertEqual(rows[0]["source_line"], 2)
+        self.assertEqual(rows[0]["publisher_anomaly_category"], "anomalous")
+        self.assertEqual(rows[0]["publisher_detector_count"], 5)
+        self.assertEqual(rows[0]["label"], "unknown")
+        self.assertFalse(rows[0]["verified_attack"])
+        self.assertNotIn("192.0.2.1", json.dumps(rows))
+
+    def test_mawilab_notice_does_not_mean_independently_benign(self):
+        header = "anomalyID,srcIP,srcPort,dstIP,dstPort,taxonomy,heuristic,distance,nbDetectors,label\n"
+        row = "A14,192.0.2.2,1,198.51.100.3,443,ntscSYN,heur,0.1,1,notice\n"
+        rows, _ = self.normalize(header + row, "mawilab-annotation", compressed=True)
+        self.assertEqual(rows[0]["label"], "unknown")
+        self.assertEqual(rows[0]["truth_basis"], "unverified")
+
     def test_reject_invalid_digest(self):
         path, _ = self.create("a.csv", LANL_AUTH)
         with self.assertRaisesRegex(ValueError, "mismatch"):
