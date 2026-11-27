@@ -8,6 +8,8 @@ on:
   push:
     branches: [feat/superviz25-sql]
     paths: ['experiment-b/superviz25-sql/**', '.github/workflows/superviz25-sql.yml']
+  pull_request:
+    paths: ['experiment-b/superviz25-sql/**', '.github/workflows/superviz25-sql.yml']
   workflow_dispatch:
     inputs:
       stage:
