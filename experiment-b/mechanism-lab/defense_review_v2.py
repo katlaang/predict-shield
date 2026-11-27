@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import math
 import time
+from broker_observer_v1 import verify_broker_evidence
 
 KNOWN = ("resync_policy", "restart_enforcer", "gateway_restrict", "monitor_only")
 MAX_AGE_S = 5.0
@@ -155,8 +156,19 @@ def review_recommendation(
     if any(a not in KNOWN for a in eligible_actions) or len(set(eligible_actions)) != len(eligible_actions):
         raise ValueError("Unregistered action eligibility")
     telemetry = inspect_operator_evidence(pre_action, now_monotonic=now_monotonic)
+    broker = verify_broker_evidence(
+        pre_action.get("broker_observation") if isinstance(pre_action, dict) else None,
+        now_monotonic=now_monotonic)
     reliability = check_model_reliability(model_evaluation, bundle)
     reasons = telemetry["reasons"][:] + reliability["reasons"][:]
+    if broker["status"] != "MEASURED":
+        reasons.append("INDEPENDENT_BROKER_EVIDENCE_UNAVAILABLE")
+        reasons.extend(broker["reasons"])
+    else:
+        telemetry["observed_committed_backlog_per_group"] = dict(broker["backlog"])
+        if any(value > 0 for value in broker["backlog"].values()):
+            telemetry.setdefault("pre_action_signals", []).append(
+                "BROKER_COMMITTED_BACKLOG_OBSERVED")
     details = {}
     if len(predictions) != len(KNOWN) or {p.action_id for p in predictions} != set(KNOWN):
         raise ValueError("Missing or duplicate action-specific model predictions")
@@ -211,6 +223,7 @@ def review_recommendation(
         "reasons": sorted(set(reasons)),
         "original_proposal": selected_action,
         "operator_evidence": telemetry,
+        "broker_offset_evidence": broker,
         "model_reliability": reliability,
         "action_prediction_screen": details,
         "bounded_effective_candidates": supported,
