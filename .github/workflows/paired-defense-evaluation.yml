@@ -1,6 +1,12 @@
 name: Paired adaptive-defense research evaluation tests
 
 on:
+  workflow_dispatch:
+    inputs:
+      source_run_id:
+        description: 'Historical physical campaign run ID whose artifacts remain available'
+        required: true
+        default: '44879497946'
   pull_request:
     paths:
       - 'experiment-b/mechanism-lab/paired_defense_eval.py'
@@ -32,7 +38,8 @@ jobs:
         run: python -m unittest test_paired_defense_eval -v
 
   historical-paired-measured-evaluation:
-    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+    # Explicit opt-in: historic artifacts expire, and this is exploratory only.
+    if: github.event_name == 'workflow_dispatch'
     needs: paired-policy-unit-tests
     runs-on: ubuntu-latest
     timeout-minutes: 25
@@ -51,7 +58,7 @@ jobs:
         with:
           name: mechanism-scored-records
           repository: katlaang/predict-shield
-          run-id: 44879497946
+          run-id: ${{ github.event.inputs.source_run_id }}
           github-token: ${{ github.token }}
           path: ${{ runner.temp }}/measured
       - name: Fail if source data or independent streams are absent
