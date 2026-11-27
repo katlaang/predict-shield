@@ -1,0 +1,167 @@
+name: Confirmatory defense-selection protocol 196 - PILOT ONLY
+
+on:
+  pull_request:
+    paths:
+      - "experiment-b/mechanism-lab/confirmatory_196_*.py"
+      - "experiment-b/mechanism-lab/test_confirmatory_196.py"
+      - "experiment-b/mechanism-lab/pilot.py"
+      - "experiment-b/mechanism-lab/plan.py"
+      - "docs/protocols/CONFIRMATORY_DEFENSE_SELECTION_V1.md"
+      - ".github/workflows/confirmatory-196-pilot.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  protocol-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Verify all ten strata, registered seed and plan exclusions
+        working-directory: experiment-b/mechanism-lab
+        run: python -m unittest test_confirmatory_196 test_pilot -v
+
+  sixteen-configuration-physical-pilot:
+    needs: protocol-check
+    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)
+    runs-on: ubuntu-latest
+    timeout-minutes: 330
+    permissions:
+      contents: read
+      actions: read
+    defaults:
+      run:
+        working-directory: experiment-b/mechanism-lab
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install pinned original measured-model runtime
+        run: python -m pip install "scikit-learn==1.7.2" "numpy==2.3.4" "joblib==1.5.2"
+      - name: Fetch original 1200 physical action records
+        uses: actions/download-artifact@v4
+        with:
+          name: mechanism-scored-records
+          repository: katlaang/predict-shield
+          run-id: 44879497946
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/historical
+      - name: Freeze model SHA before any new pilot outcomes
+        run: |
+          mkdir -p reports
+          python train.py \
+            --records "$RUNNER_TEMP/historical/results/scored" \
+            --report reports/confirmatory-196-training.json \
+            --export-model "$RUNNER_TEMP/confirm196-original-model.joblib"
+          sha256sum "$RUNNER_TEMP/confirm196-original-model.joblib" | cut -d' ' -f1 > reports/frozen-model.sha256
+          test "$(cat reports/frozen-model.sha256)" = "87208240dbea19b34c4a5ac067639ac9cdb484b2de8f1985dbbcd143d4fe3b39"
+      - name: Freeze deterministic sixteen-group five-family pilot plan
+        run: |
+          python confirmatory_196_plan.py --phase pilot --output plans/confirmatory-196-pilot
+          python - <<'PY'
+          import json
+          p=json.load(open("plans/confirmatory-196-pilot/selected.json"))
+          assert p["phase"]=="pilot" and len(p["selected"])==16
+          assert p["selected_arms"]==192
+          assert len({(x["family"],x["restart_permitted"]) for x in p["selected"]})==10
+          print("Frozen 16 pilot groups across ten strata")
+          PY
+      - name: Create disposable independent Kafka and oracle credentials
+        run: |
+          for name in LAB_CONTROL_TOKEN LAB_ORACLE_TOKEN LAB_INTERNAL_TOKEN; do
+            value="$(python -c 'import secrets;print(secrets.token_urlsafe(32))')"
+            echo "::add-mask::$value"
+            echo "$name=$value" >> "$GITHUB_ENV"
+          done
+      - name: Start isolated four-JVM physical action testbed
+        run: docker compose up --build -d
+      - name: Reject v2 telemetry failure before physical collection
+        run: |
+          python - <<'PY'
+          import json,os
+          from pathlib import Path
+          from pilot import ENFORCERS, operator_telemetry, wait_ready
+          wait_ready()
+          rows=operator_telemetry(os.environ["LAB_CONTROL_TOKEN"])
+          Path("reports/pilot-preflight.json").write_text(json.dumps(
+              {"observed":sum(x["observed"] for x in rows),
+               "total":len(rows),"readings":rows},indent=2)+"\n")
+          if len(rows)!=len(ENFORCERS) or not all(r["observed"] for r in rows):
+              raise RuntimeError("VOID: missing actual v2 operator observations")
+          print("Live v2 telemetry observed on all four enforcers")
+          PY
+      - name: Run sixteen independent reset physical configuration groups
+        run: |
+          python - <<'PY'
+          import json
+          d=json.load(open("plans/confirmatory-196-pilot/selected.json"))
+          with open("reports/pilot-selected-indices.txt","w") as f:
+              for row in d["selected"]:
+                  f.write(row["id"]+" "+str(row["start_index"])+"\n")
+          PY
+          while read -r config start; do
+            echo "Measuring pilot configuration $config"
+            python campaign.py --execute-lab \
+              --plan plans/confirmatory-196-pilot \
+              --records results/confirmatory-196-pilot \
+              --start "$start" --max-trials 12 > "reports/pilot-$config.json"
+            python - "$config" <<'PY'
+          import json,sys
+          d=json.load(open("reports/pilot-"+sys.argv[1]+".json"))
+          assert d["newly_executed_trials"]==12
+          assert d["partial"]==0 and d["invalid"]==0
+          assert not d["newly_excluded"]
+          print("Physical reset interventions executed:", d["newly_executed_trials"])
+          PY
+          done < reports/pilot-selected-indices.txt
+      - name: Score pilot only and determine REGISTERED main size
+        env:
+          PYTHONPATH: ${{ github.workspace }}/engine
+        run: |
+          python confirmatory_196_score.py \
+            --phase pilot \
+            --plan plans/confirmatory-196-pilot \
+            --records results/confirmatory-196-pilot \
+            --model "$RUNNER_TEMP/confirm196-original-model.joblib" \
+            --model-sha256 "$(cat reports/frozen-model.sha256)" \
+            --training-report reports/confirmatory-196-training.json \
+            --output reports/confirmatory-196-pilot-results.json
+          python - <<'PY'
+          import json
+          p=json.load(open("reports/confirmatory-196-pilot-results.json"))
+          assert p["status"]=="DEVELOPMENT_PILOT_NOT_CONFIRMATORY"
+          assert p["provenance"]["groups"]==16 and p["provenance"]["physical_arms"]==192
+          assert not p["ai_superiority_established"]
+          print("Pilot discordance:",p["pilot_sizing"]["pilot_discordant_configurations"])
+          print("Main N proposal only, NOT YET COMMITTED:",
+                p["pilot_sizing"]["registered_main_n"])
+          PY
+      - name: Preserve immutable raw physical evidence even for negative or void runs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: confirmatory-196-pilot-raw-four-stream
+          path: experiment-b/mechanism-lab/results/confirmatory-196-pilot/
+          retention-days: 60
+          if-no-files-found: warn
+      - name: Preserve pilot reports, selected plan, and invalid findings
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: confirmatory-196-pilot-report-and-provenance
+          path: |
+            experiment-b/mechanism-lab/reports/
+            experiment-b/mechanism-lab/plans/confirmatory-196-pilot/
+          retention-days: 90
+          if-no-files-found: warn
+      - name: Destroy isolated laboratory and ephemeral secrets
+        if: always()
+        run: docker compose down --remove-orphans --volumes
