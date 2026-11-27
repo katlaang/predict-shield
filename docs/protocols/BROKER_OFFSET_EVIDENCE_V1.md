@@ -1,6 +1,6 @@
 # PREDICT-SHIELD P0: independent Kafka broker-offset evidence (v1)
 
-**Status:** Under CI validation; no new model fitted, no outcome superiority claimed.
+**Status: VALIDATED FOR BOUNDED LAB TELEMETRY ONLY.** [PR #189](https://github.com/katlaang/predict-shield/pull/189) merged; [GitHub Actions #45929835646](https://github.com/katlaang/predict-shield/actions/runs/45929835646) passed both synthetic evidence contracts and the disposable physical four-group Kafka measurement. Source artifact: `actual-readonly-kafka-broker-offsets`. Before pause all four group backlogs were **0**. During an actual `enforcer-b` Kafka consumer pause its committed backlog reached **3** while the other three were **0**. After resume all four were **0**. The mutation control credential was denied by the observer endpoint. These are actual measured committed-backlog counts, not lag in milliseconds, proof of handler correctness or a measured AI improvement. No new model was trained.
 
 ## Scientific and engineering motivation
 
