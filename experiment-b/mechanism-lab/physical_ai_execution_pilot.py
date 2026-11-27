@@ -13,6 +13,7 @@ from pathlib import Path
 
 from pilot import wait_ready, setup_fault, gateway_probes
 from operator_telemetry_v2 import operator_telemetry_v2
+from broker_observer_v1 import read_broker_offsets
 from model_adapter import load_local_bundle
 from lab_ai_decision import select_lab_defense
 from lab_autonomous_execution import execute_lab_recommendation
@@ -47,6 +48,11 @@ def run(*, project: str, model: Path, trusted_sha256: str, control_token: str,
         },
         "external_deny_observations":gateway_probes(24),
         "operator_observations":operator_telemetry_v2(control_token),
+        # Independently collected, pre-action, broker-side offsets. No
+        # mutation rights, oracle state or post-action labels are supplied.
+        "broker_observation": (
+            read_broker_offsets(os.environ["LAB_OBSERVER_TOKEN"])
+            if os.environ.get("LAB_OBSERVER_TOKEN") else None),
     }
     snapshot, scope, inventory=collect_live_scope(
         project=project, token=control_token, case_id=pre["run_id"])

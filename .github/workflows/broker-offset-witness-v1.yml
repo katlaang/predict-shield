@@ -1,0 +1,97 @@
+name: P0 isolated Kafka broker offsets independent witness
+
+on:
+  pull_request:
+    paths:
+      - 'experiment-b/mechanism-lab/java/src/main/java/org/predictshield/mechanism/BrokerOffsetObserver.java'
+      - 'experiment-b/mechanism-lab/java/src/test/java/org/predictshield/mechanism/BrokerOffsetObserverTest.java'
+      - 'experiment-b/mechanism-lab/broker_observer_v1.py'
+      - 'experiment-b/mechanism-lab/broker_offset_physical_smoke.py'
+      - 'experiment-b/mechanism-lab/test_broker_observer_v1.py'
+      - 'experiment-b/mechanism-lab/defense_review_v2.py'
+      - 'experiment-b/mechanism-lab/test_defense_review_v2.py'
+      - 'experiment-b/mechanism-lab/compose.yaml'
+      - '.github/workflows/broker-offset-witness-v1.yml'
+  push:
+    branches: [master]
+    paths:
+      - 'experiment-b/mechanism-lab/java/src/main/java/org/predictshield/mechanism/BrokerOffsetObserver.java'
+      - 'experiment-b/mechanism-lab/broker_observer_v1.py'
+      - 'experiment-b/mechanism-lab/defense_review_v2.py'
+      - '.github/workflows/broker-offset-witness-v1.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  synthetic-evidence-contracts:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Pure read-only broker evidence tests, no model training
+        working-directory: experiment-b/mechanism-lab
+        run: |
+          python -m unittest test_broker_observer_v1 test_defense_review_v2 test_operator_telemetry_v2 -v
+      - name: Broker observation and physical runner compile
+        working-directory: experiment-b/mechanism-lab
+        run: |
+          python -m py_compile broker_observer_v1.py broker_offset_physical_smoke.py defense_review_v2.py
+
+  isolated-physical-offset-observation:
+    needs: synthetic-evidence-contracts
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Generate four distinct disposable credentials
+        run: |
+          for name in LAB_CONTROL_TOKEN LAB_ORACLE_TOKEN LAB_INTERNAL_TOKEN LAB_OBSERVER_TOKEN; do
+            value="$(python -c 'import secrets;print(secrets.token_urlsafe(32))')"
+            echo "::add-mask::$value"
+            echo "$name=$value" >> "$GITHUB_ENV"
+          done
+      - name: Build isolated Kafka broker, authority, four enforcers, observer
+        working-directory: experiment-b/mechanism-lab
+        run: |
+          for attempt in 1 2 3; do
+            if docker compose up --build -d; then exit 0; fi
+            docker compose down --volumes --remove-orphans || true
+            if [ "$attempt" -lt 3 ]; then sleep $((attempt * 7)); fi
+          done
+          exit 1
+      - name: Read broker offset backlog through isolated credential and physical pause
+        working-directory: experiment-b/mechanism-lab
+        run: |
+          python broker_offset_physical_smoke.py --execute-isolated-lab --output reports/broker-offset-observation.json
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          r=json.loads(Path('reports/broker-offset-observation.json').read_text())
+          assert r['broker_observer_distinct_credential_test'] == 'CONTROL_TOKEN_REJECTED'
+          assert r['during_physical_pause']['enforcer-b'] >= 1
+          assert all(value == 0 for value in r['before'].values())
+          assert all(value == 0 for value in r['after_resuming_consumer'].values())
+          assert r['outcome_oracle_read'] is False
+          assert r['security_action_executed'] is False
+          assert r['ai_accuracy_or_superiority_proven'] is False
+          print('PASS: actual independently read Kafka consumer-group backlog, no causal security verdict')
+          PY
+      - name: Preserve limited broker offset evidence with no payloads
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: actual-readonly-kafka-broker-offsets
+          path: experiment-b/mechanism-lab/reports/broker-offset-observation.json
+          retention-days: 60
+      - name: Always remove isolated lab
+        if: always()
+        working-directory: experiment-b/mechanism-lab
+        run: docker compose down --volumes --remove-orphans
