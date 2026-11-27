@@ -230,7 +230,7 @@
   {
    "id": "poland-ecommerce-dec2025",
    "title": "Online Shop Server Logs for Bot Traffic and Web Usage Analysis (Dec 2025)",
-   "publisher": "Grzegorz Chodak, Wrocław University of Science and Technology",
+   "publisher": "Grzegorz Chodak, Wroc\u0142aw University of Science and Technology",
    "country": "Poland",
    "url": "https://zenodo.org/records/18895701",
    "zenodo_record": 18895701,
@@ -288,7 +288,7 @@
   {
    "id": "biblio-us17",
    "title": "Biblio-US17: labeled University of Seville HTTP URI traces",
-   "publisher": "University of Seville, Díaz-Verdejo et al.",
+   "publisher": "University of Seville, D\u00edaz-Verdejo et al.",
    "country": "Spain",
    "url": "https://doi.org/10.12795/11441/148254",
    "license": "UNVERIFIED",
@@ -325,6 +325,37 @@
    ],
    "status": "publisher_verified_not_ingested",
    "notes": "Domain A (OurAirports) reuses Superviz25-SQL verbatim; results on it are not new-domain evidence. Generator: github.com/gquetel/adapt-sql."
+  },
+  {
+   "id": "real-web-logs-indonesia",
+   "title": "Web Server Log Dataset (two public sector organizations, Indonesia)",
+   "publisher": "Anonymous authors, Zenodo",
+   "country": "Indonesia",
+   "url": "https://zenodo.org/records/20001206",
+   "zenodo_record": 20001206,
+   "license": "MIT",
+   "license_evidence": "https://zenodo.org/records/20001206",
+   "collection_environment": "real-production-public-sector-web-servers",
+   "kind": "raw-web-server-logs",
+   "evaluation_role": "real-traffic benign alert burden and rule-labeled attack detection",
+   "ground_truth": "publisher YAML pattern-matching rules; unmatched entries labeled benign; not confirmed",
+   "benign_baseline_available": true,
+   "files": [
+    {
+     "name": "organization-x.zip",
+     "md5": "b4bf79effa6f3ee1b9e53f278d916620",
+     "approx_mb": 3,
+     "ci_default": false
+    },
+    {
+     "name": "organization-y.zip",
+     "md5": "b1925ff7f043c391d501cfd404e0df10",
+     "approx_mb": 373,
+     "ci_default": false
+    }
+   ],
+   "status": "publisher_verified_not_ingested",
+   "notes": "Real production traffic with real attacks. Labels come from regex rules, so benign-labeled entries can hold unlabeled attacks."
   }
  ]
 }

@@ -24,3 +24,21 @@ jobs:
         with:
           python-version: '3.12'
       - run: python experiment-b/real-logs-indonesia/record_metadata.py 20001206
+
+  inspect:
+    if: github.event_name == 'workflow_dispatch' && github.event.inputs.stage == 'inspect'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Download with publisher checksums
+        run: |
+          for f in organization-x.zip organization-y.zip; do
+            python experiment-b/open-datasets/registry.py download --dataset real-web-logs-indonesia \
+              --file $f --output "$RUNNER_TEMP/$f" --max-mb 400
+            sha256sum "$RUNNER_TEMP/$f"
+          done
+      - run: python experiment-b/real-logs-indonesia/inspect_archive.py "$RUNNER_TEMP/organization-x.zip" "$RUNNER_TEMP/organization-y.zip"
