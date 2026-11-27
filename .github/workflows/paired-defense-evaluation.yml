@@ -1,0 +1,32 @@
+name: Paired adaptive-defense research evaluation tests
+
+on:
+  pull_request:
+    paths:
+      - 'experiment-b/mechanism-lab/paired_defense_eval.py'
+      - 'experiment-b/mechanism-lab/test_paired_defense_eval.py'
+      - '.github/workflows/paired-defense-evaluation.yml'
+  push:
+    branches: [master]
+    paths:
+      - 'experiment-b/mechanism-lab/paired_defense_eval.py'
+      - 'experiment-b/mechanism-lab/test_paired_defense_eval.py'
+      - '.github/workflows/paired-defense-evaluation.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  paired-policy-unit-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Ensure script compiles
+        run: python -m py_compile experiment-b/mechanism-lab/paired_defense_eval.py
+      - name: Test paired action scoring on synthetic fixtures only
+        working-directory: experiment-b/mechanism-lab
+        run: python -m unittest test_paired_defense_eval -v
