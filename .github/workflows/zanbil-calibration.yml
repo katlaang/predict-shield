@@ -3,7 +3,7 @@ name: Calibration comparison on real e-commerce logs (zanbil.ir)
 on:
   push:
     branches: [feat/zanbil-calibration]
-    paths: ['experiment-b/zanbil-calibration/dataverse_metadata.py']
+    paths: ['experiment-b/zanbil-calibration/peek_open_files.py']
   workflow_dispatch:
     inputs:
       stage:
@@ -22,4 +22,4 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - run: python experiment-b/zanbil-calibration/dataverse_metadata.py doi:10.7910/DVN/3QBYB5
+      - run: python experiment-b/zanbil-calibration/peek_open_files.py
