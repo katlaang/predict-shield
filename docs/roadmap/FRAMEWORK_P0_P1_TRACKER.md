@@ -74,6 +74,10 @@
 - [ ] AI-vs-fixed-defense prospective experiment completed; **model superiority remains unproven**.
 - [x] Offline paired-defense evaluator passed its unit tests; prior physical records were replayed in [CI 45920476469](https://github.com/katlaang/predict-shield/actions/runs/45920476469), recording lower AI composite cost but fewer resolved exposures than fixed restart. See [permanent report](../evidence/EXPLORATORY_PAIRED_DEFENSE_2026_11_26.md); prospective test still pending.
 - [x] Lab authority cold-restart [CI 45920083955](https://github.com/katlaang/predict-shield/actions/runs/45920083955) passed. Store hardening in PR #178 added stale-revision, same-trial unrevocation and corrupted-state protections. Repeated fault-injected crash validation and outage action comparison remain pending.
+- [x] [PR #178](https://github.com/katlaang/predict-shield/pull/178) merged: historical paired defense analyzer, matched fixed-policy comparisons, calibrated disruption-bound gate, and durable-authority revision hardening.
+- [x] [Physical authority cold restart CI 45920083955](https://github.com/katlaang/predict-shield/actions/runs/45920083955) passed. Full outage four-action experiment and repeated crash/fault-injection remain pending.
+- [x] [Historical AI action replay CI 45920476469](https://github.com/katlaang/predict-shield/actions/runs/45920476469) passed on 20 old test configurations; [permanent measured report](../evidence/EXPLORATORY_PAIRED_DEFENSE_2026_11_26.md) records lower weighted AI cost **but fewer resolved episodes than restart**.
+- [ ] New pre-registered, untouched AI-versus-fixed-policy physical evaluation completed; retrospective results cannot satisfy this gate.
 - [ ] Any external operator has signed participation and independent assessment.
 
 ## Source caveats and data governance
