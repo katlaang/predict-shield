@@ -30,7 +30,9 @@ jobs:
 
   sixteen-configuration-physical-pilot:
     needs: protocol-check
-    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository)
+    # Only PR #197 is the registered pilot. A follow-on main-tool PR must not
+    # execute another pilot with the same seed and pretend it is a new cohort.
+    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'pull_request' && github.event.pull_request.number == 197 && github.event.pull_request.base.ref == 'master' && github.event.pull_request.head.repo.full_name == github.repository)
     runs-on: ubuntu-latest
     timeout-minutes: 330
     permissions:
