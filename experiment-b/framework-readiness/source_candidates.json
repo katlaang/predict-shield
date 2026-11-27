@@ -6,41 +6,49 @@
       "id": "ugr16",
       "official_url": "https://nesg.ugr.es/nesg-ugr16/",
       "type": "historical Spanish ISP NetFlow",
-      "permission_review": "pending",
-      "source_checksum_review": "pending",
+      "permission_review": "not confirmed: original site publicly serves the files but explicit reuse/license not yet established",
+      "source_checksum_review": "pending; original ISP paper confirmed CSV projection only",
       "dataset_downloaded": false,
       "label_warning": "Publisher attack scenarios do not certify every other flow is benign.",
-      "next": "Confirm use and redistribution terms, inspect publisher time windows, pin checksums."
+      "next": "Confirm use and redistribution terms, inspect publisher time windows, pin checksums.",
+      "adapter_implemented": true,
+      "adapter_tests_only": true
     },
     {
       "id": "lanl-cyber1",
       "official_url": "https://csr.lanl.gov/data/cyber1/",
       "type": "anonymized enterprise authentication, DNS, processes, flows, red team",
-      "permission_review": "pending",
-      "source_checksum_review": "pending",
+      "permission_review": "publisher states copyright waiver; actual download still requires publisher's intended-use form",
+      "source_checksum_review": "pending; download not performed",
       "dataset_downloaded": false,
       "label_warning": "Known red-team events are partial attack truth; other events are not independently proven benign.",
-      "next": "Confirm terms and files; select small approved authentication and red-team subset, time-split by host and activity campaign."
+      "next": "Confirm terms and files; select small approved authentication and red-team subset, time-split by host and activity campaign.",
+      "adapter_implemented": true,
+      "adapter_tests_only": true
     },
     {
       "id": "mawilab",
       "official_url": "https://www.fukuda-lab.org/mawilab/",
       "type": "Internet backbone traces and anomaly annotations",
-      "permission_review": "pending",
-      "source_checksum_review": "pending",
+      "permission_review": "publisher annotation access appears public, but trace reuse may be research-only; separate permission check pending",
+      "source_checksum_review": "pending; no annotation or trace downloaded",
       "dataset_downloaded": false,
       "label_warning": "Algorithm-generated anomaly annotations are not independently verified attacks.",
-      "next": "Verify publisher trace access and reuse rules."
+      "next": "Verify publisher trace access and reuse rules.",
+      "adapter_implemented": true,
+      "adapter_tests_only": true
     },
     {
       "id": "superviz26",
       "official_url": "https://zenodo.org/records/21068333",
       "type": "generated multi-domain SQL queries",
-      "permission_review": "pending",
-      "source_checksum_review": "publisher archive MD5 available, local SHA-256 unverified",
+      "permission_review": "publisher states CC BY 4.0; full archive not downloaded; credit and overlap constraints apply",
+      "source_checksum_review": "publisher MD5 9fd0668bd5c229b1e63771d9d50972bd; local SHA256 unavailable",
       "dataset_downloaded": false,
       "label_warning": "OurAirports overlaps Superviz25; target-domain train/test also overlap among 2026 releases.",
-      "next": "Verify rights and publisher digest; use registered leak-free domain protocol."
+      "next": "Verify rights and publisher digest; use registered leak-free domain protocol.",
+      "adapter_implemented": false,
+      "adapter_tests_only": true
     }
   ]
 }
