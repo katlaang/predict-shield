@@ -1,0 +1,21 @@
+{
+ "name": "Choosing a calibration for the benign-only detector on real e-commerce logs (zanbil.ir)",
+ "registered": "2026-11-28, before the raw log was obtained or any request was read",
+ "question": "Which calibration keeps the realized benign alert rate on its 0.5% budget separately for known pages and for new pages, and does the chosen one keep it on later days it never saw?",
+ "source": {"dataset": "Zaker, Online Shopping Store - Web Server Logs, Harvard Dataverse doi:10.7910/DVN/3QBYB5, CC0 1.0", "file": "Access.log.zip", "md5": "844c1bd5c81807ccf3d8de9caab03b49", "obtained": "owner's copy (restricted on Dataverse; mirrored on Kaggle under CC0); the archive's MD5 must match the Dataverse value or the run is void"},
+ "scope_and_mapping": "Requests whose target has a query string. Template = method + path with digit runs replaced by 9 (one site). Inputs = URL-decoded query values joined by spaces. As in experiment-b/real-logs-indonesia/protocol.json.",
+ "periods": "Calendar days in the log's own offset, sorted. Development = the earliest 60% of days (rounded down, at least 2); test = the rest. Within development, the earliest two thirds of development time is the selection-fit window and the last third is the selection window. Partial first and last days count as days.",
+ "core_method": "v3 as used on the Indonesian logs: per-template input novelty, isolation forest with the template-frequency feature, benign tail probabilities, Fisher fusion, budget 0.5%, seed 2026112801. Only the calibration differs between candidates.",
+ "candidates": {
+  "C0-random": "Training rows shuffled; 40% fit, 35% calibration, 25% threshold (v3 as registered).",
+  "C1-temporal": "Training rows in time order; earliest 40% fit, next 35% calibration, last 25% threshold.",
+  "C2-temporal-strata": "C1's split, but calibration rows and threshold rows are divided into two strata, template seen in the fit rows or not, and each stratum gets its own tail-probability reference and threshold. A scored request uses the stratum of its template. If a stratum has fewer than 200 calibration or threshold rows, it falls back to the pooled C1 reference and threshold, and this is reported.",
+  "C3-temporal-abstain": "C1 for templates seen in the fit rows; requests on unseen templates are not scored, and the share of such abstentions is reported."
+ },
+ "selection": "Each candidate is fitted on the selection-fit window and scored on the selection window. Per stratum (seen, unseen relative to that candidate's fit rows) with at least 1,000 requests, realized alert rate r. Score = max over those strata of |r - 0.005|. C3 is eligible only if it abstains on at most 5% of selection-window requests; its unseen stratum is excluded from its score. Lowest score wins; scores within 0.001 tie, broken by lower abstention, then by candidate order C0 to C3.",
+ "test": "The winner is refitted with its own recipe on all development days, frozen, and scored once on the test days. All candidates are refitted and scored the same way and reported beside it as secondary results.",
+ "pass_condition": "For the winner on the test days: in every stratum with at least 1,000 requests, realized alert rate between 0.25% and 1.0%; and abstention at most 5% if the winner is C3.",
+ "reported_beside": "Alerts per day; share of requests on unseen templates; libinjection (1.1.6) SQL injection and XSS flags on input values, and the share of flagged requests that alert (an agreement measure, not a detection rate). The logs carry no attack labels.",
+ "privacy": "Query values and client addresses are never committed, printed or uploaded; committed reports hold counts only.",
+ "not_claimed": "False-positive or detection rates; behaviour on entirely new sites (one site only)."
+}
