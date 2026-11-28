@@ -1,0 +1,22 @@
+name: Prospective defense evidence audit unit tests
+
+on:
+  pull_request:
+    paths:
+      - 'experiment-b/mechanism-lab/prospective_defense_audit.py'
+      - 'experiment-b/mechanism-lab/test_prospective_defense_audit.py'
+      - '.github/workflows/prospective-defense-evidence-audit.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Python unit tests (standard library only)
+        working-directory: experiment-b/mechanism-lab
+        run: python3 -m unittest -v test_prospective_defense_audit.py
