@@ -236,7 +236,7 @@ def setup_fault(control_token: str, *, ttl_ms: int, delay_ms: int,
     if fault_target not in ENFORCERS:
         raise ValueError("Unexpected fault target")
     # "none" exists only for the preregistered negative control (controls.py).
-    if fault_mode not in {"none", "loss", "delay", "duplicate", "reorder", "consumer_paused"}:
+    if fault_mode not in {"none", "loss", "delay", "duplicate", "reorder", "consumer_paused", "withheld_publication"}:
         raise ValueError("Unsupported Kafka fault mode")
     if fault_mode == "consumer_paused":
         # v3.1 ONLY: pause the actual Spring Kafka listener container
@@ -261,13 +261,21 @@ def setup_fault(control_token: str, *, ttl_ms: int, delay_ms: int,
         else:
             raise RuntimeError("Kafka listener not physically paused with HTTP available")
     else:
-        status, _, _ = request(fault_target, f"/admin/fault/{fault_mode}/{delay_ms}",
+        # A withheld authority publication differs from a Kafka consumer fault:
+        # ALL consumers stay healthy and no event is published at the source.
+        configured = "none" if fault_mode == "withheld_publication" else fault_mode
+        status, _, _ = request(fault_target, f"/admin/fault/{configured}/{delay_ms}",
                                method="POST", token=control_token)
         if status != 200:
             raise RuntimeError("Consumer fault setup failed")
-    status, _, _ = request("authority", "/control/revoke", method="POST", token=control_token, timeout=10)
+    revoked_endpoint = ("/control/revoke-withheld"
+                        if fault_mode == "withheld_publication" else "/control/revoke")
+    status, revoked, _ = request("authority", revoked_endpoint,
+                                method="POST", token=control_token, timeout=10)
     if status != 202:
         raise RuntimeError("Policy revocation rejected")
+    if fault_mode == "withheld_publication" and revoked.get("publication_queued") is not False:
+        raise RuntimeError("Withheld fault unexpectedly published to Kafka")
     if fault_mode == "reorder":
         # Two distinct broker revisions are necessary to exercise true
         # out-of-order consumer delivery; a single held message is not enough.
@@ -600,6 +608,11 @@ def run_case(action: str, control_token: str, oracle_token: str,
             "target_http_status": healthy,
         }
     before_probes = gateway_probes(count=8)
+    if fault_mode == "withheld_publication":
+        # A physical pre-action positive control, NOT a model feature.
+        # If a publication was accidentally delivered, the trial is invalid.
+        if any(p.get("http_status") != 200 for p in before_probes):
+            raise RuntimeError("Withheld-publication fault not physically established")
     before_operator_telemetry = operator_telemetry(control_token)
     before_scope = gateway_scope_evidence(control_token, before_probes)
     before_truth = oracle_snapshot(oracle_token)

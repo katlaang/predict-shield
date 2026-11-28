@@ -34,7 +34,9 @@ SCHEMA = "predict-shield/mechanism-experiment-plan/1"
 # fault heals within the window (delay 2-3 s; loss with TTL 2.5-4 s), where
 # doing nothing is a legitimate outcome.
 SCHEMA_V31 = "predict-shield/mechanism-experiment-plan/3.1"
-FAULTS_V31 = ("loss", "consumer_paused", "delay")
+# Withheld publication is supported by the newer confirmatory registration
+# generator only; the original v3.1 generator's 1,200 trials remain unchanged.
+FAULTS_V31 = ("loss", "consumer_paused", "delay", "withheld_publication")
 SEED_V31 = 20261121
 # 20-configuration cycle: 7 persistent loss, 7 persistent listener pause,
 # 3 self-healing delay, 3 self-healing short-TTL loss.

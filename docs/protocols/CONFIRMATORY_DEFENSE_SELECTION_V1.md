@@ -41,7 +41,7 @@ The unit of analysis is the **configuration**; the three episodes within a confi
   - no unauthorized action was selected.
 
   A configuration's score is its share of successful episodes. H1 holds if the one-sided 95% lower bound of mean(AI − E) across configurations is above **−0.10**, using a bootstrap over configurations with 10,000 resamples and seed 2026112701.
-- **Secondary, H2 (disruption superiority).** This is tested only if H1 holds: fewer failed legitimate requests per configuration for AI than for E, by a one-sided Wilcoxon signed-rank test at α = 0.05.
+- **Secondary, H2 (disruption superiority).** This is tested only if H1 holds: fewer failed legitimate requests per configuration for AI than for E, by a one-sided Wilcoxon signed-rank test at α = 0.05. **Escalation (by either policy) performs no mutation and is represented by the separately measured monitor-only arm over the same fixed observation window. Its failed legitimate requests count exactly as measured in that monitor-only arm, not as an invented zero; escalation itself scores zero H1 resolutions.** Escalation remains correct only if no authorized, within-budget arm physically resolves the exposure. If all paired differences are zero, H2 does not pass.
 - **Escalation scoring.** Escalating is scored as correct only when no authorized action resolved the exposure in that configuration's executed arms. Escalating when an authorized action would have resolved it counts as a failure, so escalation is never a free pass. Neither case counts as a resolution under H1. Correct and wrong escalations are reported separately for policies 2 and 3.
 - **Not an endpoint:** composite cost. It is reported for continuity with earlier runs, but its weights are a modelling choice, so it cannot decide the result.
 
@@ -84,7 +84,7 @@ The unit of analysis is the **configuration**; the three episodes within a confi
 | Outcome | Claim |
 |---|---|
 | H1 and H2 pass | The AI is non-inferior to an expert rule on security and causes less disruption, in this lab |
-| H1 passes, H2 fails | The AI matches an expert rule |
+| H1 passes, H2 fails | The AI is non-inferior within the registered 0.10 security-success margin; disruption superiority is not demonstrated |
 | H1 fails | The AI is not shown non-inferior to an expert rule |
 
 Field or critical-infrastructure effectiveness is out of scope in every case.
@@ -92,3 +92,11 @@ Field or critical-infrastructure effectiveness is out of scope in every case.
 ## Owner
 
 The defense-selection workstream runs this test. This file only registers the design.
+
+## Implementation clarification registered before the pilot outcomes
+
+- **Five physical arms families, four intervention actions each:** The pre-existing v3.1 plan did not include the withheld-publication family. The pilot implementation adds a new *disposable-lab-only* withheld-source-publication case using the existing `/control/revoke-withheld` endpoint. Every replay separately resets the lab and measures monitor, resync, restart and gateway restriction. It verifies pre-action revoked access was allowed; fault labels stay out of the learned/expert input.
+- **Deterministic sampling:** Use `confirmatory_196_plan.py` and the SHA of the merged #196 registration commit `fbbbe898a0e1a0a37db6e5d973a2f148bcd5b320`. Pilot indices are fixed as `[0,1,2,3,4,5,6,7,8,9,10,11,12,14,16,18]` from the registered 100-configuration plan. This yields 16 configurations and covers all ten family × authorization strata; no outcome-based replacements. Distinct phase/shard namespaces prevent reuse in main. Any exact duplicate of a prior operational configuration is rejected before execution.
+- **Pilot before main:** Pilot results may estimate discordance and N, but must NOT be mixed with the main. The main cannot be executed unless the pilot raw-evidence digest, Wilson upper bound, main size and source code fingerprint are locked in a **committed** sample-size file. The registration's N cap and underpowered flag remain binding.
+- **Outcome validity:** Real v2 operator feeds, direct-target oracle, timed path exposure and legitimate-request denominator are mandatory for each physical arm; incomplete/corrupt cases are VOID or INCONCLUSIVE and retained. Partial main shards do not become scored superiority.
+- **Limits:** These remain synthetic controlled authority/Kafka/JVM mechanisms with physical HTTP action results, not a production attack-defense trial or independently authorized critical-infrastructure field test. The AI is scored offline against separately measured physical counterfactual arms.
