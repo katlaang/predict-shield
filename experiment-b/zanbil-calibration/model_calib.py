@@ -39,16 +39,21 @@ def code_hashes() -> dict:
 
 
 def check_source(path: Path, pinned: bool) -> str:
-    md5 = hashlib.md5(path.read_bytes()).hexdigest()
-    if pinned and md5 != json.loads((HERE / "protocol.json").read_text())["source"]["md5"]:
-        raise SystemExit("archive does not match the Dataverse MD5")
-    return md5
+    h = hashlib.sha256()
+    with open(path, "rb") as f:
+        for chunk in iter(lambda: f.read(1 << 22), b""):
+            h.update(chunk)
+    digest = h.hexdigest()
+    if pinned and digest != json.loads((HERE / "protocol.json").read_text())["source"]["received"]["sha256"]:
+        raise SystemExit("archive does not match the pinned SHA-256 (amendment 1)")
+    return digest
 
 
 def lines(path: Path):
     if path.suffix == ".zip":
         with zipfile.ZipFile(path) as z:
-            name = max((i for i in z.infolist() if not i.is_dir()), key=lambda i: i.file_size).filename
+            name = "access.log" if "access.log" in z.namelist() else max(
+                (i for i in z.infolist() if not i.is_dir()), key=lambda i: i.file_size).filename
             with z.open(name) as raw:
                 yield from io.TextIOWrapper(raw, encoding="utf-8", errors="replace")
     else:
@@ -177,7 +182,7 @@ def select(log: Path, out_dir: Path, pinned: bool = True) -> None:
         print("SELECT", c, json.dumps({k: results[c][k] for k in ("selection_score", "abstain_share")}),
               json.dumps(results[c]["strata"]), flush=True)
     winner = choose(results)
-    freeze = {"schema": "predict-shield/zanbil-calibration-freeze/1", "source_md5": md5, "code_sha256": code_hashes(),
+    freeze = {"schema": "predict-shield/zanbil-calibration-freeze/1", "source_sha256": md5, "code_sha256": code_hashes(),
               "days": p["days"], "dev_days": p["dev_days"], "test_days": p["test_days"],
               "counts": {k: len(p[k]) for k in ("dev", "test", "sel_fit", "sel")},
               "selection": results, "winner": winner}
@@ -196,7 +201,7 @@ def test(log: Path, frozen: Path, expected: str, output: Path, pinned: bool = Tr
         raise SystemExit("freeze record does not match")
     if code_hashes() != freeze["code_sha256"]:
         raise SystemExit("code changed after freeze")
-    if check_source(log, pinned) != freeze["source_md5"]:
+    if check_source(log, pinned) != freeze["source_sha256"]:
         raise SystemExit("log differs from the one used at selection")
     p = periods(rows(log))
     if p["test_days"] != freeze["test_days"]:

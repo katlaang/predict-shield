@@ -2,7 +2,21 @@
  "name": "Choosing a calibration for the benign-only detector on real e-commerce logs (zanbil.ir)",
  "registered": "2026-11-28, before the raw log was obtained or any request was read",
  "question": "Which calibration keeps the realized benign alert rate on its 0.5% budget separately for known pages and for new pages, and does the chosen one keep it on later days it never saw?",
- "source": {"dataset": "Zaker, Online Shopping Store - Web Server Logs, Harvard Dataverse doi:10.7910/DVN/3QBYB5, CC0 1.0", "file": "Access.log.zip", "md5": "844c1bd5c81807ccf3d8de9caab03b49", "obtained": "owner's copy (restricted on Dataverse; mirrored on Kaggle under CC0); the archive's MD5 must match the Dataverse value or the run is void"},
+ "source": {
+  "dataset": "Zaker, Online Shopping Store - Web Server Logs, Harvard Dataverse doi:10.7910/DVN/3QBYB5, CC0 1.0",
+  "file": "Access.log.zip",
+  "md5": "844c1bd5c81807ccf3d8de9caab03b49",
+  "obtained": "owner's copy (restricted on Dataverse; mirrored on Kaggle under CC0); the archive's MD5 must match the Dataverse value or the run is void",
+  "received": {
+   "copy": "Kaggle mirror eliasdabbas/web-server-access-logs (listed CC0), supplied by the owner on 2026-11-28",
+   "file": "archive.zip",
+   "sha256": "ac587ea610cb3500a145c0a015708e1def6dbf77f8ab0f510ede09cb20763f5a",
+   "members": {
+    "access.log": 3502440823,
+    "client_hostname.csv": 13453944
+   }
+  }
+ },
  "scope_and_mapping": "Requests whose target has a query string. Template = method + path with digit runs replaced by 9 (one site). Inputs = URL-decoded query values joined by spaces. As in experiment-b/real-logs-indonesia/protocol.json.",
  "periods": "Calendar days in the log's own offset, sorted. Development = the earliest 60% of days (rounded down, at least 2); test = the rest. Within development, the earliest two thirds of development time is the selection-fit window and the last third is the selection window. Partial first and last days count as days.",
  "core_method": "v3 as used on the Indonesian logs: per-template input novelty, isolation forest with the template-frequency feature, benign tail probabilities, Fisher fusion, budget 0.5%, seed 2026112801. Only the calibration differs between candidates.",
@@ -17,5 +31,13 @@
  "pass_condition": "For the winner on the test days: in every stratum with at least 1,000 requests, realized alert rate between 0.25% and 1.0%; and abstention at most 5% if the winner is C3.",
  "reported_beside": "Alerts per day; share of requests on unseen templates; libinjection (1.1.6) SQL injection and XSS flags on input values, and the share of flagged requests that alert (an agreement measure, not a detection rate). The logs carry no attack labels.",
  "privacy": "Query values and client addresses are never committed, printed or uploaded; committed reports hold counts only.",
- "not_claimed": "False-positive or detection rates; behaviour on entirely new sites (one site only)."
+ "not_claimed": "False-positive or detection rates; behaviour on entirely new sites (one site only).",
+ "amendments": [
+  {
+   "n": 1,
+   "date": "2026-11-28",
+   "before_any_request_was_read": true,
+   "change": "The run uses the Kaggle mirror, pinned by the SHA-256 above, instead of requiring the Dataverse MD5. The mirror repackages the file, so its archive MD5 cannot match Dataverse's Access.log.zip, and the inner access.log could not be compared with the restricted Dataverse copy. Only access.log is read; client_hostname.csv, which maps client addresses to host names, is never opened."
+  }
+ ]
 }
