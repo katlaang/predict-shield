@@ -1,0 +1,105 @@
+{
+ "freeze_sha256": "275c6fb25fb1222b6510d9bf0db1266698e18f59e9d74f0f8c87bf4b5f3bef55",
+ "pass_condition": "For the winner on the test days: in every stratum with at least 1,000 requests, realized alert rate between 0.25% and 1.0%; and abstention at most 5% if the winner is C3.",
+ "passed": false,
+ "results": {
+  "C0-random": {
+   "abstain_share": 0.0,
+   "agreement": 0.15447154471544716,
+   "alert_rate": 0.004454230079959664,
+   "alerts_libinjection_flagged": 38,
+   "alerts_per_day": 1625.5,
+   "libinjection_flagged": 246,
+   "requests": 729868,
+   "strata": {
+    "seen": {
+     "alerts": 1938,
+     "rate": 0.0026979543992805455,
+     "requests": 718322,
+     "scored": true
+    },
+    "unseen": {
+     "alerts": 1313,
+     "rate": 0.11371903689589469,
+     "requests": 11546,
+     "scored": true
+    }
+   },
+   "unseen_share": 0.01581929883211759
+  },
+  "C1-temporal": {
+   "abstain_share": 0.0,
+   "agreement": 0.1016260162601626,
+   "alert_rate": 0.002114080902300142,
+   "alerts_libinjection_flagged": 25,
+   "alerts_per_day": 771.5,
+   "libinjection_flagged": 246,
+   "requests": 729868,
+   "strata": {
+    "seen": {
+     "alerts": 1541,
+     "rate": 0.002162545994448389,
+     "requests": 712586,
+     "scored": true
+    },
+    "unseen": {
+     "alerts": 2,
+     "rate": 0.0001157273463719477,
+     "requests": 17282,
+     "scored": true
+    }
+   },
+   "unseen_share": 0.02367825415006549
+  },
+  "C2-temporal-strata": {
+   "abstain_share": 0.0,
+   "agreement": 0.12195121951219512,
+   "alert_rate": 0.0026470539878443774,
+   "alerts_libinjection_flagged": 30,
+   "alerts_per_day": 966.0,
+   "libinjection_flagged": 246,
+   "requests": 729868,
+   "strata": {
+    "seen": {
+     "alerts": 1849,
+     "rate": 0.0025947745254607866,
+     "requests": 712586,
+     "scored": true
+    },
+    "unseen": {
+     "alerts": 83,
+     "rate": 0.004802684874435829,
+     "requests": 17282,
+     "scored": true
+    }
+   },
+   "unseen_share": 0.02367825415006549
+  },
+  "C3-temporal-abstain": {
+   "abstain_share": 0.02367825415006549,
+   "agreement": 0.1016260162601626,
+   "alert_rate": 0.0021113406807806343,
+   "alerts_libinjection_flagged": 25,
+   "alerts_per_day": 770.5,
+   "libinjection_flagged": 246,
+   "requests": 729868,
+   "strata": {
+    "seen": {
+     "alerts": 1541,
+     "rate": 0.002162545994448389,
+     "requests": 712586,
+     "scored": true
+    },
+    "unseen": {
+     "alerts": 0,
+     "rate": 0.0,
+     "requests": 17282,
+     "scored": false
+    }
+   },
+   "unseen_share": 0.02367825415006549
+  }
+ },
+ "schema": "predict-shield/zanbil-calibration-test/1",
+ "winner": "C3-temporal-abstain"
+}

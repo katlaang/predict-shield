@@ -1,0 +1,133 @@
+{
+ "code_sha256": {
+  "model_calib.py": "7fe8ca8545f9c847a81cb1ba67262299b201f088f725b5c79132a98ea86e9ad6",
+  "model_logs.py": "d1adb00b2313339fc457c19045a2753d25720c2507578a80dad807ad084b47f0",
+  "model_sql.py": "9e8cf0b66c1a34041f816173943c7ba014ceb5e6b8346c0eba861ee3eef864ba",
+  "model_v3.py": "8df890c22184e77ab42a520f0e99c341a9981f67a1dc93b151990b0fdf8d5cdd",
+  "protocol.json": "be6a4d0f69fd92a1d946afbe49c0c316e4d696a82d333e4ee1566a80869e05bd"
+ },
+ "counts": {
+  "dev": 1170474,
+  "sel": 342795,
+  "sel_fit": 827679,
+  "test": 729868
+ },
+ "days": [
+  "2019-01-22",
+  "2019-01-23",
+  "2019-01-24",
+  "2019-01-25",
+  "2019-01-26"
+ ],
+ "dev_days": [
+  "2019-01-22",
+  "2019-01-23",
+  "2019-01-24"
+ ],
+ "freeze_sha256": "275c6fb25fb1222b6510d9bf0db1266698e18f59e9d74f0f8c87bf4b5f3bef55",
+ "schema": "predict-shield/zanbil-calibration-freeze/1",
+ "selection": {
+  "C0-random": {
+   "abstain_share": 0.0,
+   "alert_rate": 0.007809332108111262,
+   "alerts_per_day": 2677.0,
+   "cal_unseen_share": 0.012437518985943499,
+   "fallback": [],
+   "requests": 342795,
+   "selection_score": 0.09332134292565947,
+   "strata": {
+    "seen": {
+     "alerts": 2021,
+     "rate": 0.006012679882066981,
+     "requests": 336123,
+     "scored": true
+    },
+    "unseen": {
+     "alerts": 656,
+     "rate": 0.09832134292565947,
+     "requests": 6672,
+     "scored": true
+    }
+   },
+   "unseen_share": 0.0194635277644073
+  },
+  "C1-temporal": {
+   "abstain_share": 0.0,
+   "alert_rate": 0.009437127145961873,
+   "alerts_per_day": 3235.0,
+   "cal_unseen_share": 0.028327027698765567,
+   "fallback": [],
+   "requests": 342795,
+   "selection_score": 0.07422761849034523,
+   "strata": {
+    "seen": {
+     "alerts": 2558,
+     "rate": 0.007652954375467464,
+     "requests": 334250,
+     "scored": true
+    },
+    "unseen": {
+     "alerts": 677,
+     "rate": 0.07922761849034524,
+     "requests": 8545,
+     "scored": true
+    }
+   },
+   "unseen_share": 0.02492743476421768
+  },
+  "C2-temporal-strata": {
+   "abstain_share": 0.0,
+   "alert_rate": 0.010181011975087152,
+   "alerts_per_day": 3490.0,
+   "cal_unseen_share": 0.028327027698765567,
+   "fallback": [],
+   "requests": 342795,
+   "selection_score": 0.005336574420344054,
+   "strata": {
+    "seen": {
+     "alerts": 3455,
+     "rate": 0.010336574420344054,
+     "requests": 334250,
+     "scored": true
+    },
+    "unseen": {
+     "alerts": 35,
+     "rate": 0.004095962551199532,
+     "requests": 8545,
+     "scored": true
+    }
+   },
+   "unseen_share": 0.02492743476421768
+  },
+  "C3-temporal-abstain": {
+   "abstain_share": 0.02492743476421768,
+   "alert_rate": 0.007462185854519465,
+   "alerts_per_day": 2558.0,
+   "cal_unseen_share": 0.028327027698765567,
+   "fallback": [],
+   "requests": 342795,
+   "selection_score": 0.0026529543754674643,
+   "strata": {
+    "seen": {
+     "alerts": 2558,
+     "rate": 0.007652954375467464,
+     "requests": 334250,
+     "scored": true
+    },
+    "unseen": {
+     "alerts": 0,
+     "rate": 0.0,
+     "requests": 8545,
+     "scored": false
+    }
+   },
+   "unseen_share": 0.02492743476421768
+  }
+ },
+ "source_sha256": "ac587ea610cb3500a145c0a015708e1def6dbf77f8ab0f510ede09cb20763f5a",
+ "test_days": [
+  "2019-01-25",
+  "2019-01-26"
+ ],
+ "winner": "C3-temporal-abstain"
+}
