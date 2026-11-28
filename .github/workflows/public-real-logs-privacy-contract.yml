@@ -1,0 +1,26 @@
+name: Public real-user log artifact privacy contract
+
+on:
+  pull_request:
+    paths:
+      - '.github/workflows/real-logs-indonesia.yml'
+      - '.github/workflows/public-real-logs-privacy-contract.yml'
+      - 'experiment-b/real-logs-indonesia/test_artifact_privacy.py'
+      - 'experiment-b/real-logs-indonesia/model_logs.py'
+  push:
+    branches: [master]
+    paths:
+      - '.github/workflows/real-logs-indonesia.yml'
+      - 'experiment-b/real-logs-indonesia/test_artifact_privacy.py'
+
+permissions:
+  contents: read
+
+jobs:
+  no-public-raw-user-requests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check only aggregate results are publicly published and frozen code unchanged
+        run: python -m unittest -v experiment-b/real-logs-indonesia/test_artifact_privacy.py

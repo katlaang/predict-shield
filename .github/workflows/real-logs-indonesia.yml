@@ -138,9 +138,17 @@ jobs:
           git add frozen/test-report.json
           git commit -m "real-logs-indonesia: record the single test run (run ${{ github.run_id }})"
           git push origin HEAD:${{ github.ref_name }}
-      - uses: actions/upload-artifact@v4
-        if: github.event.inputs.stage == 'test'
-        with:
-          name: real-logs-review-sample
-          path: ${{ runner.temp }}/work/review
-          retention-days: 90
+      # The existing frozen experimental code uses raw request targets for
+      # CRS comparison and writes a local review staging file. NEVER upload
+      # those targets/query values/user agents to this public repository.
+      # Only aggregate committed counts are published.
+      - name: Remove raw review staging from disposable runner
+        if: always()
+        shell: bash
+        run: |
+          if [[ -d "$RUNNER_TEMP/work" ]]; then
+            rm -f "$RUNNER_TEMP/work/"*.targets.json \
+                  "$RUNNER_TEMP/work/"*.inputs.json \
+                  "$RUNNER_TEMP/work/"*.review.json
+            rm -rf "$RUNNER_TEMP/work/review"
+          fi
